@@ -1,0 +1,66 @@
+<div class="location_block_0">
+  <div class="location_exit_block">
+    <button mat-button class="location_exit" [routerLink]="['']">x</button>
+  </div>
+  <div class="location_top_bar">
+    <span *ngIf="hasLocations(); then has_locations else no_locations"></span>
+    <ng-template #no_locations>
+        <div class="no_locations location_count">No locations currently saved. Click on the map to save a locaiton.</div>
+      </ng-template>
+    <ng-template #has_locations>
+      <div class="location_sort">
+        <mat-form-field>
+          <mat-select (selectionChange)="sortLocations();" [(ngModel)]="selected_value">
+            <mat-option *ngFor="let sort of sort_selection" [value]="sort.value">{{sort.viewValue}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked();" color="primary">Show checked locations</mat-checkbox>
+      </div>
+      <div class="location_count">{{ sorted_locations.length }} locations</div>
+    </ng-template>
+  </div>
+  <ul class="location_list">
+    <li *ngFor="let location of sorted_locations" class="location_li" (click)="locationSelect($event, location)">
+      <div class="location_name">{{location.name}}</div>
+      <div class="left_block">
+        <div class="location_block_1">
+          <div class="location_coord">
+            {{location.latitude_deg}}&deg;{{location.latitude_min}}'{{location.latitude_sec}}"{{location.latitude_dir}},
+            {{location.longitude_deg}}&deg;{{location.longitude_min}}'{{location.longitude_sec}}"{{location.longitude_dir}}
+          </div>
+          <div class="location_max">(Max adjacent cells: {{formatNumber(location.maxCellConcentration)}})</div>
+      </div>
+      <div class="location_block_1">
+        <div class="location_cell">
+            <div class="location_cellC_meter">
+                <div class="location_cellC_meter_center"></div>
+                <div class="location_meter_img"></div>
+                <div class="location_meter_value" [style.background]="getPercentage(location)"></div>
+                <div class="location_cellCon" [style.color]="getColor(location, false)">{{formatNumber(location.cellConcentration)}}</div>
+                <div class="location_units">cells/mL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right_block">
+        <div class="location_block_1">
+          <div class="location_trend">
+            <div class="arrow_block">
+              <div *ngIf="getArrow(location); then location_up else location_down"></div>
+              <ng-template #location_up>
+                <div [ngClass]="['location_arrow_img', 'arrow_up', getColor(location, true)]"></div>
+              </ng-template>
+              <ng-template #location_down>
+                <div [ngClass]="['location_arrow_img', 'arrow_down', getColor(location, true)]"></div>
+              </ng-template>         
+              <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
+            </div>
+            <div class="location_cellDescript">cells/mL</div>
+            <div class="location_date_since">since {{location.changeDate}}</div>
+            <div class="location_date">Date: {{location.dataDate}}</div>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>

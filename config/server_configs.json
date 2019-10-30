@@ -1,0 +1,17 @@
+[
+	{
+		"SERVER_NAME": "UberTool-Dev",
+		"ENV": "cgi_azure_docker_dev.env",
+		"DESCRIPTION": "CGI Azure Linux server for testing."
+	},
+	{
+		"SERVER_NAME": "local",
+		"ENV": "local_dev.env",
+		"DESCRIPTION": "Local development environment."
+	},
+	{
+		"SERVER_NAME": "docker",
+		"ENV": "local_docker_dev.env",
+		"DESCRIPTION": "Local development with Docker."
+	}
+]

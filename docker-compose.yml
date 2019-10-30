@@ -1,0 +1,43 @@
+version: '2.1'
+volumes:
+  collected_static: {}
+services:
+
+  cyan-webserver:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile_Webserver
+    ports:
+      - "80:80"
+      # - "443:443"
+    links:
+      - cyan-api:uwsgi_flask
+
+  cyan-api:
+    build:
+      context: .
+      dockerfile: Dockerfile_API
+    expose:
+      - "5001"
+    depends_on:
+      - cyan-db
+    environment:
+      - DOCKER_HOSTNAME=${HOSTNAME}
+
+  cyan-db:
+    build:
+      context: .
+      dockerfile: Dockerfile_Database
+    volumes:
+      # NOTE: Optional volume for existing DB dump, defaults to blank dummy file if no dump
+      - ${SQL_DUMP:-./cyan_mysql/no_dump.txt}:/tmp/dump.sql  # use optional dump file to build container DB
+      # - /var/lib/mysql:/var/lib/mysql  # prod server existing host DB mapping
+      # - /c/ProgramData/MySQL/MySQL Server 5.6/data:/var/lib/mysql  # local windows existing DB mapping (currently throwing "not writable" error due to privilege)
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      # - MYSQL_DATABASE=${DB_NAME}
+      - DB_NAME
+      # NOTE: Below env vars create one-time pass displayed once in container stdout
+      # - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      # - MYSQL_ONETIME_PASSWORD

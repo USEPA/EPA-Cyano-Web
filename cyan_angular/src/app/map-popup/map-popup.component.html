@@ -1,0 +1,53 @@
+<div class="popup-div">
+  <mat-form-field>
+    <input matInput type="text" value="{{ locationData?.name }}" class="popup-name" (blur)="updateName($event)">
+  </mat-form-field>
+  <div class="popup-location">
+    {{locationData?.latitude_deg}}&deg;{{locationData?.latitude_min}}'{{locationData?.latitude_sec}}"{{locationData?.latitude_dir}},
+    {{locationData?.longitude_deg}}&deg;{{locationData?.longitude_min}}'{{locationData?.longitude_sec}}"{{locationData?.longitude_dir}}
+  </div>
+  <div class="popup-count-title">
+    Counts of cyanobacteria
+  </div>
+  <div class="popup-data-date">
+    Date: {{locationData?.dataDate}}
+  </div>
+  <div class="location_block_0">
+    <div class="location_block_1 left">
+      <div class="location_cell">
+        <div class="location_cellC_meter">
+            <div class="location_cellC_meter_center"></div>
+            <div class="location_meter_img"></div>
+            <div class="location_meter_value" [style.background]="getPercentage()"></div>
+            <span class="location_cellCon" [style.color]="getColor(false)">{{formatNumber(locationData?.cellConcentration)}}</span><br />
+            <span class="location_units">cells/mL</span>
+        </div>
+      </div>
+    </div>
+    <div class="location_block_1 right">
+      <span class="location_trend">
+        <!-- <span class="location_max">(Max: {{formatNumber(locationData?.maxCellConcentration)}})</span> -->
+        <span *ngIf="getArrow(); then location_up else location_down"></span>
+        <ng-template #location_up>
+            <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(true)]"></span>
+          </ng-template>
+          <ng-template #location_down>
+            <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(true)]"></span>
+        </ng-template>          
+        <span class="location_cellChange" [style.color]="getColor(true)">{{formatNumber(locationData?.concentrationChange)}}</span><br /> 
+        <span class="location_cellDescript">cells/mL<br />since {{locationData?.changeDate}}</span><br />
+      </span>
+    </div>
+  </div>
+  <div class="location_buttons">
+    <span *ngIf=" marked == 'Unmark'; then unmark else mark"></span>
+    <ng-template #unmark>
+      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
+    </ng-template>
+    <ng-template #mark>
+        <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="unmark"></span><span id="marked-label">Unmark</span> Location</button>
+      </ng-template>
+    <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation(location)"><span class="compare_icon"></span>Select to Compare</button>
+    <button type="button" class="popup-remove-btn popup-btn" (click)="deleteLocation(location)"><span class="remove_icon"></span>Remove</button>
+  </div>
+</div>
