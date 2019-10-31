@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 
 import { Options, ChangeContext } from 'ng5-slider';
 
-import { ConfigService } from '../config.service';
-import { ConcentrationRanges } from '../test-levels';
+import { ConfigService } from '../services/config.service';
+import { ConcentrationRanges } from '../test-data/test-levels';
 
 @Component({
   selector: 'app-config',
@@ -12,7 +12,6 @@ import { ConcentrationRanges } from '../test-levels';
   styleUrls: ['./config.component.css']
 })
 export class ConfigComponent implements OnInit {
-
   cyan_levels: ConcentrationRanges;
 
   low_level_0: number;
@@ -41,7 +40,7 @@ export class ConfigComponent implements OnInit {
     floor: 10000,
     ceil: 1000000,
     showSelectionBarEnd: true
-  }
+  };
 
   slider_options_alert: Options = {
     hideLimitLabels: true,
@@ -51,9 +50,9 @@ export class ConfigComponent implements OnInit {
     ceil: 5000000,
     showSelectionBarEnd: true,
     readOnly: true
-  }
+  };
 
-  constructor(private configService: ConfigService, private router: Router) { }
+  constructor(private configService: ConfigService, private router: Router) {}
 
   ngOnInit() {
     this.getRanges();
@@ -71,63 +70,54 @@ export class ConfigComponent implements OnInit {
   }
 
   getRanges(): void {
-    this.configService.getLevels().subscribe(levels => this.cyan_levels = levels);
+    this.configService.getLevels().subscribe(levels => (this.cyan_levels = levels));
   }
 
   validateValue(c: ChangeContext, slider: any): void {
-    switch(slider){
-      case "low":
-        if (this.low_level_0 >= this.low_level_1){
+    switch (slider) {
+      case 'low':
+        if (this.low_level_0 >= this.low_level_1) {
           this.low_level_0 = this.low_level_1 - 1;
           this.med_level_0 = this.low_level_1 + 1;
-        }
-        else if(this.low_level_1 >= this.med_level_1 - 1){
+        } else if (this.low_level_1 >= this.med_level_1 - 1) {
           this.med_level_0 = this.med_level_1 - 1;
           this.low_level_1 = this.med_level_0 - 1;
-        }
-        else{
+        } else {
           this.med_level_0 = this.low_level_1 + 1;
         }
         break;
-      case "med":
-        if (this.med_level_0 <= this.low_level_0){
+      case 'med':
+        if (this.med_level_0 <= this.low_level_0) {
           this.med_level_0 = this.low_level_1 + 1;
-        }
-        else if(this.med_level_0 >= this.med_level_1){
-
+        } else if (this.med_level_0 >= this.med_level_1) {
           this.med_level_0 = this.low_level_1 + 1;
           this.med_level_1 = this.med_level_0 + 1;
           this.hi_level_0 = this.med_level_1 + 1;
-        }
-        else if(this.med_level_1 >= this.hi_level_1 - 1){
+        } else if (this.med_level_1 >= this.hi_level_1 - 1) {
           this.hi_level_0 = this.hi_level_1 - 1;
           this.med_level_1 = this.hi_level_0 - 1;
-        }
-        else{
+        } else {
           this.low_level_1 = this.med_level_0 - 1;
           this.hi_level_0 = this.med_level_1 + 1;
         }
         break;
-      case "hi":
-        if (this.hi_level_0 <= this.med_level_0){
+      case 'hi':
+        if (this.hi_level_0 <= this.med_level_0) {
           this.med_level_1 = this.med_level_0 + 1;
           this.hi_level_0 = this.med_level_1 + 1;
-        }
-        else if(this.hi_level_0 >= this.hi_level_1){
+        } else if (this.hi_level_0 >= this.hi_level_1) {
           this.hi_level_1 = this.hi_level_0 + 1;
           this.med_level_1 = this.hi_level_0 - 1;
-        }
-        else{
+        } else {
           this.med_level_1 = this.hi_level_0 - 1;
         }
         this.vhi_level = this.hi_level_1;
         break;
-      case "vhi":
-        if (this.vhi_level <= this.hi_level_0){
+      case 'vhi':
+        if (this.vhi_level <= this.hi_level_0) {
           this.hi_level_1 = this.hi_level_0 + 1;
           this.vhi_level = this.hi_level_1 + 1;
-        }
-        else{
+        } else {
           this.hi_level_1 = this.vhi_level;
         }
         break;
@@ -150,10 +140,10 @@ export class ConfigComponent implements OnInit {
   }
 
   onChangeReadOnly(): void {
-    this.slider_options_alert = Object.assign({}, this.slider_options_alert, {readOnly: !this.no_alert});
+    this.slider_options_alert = Object.assign({}, this.slider_options_alert, { readOnly: !this.no_alert });
   }
 
-  exitConfig(){
+  exitConfig() {
     this.router.navigate(['']);
   }
 }

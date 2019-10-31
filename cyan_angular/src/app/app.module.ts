@@ -1,12 +1,22 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, Injector } from '@angular/core';
-import { CommonModule } from '@angular/common'
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'
+import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createCustomElement } from '@angular/elements';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSelectModule, MatCheckboxModule, MatButtonModule, MatSliderModule, MatNativeDateModule, MatInputModule, MatTabsModule, MatBottomSheetModule, MatIconModule } from '@angular/material';
+import {
+  MatSelectModule,
+  MatCheckboxModule,
+  MatButtonModule,
+  MatSliderModule,
+  MatNativeDateModule,
+  MatInputModule,
+  MatTabsModule,
+  MatBottomSheetModule,
+  MatIconModule
+} from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { Ng5SliderModule } from 'ng5-slider';
@@ -26,17 +36,16 @@ import { ChartsModule } from 'ng2-charts';
 
 import { AppRoutingModule } from './app-routing.module';
 
-import { LocationService } from './location.service';
-import { MapService } from './map.service';
-import { CyanMap } from './cyan-map';
+import { LocationService } from './services/location.service';
+import { MapService } from './services/map.service';
+import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
-import { Location } from './location';
+import { Location } from './models/location';
 import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details/location-details.component';
 import { AccountComponent } from './account/account.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-
 
 @NgModule({
   declarations: [
@@ -79,18 +88,13 @@ import { environment } from '../environments/environment';
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
-  providers: [
-    LocationService,
-    MapService,
-    CyanMap,
-    Location
-  ],
+  providers: [LocationService, MapService, CyanMap, Location],
   bootstrap: [AppComponent],
   entryComponents: [MapPopupComponent, LocationDetailsNotes]
 })
 export class AppModule {
   constructor(private injector: Injector) {
-    const PopupElement = createCustomElement(MapPopupComponent, {injector});
+    const PopupElement = createCustomElement(MapPopupComponent, { injector });
     customElements.define('popup-element', PopupElement);
   }
- }
+}
