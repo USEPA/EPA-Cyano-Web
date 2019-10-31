@@ -1,1 +1,9 @@
-dist/*
+# Angular settings
+dist/
+cyan_angular/dist/
+
+# Python settings
+config/__pycache__/
+
+# Pycharm settings
+.idea
