@@ -4,11 +4,7 @@ Builds tables for local DB that handles user account and user location informati
 
 import os
 import sys
-import sqlite3
 import mysql.connector
-
-# Local imports:
-# from models import user
 
 
 
@@ -116,18 +112,20 @@ class DBHandler(object):
 if __name__ == '__main__':
 	
 	try:
-		db_name = sys.argv[1]
+		option = int(sys.argv[1])
+	except IndexError:
+		raise Exception("No option specified.\n1-create database\n2-create table\n3-delete table")
+	try:
+		db_name = sys.argv[2]
 	except IndexError:
 		raise Exception("No db name arg specified.")
 	try:
-		table_name = sys.argv[2]
+		table_name = sys.argv[3]
 	except IndexError:
-		print("No table name specified for 2nd arg, which may not matter.")
+		print("No table name specified, which may not matter.")
 		pass
-	try:
-		option = sys.argv[3]
-	except IndexError:
-		print("No option specified.")
+
+	print("Option: {}, DB Name: {}, Table Name: {}".format(option, db_name, table_name))
 
 	dbh = DBHandler(db_name)
 
@@ -135,11 +133,13 @@ if __name__ == '__main__':
 		print("Creating database: {}".format(db_name))
 		dbh.create_database()
 	elif option == 2:
-		print("Creating User table in {}".format(db_name))
-		dbh.create_user_table()
+		print("Creating {} table in {}".format(table_name, db_name))
+		if table_name == 'user':
+			dbh.create_user_table()
+		elif table_name == 'location':
+			dbh.create_location_table()
+		else:
+			raise Exception("Table name should be 'user' or 'location'.")
 	elif option == 3:
-		print("Creating Location table in {}".format(db_name))
-		dbh.create_location_table()
-	elif option == 4:
 		print("Deleting table: {}".format(table_name))
 		dbh.delete_table(table_name)
