@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Location } from '../location';
-import { LocationService } from '../location.service'
+import { Location } from '../models/location';
+import { LocationService } from '../services/location.service';
 
 @Component({
   selector: 'app-location-compare',
@@ -9,21 +9,20 @@ import { LocationService } from '../location.service'
   styleUrls: ['./location-compare.component.css']
 })
 export class LocationCompareComponent implements OnInit {
-
   selected_locations: Location[];
 
-  constructor(private locationService: LocationService) { }
+  constructor(private locationService: LocationService) {}
 
   ngOnInit() {
     console.log(this.selected_locations);
     this.getLocations();
-    if(this.selected_locations === undefined){
+    if (this.selected_locations === undefined) {
       this.selected_locations = [];
     }
   }
 
   getLocations(): void {
-    this.locationService.getCompareLocations().subscribe(locations => this.selected_locations = locations);
+    this.locationService.getCompareLocations().subscribe(locations => (this.selected_locations = locations));
   }
 
   removeLocation(loc: Location): void {
@@ -31,10 +30,9 @@ export class LocationCompareComponent implements OnInit {
   }
 
   hasLocations(): boolean {
-    if (this.selected_locations.length > 0){
+    if (this.selected_locations.length > 0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -43,16 +41,15 @@ export class LocationCompareComponent implements OnInit {
     return this.locationService.getPercentage(l);
   }
 
-  getColor(l: Location, delta: boolean){
+  getColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
   }
 
-  getArrow(l: Location){
+  getArrow(l: Location) {
     return this.locationService.getArrow(l);
   }
 
-  formatNumber(n: number){
+  formatNumber(n: number) {
     return this.locationService.formatNumber(n);
   }
-
 }

@@ -3,9 +3,9 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { Location } from '../location';
-import { LocationService } from '../location.service';
-import { MapService } from '../map.service';
+import { Location } from '../models/location';
+import { LocationService } from '../services/location.service';
+import { MapService } from '../services/map.service';
 
 export interface Sort {
   value: string;
@@ -18,18 +18,19 @@ export interface Sort {
   styleUrls: ['./my-locations.component.css']
 })
 export class MyLocationsComponent implements OnInit {
-
   locations: Location[];
   sorted_locations: Location[];
-  selected_value: string = "name";
-  sort_selection: Sort[] = [
-    {value: "name", viewValue: "Location Name"},
-    {value: "cellcount", viewValue: "Cell Count"}
-  ];
+  selected_value: string = 'name';
+  sort_selection: Sort[] = [{ value: 'name', viewValue: 'Location Name' }, { value: 'cellcount', viewValue: 'Cell Count' }];
   show_checked: boolean = false;
   locSub: Subscription;
 
-  constructor(private router: Router, private locationService: LocationService, private mapService: MapService, private _sanitizer: DomSanitizer) { }
+  constructor(
+    private router: Router,
+    private locationService: LocationService,
+    private mapService: MapService,
+    private _sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit() {
     this.getLocations();
@@ -41,37 +42,45 @@ export class MyLocationsComponent implements OnInit {
   }
 
   getLocations(): void {
-    this.locSub = this.locationService.getLocations("").subscribe(locations => this.locations = locations);
+    this.locSub = this.locationService.getLocations('').subscribe(locations => (this.locations = locations));
   }
 
   sortLocations(): void {
-    if(this.show_checked){
-      this.sorted_locations = (this.selected_value.localeCompare("name") == 0) ? this.sorted_locations.sort((a,b) => a.name.localeCompare(b.name)) : this.sorted_locations.sort((a,b) => b.cellConcentration - a.cellConcentration );
-    }
-    else{
-      this.sorted_locations = (this.selected_value.localeCompare("name") == 0) ? this.locations.sort((a,b) => a.name.localeCompare(b.name)) : this.locations.sort((a,b) => b.cellConcentration - a.cellConcentration );
+    if (this.show_checked) {
+      this.sorted_locations =
+        this.selected_value.localeCompare('name') == 0
+          ? this.sorted_locations.sort((a, b) => a.name.localeCompare(b.name))
+          : this.sorted_locations.sort((a, b) => b.cellConcentration - a.cellConcentration);
+    } else {
+      this.sorted_locations =
+        this.selected_value.localeCompare('name') == 0
+          ? this.locations.sort((a, b) => a.name.localeCompare(b.name))
+          : this.locations.sort((a, b) => b.cellConcentration - a.cellConcentration);
     }
   }
 
-  toggleChecked(): void{
+  toggleChecked(): void {
     this.show_checked = !this.show_checked;
     this.filterLocations();
   }
 
   filterLocations(): void {
-    if(this.show_checked){
-      this.sorted_locations = this.sorted_locations.filter(a => {return a.marked == true});
-    }
-    else{
-      this.sorted_locations = (this.selected_value.localeCompare("name") == 0) ? this.locations.sort((a,b) => a.name.localeCompare(b.name)) : this.locations.sort((a,b) => b.cellConcentration - a.cellConcentration );
+    if (this.show_checked) {
+      this.sorted_locations = this.sorted_locations.filter(a => {
+        return a.marked == true;
+      });
+    } else {
+      this.sorted_locations =
+        this.selected_value.localeCompare('name') == 0
+          ? this.locations.sort((a, b) => a.name.localeCompare(b.name))
+          : this.locations.sort((a, b) => b.cellConcentration - a.cellConcentration);
     }
   }
 
   hasLocations(): boolean {
-    if (this.locations.length > 0){
+    if (this.locations.length > 0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -80,19 +89,19 @@ export class MyLocationsComponent implements OnInit {
     return this.locationService.getPercentage(l);
   }
 
-  getColor(l: Location, delta: boolean){
+  getColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
   }
 
-  getArrow(l: Location){
+  getArrow(l: Location) {
     return this.locationService.getArrow(l);
   }
 
-  formatNumber(n: number){
+  formatNumber(n: number) {
     return this.locationService.formatNumber(n);
   }
 
   locationSelect(event: any, l: Location) {
-    this.router.navigate(['/locationdetails', {location: l.id, locations: this.sorted_locations.map((ln: Location) => ln.id)}]);
+    this.router.navigate(['/locationdetails', { location: l.id, locations: this.sorted_locations.map((ln: Location) => ln.id) }]);
   }
 }

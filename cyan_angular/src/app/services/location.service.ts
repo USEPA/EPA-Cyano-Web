@@ -3,19 +3,17 @@ import { Observable, of, Subscription } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { marker, icon, Map } from 'leaflet';
 
-import { Location } from './location';
-import { UserService, UserLocations, User } from  './user.service';
-import { ConfigService } from './config.service';
-import { DownloaderService } from './downloader.service';
-import { ConcentrationRanges } from './test-levels'; 
-import { MapService } from './map.service';
-
+import { Location } from '../models/location';
+import { UserService, UserLocations, User } from '../services/user.service';
+import { ConfigService } from '../services/config.service';
+import { DownloaderService } from '../services/downloader.service';
+import { ConcentrationRanges } from '../test-data/test-levels';
+import { MapService } from '../services/map.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
-
   userLocations: UserLocations = null;
 
   test_levels: any;
@@ -24,46 +22,50 @@ export class LocationService {
   downloaderSub: Subscription;
   userSub: Subscription;
 
-  constructor(private _sanitizer: DomSanitizer, private user: UserService, private configService: ConfigService, private downloader: DownloaderService, private mapService: MapService) {
+  constructor(
+    private _sanitizer: DomSanitizer,
+    private user: UserService,
+    private configService: ConfigService,
+    private downloader: DownloaderService,
+    private mapService: MapService
+  ) {
     this.getCyanLevels();
     this.loadUser();
   }
 
-  loadUser(){
+  loadUser() {
     let self = this;
-    if(this.userSub){
+    if (this.userSub) {
       this.userSub.unsubscribe();
     }
     this.userSub = this.user.getUserDetails().subscribe((user: User) => {
-      if(user != null){
-        if(user.username != ""){
-          setTimeout(function(){
+      if (user != null) {
+        if (user.username != '') {
+          setTimeout(function() {
             self.getUserLocations();
           }, 1000);
-        }
-        else{
-          setTimeout(function(){
+        } else {
+          setTimeout(function() {
             self.loadUser();
           }, 1000);
         }
-      }
-      else{
-        setTimeout(function(){
+      } else {
+        setTimeout(function() {
           self.loadUser();
         }, 1000);
       }
-    })
+    });
   }
 
   getUserLocations() {
     let self = this;
     let username = this.user.getUserName();
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
-      if(locations.length != 0){
-        let loc = []
-        locations.forEach(function(location){
-          if(!self.locationIDCheck(location.id)){
-            let l = new Location;
+      if (locations.length != 0) {
+        let loc = [];
+        locations.forEach(function(location) {
+          if (!self.locationIDCheck(location.id)) {
+            let l = new Location();
             l.id = location.id;
             l.name = location.name;
             let coord = self.convertCoordinates(location.latitude, location.longitude);
@@ -77,41 +79,41 @@ export class LocationService {
             l.longitude_dir = coord.lngDir;
             l.cellConcentration = 0;
             l.maxCellConcentration = 0;
-            l.source = "";
+            l.source = '';
             l.concentrationChange = 0;
-            l.changeDate = "";
-            l.dataDate = "";
-            l.marked = (location.marked == "true") ? true : false;
-            l.notes = (location.notes == "") ? "" : JSON.parse(location.notes);
-            l.sourceFrequency = "";
+            l.changeDate = '';
+            l.dataDate = '';
+            l.marked = location.marked == 'true' ? true : false;
+            l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
+            l.sourceFrequency = '';
             l.validCellCount = 0;
             loc.push(l);
           }
         });
-        loc.forEach(function(ln){
+        loc.forEach(function(ln) {
           self.downloadLocation(ln, false);
         });
         let map = self.mapService.getMap();
         self.addMarkers(map);
       }
-    })
+    });
   }
 
   locationIDCheck(id: number): Boolean {
     let inLocations = false;
-    this.locations.forEach(function(location){
-      if(location.id == id){
+    this.locations.forEach(function(location) {
+      if (location.id == id) {
         inLocations = true;
       }
-    })
+    });
     return inLocations;
   }
 
   getCyanLevels(): void {
-    this.configService.getLevels().subscribe(levels => this.test_levels = levels);
+    this.configService.getLevels().subscribe(levels => (this.test_levels = levels));
   }
 
-  getAllLocations(): Observable<Location[]>{
+  getAllLocations(): Observable<Location[]> {
     return of(this.locations);
   }
 
@@ -123,31 +125,40 @@ export class LocationService {
   }
 
   getData(): void {
-    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => 
-      this.locations = locations
-    );
+    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => (this.locations = locations));
   }
 
-  getLocationData(): Observable<Location[]>{
+  getLocationData(): Observable<Location[]> {
     return of(this.locations);
   }
 
   // NOTE: Will not filter locations within service, set source type in my-locations
-  getLocations(src: string): Observable<Location[]>{
-    src = (src == "MERIS") ? "MERIS" : "OLCI";
+  getLocations(src: string): Observable<Location[]> {
+    src = src == 'MERIS' ? 'MERIS' : 'OLCI';
     //TODO: add filtering for data source
     return of(this.locations);
   }
 
-  getStaticLocations(): Location[]{
+  getStaticLocations(): Location[] {
     return this.locations;
   }
 
   getLocationByID(id: number): Location {
-    return this.locations.filter(ln => {return ln.id == id})[0];
+    return this.locations.filter(ln => {
+      return ln.id == id;
+    })[0];
   }
 
-  createLocation(name: string, latitude: number, longitude: number, cellCon: number, maxCellCon: number, cellConChange: number, dataDate: string, source: string): Location {
+  createLocation(
+    name: string,
+    latitude: number,
+    longitude: number,
+    cellCon: number,
+    maxCellCon: number,
+    cellConChange: number,
+    dataDate: string,
+    source: string
+  ): Location {
     let l = new Location();
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
@@ -165,7 +176,7 @@ export class LocationService {
     l.concentrationChange = cellConChange;
     l.dataDate = dataDate;
     l.changeDate = dataDate;
-    l.sourceFrequency = "Daily";
+    l.sourceFrequency = 'Daily';
     l.source = source;
     l.validCellCount = 9;
     l.notes = [];
@@ -177,14 +188,14 @@ export class LocationService {
   deleteLocation(ln: Location): void {
     let i = 0;
     let j = null;
-    this.locations.map(loc =>{
-      if(loc.id == ln.id){
+    this.locations.map(loc => {
+      if (loc.id == ln.id) {
         j = i;
       }
       i = i + 1;
     });
 
-    if(j !== null){
+    if (j !== null) {
       let name = this.locations[j].name;
       this.locations.splice(j, 1);
       let username = this.user.getUserName();
@@ -195,8 +206,8 @@ export class LocationService {
   updateLocation(name: string, ln: Location): void {
     let i = 0;
     let j = 0;
-    this.locations.map(loc =>{
-      if(loc.id == ln.id){
+    this.locations.map(loc => {
+      if (loc.id == ln.id) {
         j = i;
       }
       i = i + 1;
@@ -210,7 +221,7 @@ export class LocationService {
   getCompareLocations(): Observable<Location[]> {
     return of(this.compare_locations);
   }
-  
+
   addCompareLocation(ln: Location): void {
     // if(this.compare_locations == undefined){
     //   this.compare_locations = [];
@@ -219,12 +230,12 @@ export class LocationService {
     // else if(!this.compare_locations.includes(ln)){
     //   this.compare_locations.push(ln);
     // }
-    console.log("Feature not yet implemented.");
+    console.log('Feature not yet implemented.');
     // console.log(this.compare_locations);
   }
 
   deleteCompareLocation(ln: Location): void {
-    if(this.compare_locations.includes(ln)){
+    if (this.compare_locations.includes(ln)) {
       this.compare_locations.splice(this.compare_locations.indexOf(ln), 1);
     }
   }
@@ -241,36 +252,35 @@ export class LocationService {
     coordinate.latMin = Math.trunc((lat - coordinate.latDeg) * 60) % 60;
     coordinate.lngMin = Math.trunc((lng - coordinate.lngDeg) * 60) % 60;
 
-    coordinate.latSec = Math.trunc(((lat - coordinate.latDeg) - coordinate.latMin / 60) * 3600 );
-    coordinate.lngSec = Math.trunc(((lng - coordinate.lngDeg) - coordinate.lngMin / 60) * 3600 );
+    coordinate.latSec = Math.trunc((lat - coordinate.latDeg - coordinate.latMin / 60) * 3600);
+    coordinate.lngSec = Math.trunc((lng - coordinate.lngDeg - coordinate.lngMin / 60) * 3600);
 
-    coordinate.latDir = (latitude >= 0) ? "N" : "S";
-    coordinate.lngDir = (longitude >= 0) ? "E" : "W";
+    coordinate.latDir = latitude >= 0 ? 'N' : 'S';
+    coordinate.lngDir = longitude >= 0 ? 'E' : 'W';
 
     return coordinate;
   }
 
   convertToDegrees(location: Location): Degree {
     let deg = new Degree();
-    deg.latitude = location.latitude_deg + (location.latitude_min/60) + (location.latitude_sec/3600);
-    deg.longitude = location.longitude_deg + (location.longitude_min/60) + (location.longitude_sec/3600);
-    deg.latitude = (location.latitude_dir == "S") ? deg.latitude * -1: deg.latitude;
-    deg.longitude = (location.longitude_dir == "W") ? deg.longitude * -1: deg.longitude;
+    deg.latitude = location.latitude_deg + location.latitude_min / 60 + location.latitude_sec / 3600;
+    deg.longitude = location.longitude_deg + location.longitude_min / 60 + location.longitude_sec / 3600;
+    deg.latitude = location.latitude_dir == 'S' ? deg.latitude * -1 : deg.latitude;
+    deg.longitude = location.longitude_dir == 'W' ? deg.longitude * -1 : deg.longitude;
     return deg;
   }
 
   getLastID(): number {
     let startID = 100001;
-    if(this.locations.length > 0){
+    if (this.locations.length > 0) {
       let last = this.locations[0];
       this.locations.map(location => {
-        if(location.id > last.id){
+        if (location.id > last.id) {
           last = location;
         }
-      })
+      });
       return last.id;
-    }
-    else{
+    } else {
       return startID;
     }
   }
@@ -278,39 +288,35 @@ export class LocationService {
   getPercentage(l: Location) {
     let cells = l.cellConcentration;
     let p = (cells / this.test_levels.veryhigh[0]) * 100;
-    if (p > 100){
+    if (p > 100) {
       p = 100;
     }
-    return this._sanitizer.bypassSecurityTrustStyle("conic-gradient(transparent " + p.toString() +"%, #A6ACAF 0)");
+    return this._sanitizer.bypassSecurityTrustStyle('conic-gradient(transparent ' + p.toString() + '%, #A6ACAF 0)');
   }
 
-  getColor(l: Location, delta: boolean){
-    let cc = new ConcentrationRanges;
+  getColor(l: Location, delta: boolean) {
+    let cc = new ConcentrationRanges();
     let cells = l.cellConcentration;
-    if (delta){
+    if (delta) {
       cells = Math.abs(l.concentrationChange);
     }
     let c = 'green';
-    if (cells <= this.test_levels.low[0]){
+    if (cells <= this.test_levels.low[0]) {
       c = 'green';
-    }
-    else if (cells > this.test_levels.low[0] && cells <= this.test_levels.low[1]) {
+    } else if (cells > this.test_levels.low[0] && cells <= this.test_levels.low[1]) {
       c = 'green';
-    }
-    else if (cells > this.test_levels.medium[0] && cells <= this.test_levels.medium[1]) {
+    } else if (cells > this.test_levels.medium[0] && cells <= this.test_levels.medium[1]) {
       c = 'yellow';
-    }
-    else if (cells > this.test_levels.high[0] && cells <= this.test_levels.high[1]) {
+    } else if (cells > this.test_levels.high[0] && cells <= this.test_levels.high[1]) {
       c = 'orange';
-    } 
-    else if (cells > this.test_levels.veryhigh[0]) {
+    } else if (cells > this.test_levels.veryhigh[0]) {
       c = 'red';
-    } 
+    }
     return c;
   }
 
   getArrow(l: Location): boolean {
-    if (l.concentrationChange > 0){
+    if (l.concentrationChange > 0) {
       return true;
     }
     return false;
@@ -333,19 +339,19 @@ export class LocationService {
   addMarkers(map: Map): void {
     this.locations.forEach(location => {
       let self = this;
-      if(!self.mapService.hasMarker(location.id)){
+      if (!self.mapService.hasMarker(location.id)) {
         let m = marker(this.mapService.getLatLng(location), {
-          "icon": icon({
-            iconSize: [ 30, 36 ],
-            iconAnchor: [ 13, 41 ],
+          icon: icon({
+            iconSize: [30, 36],
+            iconAnchor: [13, 41],
             iconUrl: this.mapService.getMarker(location),
             shadowUrl: 'leaflet/marker-shadow.png'
           }),
-          "title": location.name,
-          "riseOnHover": true,
-          "zIndexOffset": 10000
+          title: location.name,
+          riseOnHover: true,
+          zIndexOffset: 10000
         });
-        m.on("click", function(e){
+        m.on('click', function(e) {
           let p = self.mapService.createPopup(self.getLocationByID(location.id));
           map.setView(m.getLatLng(), 12);
           m.bindPopup(p).openPopup();
@@ -355,11 +361,10 @@ export class LocationService {
       }
     });
     let self = this;
-    setTimeout(function(){
+    setTimeout(function() {
       self.addMarkers(map);
     }, 100);
   }
-
 }
 
 class Coordinate {
