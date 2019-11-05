@@ -5,6 +5,7 @@ import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
 import { Account } from '../services/user.service';
+import { environment } from '../../environments/environment';
 
 class UrlInfo {
   type: string;
@@ -62,9 +63,7 @@ export class DownloaderService {
   private baseUrl: string = 'https://cyan.epa.gov/';
   private dataUrl: string = 'cyan/cyano/location/data/'; //  complete url is baseUrl + dataUrl + LAT + "/" + LNG + "/all"
 
-  // private baseServerUrl: string = "http://127.0.0.1:8000/cyan/app/api/";      // TESTING URL
-  // private baseServerUrl: string = "http://127.0.0.1:5001/cyan/app/api/";      // TESTING URL
-  private baseServerUrl: string = '/cyan/app/api/'; // Production URL
+  private baseServerUrl: string = environment.baseServerUrl;  // see src/environments for this value
 
   data: RawData[] = [];
   locationsData: any = {};
