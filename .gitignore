@@ -3,7 +3,7 @@ dist/
 cyan_angular/dist/
 
 # Python settings
-config/__pycache__/
+__pycache__/
 
 # Pycharm settings
 .idea
