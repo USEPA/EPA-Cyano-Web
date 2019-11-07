@@ -17,99 +17,83 @@ class DBHandler(object):
 	def __init__(self, db_name):
 		self.db_name = db_name
 
-	def process_env_string(self, env_string):
-		return env_string.replace("\r", "").replace("\n", "").replace(" ", "")
-
-	def connect_to_db(self):
+	def connect_to_db(self, db_name=None):
 		conn = mysql.connector.connect(
-			host=self.process_env_string(os.environ.get('DB_HOST')),
-			port=self.process_env_string(os.environ.get('DB_PORT')),
-			user=self.process_env_string(os.environ.get('DB_USER')),
-			passwd=self.process_env_string(os.environ.get('DB_PASS')),
+			host=os.environ.get('DB_HOST'),
+			port=os.environ.get('DB_PORT'),
+			user=os.environ.get('DB_USER'),
+			passwd=os.environ.get('DB_PASS'),
+			buffered=True
 		)
-		if self.db_name:
-			conn.connect(database=self.process_env_string(self.db_name))
+		if db_name:
+			conn.connect(database=self.db_name)
 		return conn
 
-	def delete_table(self, table_name):
-		conn = self.connect_to_db()
+	def execute_query(self, query, db_name=None):
+		conn = self.connect_to_db(db_name)
 		c = conn.cursor()
+		try:
+			c.execute(query)
+		except mysql.connector.Error as e:
+			conn.close()
+			print("query_database error: {}".format(e))
+			print("query: {}".format(query))
+		conn.commit()
+		conn.close()
+		
+
+	def delete_table(self, table_name):
 		query = """
 		DROP TABLE {};
 		""".format(table_name)
-		try:
-			c.execute(query)
-		except mysql.connector.Error as e:
-			conn.close()
-			print("query_database error: {}".format(e))
-			return {"error": "Error deleting table."}
-		conn.commit()
-		conn.close()
+		self.execute_query(query, self.db_name)
 
 	def create_database(self):
-		conn = self.connect_to_db()
-		c = conn.cursor()
-		dbs = c.execute("SHOW DATABASES")
 		query = """
 		CREATE DATABASE {};
 		""".format(self.db_name)
-		try:
-			if dbs and len(dbs) < 1:
-				c.execute(query)
-		except mysql.connector.Error as e:
-			conn.close()
-			print("query_database error: {}".format(e))
-			return {"error": "Error accessing database"}
-		conn.close()
+		self.execute_query(query)
+
+	def delete_database(self):
+		query = """
+		DROP DATABASE {};
+		""".format(self.db_name)
+		self.execute_query(query)
 
 	def create_user_table(self):
-		conn = self.connect_to_db()
-		c = conn.cursor()
 		query = """
 		CREATE TABLE IF NOT EXISTS User (
-			id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			username VARCHAR(20) CHARACTER SET utf8 NOT NULL UNIQUE,
+			id INT(11) NOT NULL AUTO_INCREMENT,
+			username VARCHAR(15) CHARACTER SET utf8 NOT NULL UNIQUE,
 			email VARCHAR(50) NOT NULL UNIQUE,
-			password VARCHAR(300) NOT NULL UNIQUE,
+			password VARCHAR(256) NOT NULL UNIQUE,
 			created  DATE NOT NULL,
-			last_visit DATE NOT NULL
+			last_visit DATE NOT NULL,
+			PRIMARY KEY (id)
 		);
 		"""
-		try:
-			c.execute(query)
-		except mysql.connector.Error as e:
-			conn.close()
-			print("query_database error: {}".format(e))
-			return {"error": "Error accessing database"}
-		conn.commit()
-		conn.close()
+		self.execute_query(query, self.db_name)
 
 	def create_location_table(self):
-		conn = self.connect_to_db()
-		c = conn.cursor()
 		query = """
 		CREATE TABLE IF NOT EXISTS Location (
 			owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
-			id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			id INTEGER NOT NULL AUTO_INCREMENT,
 			name VARCHAR(256) NOT NULL,
 			latitude DECIMAL(12,10) NOT NULL,
 			longitude DECIMAL(13,10) NOT NULL,
 			marked BIT NOT NULL,
-			notes TEXT NOT NULL
+			notes TEXT NOT NULL,
+			PRIMARY KEY (id, owner)
 		);
 		"""
-		try:
-			c.execute(query)
-		except mysql.connector.Error as e:
-			conn.close()
-			print("query_database error: {}".format(e))
-			return {"error": "Error accessing database"}
-		conn.commit()
-		conn.close()
+		self.execute_query(query, self.db_name)
 
 
 
 if __name__ == '__main__':
+
+	option, db_name, table_name = None, None, None
 	
 	try:
 		option = int(sys.argv[1])
@@ -125,7 +109,7 @@ if __name__ == '__main__':
 		print("No table name specified, which may not matter.")
 		pass
 
-	print("Option: {}, DB Name: {}, Table Name: {}".format(option, db_name, table_name))
+	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 
 	dbh = DBHandler(db_name)
 
@@ -143,3 +127,14 @@ if __name__ == '__main__':
 	elif option == 3:
 		print("Deleting table: {}".format(table_name))
 		dbh.delete_table(table_name)
+	elif option == 4:
+		print("Running full setup.\nCreating database.")
+		dbh.create_database()
+		print("Creating tables.")
+		dbh.create_user_table()
+		dbh.create_location_table()
+	elif option == 5:
+		print("Removing database and tables.")
+		dbh.delete_table('user')
+		dbh.delete_table('location')
+		dbh.delete_database()
