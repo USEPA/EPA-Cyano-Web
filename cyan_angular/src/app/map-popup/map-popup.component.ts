@@ -101,6 +101,7 @@ export class MapPopupComponent implements OnInit {
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
     ln.notes.push(noteTextbox.value);  // any sort of parsing?
     this.locationService.updateLocation(ln.name, ln);
+    noteTextbox.value = "";
   }
 
   toggleMarkedLocation(ln: Location): void {
