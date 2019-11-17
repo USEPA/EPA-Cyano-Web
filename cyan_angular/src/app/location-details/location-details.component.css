@@ -489,7 +489,7 @@
     opacity: 0.80;
 }
 .details_notes {
-    width: 100%;
+    /*width: 100%;*/
     float: left;
     text-align: center;
     height: 8%;
