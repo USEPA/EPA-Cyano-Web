@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 
 import { Location } from '../models/location';
@@ -17,7 +18,7 @@ export class MapPopupComponent implements OnInit {
 
   locationSubscription: Subscription;
 
-  constructor(private locationService: LocationService, private mapService: MapService) {}
+  constructor(private locationService: LocationService, private mapService: MapService, private datePipe: DatePipe) {}
 
   ngOnInit() {
     let self = this;
@@ -96,11 +97,17 @@ export class MapPopupComponent implements OnInit {
     this.locationService.updateLocation(name, this.location);
   }
 
+  // saveNoteToLocation(ln: Location): void {
   saveNoteToLocation(ln: Location): void {
-    console.log("Save note to location button hit.");
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
-    ln.notes.push(noteTextbox.value);  // any sort of parsing?
-    this.locationService.updateLocation(ln.name, ln);
+    let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+
+    console.log("date time: " + dateTime);
+
+    this.location.notes.push({timestamp: dateTime, note: noteTextbox.value});  // any sort of parsing?
+
+    this.locationService.updateLocation(this.location.name, this.location);
+    // this.locationService.addNote(this.location.name, this.location, noteTextbox.value);
     noteTextbox.value = "";
   }
 
