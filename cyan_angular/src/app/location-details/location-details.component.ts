@@ -1,6 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material';
+
+import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
+import {MatCardModule} from '@angular/material/card';
+
 import { latLng, latLngBounds, tileLayer, marker, icon, Map, Layer, Marker, ImageOverlay, LayerGroup } from 'leaflet';
 import { Subscription } from 'rxjs';
 
@@ -484,16 +488,21 @@ export class LocationDetailsComponent implements OnInit {
   getArrow(l: Location) {
     return this.locationService.getArrow(l);
   }
+
   getColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
   }
+
   formatNumber(n: number) {
     return this.locationService.formatNumber(n);
   }
 
-  openNotes(): void {
-    this.bottomSheet.open(LocationDetailsNotes);
+  openNotes(l: Location): void {
+    this.bottomSheet.open(LocationDetailsNotes, {
+      data: { notes: l.notes }
+    });
   }
+
 }
 
 @Component({
@@ -501,10 +510,46 @@ export class LocationDetailsComponent implements OnInit {
   templateUrl: 'location-details-notes.html'
 })
 export class LocationDetailsNotes {
-  constructor(private bottomSheetRef: MatBottomSheetRef<LocationDetailsNotes>) {}
+
+  addingNote: boolean = false;
+  preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
+
+  // constructor(private bottomSheetRef: MatBottomSheetRef<LocationDetailsNotes>) {}
+  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) {}
 
   openLink(event: MouseEvent): void {
-    this.bottomSheetRef.dismiss();
+    // this.bottomSheetRef.dismiss();
     event.preventDefault();
   }
+
+  displayAddNote(): void {
+    /*
+    Displays textarea and cancel button for adding a note
+    while in the notes view.
+    */
+    this.addingNote = true;
+    this.preAddNote = false;
+  }
+
+  hideAddNote(): void {
+    /*
+    Hides textarea and cancel button for adding a note
+    while in the notes view.
+    */
+    this.addingNote = false;
+    this.preAddNote = true;
+  }
+
+  addNote(): void {
+    /*
+    Adds the note entered in the note bottom sheet.
+
+    TODO: Append the note to the notes-div in location-details-notes.html!
+    */
+    let noteTextbox = <HTMLInputElement>document.getElementById('note-textarea');  // NOTE: casted as HTMLInputElement to make Typescript happy
+    console.log("Ok we adding a note here.");
+    console.log(noteTextbox.value);
+    noteTextbox.value = "";
+  }
+
 }
