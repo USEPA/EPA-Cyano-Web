@@ -1,0 +1,8 @@
+bcrypt
+flask
+flask-cors
+flask-restful
+mysql-connector-python
+python-dotenv
+requests
+simplejson

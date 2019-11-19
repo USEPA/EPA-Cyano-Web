@@ -1,0 +1,28 @@
+router-outlet ~ * {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.menu-bar {
+    height:10%;
+    /* padding-bottom: 5px; */
+}
+app-header {
+    z-index: 5;
+}
+.footer {
+    height: 10%;
+}
+.map-window {
+    height: 80%;
+    z-index: 2;
+    position: relative;
+}
+.menu-windows {
+    width: fit-content;
+    position: absolute;
+    z-index: 100;
+    /* background: white; */
+    height: 80%;
+}

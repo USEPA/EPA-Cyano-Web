@@ -1,0 +1,102 @@
+.config-background {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    position: fixed;
+    z-index: 1000;
+}
+.config-background-click {
+    width: 100%;
+    height: 80%;
+    position: fixed;
+}
+.config-block {
+    width: fit-content;
+    height: 80%;
+    overflow-y: scroll;
+    position: relative;
+    background: #0071bc;
+    float: right;
+    color: white;
+}
+.top-block {
+    border-bottom: 1px solid #205493;
+    padding: 10px;
+}
+.config-title {
+    text-align: center;
+}
+.cyan-icon {
+    width: 20%;
+    float: left;
+    text-align: center;
+    display: inline-block;
+    margin-top: 5%;
+}
+.cyan-level {
+    padding: 10px;
+    border-bottom: 1px solid #205493;
+}
+.cyan-inputs {
+    width: 75%;
+    display: inline-block;
+    margin-left: 10px;
+}
+.inputs {
+    width: 45%;
+    float: left;
+    display: inline-block;
+    margin-bottom: -25px;
+}
+.low-level-slider {
+    width: 80%;
+}
+.med-level-slider {
+    width: 80%;
+}
+.hi-level-slider {
+    width: 80%;
+}
+.vhi-level-slider {
+    width: 80%;
+}
+.alert-level-slider {
+    width: 80%;
+}
+.circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+.green {
+    background: green;
+}
+.yellow {
+    background: yellow;
+}
+.orange {
+    background: orange;
+}
+.red {
+    background: red;
+}
+.alert-inputs {
+    width: 80%;
+    float:left;
+    display: inline-block;
+    margin-bottom: -25px;
+}
+.number-input {
+    width: 90%;
+}
+.mat-number-input {
+    width: 80%;
+}
+.config-exit {
+    margin: 3px;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}

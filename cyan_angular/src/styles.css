@@ -1,0 +1,50 @@
+/* You can add global styles to this file, and also import other style files */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Links left */
+.links-left-menu {
+    background: #205493 !important;
+    color: white;
+    text-align: left;
+}
+
+
+/* Footer Menu */
+.mat-menu-panel {
+    background: #205493;
+    color: white ;
+    margin-bottom: 15px;
+}
+.mat-menu-item:focus {
+    outline: none;
+}
+
+/* Slider */
+.ng5-slider .ng5-slider-pointer {
+    background-color: white !important;
+    width: 16px !important;
+    height: 16px !important;
+}
+.ng5-slider .ng5-slider-bar-wrapper {
+    margin-top: -24px !important;
+}
+.ng5-slider .ng5-slider-pointer:after {
+    display: none !important;
+}
+
+/* Minimap */
+.mat-tab-body-wrapper{
+    height: inherit;
+}
+
+/* Image gallery tab */
+.mat-tab-body-content {
+    overflow: hidden !important;
+    overflow-y: hidden !important;
+}

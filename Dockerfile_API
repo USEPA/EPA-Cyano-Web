@@ -1,0 +1,25 @@
+ARG version=dev
+
+FROM python:3.8-alpine
+
+RUN apk add python3-dev libffi-dev build-base linux-headers pcre-dev
+
+# Install Python Dependencies
+COPY cyan_flask/requirements.txt /tmp/
+RUN pip install --requirement /tmp/requirements.txt
+
+# Install uWSGI
+RUN pip install uwsgi
+
+# Overwrite the uWSGI config
+COPY cyan_flask/uwsgi.ini /etc/uwsgi/
+
+COPY cyan_flask/ /src/
+COPY config/ /src/config
+WORKDIR /src
+
+EXPOSE 5001
+
+RUN chmod 755 /src/start_flask.sh
+
+CMD ["sh", "/src/start_flask.sh"]
