@@ -223,15 +223,15 @@ export class LocationService {
   }
 
   addCompareLocation(ln: Location): void {
-    // if(this.compare_locations == undefined){
-    //   this.compare_locations = [];
-    //   this.compare_locations.push(ln);
-    // }
-    // else if(!this.compare_locations.includes(ln)){
-    //   this.compare_locations.push(ln);
-    // }
-    console.log('Feature not yet implemented.');
-    // console.log(this.compare_locations);
+    if(this.compare_locations == undefined){
+      this.compare_locations = [];
+      this.compare_locations.push(ln);
+    }
+    else if(!this.compare_locations.includes(ln)){
+      this.compare_locations.push(ln);
+    }
+    console.log('Feature not yet implemented. Compare locations:');
+    console.log(this.compare_locations);
   }
 
   deleteCompareLocation(ln: Location): void {
