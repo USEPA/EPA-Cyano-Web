@@ -1,6 +1,7 @@
 <h3>Notes:</h3>
 <br>
-<div id="notes-div" *ngFor="let note of data.notes">
+<!-- <div id="notes-div" *ngFor="let note of data.notes"> -->
+<div id="notes-div" *ngFor="let note of data.location.notes">
 	<h6>{{note.timestamp}}</h6>
 	<mat-card>
 		{{note.note}}
@@ -13,7 +14,7 @@
 	<button mat-raised-button id="add-note-btn" (click)="displayAddNote()" style="float:right;">Add</button>
 </div>
 <div *ngIf="addingNote">
-	<textarea id="note-textarea" placeholder="Note text" rows="2" (keyup.enter)="addNote()" style="width:100%;"></textarea>
-	<button mat-raised-button id="add-note-btn" (click)="addNote()" style="float:right;">Add</button>
+	<textarea id="note-textarea" placeholder="Note text" rows="2" (keyup.enter)="addNote(data.location)" style="width:100%;"></textarea>
+	<button mat-raised-button id="add-note-btn" (click)="addNote(data.location)" style="float:right;">Add</button>
 	<button mat-button class="add-note" id="cancel-note-tn" (click)="hideAddNote()" style="float:right;">Cancel</button>
 </div>

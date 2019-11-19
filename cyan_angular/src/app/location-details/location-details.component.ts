@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material';
+import { DatePipe } from '@angular/common';
 
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import {MatCardModule} from '@angular/material/card';
@@ -37,7 +38,7 @@ export class LocationDetailsComponent implements OnInit {
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
-  current_location: Location;
+  public current_location: Location;
   current_location_index: number;
   locations: Location[];
   imageSub: Subscription;
@@ -499,11 +500,16 @@ export class LocationDetailsComponent implements OnInit {
 
   openNotes(l: Location): void {
     this.bottomSheet.open(LocationDetailsNotes, {
-      data: { notes: l.notes }
+      data: { 
+        location: l
+      }
     });
+
   }
 
 }
+
+
 
 @Component({
   selector: 'location-details-notes',
@@ -515,7 +521,11 @@ export class LocationDetailsNotes {
   preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
 
   // constructor(private bottomSheetRef: MatBottomSheetRef<LocationDetailsNotes>) {}
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) {}
+  constructor(
+    @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
+    private datePipe: DatePipe,
+    private locationService: LocationService
+   ) {}
 
   openLink(event: MouseEvent): void {
     // this.bottomSheetRef.dismiss();
@@ -540,16 +550,20 @@ export class LocationDetailsNotes {
     this.preAddNote = true;
   }
 
-  addNote(): void {
+  addNote(l: Location): void {
     /*
     Adds the note entered in the note bottom sheet.
-
-    TODO: Append the note to the notes-div in location-details-notes.html!
     */
     let noteTextbox = <HTMLInputElement>document.getElementById('note-textarea');  // NOTE: casted as HTMLInputElement to make Typescript happy
-    console.log("Ok we adding a note here.");
-    console.log(noteTextbox.value);
-    noteTextbox.value = "";
+    let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    let noteObj = {
+      timestamp: dateTime,
+      note: noteTextbox.value
+    };
+    noteTextbox.value = "";  // clears textbox
+    noteObj.note = noteObj.note.replace(/\r?\n|\r/g, '');  // remove any newlines
+    l.notes.push(noteObj);
+    this.locationService.updateLocation(l.name, l);  // adds note to location in db
   }
 
 }
