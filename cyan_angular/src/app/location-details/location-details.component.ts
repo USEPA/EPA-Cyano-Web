@@ -136,6 +136,12 @@ export class LocationDetailsComponent implements OnInit {
     }
     this.getImages();
     this.downloadTimeSeries();
+
+    let userLocs = this.user.currentAccount.locations;
+    let locId = this.current_location.id;
+    let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
+    this.current_location.notes = JSON.parse(userLoc.notes);
+
     let self = this;
     let timeout = this.tsTicker * 1000;
     setTimeout(function() {
