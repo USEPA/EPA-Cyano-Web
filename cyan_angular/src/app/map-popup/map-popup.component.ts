@@ -6,6 +6,9 @@ import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
 
+import { DownloaderService } from '../services/downloader.service';
+import { UserService } from '../services/user.service';
+
 @Component({
   selector: 'app-map-popup',
   templateUrl: './map-popup.component.html',
@@ -18,7 +21,13 @@ export class MapPopupComponent implements OnInit {
 
   locationSubscription: Subscription;
 
-  constructor(private locationService: LocationService, private mapService: MapService, private datePipe: DatePipe) {}
+  constructor(
+    private locationService: LocationService,
+    private mapService: MapService,
+    private downloaderService: DownloaderService,
+    private user: UserService,
+    private datePipe: DatePipe
+  ) {}
 
   ngOnInit() {
     let self = this;
@@ -57,12 +66,14 @@ export class MapPopupComponent implements OnInit {
           setTimeout(function() {
             self.getLocation();
           }, 100);
-        } else {
+        }
+        else {
           if (self.locationData.name.indexOf('Update') !== -1) {
             setTimeout(function() {
               self.getLocation();
             }, 100);
-          } else {
+          }
+          else {
             self.location = self.locationData;
           }
         }
@@ -97,18 +108,29 @@ export class MapPopupComponent implements OnInit {
     this.locationService.updateLocation(name, this.location);
   }
 
-  // saveNoteToLocation(ln: Location): void {
   saveNoteToLocation(ln: Location): void {
+
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
     let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
-
     console.log("date time: " + dateTime);
 
-    this.location.notes.push({timestamp: dateTime, note: noteTextbox.value});  // any sort of parsing?
+    let noteObj = {
+      timestamp: dateTime,
+      note: noteTextbox.value
+    };
 
-    this.locationService.updateLocation(this.location.name, this.location);
-    // this.locationService.addNote(this.location.name, this.location, noteTextbox.value);
+
+    this.user.getUserLocations().subscribe((userLocs) => {
+      let userLoc = userLocs.find(locObj => locObj.id == ln.id);  // matches locId to userLocs location with same id
+      let locNotes = JSON.parse(userLoc.notes);
+      locNotes.push(noteObj);
+      userLoc.notes = locNotes;
+      this.locationService.updateLocation(userLoc.name, userLoc);
+      userLoc.notes = JSON.stringify(locNotes);
+    });
     noteTextbox.value = "";
+
+
   }
 
   toggleMarkedLocation(ln: Location): void {
