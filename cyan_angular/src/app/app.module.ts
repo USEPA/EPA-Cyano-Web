@@ -15,7 +15,8 @@ import {
   MatInputModule,
   MatTabsModule,
   MatBottomSheetModule,
-  MatIconModule
+  MatIconModule,
+  MatBadgeModule
 } from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -84,6 +85,7 @@ import { environment } from '../environments/environment';
     MatTabsModule,
     MatIconModule,
     MatBottomSheetModule,
+    MatBadgeModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
