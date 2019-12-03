@@ -79,7 +79,7 @@
         <button mat-button class="compare menu-item" [routerLink]="['/comparelocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
                 <img class="tab-icon" src="assets/images/tab_compare_icon.png"/>
-                <span class="tab-title">Compare</span>
+                <span matBadge="{{compare_locations.length || ''}}" matBadgeColor="warn" class="tab-title">Compare</span>
             </div>
         </button>
         <button mat-button disabled class="notifications menu-item">
