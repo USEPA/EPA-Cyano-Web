@@ -187,3 +187,22 @@ def edit_location(post_data):
 	values = (name, marked, notes, user, _id,)
 	location = query_database(query, values)
 	return {"status": "success"}, 200
+
+
+def get_location(user='', _id=''):
+	"""
+	Returns user location based on user and location ID.
+	TODO: How to prevent any user getting user locations if they could guess a username?
+	"""
+	query = 'SELECT * FROM Location WHERE id = %s AND owner = %s'
+	values = (_id, user,)
+	location = query_database(query, values)
+	if type(location) is dict:
+		if "error" in location.keys():
+			return {"error": "Error getting location from database."}, 200
+		else:
+			return location, 200
+	elif type(location) is list and len(location) > 0:
+		return location[0], 200
+	else:
+		return location, 200

@@ -70,13 +70,14 @@
             </div>
           </ng-template>
         </div>
-        <!-- <div class="details_notes">
-            <div class="details_note_title" (click)="openNotes()">
-              <div class="details_note_icon"></div>Notes (0)
+        <div class="details_notes">
+            <div class="details_note_title" (click)="openNotes(current_location)">
+              <img class="tab-icon" src="assets/images/details_notes.png"/>
+              <span class="tab-title">Notes ({{current_location.notes ? current_location.notes.length : '0'}})</span>
             </div>
             <div class="details_note_body"></div>
             <div class="details_note_add"></div> 
-        </div> -->
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Imagery" class="imagery_tab">

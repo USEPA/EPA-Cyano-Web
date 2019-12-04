@@ -40,6 +40,7 @@
     </div>
   </div>
   <div class="location_buttons">
+    <input id="note-input" type="text" placeholder="Add Note" (keyup.enter)="saveNoteToLocation(location)">
     <span *ngIf=" marked == 'Unmark'; then unmark else mark"></span>
     <ng-template #unmark>
       <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>

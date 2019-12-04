@@ -127,6 +127,16 @@ export class DownloaderService {
     return this.http.get(url);
   }
 
+  getUserLocation(username: string, id: number) {
+    let url = this.baseServerUrl + 'location/' + username + '/' + id;
+    // this.executeGetUserLocation(url).subscribe();
+    return this.http.get(url);
+  }
+
+  // executeGetUserLocation(url: string) {
+  //   return this.http.get(url);
+  // }
+
   ajaxRequest(id: number, username: string, name: string, marked: boolean, url: string, newLocation: boolean) {
     let self = this;
     ajax(url).subscribe(data => {

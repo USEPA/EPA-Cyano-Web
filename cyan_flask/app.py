@@ -147,6 +147,25 @@ class DeleteLocation(Resource):
 		results, status_code = web_app_api.delete_location(user, _id)
 		return results, status_code
 
+class GetLocation(Resource):
+	"""
+	Endoint for getting a user location by user and location id.
+	"""
+	def get(self, user='', _id=''):
+		# results, status_code = web_app_api.delete_location(user, _id)
+		results, status_code = web_app_api.get_location(user, _id)
+		result_obj = {
+			'owner': results[0],
+			'id': results[1],
+			'name': results[2],
+			'latitude': results[3],
+			'longitude': results[4],
+			'marked': results[5],
+			'notes': results[6]
+		}
+		results = simplejson.loads(simplejson.dumps(result_obj))
+		return results, status_code
+
 
 
 api.add_resource(StatusTest, '/test')
@@ -156,6 +175,7 @@ api.add_resource(Register, '/cyan/app/api/user/register')
 api.add_resource(AddLocation, '/cyan/app/api/location/add')
 api.add_resource(EditLocation, '/cyan/app/api/location/edit')
 api.add_resource(DeleteLocation, '/cyan/app/api/location/delete/<string:user>/<string:_id>')
+api.add_resource(GetLocation, '/cyan/app/api/location/<string:user>/<string:_id>')
 
 logging.info("CyAN Flask app started.\nLive endpoints:")
 logging.info(base_url + '/test')

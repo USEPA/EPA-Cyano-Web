@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, Injector } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -15,7 +15,8 @@ import {
   MatInputModule,
   MatTabsModule,
   MatBottomSheetModule,
-  MatIconModule
+  MatIconModule,
+  MatCardModule
 } from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -84,11 +85,12 @@ import { environment } from '../environments/environment';
     MatTabsModule,
     MatIconModule,
     MatBottomSheetModule,
+    MatCardModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
-  providers: [LocationService, MapService, CyanMap, Location],
+  providers: [LocationService, MapService, CyanMap, Location, DatePipe],
   bootstrap: [AppComponent],
   entryComponents: [MapPopupComponent, LocationDetailsNotes]
 })
