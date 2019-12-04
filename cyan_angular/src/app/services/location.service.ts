@@ -209,7 +209,8 @@ export class LocationService {
     }
   }
 
-  updateLocation(name: string, ln: Location): void {
+  // updateLocation(name: string, ln: Location): void {
+  updateLocation(name: string, ln): void {
     let i = 0;
     let j = 0;
     this.locations.map(loc => {
@@ -223,6 +224,33 @@ export class LocationService {
     let username = this.user.getUserName();
     this.downloader.editUserLocation(username, ln.id, name, ln.marked, JSON.stringify(ln.notes));
   }
+
+  // getLocation(ln: Location): any {
+  //   let i = 0;
+  //   let j = null;
+  //   this.locations.map(loc => {
+  //     if (loc.id == ln.id) {
+  //       j = i;
+  //     }
+  //     i = i + 1;
+  //   });
+
+  //   if (j !== null) {
+  //     let name = this.locations[j].name;
+  //     this.locations.splice(j, 1);
+  //     let username = this.user.getUserName();
+  //     // this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => (this.locations = locations));
+  //     // return this.downloader.getUserLocation(username, ln.id);
+  //     // this.downloader.getUserLocation(username, ln.id).subscribe(
+  //     //   data => { 
+  //     //     console.log("incoming downloader service data: ");
+  //     //     console.log(data)
+  //     //     return location
+  //     //   },
+  //     //   err => console.log(err),
+  //     //   () => console.log("done running download service."));
+  //   }
+  // }
 
   getCompareLocations(): Observable<Location[]> {
     return of(this.compare_locations);

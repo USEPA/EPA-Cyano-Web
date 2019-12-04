@@ -87,6 +87,13 @@
         margin-right: 35px;
     }
 }
+#select-text {
+    float: left;
+}
+.compare-btn {
+    background: #205493;
+    color: white;
+}
 .left_block {
     float:left;
     width: fit-content;

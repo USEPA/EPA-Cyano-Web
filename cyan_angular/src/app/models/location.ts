@@ -17,6 +17,6 @@ export class Location {
   source: string;
   sourceFrequency: string;
   validCellCount: number;
-  notes: string[];
+  notes: object[];
   marked: boolean;
 }
