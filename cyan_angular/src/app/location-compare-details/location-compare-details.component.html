@@ -1,0 +1,142 @@
+<div class="details_block_0">
+  <div class="details_loader hide"></div>
+
+  <mat-tab-group mat-stretch-tabs class="details_tab_group">
+
+    <mat-tab label="Statistics">
+      <div class="details_tab">
+
+
+        <ul class="location_list">
+          <li *ngFor="let location of locations" class="location_li">
+            <div class="location_name">{{location.name}}</div>
+            <div class="left_block">
+              <div class="location_block_1">
+                <div class="location_coord">
+                  {{location.latitude_deg}}&deg;{{location.latitude_min}}'{{location.latitude_sec}}"{{location.latitude_dir}},
+                  {{location.longitude_deg}}&deg;{{location.longitude_min}}'{{location.longitude_sec}}"{{location.longitude_dir}}
+                </div>
+                <div class="location_max">(Max adjacent cells: {{formatNumber(location.maxCellConcentration)}})</div>
+            </div>
+            <div class="location_block_1">
+              <div class="location_cell">
+                  <div class="location_cellC_meter">
+                      <div class="location_cellC_meter_center"></div>
+                      <div class="location_meter_img"></div>
+                      <div class="location_meter_value" [style.background]="getPercentage(location)"></div>
+                      <div class="location_cellCon" [style.color]="getColor(location, false)">{{formatNumber(location.cellConcentration)}}</div>
+                      <div class="location_units">cells/mL</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="right_block">
+              <div class="location_block_1">
+                <div class="location_trend">
+                  <div class="arrow_block">
+                    <div *ngIf="getArrow(location); then location_up else location_down"></div>
+                    <ng-template #location_up>
+                      <div [ngClass]="['location_arrow_img', 'arrow_up', getColor(location, true)]"></div>
+                    </ng-template>
+                    <ng-template #location_down>
+                      <div [ngClass]="['location_arrow_img', 'arrow_down', getColor(location, true)]"></div>
+                    </ng-template>         
+                    <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
+                  </div>
+                  <div class="location_cellDescript">cells/mL</div>
+                  <div class="location_date_since">since {{location.changeDate}}</div>
+                  <div class="location_date">Date: {{location.dataDate}}</div>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+
+        <!-- Displays current_location information, borrowed from location-details component -->
+<!--         <div class="details_cyan_left">
+          <div class="details_cyan_arrow_box">
+            <div class="details_cyan_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location?.concentrationChange)}}</div>       
+            <span *ngIf="getArrow(current_location); then location_up else location_down"></span>
+            <ng-template #location_up>
+              <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(current_location, true)]"></span>
+            </ng-template>
+            <ng-template #location_down>
+              <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(current_location, true)]"></span>            
+            </ng-template>    
+          </div>
+        </div>
+        <div class="details_cyan_right">
+          <div class="details_cell_units">cells/mL</div>
+          <div class="details_date">since {{current_location?.changeDate}}</div>
+          <div class="details_counts">(Max: {{current_location.maxCellConcentration}}, Valid: {{current_location.validCellCount}})</div>
+        </div>
+        <div *ngIf="selectedLayer">
+          <div class="details_slider">
+            <div class="slider_title">Image Opacity</div>
+            <mat-slider class="opacity_slider" [thumbLabel]="showSliderValue" [(ngModel)]="opacityValue" min="0" max="1" value="0.7" step="0.01" color="primary" (change)="changeOpacity($event);"></mat-slider>
+          </div>
+          <div class="details_image_name">
+            <div class="details_name">Satellite {{ getImageName() }}</div>
+            <div class="details_date">{{ getImageDate() }}</div>
+          </div>
+          <div class="details_slideshow">
+            <mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">Slideshow</mat-checkbox>
+          </div>
+        </div> -->
+
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Blooming Chart">
+      <div class="chart_header">
+        <div class="chart_title">Blooming Chart</div>
+        <div class="chart_source_selection"></div>
+      </div>
+      <div class="chart_graph" *ngIf="dataDownloaded">
+        <canvas baseChart class="cyan_chart" width="1" height="1"
+          [datasets]="chartData"
+          [labels]="chartDataLabels"
+          [options]="chartOptions"
+          [colors]="chartColors"
+          [legend]="chartLegend"
+          [chartType]="chartType"
+          (chartHover)="chartHover($event)"></canvas>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Map" class="imagery_tab">
+      <div class="mini_map_block">
+          <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
+      </div>
+<!--       <div class="imagery_dates">
+        <div class="imagery_date_title">Date Range:</div>
+        <mat-form-field class="date_input">
+          <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="startpicker" placeholder="From" [(ngModel)]="startDate" (dateChange)="updateFilter()">
+          <mat-datepicker-toggle matSuffix [for]="startpicker"></mat-datepicker-toggle>
+          <mat-datepicker #startpicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="date_input">
+          <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="endpicker" placeholder="To" [(ngModel)]="endDate" (dateChange)="updateFilter()">
+          <mat-datepicker-toggle matSuffix [for]="endpicker"></mat-datepicker-toggle>
+          <mat-datepicker #endpicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div *ngIf="loading; else imagesLoaded">
+        <div class="imagery_loader">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      </div>
+      <ng-template #imagesLoaded>
+        <div class="imagery_gallery">
+          <div *ngFor="let thumb of filteredPNGs">
+            <div class="image_thumb" (click)="downloadImage($event, thumb)">
+              <img class="png_image" title="Download image for {{ getImageDate2(thumb) }}" src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
+            </div>           
+          </div>
+        </div>
+      </ng-template> -->
+    </mat-tab>
+
+  </mat-tab-group>
+</div>
