@@ -19,8 +19,6 @@ import { UserService } from '../services/user.service';
 })
 export class LocationCompareDetailsComponent implements OnInit {
 
-  baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
-
   currentLocaitonData: RawData;
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
@@ -28,8 +26,6 @@ export class LocationCompareDetailsComponent implements OnInit {
   locationPNGs: ImageDetails[];
 
   filteredPNGs: ImageDetails[];
-
-  // productFrequency: string = 'Weekly';
 
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
@@ -56,16 +52,17 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   // Variables for chart
   dataDownloaded: boolean = false;
-  @Input() chartData: Array<any> = [
-    {
-      data: [],
-      label: ''
-    }
-  ];
+  @Input() chartData: Array<any> = [];
   @Input() chartDataLabels: Array<any> = [];
   public chartOptions: any = {
     responsive: true,
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
+    scales: {
+    	xAxes: [{
+    		type: "time",
+    		time: { parser: "MM-DD-YYYY" }
+    	}]
+    }
   };
   public chartColors: Array<any> = [
     {
@@ -133,18 +130,75 @@ export class LocationCompareDetailsComponent implements OnInit {
     } else {
       this.current_location_index = 1;
     }
-    // this.getImages();
-    this.downloadTimeSeries();
+
+    // Gets time series data and plots it for each location:
+   	this.locations.forEach(location => {
+   		this.downloadTimeSeries(location);
+   	});
+
     let self = this;
     let timeout = this.tsTicker * 1000;
     setTimeout(function() {
       self.tsSub.unsubscribe();
       if (!self.dataDownloaded) {
-        self.downloadTimeSeries();
+        self.downloadTimeSeries(this.current_location);
       } else {
         self.tsTicker = 1;
       }
     }, timeout);
+  }
+
+  downloadTimeSeries(l: Location) {
+    let coord = this.locationService.convertToDegrees(l);
+    let username = this.user.getUserName();
+    this.downloader.getAjaxData(
+      l.id,
+      username,
+      l.name,
+      l.marked,
+      coord.latitude,
+      coord.longitude,
+      false
+    );
+    this.chartDataLabels = [];
+    let self = this;
+    this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
+      let data = rawData[l.id].requestData;
+      let ts = [];
+      let labels = [];
+      data.outputs.map(timestep => {
+        if (timestep.satelliteImageFrequency == 'Weekly') {
+          ts.push(timestep.cellConcentration);
+          labels.push(timestep.imageDate.split(' ')[0]);
+        }
+      });
+      ts = ts.reverse();
+      labels = labels.reverse();
+
+      console.log("Adding time series data to chart.");
+
+      // Builds data var like [{x: '', y: ''}, {}...]
+      let timeSeriesData = []
+      let i = 0;
+      ts.forEach(item => {
+      	let datum = {x: null, y: null};
+      	datum.x = labels[i];
+      	datum.y = item;
+      	timeSeriesData[i] = datum;
+      	i++;
+      });
+
+      // Adds time series line to chart:
+      this.chartData.push({
+      	data: timeSeriesData,
+      	label: l.name
+      });
+
+      setTimeout(function() {
+        // self.chartDataLabels = labels;
+      }, 100);
+      this.dataDownloaded = true;
+    });
   }
 
   onMapReady(map: Map): void {
