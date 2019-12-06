@@ -50,6 +50,8 @@ export class LocationCompareDetailsComponent implements OnInit {
   loadTicker = 1;
   opacityValue = 0.7;
 
+  showMap = false;
+
   // Variables for chart
   dataDownloaded: boolean = false;
   @Input() chartData: Array<any> = [];
@@ -201,36 +203,44 @@ export class LocationCompareDetailsComponent implements OnInit {
     });
   }
 
+  displayMap($event): void {
+  	if ($event.index == 2) {
+  		this.showMap = true;
+  	}
+  	else {
+  		this.showMap = false;
+  	}
+  }
+
   onMapReady(map: Map): void {
-
-  	console.log("On map ready called inside location-compare-details.");
-
-    let marker = this.createMarker();
-    this.mapService.setMinimap(map, marker);
+    let markerArray = [];
+    let latLngArray = [];
+    map.invalidateSize();  // will this fix the gray map?
+    this.mapService.setMinimap(map, null);
+    this.locations.forEach(loc => {
+      let marker = this.createMarker(loc);
+      this.mapService.setMiniMarkerForCompare(marker);
+      latLngArray.push(this.mapService.getLatLng(loc));
+    });
     setTimeout(() => {
       map.invalidateSize();
-      map.flyTo(this.mapService.getLatLng(this.current_location));
+      map.flyToBounds(latLngArray);
     }, 200);
   }
 
-  createMarker(): Marker {
-    let m = marker(this.mapService.getLatLng(this.current_location), {
+  createMarker(loc: Location): Marker {
+    let m = marker(this.mapService.getLatLng(loc), {
       icon: icon({
         iconSize: [30, 36],
         iconAnchor: [13, 41],
-        iconUrl: this.mapService.getMarker(this.current_location),
+        iconUrl: this.mapService.getMarker(loc),
         shadowUrl: 'leaflet/marker-shadow.png'
       }),
-      title: this.current_location.name,
+      title: loc.name,
       riseOnHover: true,
       zIndexOffset: 10000
     });
     return m;
-  }
-
-  changeMarker(): void {
-    this.mapService.setMiniMarker(this.createMarker());
-    this.mapService.getMinimap().flyTo(this.mapService.getLatLng(this.current_location), 6);
   }
 
   getArrow(l: Location) {
