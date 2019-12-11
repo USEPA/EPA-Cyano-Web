@@ -6,13 +6,15 @@ import { MyLocationsComponent } from './my-locations/my-locations.component';
 import { LocationCompareComponent } from './location-compare/location-compare.component';
 import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent } from './location-details/location-details.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 const routes: Routes = [
     { path: 'account', component: AccountComponent },
-    { path: 'mylocations', component: MyLocationsComponent},
-    { path: 'comparelocations', component: LocationCompareComponent},
-    { path: 'configs', component: ConfigComponent},
-    { path: 'locationdetails', component: LocationDetailsComponent}
+    { path: 'mylocations', component: MyLocationsComponent },
+    { path: 'comparelocations', component: LocationCompareComponent },
+	{ path: 'notifications', component: NotificationsComponent },
+    { path: 'configs', component: ConfigComponent },
+    { path: 'locationdetails', component: LocationDetailsComponent }
 ];
 
 @NgModule({
