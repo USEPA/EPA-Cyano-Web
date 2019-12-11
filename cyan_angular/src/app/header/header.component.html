@@ -82,10 +82,10 @@
                 <span class="tab-title">Compare</span>
             </div>
         </button>
-        <button mat-button disabled class="notifications menu-item">
+        <button mat-button class="notifications menu-item" [routerLink]="['/notifications']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
                 <img class="tab-icon" src="assets/images/tab_notifications_icon.png"/>
-                <span class="tab-title">Notifications</span>
+                <span matBadge="{{new_notifications.length || ''}}" matBadgeColor="warn" class="tab-title">Notifications</span>
             </div>
         </button>
         <button mat-button disabled class="coordinates menu-item">
