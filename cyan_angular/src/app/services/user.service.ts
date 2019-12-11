@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of} from 'rxjs';
+import { Observable, of, Subscription, Subject } from 'rxjs';
 
 import { DownloaderService } from './downloader.service';
 
@@ -14,16 +14,22 @@ export class UserService {
       username: "",
       email: ""
     },
-    locations : [] 
+    locations : [],
+    notifications: []
   };
   response: any = null;
+
+  private allNotificationsSource = new Subject<UserNotifications[]>();  // obserable Notifications[] sources
+  allNotifications$ = this.allNotificationsSource.asObservable();  // observable Notifications[] streams
 
   constructor(private downloader: DownloaderService) { }
 
   loginUser(username: string, password: string) {
-    this.downloader.userLogin(username, password).subscribe((details: any) => {
+    this.downloader.userLogin(username, password).subscribe((details: Account) => {
+      console.log("(user.service.ts) Logging in user.");
       this.currentAccount = null;
       this.currentAccount = details;
+      this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
     });
   }
 
@@ -35,12 +41,14 @@ export class UserService {
           this.currentAccount.user.username = response['username'];
           this.currentAccount.user.email = response['email'];
           this.currentAccount.locations = [];
+          this.currentAccount.notifications = [];
           this.response = response;
         }
         else{
           this.currentAccount.user.username = response['username'];
           this.currentAccount.user.email = response['email'];
           this.currentAccount.locations = [];
+          this.currentAccount.notifications = [];
         }
       }
       else{
@@ -86,7 +94,16 @@ export class UserLocations {
   notes: string;
 }
 
+export class UserNotifications {
+  id: number;
+  date: string;
+  subject: string;
+  body: string;
+  is_new: boolean;
+}
+
 export class Account {
   user: User;
   locations: UserLocations[];
+  notifications: UserNotifications[];
 }
