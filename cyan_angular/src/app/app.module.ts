@@ -16,6 +16,7 @@ import {
   MatTabsModule,
   MatBottomSheetModule,
   MatIconModule,
+  MatBadgeModule,
   MatCardModule
 } from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -47,6 +48,7 @@ import { LocationDetailsComponent, LocationDetailsNotes } from './location-detai
 import { AccountComponent } from './account/account.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +65,8 @@ import { environment } from '../environments/environment';
     ConfigComponent,
     LocationDetailsComponent,
     LocationDetailsNotes,
-    AccountComponent
+    AccountComponent,
+    LocationCompareDetailsComponent
   ],
   imports: [
     BrowserModule,
@@ -85,6 +88,7 @@ import { environment } from '../environments/environment';
     MatTabsModule,
     MatIconModule,
     MatBottomSheetModule,
+    MatBadgeModule,
     MatCardModule,
     Ng5SliderModule,
     BrowserAnimationsModule,

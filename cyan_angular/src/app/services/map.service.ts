@@ -43,6 +43,13 @@ export class MapService {
     }
   }
 
+  setMiniMarkerForCompare(mk: Marker): void {
+    if (mk != undefined) {
+      this.cyanMap.miniMarker = mk;
+      this.cyanMap.miniMap.addLayer(mk);
+    } 
+  }
+
   getMap(): Map {
     return this.cyanMap.map;
   }

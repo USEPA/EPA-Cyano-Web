@@ -1,4 +1,6 @@
 import { Component, OnInit, NgModule } from '@angular/core';
+import { LocationService } from '../services/location.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -9,11 +11,20 @@ export class HeaderComponent implements OnInit {
 
   title = "Cyanobacteria Assessment Network";
   titleAbr = "CyAN";
+  compare_locations = {};
+  locationSubscription: Subscription;
 
-  constructor() { }
+  constructor(private locationService: LocationService) { }
 
   ngOnInit() {
+		this.locationSubscription = this.locationService.compare$.subscribe(
+			locations => {
+				this.compare_locations = locations
+		});
   }
 
+	ngOnDestroy() {
+		this.locationSubscription.unsubscribe();
+	}
 
 }
