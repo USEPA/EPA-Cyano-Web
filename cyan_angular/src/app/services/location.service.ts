@@ -1,5 +1,5 @@
 import { Injectable, Input } from '@angular/core';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of, Subscription, Subject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { marker, icon, Map } from 'leaflet';
 
@@ -19,6 +19,11 @@ export class LocationService {
   test_levels: any;
   @Input() locations: Location[] = [];
   @Input() compare_locations: Location[] = [];
+
+  // Inspired by: https://angular.io/guide/component-interaction#parent-and-children-communicate-via-a-service
+  private compareLocationsSource = new Subject<Location[]>();  // observable Location[] sources
+  compare$ = this.compareLocationsSource.asObservable();  // observable Location[] streams
+
   downloaderSub: Subscription;
   userSub: Subscription;
 
@@ -31,6 +36,7 @@ export class LocationService {
   ) {
     this.getCyanLevels();
     this.loadUser();
+    // this.compareLocations = new Subject<Location[]>();
   }
 
   loadUser() {
@@ -251,15 +257,18 @@ export class LocationService {
   }
 
   addCompareLocation(ln: Location): void {
-    // if(this.compare_locations == undefined){
-    //   this.compare_locations = [];
-    //   this.compare_locations.push(ln);
-    // }
-    // else if(!this.compare_locations.includes(ln)){
-    //   this.compare_locations.push(ln);
-    // }
-    console.log('Feature not yet implemented.');
-    // console.log(this.compare_locations);
+    if(this.compare_locations == undefined){
+      this.compare_locations = [];
+      this.compare_locations.push(ln);
+    }
+    else if(!this.compare_locations.includes(ln)){
+      this.compare_locations.push(ln);
+    }
+    console.log('Feature not yet implemented. Compare locations:');
+    console.log(this.compare_locations);
+
+    this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
+
   }
 
   deleteCompareLocation(ln: Location): void {

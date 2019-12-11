@@ -6,6 +6,7 @@ import { MyLocationsComponent } from './my-locations/my-locations.component';
 import { LocationCompareComponent } from './location-compare/location-compare.component';
 import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent } from './location-details/location-details.component';
+import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 
 const routes: Routes = [
@@ -14,7 +15,8 @@ const routes: Routes = [
     { path: 'comparelocations', component: LocationCompareComponent },
 	{ path: 'notifications', component: NotificationsComponent },
     { path: 'configs', component: ConfigComponent },
-    { path: 'locationdetails', component: LocationDetailsComponent }
+    { path: 'locationdetails', component: LocationDetailsComponent },
+    { path: 'locationcomparedetails', component: LocationCompareDetailsComponent }
 ];
 
 @NgModule({

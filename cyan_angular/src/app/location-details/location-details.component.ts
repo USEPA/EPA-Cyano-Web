@@ -23,6 +23,7 @@ import { UserService } from '../services/user.service';
 	styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsComponent implements OnInit {
+// <<<<<<< Updated upstream
 	baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
 
 	currentLocaitonData: RawData;

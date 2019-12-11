@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -11,7 +12,11 @@ import { LocationService } from '../services/location.service';
 export class LocationCompareComponent implements OnInit {
   selected_locations: Location[];
 
-  constructor(private locationService: LocationService) {}
+  constructor(
+    private locationService: LocationService,
+    private route: ActivatedRoute,
+    private router: Router
+   ) {}
 
   ngOnInit() {
     console.log(this.selected_locations);
@@ -51,5 +56,18 @@ export class LocationCompareComponent implements OnInit {
 
   formatNumber(n: number) {
     return this.locationService.formatNumber(n);
+  }
+
+  compareLocations() {
+    /*
+    Opens location compare details.
+    */
+    console.log("compareLocations called.");
+    this.router.navigate(['/locationcomparedetails',
+      {
+        locations: this.selected_locations.map((ln: Location) => ln.id),
+        current_location: this.selected_locations[0].id  // testing with current_location
+      }
+    ]);
   }
 }

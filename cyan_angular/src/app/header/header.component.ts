@@ -12,21 +12,18 @@ export class HeaderComponent implements OnInit {
 
   title = "Cyanobacteria Assessment Network";
   titleAbr = "CyAN";
-
+  compare_locations = [];
+  locationSubscription: Subscription;
   new_notifications = [];
   notificationSubscription: Subscription;
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private locationService: LocationService
   ) { }
 
   ngOnInit() {
-   //  let self = this;
-  	// setTimeout(function() {
-   //    self.userService.getAllNotifications();
-   //  }, 100);
 
-  	// Does this subscrition make sense?
     this.notificationSubscription = this.userService.allNotifications$.subscribe(
       	notifications => {
         	console.log("Received notifications update in header component.");	
@@ -34,17 +31,17 @@ export class HeaderComponent implements OnInit {
      	}
      );
 
-    // this.notificationService.getAllNotifications().subscribe(
-    // 	notifications => {
-	   //      console.log("Notifications: ");
-	   //      console.log(notifications);
-    // 	}
-    // );
+    this.locationSubscription = this.locationService.compare$.subscribe(
+		locations => {
+			this.compare_locations = locations
+		}
+    );
+
   }
 
   ngOnDestroy() {
     this.notificationSubscription.unsubscribe();
+    this.locationSubscription.unsubscribe();
   }
-
 
 }
