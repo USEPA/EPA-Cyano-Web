@@ -16,6 +16,7 @@ import {
   MatTabsModule,
   MatBottomSheetModule,
   MatIconModule,
+  MatBadgeModule,
   MatCardModule
 } from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -86,6 +87,7 @@ import { environment } from '../environments/environment';
     MatIconModule,
     MatBottomSheetModule,
     MatCardModule,
+    MatBadgeModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
