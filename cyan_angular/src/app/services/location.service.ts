@@ -225,33 +225,6 @@ export class LocationService {
     this.downloader.editUserLocation(username, ln.id, name, ln.marked, JSON.stringify(ln.notes));
   }
 
-  // getLocation(ln: Location): any {
-  //   let i = 0;
-  //   let j = null;
-  //   this.locations.map(loc => {
-  //     if (loc.id == ln.id) {
-  //       j = i;
-  //     }
-  //     i = i + 1;
-  //   });
-
-  //   if (j !== null) {
-  //     let name = this.locations[j].name;
-  //     this.locations.splice(j, 1);
-  //     let username = this.user.getUserName();
-  //     // this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => (this.locations = locations));
-  //     // return this.downloader.getUserLocation(username, ln.id);
-  //     // this.downloader.getUserLocation(username, ln.id).subscribe(
-  //     //   data => { 
-  //     //     console.log("incoming downloader service data: ");
-  //     //     console.log(data)
-  //     //     return location
-  //     //   },
-  //     //   err => console.log(err),
-  //     //   () => console.log("done running download service."));
-  //   }
-  // }
-
   getCompareLocations(): Observable<Location[]> {
     return of(this.compare_locations);
   }
@@ -264,11 +237,7 @@ export class LocationService {
     else if(!this.compare_locations.includes(ln)){
       this.compare_locations.push(ln);
     }
-    console.log('Feature not yet implemented. Compare locations:');
-    console.log(this.compare_locations);
-
     this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
-
   }
 
   deleteCompareLocation(ln: Location): void {
