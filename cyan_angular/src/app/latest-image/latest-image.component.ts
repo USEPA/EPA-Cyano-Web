@@ -82,18 +82,6 @@ export class LatestImageComponent implements OnInit {
 
 		this.getImages();
 
-		// this.route.params.subscribe(
-		// 	params =>
-		// 		(this.locations =
-		// 			params['locations'] != undefined
-		// 				? params['locations'].split(',').map(id => this.locationService.getLocationByID(id))
-		// 				: this.locationService.getStaticLocations())
-		// );
-		// this.route.params.subscribe(
-		// 	params =>
-		// 		(this.current_location =
-		// 			params['location'] != undefined ? this.locationService.getLocationByID(params['location']) : this.locations[0])
-		// );
 	}
 
 	exit(): void {
