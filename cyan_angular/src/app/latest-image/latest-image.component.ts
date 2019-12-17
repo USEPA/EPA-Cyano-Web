@@ -192,9 +192,8 @@ export class LatestImageComponent implements OnInit {
 			this.selectedLayer = pngImage;
 			this.layer = newLayer;
 			this.layer.addTo(map);
-			map.setZoom(10);
+			map.setZoom(6);
 			map.flyTo(this.mapService.getLatLng(this.location));
-			// event.path[1].classList.add('selected');
 		} else if (this.selectedLayer == pngImage) {
 			this.selectedLayer = null;
 			this.selectedLayerIndex = null;
@@ -208,9 +207,8 @@ export class LatestImageComponent implements OnInit {
 			this.layer.removeFrom(map);
 			this.layer = newLayer;
 			this.layer.addTo(map);
-			map.setZoom(10);
+			map.setZoom(6);
 			map.flyTo(this.mapService.getLatLng(this.location));
-			// event.path[1].classList.add('selected');
 		}
 	}
 
