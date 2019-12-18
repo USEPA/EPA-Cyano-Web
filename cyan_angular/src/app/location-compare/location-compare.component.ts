@@ -31,7 +31,11 @@ export class LocationCompareComponent implements OnInit {
   }
 
   removeLocation(loc: Location): void {
-    this.locationService.deleteCompareLocation(loc);
+    // Removes location from selected locations array:
+    let locIndex = this.selected_locations.map((item) => { return item.id; }).indexOf(loc.id);
+    if (locIndex > -1) {
+      this.selected_locations.splice(locIndex, 1);
+    }
   }
 
   hasLocations(): boolean {
