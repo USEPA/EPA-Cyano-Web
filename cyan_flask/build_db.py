@@ -89,11 +89,25 @@ class DBHandler(object):
 		"""
 		self.execute_query(query, self.db_name)
 
+	def create_user(self, user, password):
+		"""
+		Creates a user for flask backend.
+		"""
+		query = "CREATE USER '{}'@'localhost' IDENTIFIED BY '{}';".format(user, password)
+		self.execute_query(query)
+
+	def add_privilege(self, user):
+		"""
+		Adds user privilege.
+		"""
+		query = "GRANT SELECT, INSERT, DELETE, UPDATE ON {}.* TO '{}'@'localhost';".format(self.db_name, user)
+		self.execute_query(query)
+
 
 
 if __name__ == '__main__':
 
-	option, db_name, table_name = None, None, None
+	option, db_name, table_name, user_name, user_pass = None, None, None, None, None
 	
 	try:
 		option = int(sys.argv[1])
@@ -106,7 +120,13 @@ if __name__ == '__main__':
 	try:
 		table_name = sys.argv[3]
 	except IndexError:
-		print("No table name specified, which may not matter.")
+		print("No table name specified, which is only needed for options 2 and 3.")
+		pass
+	try:
+		user_name = sys.argv[4]
+		user_pass = input("Please enter a password for {}: ".format(user_name))
+	except IndexError:
+		print("No user name specified, which is only needed for option 6.")
 		pass
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
@@ -138,3 +158,7 @@ if __name__ == '__main__':
 		dbh.delete_table('user')
 		dbh.delete_table('location')
 		dbh.delete_database()
+	elif option == 6:
+		print("Creating user: {}".format(user_name))
+		dbh.create_user(user_name, user_pass)
+		dbh.add_privilege(user_name)

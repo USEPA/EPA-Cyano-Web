@@ -11,7 +11,7 @@ export class HeaderComponent implements OnInit {
 
   title = "Cyanobacteria Assessment Network";
   titleAbr = "CyAN";
-  compare_locations = {};
+  compare_locations = [];
   locationSubscription: Subscription;
 
   constructor(private locationService: LocationService) { }

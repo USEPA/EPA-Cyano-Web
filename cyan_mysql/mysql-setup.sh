@@ -37,3 +37,9 @@ else
 		notes TEXT NOT NULL
 	);"
 fi
+
+# Creating user for connecting to mysql cyan-responsive database:
+# TODO: Have root password be entered manually (or would this break potential for CI/CD?)
+echo "Creating DB user."
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${DB_PASS}';"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT SELECT, INSERT, DELETE, UPDATE ON ${DB_NAME}.* TO '${DB_USER}'@'${DB_HOST}';"
