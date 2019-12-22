@@ -13,7 +13,7 @@
 	    <div class="details_title_block_1">
 	        <div class="details_title">
 	        	<div style="float:left;padding-left:30%">{{location.name || ""}}</div>
-	        	<div style="float:right;padding-right:30%;">{{location.dataDate || ""}}</div>
+	        	<div style="float:right;padding-right:30%;">{{latestImageDate || ""}}</div>
 	    	</div>
 	      <button mat-button (click)="exit();" class="details_exit">x</button>
 	    </div>
@@ -32,28 +32,5 @@
   <div class="mini_map_block">
 		<div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
 	</div>
-
-	<!-- Thumbnail Images -->
-	<!-- <div class="details_image_thumbs">
-    <div *ngIf="loading; else loaded">
-      <div class="details_image_thumbs_loader">
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </div>
-    </div>
-    <ng-template #loaded>
-      <div class="details_image_info">
-      </div>
-      <div class="details_block">
-        <div class="details_thumbs_block">
-          <div *ngFor="let thumb of locationThumbs">
-            <div class="details_thumb" (click)="toggleImage(thumb)">
-              <img src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
-              <div class="details_thumb_title">{{ getImageTitle(thumb) }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-  </div> -->
 
 </div>

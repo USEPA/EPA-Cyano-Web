@@ -21,6 +21,8 @@ export class LatestImageComponent implements OnInit {
 
 	location: Location;
 
+	latestImageDate: string;
+
 	imageSub: Subscription;
 
 	loading: boolean = false;
@@ -93,12 +95,13 @@ export class LatestImageComponent implements OnInit {
 		this.loading = true;
 		this.clearImages();
 
-		let coords = this.locationService.convertToDegrees(this.location);
+		let coords = this.locationService.convertToDegrees(this.location);  // gets location in degrees
 		let self = this;
+
 		this.imageSub = this.images
-			.getImageDetails(coords.latitude, coords.longitude)
+			.getAllImages(coords.latitude, coords.longitude)
 			.subscribe((data: ImageDetails[]) => {
-				this.imageCollection = data
+				this.imageCollection = data;
 			});
 
 		let timeout = this.loadTicker * 1000;
@@ -113,21 +116,7 @@ export class LatestImageComponent implements OnInit {
 				self.setImages();
 				self.loadTicker = 1;
 
-				// This is triggered when images are finished downloading.
-				console.log("Finished downloading images. Below is the data: ");
-				console.log(self.imageCollection);
-
-				self.imageCollection.forEach((image) => {
-					console.log("> Image name and image date:");
-					console.log(image.name);
-					console.log(self.getImageDate2(image));
-				});
-
-
-				// From the above loop, it appears that the first element is the latest image.
-
-				self.toggleImage(self.imageCollection[0]);
-
+				self.toggleImage(self.imageCollection[0]);  // gets latest image (assumes first item is latest), displays image over map
 
 			}
 		}, timeout);
@@ -157,12 +146,7 @@ export class LatestImageComponent implements OnInit {
 		this.imageCollection = null;
 	}
 
-	// toggleImage(event: any, image: ImageDetails) {
 	toggleImage(image: ImageDetails) {
-
-		console.log("Toggling image in latest-image component.");
-		// console.log(event);
-		console.log(image);
 
 		let thumbs = document.getElementsByClassName('details_thumb');
 		for (let i = 0; i < thumbs.length; i++) {
@@ -173,9 +157,9 @@ export class LatestImageComponent implements OnInit {
 		self.selectedLayerIndex = 0;
 		let pngImage;
 		this.locationPNGs.map(function(png) {
-			// if (image.name === png.thumbDependencyImageName) {
 			if (image.name === png.name) {
 				pngImage = png;
+				self.latestImageDate = self.getImageDate2(pngImage);
 			}
 		})[0];
 		this.selectedLayerIndex = this.locationPNGs.indexOf(pngImage);
