@@ -13,8 +13,6 @@ services:
       # - "443:443"
     links:
       - cyan-api:uwsgi_flask
-    # env_file:
-    #   - ./config/environments/local_docker_dev.env
 
   cyan-api:
     build:
@@ -27,7 +25,9 @@ services:
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
     env_file:
-      - ./config/environments/local_docker_dev.env
+      - ${CYANO_ENV:-./config/environments/local_docker_dev.env}
+    links:
+      - cyan-db
 
   cyan-db:
     build:
@@ -39,11 +39,11 @@ services:
       # - /var/lib/mysql:/var/lib/mysql  # prod server existing host DB mapping
       # - /c/ProgramData/MySQL/MySQL Server 5.6/data:/var/lib/mysql  # local windows existing DB mapping (currently throwing "not writable" error due to privilege)
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-""}
       # - MYSQL_DATABASE=${DB_NAME}
       # - DB_NAME
     env_file:
-      - ./config/environments/local_docker_dev.env
+      - ${CYANO_ENV:-./config/environments/local_docker_dev.env}
       # NOTE: Below env vars create one-time pass displayed once in container stdout
       # - MYSQL_RANDOM_ROOT_PASSWORD=yes
       # - MYSQL_ONETIME_PASSWORD
