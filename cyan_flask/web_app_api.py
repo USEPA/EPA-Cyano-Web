@@ -106,9 +106,14 @@ def login_user(post_data):
 		if not test_password(users[0][2], password):
 			return {"error": "Invalid password"}, 200
 
-		notifications = get_notification(user)
+
+		last_visit = users[0][4]  # gets user's last visit date
+		last_visit_unix = time.mktime(last_visit.timetuple())
+
+		notifications = get_notifications(user, last_visit_unix)
 
 		# TODO: Need to update the user table's last_visit after getting notifications.
+		# NOTE: The below code is supposed to but isn't updating last_visit, might be time format.
 		query = 'UPDATE User SET last_visit = %s WHERE username = %s AND password = %s'
 		date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 		values = (date, user, password)
@@ -213,42 +218,25 @@ def get_location(user='', _id=''):
 
 
 
-def add_notification():
-	"""
-	After notification call from last sync time.
-	"""
-	pass
-
-def edit_notification():
-	"""
-	Set is_new false after read.
-	"""
-	pass
-
-def delete_notification():
-	"""
-	When "Clear" notifications button is hit.
-	"""
-	pass
-
-def get_notification(user):
+def get_notifications(user, last_visit):
 	"""
 	Populates the notifications list.
 	Populate with all notifications if new user / registered??
 	"""
-	# get notifications since last_visit, then update last_visit
 	notifications = get_all_notifications()  # gets all notifications at /cyan/cyano/notifications
-
-	# TODO: Update user's notifications table with notifications.
-	query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
 	values = []
-	# Consider refactoring for improved computation time.
 	for notification in notifications:
-		# values.append((user, None, convert_to_timestamp(notification['dateSent']), notification['subject'], notification['message'], 1))
+		# NOTE: Assuming ascending order of dates
+		notification_time = int(str(notification['dateSent'])[:-3])  # NOTE: trimming off 3 trailing 0s
+		if notification_time < last_visit:
+			continue
 		values.append((user, notification['id'], convert_to_timestamp(notification['dateSent']), notification['subject'], notification['message'], 1))
+
+	# TODO: Troubleshoot by this hasn't worked (may need it for the new/checked notifications in user's notifications table).
+	# 	> It's because a "duplicate entry" exception is thrown.
+	query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
 	notifications = query_database(query, values, 'multi')
 
-	# return notifications  # returns DB array of notifications
 	return values
 
 	
@@ -277,6 +265,9 @@ def get_all_notifications():
 
 
 def convert_to_timestamp(unix_time):
+	"""
+	Converts notifications endpoint's timestamps.
+	"""
 	mytime = time.time()
-	trimmed_time = int(str(unix_time)[:-3])
+	trimmed_time = int(str(unix_time)[:-3])  # NOTE: trimming off 3 trailing 0s
 	return datetime.datetime.fromtimestamp(trimmed_time).strftime('%Y-%m-%d %H:%M:%S')
