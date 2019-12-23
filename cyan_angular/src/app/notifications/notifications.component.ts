@@ -51,7 +51,14 @@ export class NotificationsComponent implements OnInit {
   	Check status of notification and set bool based on
   	is_new Notification attribute.
   	*/
-  	
+    console.log("notificationSelect() function hit.");
+  }
+
+  clearNotifications() {
+    /*
+    Removes all user's notifications.
+    */
+    console.log("clearNotifications() function hit.");
   }
 
 }

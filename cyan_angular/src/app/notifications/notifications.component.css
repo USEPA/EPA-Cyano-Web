@@ -341,3 +341,10 @@
 #marked_locations {
     margin: 25px 10px;
 }
+.clear-btn {
+    background: #205493;
+    color: white;
+}
+.new_notification {
+    background-color: lightgray;
+}

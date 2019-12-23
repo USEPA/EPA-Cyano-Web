@@ -12,20 +12,21 @@
         <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked();" color="primary">Only show new notifications</mat-checkbox>
       </div>
       <div class="locations_count">{{ new_notifications.length }} new notifications</div>
+      <button class="mat-button clear-btn" (click)="clearNotifications();">Clear</button>
+      <hr>
     </ng-template>
   </div>
   <ul class="location_list">
-    <li *ngFor="let notification of new_notifications" class="location_li" (click)="notificationSelect($event, notification)">
-      <!-- <div class="location_name">{{notification.subject}}</div>
-      <div class="location_block_1">
-        {{notification.dateSent}}<br>
-        {{notification.message}}<br>
-      </div> -->
-      <div class="location_name">{{notification[3]}}</div>
-      <div class="location_block_1">
-        {{notification[2]}}<br>
-        {{notification[4]}}<br>
-      </div>
-	</li>
+    <li
+      class="location_li"
+      [ngClass]="{new_notification: notification[5]==1}"
+      (click)="notificationSelect($event, notification)"
+      *ngFor="let notification of new_notifications">
+        <div class="location_name">{{notification[3]}}</div>
+        <div class="location_block_1">
+          {{notification[2]}}<br>
+          {{notification[4]}}<br>
+        </div>
+    </li>
   </ul>
 </div>
