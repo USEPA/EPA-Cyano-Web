@@ -1,0 +1,39 @@
+<div class="location_block_0">
+  <div class="location_exit_block">
+    <button mat-button class="location_exit" [routerLink]="['']">x</button>
+  </div>
+  <div class="location_top_bar">
+    Enter the latitude and longitude below to find a new location
+    <br>
+    <br>
+    Latitude <input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
+    <input type="number" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
+    <input type="number" placeholder="Sec" [(ngModel)]="latSec">
+    <mat-form-field>
+      <mat-select [(value)]="selectedLat">
+        <mat-option value="N">N</mat-option>
+        <mat-option value="S">S</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br>
+    Longitude <input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
+    <input type="number" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
+    <input type="number" placeholder="Sec" [(ngModel)]="lonSec">
+    <mat-form-field>
+      <mat-select [(value)]="selectedLon">
+        <mat-option value="W">W</mat-option>
+        <mat-option value="E">E</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br>
+    <br>
+    <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
+    <span *ngIf=" marked == 'Unmark'; then unmark else mark"></span>
+    <ng-template #unmark>
+      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation()"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
+    </ng-template>
+    <ng-template #mark>
+      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation()"><span id="marked-icon" class="unmark"></span><span id="marked-label">Unmark</span> Location</button>
+    </ng-template>
+  </div>
+</div>
