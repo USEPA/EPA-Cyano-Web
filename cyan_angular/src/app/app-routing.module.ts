@@ -7,14 +7,16 @@ import { LocationCompareComponent } from './location-compare/location-compare.co
 import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent } from './location-details/location-details.component';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
+import { CoordinatesComponent } from './coordinates/coordinates.component';
 
 const routes: Routes = [
     { path: 'account', component: AccountComponent },
-    { path: 'mylocations', component: MyLocationsComponent},
-    { path: 'comparelocations', component: LocationCompareComponent},
-    { path: 'configs', component: ConfigComponent},
-    { path: 'locationdetails', component: LocationDetailsComponent},
-    { path: 'locationcomparedetails', component: LocationCompareDetailsComponent}
+    { path: 'mylocations', component: MyLocationsComponent },
+    { path: 'comparelocations', component: LocationCompareComponent },
+    { path: 'configs', component: ConfigComponent },
+    { path: 'locationdetails', component: LocationDetailsComponent },
+    { path: 'locationcomparedetails', component: LocationCompareDetailsComponent },
+    { path: 'coordinates', component: CoordinatesComponent }
 ];
 
 @NgModule({

@@ -31,7 +31,6 @@ import { LinksLeftComponent } from './links-left/links-left.component';
 import { FooterComponent } from './footer/footer.component';
 import { LocationCompareComponent } from './location-compare/location-compare.component';
 import { NotificationsComponent } from './notifications/notifications.component';
-import { CoordiantesComponent } from './coordiantes/coordiantes.component';
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { ChartsModule } from 'ng2-charts';
@@ -49,6 +48,7 @@ import { AccountComponent } from './account/account.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
+import { CoordinatesComponent } from './coordinates/coordinates.component';
 
 @NgModule({
   declarations: [
@@ -60,13 +60,13 @@ import { LocationCompareDetailsComponent } from './location-compare-details/loca
     FooterComponent,
     LocationCompareComponent,
     NotificationsComponent,
-    CoordiantesComponent,
     MapPopupComponent,
     ConfigComponent,
     LocationDetailsComponent,
     LocationDetailsNotes,
     AccountComponent,
-    LocationCompareDetailsComponent
+    LocationCompareDetailsComponent,
+    CoordinatesComponent
   ],
   imports: [
     BrowserModule,
