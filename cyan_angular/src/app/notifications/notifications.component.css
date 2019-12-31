@@ -316,28 +316,6 @@
     position: relative;
     margin-right: 5px;
 }
-.arrow_up {
-
-}
-.arrow_down {
-    transform: rotate(180deg);
-}
-.green {
-    background: url('src/assets/images/arrow_green.png') no-repeat;
-    background-size: contain;
-}
-.yellow {
-    background: url('src/assets/images/arrow_yellow.png') no-repeat;
-    background-size: contain;
-}
-.orange {
-    background: url('src/assets/images/arrow_orange.png') no-repeat;
-    background-size: contain;
-}
-.red {
-    background: url('src/assets/images/arrow_red.png') no-repeat;
-    background-size: contain;
-}
 #marked_locations {
     margin: 25px 10px;
 }
@@ -347,4 +325,7 @@
 }
 .new_notification {
     background-color: lightgray;
+}
+.old_notification {
+    background-color: white;
 }
