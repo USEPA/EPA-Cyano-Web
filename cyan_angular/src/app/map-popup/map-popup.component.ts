@@ -128,7 +128,7 @@ export class MapPopupComponent implements OnInit {
         locNotes = JSON.parse(userLoc.notes);
       }
       locNotes.push(noteObj);
-      userLoc.notes = locNotes;
+      userLoc.notes = JSON.stringify(locNotes);
       this.locationService.updateLocation(userLoc.name, userLoc);
       userLoc.notes = JSON.stringify(locNotes);
     });
