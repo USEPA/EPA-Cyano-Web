@@ -25,16 +25,16 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
 
     this.notificationSubscription = this.userService.allNotifications$.subscribe(
-      	notifications => {
-        	console.log("Received notifications update in header component.");	
-        	this.new_notifications = notifications;
+    	notifications => {
+        // Only using new (ie, unread, is_new=true) notifications.
+        this.new_notifications = notifications.filter(x => x[5] === 1);
      	}
-     );
+    );
 
     this.locationSubscription = this.locationService.compare$.subscribe(
-		locations => {
-			this.compare_locations = locations
-		}
+  		locations => {
+  			this.compare_locations = locations
+  		}
     );
 
   }
