@@ -77,6 +77,30 @@ export class UserService {
     return of(this.currentAccount.locations);
   }
 
+  updateUserNotifications(username: string, id: number) {
+    /*
+    Updates user's notification, e.g., is_new set to false if clicked.
+    */
+    this.downloader.updateNotification(username, id);
+    let _notifications = this.currentAccount.notifications.map(item => {
+      // Update notification's is_new bool to false.
+      if (item[1] !== id) {
+        return item;
+      }
+      item[5] = 0;
+      return item;
+    });
+    // TODO: Set notifications in currentAccount?
+    this.allNotificationsSource.next(_notifications);  // push updated notifications
+  }
+
+  clearUserNotifications(username: string) {
+    /*
+    Clears user's notifications.
+    */
+    this.downloader.clearUserNotifications(username);
+  }
+
 }
 
 export class User {
