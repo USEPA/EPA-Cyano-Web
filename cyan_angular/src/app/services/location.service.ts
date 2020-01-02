@@ -167,7 +167,7 @@ export class LocationService {
   ): Location {
     let l = new Location();
     let c = this.convertCoordinates(latitude, longitude);
-    l.id = this.getLastID();
+    l.id = this.getLastID() + 1;
     l.name = name;
     l.latitude_deg = c.latDeg;
     l.latitude_min = c.latMin;
@@ -277,7 +277,7 @@ export class LocationService {
   }
 
   getLastID(): number {
-    let startID = 1;
+    let startID = 0;
     if (this.locations.length > 0) {
       let last = this.locations[0];
       this.locations.map(location => {
