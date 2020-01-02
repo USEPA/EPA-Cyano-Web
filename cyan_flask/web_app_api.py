@@ -223,21 +223,57 @@ def get_notifications(user, last_visit):
 	Populates the notifications list.
 	Populate with all notifications if new user / registered??
 	"""
+
+	# Gets existing notifications from user (TODO: clean up / refactor this block):
+	query = 'SELECT * FROM Notifications WHERE owner = %s'
+	values = (user,)
+	user_notifications = query_database(query, values)
+	_notifications = []
+	for notification in user_notifications:
+		notification = list(notification)
+		notification[2] = notification[2].strftime('%Y-%m-%d %H:%M:%S')
+		_notifications.append(notification)
+
+	latest_time = None
+	if len(_notifications) > 0:
+		latest_time = convert_to_unix(_notifications[-1][2])
+	else:
+		latest_time = last_visit
+
 	notifications = get_all_notifications()  # gets all notifications at /cyan/cyano/notifications
 	values = []
 	for notification in notifications:
 		# NOTE: Assuming ascending order of dates
 		notification_time = int(str(notification['dateSent'])[:-3])  # NOTE: trimming off 3 trailing 0s
-		if notification_time < last_visit:
+		if notification_time <= latest_time:
 			continue
-		values.append((user, notification['id'], convert_to_timestamp(notification['dateSent']), notification['subject'], notification['message'], 1))
+		val = (user, notification['id'], convert_to_timestamp(notification['dateSent']), notification['subject'], notification['message'], 1)
+		_notifications.append(list(val))
+		
+	if len(values) > 0:
+		query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
+		notifications = query_database(query, values, 'multi')
 
-	# TODO: Troubleshoot by this hasn't worked (may need it for the new/checked notifications in user's notifications table).
-	# 	> It's because a "duplicate entry" exception is thrown.
-	query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
-	notifications = query_database(query, values, 'multi')
+	return _notifications
 
-	return values
+def edit_notifications(user, _id):
+	"""
+	Updates user's notification that has been read,
+	e.g., sets is_new to false.
+	"""
+	query = 'UPDATE Notifications SET is_new = %s WHERE owner = %s AND id = %s'
+	values = (0, user, _id)
+	query_database(query, values)
+	return {"status": "success"}, 200
+
+def delete_notifications(user):
+	"""
+	Removes user's notifications (event: "Clear" button hit)
+	"""
+	query = 'DELETE FROM Notifications WHERE owner = %s'
+	values = (user)
+	query_database(query, values)
+	return {"status": "success"}, 200
 
 	
 
@@ -268,6 +304,14 @@ def convert_to_timestamp(unix_time):
 	"""
 	Converts notifications endpoint's timestamps.
 	"""
-	mytime = time.time()
 	trimmed_time = int(str(unix_time)[:-3])  # NOTE: trimming off 3 trailing 0s
 	return datetime.datetime.fromtimestamp(trimmed_time).strftime('%Y-%m-%d %H:%M:%S')
+
+def convert_to_unix(timestamp):
+	"""
+	Converts notification timestamp to unix time.
+	"""
+	dt = datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
+	unix_time = dt.timetuple()
+	unix_time = int(time.mktime(unix_time))
+	return unix_time
