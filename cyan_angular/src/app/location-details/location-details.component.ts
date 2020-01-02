@@ -23,7 +23,7 @@ import { UserService } from '../services/user.service';
 	styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsComponent implements OnInit {
-// <<<<<<< Updated upstream
+
 	baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
 
 	currentLocaitonData: RawData;
@@ -138,18 +138,12 @@ export class LocationDetailsComponent implements OnInit {
 		this.getImages();
 		this.downloadTimeSeries();
 
-
-		// Load locations from DB instead?
-		// let userLocs = this.user.currentAccount.locations;  // loads current user account's locations
+		
 		let locId = this.current_location.id;
 		this.user.getUserLocations().subscribe((userLocs) => {
 			let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
 			this.current_location.notes = JSON.parse(userLoc.notes);
 		});
-		// let locId = this.current_location.id;
-		// let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-		// this.current_location.notes = JSON.parse(userLoc.notes);
-
 
 		let self = this;
 		let timeout = this.tsTicker * 1000;
@@ -594,16 +588,8 @@ export class LocationDetailsNotes {
 				let locNotes = JSON.parse(userLoc.notes);
 				locNotes.push(noteObj);
 				userLoc.notes = JSON.stringify(locNotes);
-			});
-
-
-		// // Add to user locations?
-		// let userLocs = this.user.currentAccount.locations;  // loads current user account's locations
-		// let locId = l.id;  // gets id of selected location
-		// let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-		// // JSON.parse(userLocs[locId].notes).push(noteTextbox.value);
-		// let locNotes = JSON.parse(userLoc.notes);
-		// locNotes.push(noteObj);
+			}
+		);
 
 	}
 
