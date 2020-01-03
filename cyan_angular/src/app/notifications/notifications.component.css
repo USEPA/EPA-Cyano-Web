@@ -219,12 +219,19 @@
     opacity: 0.8;
     font-size: small;
 }
-.location_name {
-    width: 75%;
+.notification_name {
+    width: 100%;
+    font-weight: 400;
+    /*color: #205493;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.notification_div {
     font-weight: 400;
     color: #205493;
-    display: inline-flex
-} 
+    display: flex;
+}
 .location_cellDescript {
     font-size: small;
     display: inline-block;

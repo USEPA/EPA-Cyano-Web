@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 
 import { Location } from '../models/location';
 // import { LocationService } from '../services/location.service';
@@ -24,9 +27,9 @@ export class NotificationsComponent implements OnInit {
 	notificationSubscription: Subscription;
 
   constructor(
-		// private router: Router,
 		private userService: UserService,
-    // private downloaderService: DownloaderService
+    private bottomSheet: MatBottomSheet,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -70,6 +73,9 @@ export class NotificationsComponent implements OnInit {
 
     }
 
+    // Opens selected notification in bottom sheet:
+    this.openNotification(notification, this.new_notifications_counter);
+
   }
 
   clearNotifications() {
@@ -79,8 +85,51 @@ export class NotificationsComponent implements OnInit {
     console.log("clearNotifications() function hit.");
     let user = this.userService.getUserName();
     this.userService.clearUserNotifications(user);
-    // Remove notifications from the list
+    // TODO: Remove notifications from the list
+  }
+
+  openNotification(notification, notificationCount) {
+
+    console.log("notification object: ");
+    console.log(notification);
+
+    // this.bottomSheet.open(NotificationDetails, {
+    const dialogRef = this.dialog.open(NotificationDetails, {
+      width: '50%',
+      data: {
+        notificationObj: notification,
+        notificationCount: notificationCount
+      }
+    });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log("dialog was closed");
+    // });
+
   }
 
 }
 
+
+
+@Component({
+  selector: 'notification-details',
+  templateUrl: 'notification-details.html',
+  styleUrls: ['./notifications.component.css']
+})
+export class NotificationDetails {
+
+  // addingNote: boolean = false;
+  // preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
+
+  constructor(
+    // @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
+
+  ngOnInit() {
+  }
+
+
+
+}

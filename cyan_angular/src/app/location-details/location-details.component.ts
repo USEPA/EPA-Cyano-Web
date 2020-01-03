@@ -23,7 +23,7 @@ import { UserService } from '../services/user.service';
 	styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsComponent implements OnInit {
-// <<<<<<< Updated upstream
+
 	baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
 
 	currentLocaitonData: RawData;
@@ -544,9 +544,7 @@ export class LocationDetailsNotes {
 	 ) {}
 
 	ngOnInit() {
-		// Loads selected location's notes upon component initialization:
-		console.log("notes component init");
-		var test = this;
+		// Loads selected location's notes upon component initialization
 	}
 
 	openLink(event: MouseEvent): void {

@@ -22,7 +22,7 @@
       (click)="notificationSelect(notification)"
       [ngClass]="notification[5]==1 ? 'new_notification' : 'old_notification'"
       *ngFor="let notification of new_notifications">
-        <div class="location_name">{{notification[3]}}</div>
+        <div class="notification_div">{{notification[3]}}</div>
         <div class="location_block_1">
           {{notification[2]}}<br>
           {{notification[4]}}<br>

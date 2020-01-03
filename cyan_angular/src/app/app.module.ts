@@ -30,7 +30,7 @@ import { HeaderComponent } from './header/header.component';
 import { LinksLeftComponent } from './links-left/links-left.component';
 import { FooterComponent } from './footer/footer.component';
 import { LocationCompareComponent } from './location-compare/location-compare.component';
-import { NotificationsComponent } from './notifications/notifications.component';
+import { NotificationsComponent, NotificationDetails } from './notifications/notifications.component';
 import { CoordiantesComponent } from './coordiantes/coordiantes.component';
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
@@ -60,6 +60,7 @@ import { LocationCompareDetailsComponent } from './location-compare-details/loca
     FooterComponent,
     LocationCompareComponent,
     NotificationsComponent,
+    NotificationDetails,
     CoordiantesComponent,
     MapPopupComponent,
     ConfigComponent,
@@ -97,7 +98,7 @@ import { LocationCompareDetailsComponent } from './location-compare-details/loca
   ],
   providers: [LocationService, MapService, CyanMap, Location, DatePipe],
   bootstrap: [AppComponent],
-  entryComponents: [MapPopupComponent, LocationDetailsNotes]
+  entryComponents: [MapPopupComponent, LocationDetailsNotes, NotificationDetails]
 })
 export class AppModule {
   constructor(private injector: Injector) {
