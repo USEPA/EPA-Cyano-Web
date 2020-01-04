@@ -185,7 +185,7 @@ class DeleteNotification(Resource):
 	Endpoint for "Clear" notifications.
 	"""
 	def get(self, user=''):
-		results, status_code = web_app_api.delete_notification(user)
+		results, status_code = web_app_api.delete_notifications(user)
 		return results, status_code
 
 class GetNotification(Resource):

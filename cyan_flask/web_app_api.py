@@ -249,6 +249,7 @@ def get_notifications(user, last_visit):
 			continue
 		val = (user, notification['id'], convert_to_timestamp(notification['dateSent']), notification['subject'], notification['message'], 1)
 		_notifications.append(list(val))
+		values.append(val)
 		
 	if len(values) > 0:
 		query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
@@ -271,7 +272,7 @@ def delete_notifications(user):
 	Removes user's notifications (event: "Clear" button hit)
 	"""
 	query = 'DELETE FROM Notifications WHERE owner = %s'
-	values = (user)
+	values = (user,)
 	query_database(query, values)
 	return {"status": "success"}, 200
 
