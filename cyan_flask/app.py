@@ -201,13 +201,13 @@ api.add_resource(StatusTest, '/test')
 api.add_resource(Login, '/cyan/app/api/user')
 api.add_resource(Register, '/cyan/app/api/user/register')
 api.add_resource(AddLocation, '/cyan/app/api/location/add')
-api.add_resource(EditLocation, '/cyan/app/api/location/edit/<string:user>/<string:_id>')
+api.add_resource(EditLocation, '/cyan/app/api/location/edit')
 api.add_resource(DeleteLocation, '/cyan/app/api/location/delete/<string:user>/<string:_id>')
 api.add_resource(GetLocation, '/cyan/app/api/location/<string:user>/<string:_id>')
 
 # Notifications Endpoints:
 api.add_resource(AddNotification, '/cyan/app/api/notification/add')
-api.add_resource(EditNotification, '/cyan/app/api/notification/edit')
+api.add_resource(EditNotification, '/cyan/app/api/notification/edit/<string:user>/<string:_id>')
 api.add_resource(DeleteNotification, '/cyan/app/api/notification/delete/<string:user>')
 api.add_resource(GetNotification, '/cyan/app/api/notification/<string:user>/<string:_id>')
 
