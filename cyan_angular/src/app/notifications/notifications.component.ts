@@ -124,12 +124,16 @@ export class NotificationDetails {
 
   constructor(
     // @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
+    public dialogRef: MatDialogRef<NotificationDetails>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit() {
   }
 
-
+  exit(): void {
+    // close the notification detail
+    this.dialogRef.close();
+  }
 
 }

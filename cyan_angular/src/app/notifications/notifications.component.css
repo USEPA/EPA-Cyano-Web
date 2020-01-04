@@ -336,3 +336,16 @@
 .old_notification {
     background-color: white;
 }
+.details_exit {
+    float: right;
+    font-size: x-large;
+    margin: 5px 10px;
+}
+.details_title_block_1 {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+}
+.details_title_block_1 div {
+    display: inline-block;
+}
