@@ -34,14 +34,20 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit() {
 
-		this.new_notifications = this.userService.currentAccount.notifications;
-    this.new_notifications_counter = this.new_notifications.filter(x => x[5] === 1).length;
+    this.all_notifications = this.userService.currentAccount.notifications
+    this.new_notifications = this.userService.currentAccount.notifications.filter(x => x[5] === 1);
+    this.display_notifications = this.all_notifications;
+    this.new_notifications_counter = this.new_notifications.length;
+
+    this.current_notification_index = 0;
 
 		this.notificationSubscription = this.userService.allNotifications$.subscribe(
 			notifications => {
 				console.log("Received notifications update in notifications component.");
-        this.new_notifications = notifications;
-        this.new_notifications_counter = notifications.filter(x => x[5] === 1).length;
+        // this.new_notifications = notifications;
+        this.all_notifications = notifications;
+        this.new_notifications = notifications.filter(x => x[5] === 1)
+        this.new_notifications_counter = this.new_notifications.length;
 			}
 		);
   }
@@ -50,7 +56,15 @@ export class NotificationsComponent implements OnInit {
 		this.notificationSubscription.unsubscribe();
   }
 
-  toggleChecked() {
+  toggleChecked(event) {
+    console.log("toggleChecked hit.");
+    if (event.checked == true) {
+      // Only shows new notifications:
+      this.display_notifications = this.new_notifications;
+    }
+    else {
+      this.display_notifications = this.all_notifications;
+    }
   }
 
   hasNotifications() {
@@ -61,21 +75,15 @@ export class NotificationsComponent implements OnInit {
   	Check status of notification and set bool based on
   	is_new Notification attribute.
   	*/
-    console.log("notificationSelect() function hit.");
-
     if (notification[5] == 1) {
       notification[5] = 0;  // sets is_new to false
-
       let owner = notification[0];
       let id = notification[1];
-
-      let notifications = this.userService.updateUserNotifications(owner, id);
-
+      // let notifications = this.userService.updateUserNotifications(owner, id);
+      this.userService.updateUserNotifications(owner, id);
     }
-
     // Opens selected notification in bottom sheet:
     this.openNotification(notification, this.new_notifications_counter);
-
   }
 
   clearNotifications() {
@@ -85,27 +93,26 @@ export class NotificationsComponent implements OnInit {
     console.log("clearNotifications() function hit.");
     let user = this.userService.getUserName();
     this.userService.clearUserNotifications(user);
+
     // TODO: Remove notifications from the list
+    this.new_notifications = [];
+    this.all_notifications = [];
+    this.display_notifications = [];
+
   }
 
   openNotification(notification, notificationCount) {
-
-    console.log("notification object: ");
-    console.log(notification);
-
-    // this.bottomSheet.open(NotificationDetails, {
     const dialogRef = this.dialog.open(NotificationDetails, {
       width: '50%',
       data: {
         notificationObj: notification,
-        notificationCount: notificationCount
+        notificationCount: notificationCount,
+        allNotifications: this.all_notifications
       }
     });
-
     // dialogRef.afterClosed().subscribe(result => {
     //   console.log("dialog was closed");
     // });
-
   }
 
 }
@@ -119,13 +126,12 @@ export class NotificationsComponent implements OnInit {
 })
 export class NotificationDetails {
 
-  // addingNote: boolean = false;
-  // preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
+  current_notification_index = 1;
 
   constructor(
-    // @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
     public dialogRef: MatDialogRef<NotificationDetails>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private userService: UserService
   ) { }
 
   ngOnInit() {
@@ -134,6 +140,24 @@ export class NotificationDetails {
   exit(): void {
     // close the notification detail
     this.dialogRef.close();
+  }
+
+  previousNotification(): void {
+    this.current_notification_index = this.current_notification_index == 1 ? this.data.allNotifications.length : this.current_notification_index - 1;
+    this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
+    this.updateUserNotification(this.data.notificationObj);
+  }
+
+  nextNotification(): void {
+    this.current_notification_index = this.current_notification_index == this.data.allNotifications.length ? 1 : this.current_notification_index + 1;
+    this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
+    this.updateUserNotifications(this.data.notificationObj);
+  }
+
+  updateUserNotifications(notificationObj: any): void {
+    let owner = notificationObj[0];
+    let id = notificationObj[1];
+    this.userService.updateUserNotifications(owner, id);
   }
 
 }

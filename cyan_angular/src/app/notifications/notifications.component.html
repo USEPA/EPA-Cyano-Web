@@ -5,11 +5,16 @@
   <div class="location_top_bar">
     <span *ngIf="new_notifications_counter > 0; then has_locations else no_locations"></span>
     <ng-template #no_locations>
-        <div class="no_locations locations_count">No new notifications.</div>
-      </ng-template>
+      <div class="location_sort">
+        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked($event);" color="primary">Only show new notifications</mat-checkbox>
+      </div>
+      <div class="no_locations locations_count">0 new notifications.</div>
+      <button class="mat-button clear-btn" (click)="clearNotifications();">Clear</button>
+      <hr>
+    </ng-template>
     <ng-template #has_locations>
       <div class="location_sort">
-        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked();" color="primary">Only show new notifications</mat-checkbox>
+        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked($event);" color="primary">Only show new notifications</mat-checkbox>
       </div>
       <div class="locations_count">{{ new_notifications_counter }} new notifications</div>
       <button class="mat-button clear-btn" (click)="clearNotifications();">Clear</button>
@@ -21,7 +26,7 @@
       class="location_li"
       (click)="notificationSelect(notification)"
       [ngClass]="notification[5]==1 ? 'new_notification' : 'old_notification'"
-      *ngFor="let notification of new_notifications">
+      *ngFor="let notification of display_notifications">
         <div class="notification_div">{{notification[3]}}</div>
         <div class="location_block_1">
           {{notification[2]}}<br>
