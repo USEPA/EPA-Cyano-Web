@@ -99,6 +99,9 @@ export class UserService {
     Clears user's notifications.
     */
     this.downloader.clearUserNotifications(username);
+    // Update user's notifications array to a new/blank array?
+    this.currentAccount.notifications = [];
+    this.allNotificationsSource.next(this.currentAccount.notifications);
   }
 
 }
