@@ -349,3 +349,29 @@
 .details_title_block_1 div {
     display: inline-block;
 }
+.details_prev_notification {
+    min-width: 32px;
+    font-size: 35px;
+    vertical-align: super;
+    /*color: white;*/
+    opacity: 0.75;
+    font-weight: 200;
+    float: left;
+}
+.details_next_notification {
+    min-width: 32px;
+    font-size: 35px;
+    vertical-align: super;
+    /*color: white;*/
+    opacity: 0.75;
+    font-weight: 200;
+    float: right;
+}
+.details_notification_counter {
+    width: 100%;
+    /*color: white;*/
+    /*font-size: smaller;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
