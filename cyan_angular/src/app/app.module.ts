@@ -49,6 +49,7 @@ import { AccountComponent } from './account/account.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
+import { LatestImageComponent } from './latest-image/latest-image.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +67,8 @@ import { LocationCompareDetailsComponent } from './location-compare-details/loca
     LocationDetailsComponent,
     LocationDetailsNotes,
     AccountComponent,
-    LocationCompareDetailsComponent
+    LocationCompareDetailsComponent,
+    LatestImageComponent
   ],
   imports: [
     BrowserModule,
