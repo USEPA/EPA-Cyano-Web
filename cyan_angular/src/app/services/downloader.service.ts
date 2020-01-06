@@ -4,7 +4,6 @@ import { Observable, of } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
-import { Account } from '../services/user.service';
 import { environment } from '../../environments/environment';
 
 class UrlInfo {
@@ -68,8 +67,10 @@ export class DownloaderService {
   data: RawData[] = [];
   locationsData: any = {};
   locations: Location[] = [];
-
-  constructor(private http: HttpClient) {}
+    
+  constructor(
+    private http: HttpClient
+  ) {}
 
   registerUser(username: string, email: string, password: string) {
     let url = this.baseServerUrl + 'user/register';
@@ -221,6 +222,12 @@ export class DownloaderService {
       ln.name = name;
     } else {
       ln.name = data.metaInfo.locationName;
+    }
+
+    // Check for "Unknown Location" as name, if so, then
+    // add an incremental integer to name (e.g., "Unknown Location -- 1"):
+    if (ln.name == "Unknown Location") {
+      ln.name = ln.name + " -- " + ln.id;
     }
 
     ln.latitude_deg = coordinates.latDeg;

@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -26,7 +27,8 @@ export class MapPopupComponent implements OnInit {
     private mapService: MapService,
     private downloaderService: DownloaderService,
     private user: UserService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -159,6 +161,14 @@ export class MapPopupComponent implements OnInit {
 
   compareLocation(ln: Location): void {
     this.locationService.addCompareLocation(ln);
+  }
+
+  viewLatestImage(ln: Location): void {
+    console.log("We're here at viewLatestImage");
+    console.log(ln);
+
+    this.router.navigate(['/latestimage', { location: JSON.stringify(ln) }]);
+
   }
 
   deleteLocation(ln: Location): void {
