@@ -14,15 +14,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class DBHandler(object):
 
-	def __init__(self, db_name):
+	def __init__(self, db_name, root_pass):
 		self.db_name = db_name
+		self.root_pass = root_pass
 
 	def connect_to_db(self, db_name=None):
 		conn = mysql.connector.connect(
 			host=os.environ.get('DB_HOST'),
 			port=os.environ.get('DB_PORT'),
-			user=os.environ.get('DB_USER'),
-			passwd=os.environ.get('DB_PASS'),
+			user='root',
+			passwd=self.root_pass,
 			buffered=True
 		)
 		if db_name:
@@ -127,7 +128,7 @@ class DBHandler(object):
 
 if __name__ == '__main__':
 
-	option, db_name, table_name, user_name, user_pass = None, None, None, None, None
+	option, db_name, table_name, user_name, user_pass, root_pass = None, None, None, None, None, None
 	
 	try:
 		option = int(sys.argv[1])
@@ -147,13 +148,14 @@ if __name__ == '__main__':
 		try:
 			user_name = os.environ.get('DB_USER') or input("Please enter a username: ")
 			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
+			root_pass = input("Please enter root password for database: ")
 		except IndexError:
 			print("No user name specified, which is only needed for option 6.")
 			pass
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 
-	dbh = DBHandler(db_name)
+	dbh = DBHandler(db_name, root_pass)
 
 	if option == 1:
 		print("Creating database: {}".format(db_name))
