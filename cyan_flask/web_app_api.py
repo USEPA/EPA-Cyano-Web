@@ -112,11 +112,9 @@ def login_user(post_data):
 
 		notifications = get_notifications(user, last_visit_unix)
 
-		# TODO: Need to update the user table's last_visit after getting notifications.
-		# NOTE: The below code is supposed to but isn't updating last_visit, might be time format.
-		query = 'UPDATE User SET last_visit = %s WHERE username = %s AND password = %s'
-		date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-		values = (date, user, password)
+		query = 'UPDATE User SET last_visit = %s WHERE username = %s'
+		date = datetime.date.today().isoformat()
+		values = (date, user)
 		query_result = query_database(query, values)
 
 		query = 'SELECT * FROM Location WHERE owner = %s'
@@ -224,7 +222,29 @@ def get_notifications(user, last_visit):
 	Populate with all notifications if new user / registered??
 	"""
 
-	# Gets existing notifications from user (TODO: clean up / refactor this block):
+	all_notifications = get_users_notifications(user)  # gets any existing notifications from user
+
+	# Sets minimum time for getting notifications from cyano endpoint:
+	latest_time = None
+	if len(all_notifications) > 0:
+		latest_time = convert_to_unix(all_notifications[-1][2])
+	else:
+		latest_time = last_visit
+
+	new_notifications = make_notifications_request(latest_time)  # gets all notifications at /cyan/cyano/notifications
+
+	db_values = parse_notifications_response(new_notifications, latest_time, user)
+		
+	if len(db_values) > 0:
+		query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
+		new_notifications = query_database(query, db_values, 'multi')
+
+	all_notifications += [list(val) for val in db_values]  # converts tuples to lists
+
+	return all_notifications
+
+def get_users_notifications(user):
+	# Gets existing notifications from user:
 	query = 'SELECT * FROM Notifications WHERE owner = %s'
 	values = (user,)
 	user_notifications = query_database(query, values)
@@ -233,29 +253,18 @@ def get_notifications(user, last_visit):
 		notification = list(notification)
 		notification[2] = notification[2].strftime('%Y-%m-%d %H:%M:%S')
 		_notifications.append(notification)
+	return _notifications
 
-	latest_time = None
-	if len(_notifications) > 0:
-		latest_time = convert_to_unix(_notifications[-1][2])
-	else:
-		latest_time = last_visit
-
-	notifications = get_all_notifications()  # gets all notifications at /cyan/cyano/notifications
+def parse_notifications_response(new_notifications, latest_time, user):
 	values = []
-	for notification in notifications:
+	for notification in new_notifications:
 		# NOTE: Assuming ascending order of dates
 		notification_time = int(str(notification['dateSent'])[:-3])  # NOTE: trimming off 3 trailing 0s
 		if notification_time <= latest_time:
 			continue
 		val = (user, notification['id'], convert_to_timestamp(notification['dateSent']), notification['subject'], notification['message'], 1)
-		_notifications.append(list(val))
 		values.append(val)
-		
-	if len(values) > 0:
-		query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
-		notifications = query_database(query, values, 'multi')
-
-	return _notifications
+	return values
 
 def edit_notifications(user, _id):
 	"""
@@ -278,12 +287,14 @@ def delete_notifications(user):
 
 	
 
-def get_all_notifications():
+def make_notifications_request(latest_time):
 	"""
 	Gets all notifications from epa cyano endpoint.
 	"""
+	formatted_time = datetime.datetime.fromtimestamp(latest_time).strftime('%Y-%m-%d')
+
 	notification_url = 'https://cyan.epa.gov/cyan/cyano/notifications/'
-	start_date = '2017-06-23T00-00-00-000-0000'
+	start_date = '{}T00-00-00-000-0000'.format(formatted_time)
 	try:
 		notification_response = requests.get(notification_url + start_date)
 		return json.loads(notification_response.content)
