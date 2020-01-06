@@ -122,12 +122,14 @@ if __name__ == '__main__':
 	except IndexError:
 		print("No table name specified, which is only needed for options 2 and 3.")
 		pass
-	try:
-		user_name = sys.argv[4]
-		user_pass = input("Please enter a password for {}: ".format(user_name))
-	except IndexError:
-		print("No user name specified, which is only needed for option 6.")
-		pass
+
+	if option == 4 or option == 6:
+		try:
+			user_name = os.environ.get('DB_USER') or input("Please enter a username: ")
+			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
+		except IndexError:
+			print("No user name specified, which is only needed for option 6.")
+			pass
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 
@@ -153,6 +155,9 @@ if __name__ == '__main__':
 		print("Creating tables.")
 		dbh.create_user_table()
 		dbh.create_location_table()
+		print("Creating user: {}".format(user_name))
+		dbh.create_user(user_name, user_pass)
+		dbh.add_privilege(user_name)
 	elif option == 5:
 		print("Removing database and tables.")
 		dbh.delete_table('user')
