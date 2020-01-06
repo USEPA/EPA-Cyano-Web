@@ -12,7 +12,7 @@ if (( file_size > 0 )); then
 	echo "SQL_DUMP env var provided, building database with this file."
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} < ${dump_file}
 else
-	echo "Building fresh ${DB_NAME} database instance with User and Location tables."
+	echo "Building fresh ${DB_NAME} database instance with User, Location and Notifications tables."
 	# Creates database:
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
 	# Creates user table:
