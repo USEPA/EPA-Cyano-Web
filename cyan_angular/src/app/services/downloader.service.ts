@@ -130,13 +130,36 @@ export class DownloaderService {
 
   getUserLocation(username: string, id: number) {
     let url = this.baseServerUrl + 'location/' + username + '/' + id;
-    // this.executeGetUserLocation(url).subscribe();
     return this.http.get(url);
   }
 
-  // executeGetUserLocation(url: string) {
-  //   return this.http.get(url);
-  // }
+  
+  updateNotification(username: string, id: number) {
+    /*
+    Updates user's notification, e.g., is_new set to false if clicked.
+    */
+    let url = this.baseServerUrl + 'notification/edit/' + username + '/' + id;
+    return this.executeUpdateNotification(url).subscribe();
+  }
+
+  executeUpdateNotification(url: string) {
+    return this.http.get(url);
+  }
+
+
+  clearUserNotifications(username: string) {
+    /*
+    Clears all user's notifications.
+    */
+    console.log("downloader service clearUserNotification()");
+    let url = this.baseServerUrl + 'notification/delete/' + username;
+    this.executeClearUserNotifications(url).subscribe();
+  }
+
+  executeClearUserNotifications(url: string) {
+    return this.http.get(url);
+  }
+
 
   ajaxRequest(id: number, username: string, name: string, marked: boolean, url: string, newLocation: boolean) {
     let self = this;
