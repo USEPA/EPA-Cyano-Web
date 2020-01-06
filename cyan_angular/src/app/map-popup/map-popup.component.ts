@@ -124,9 +124,13 @@ export class MapPopupComponent implements OnInit {
 
     this.user.getUserLocations().subscribe((userLocs) => {
       let userLoc = userLocs.find(locObj => locObj.id == ln.id);  // matches locId to userLocs location with same id
-      let locNotes = JSON.parse(userLoc.notes);
+      let notes = userLoc.notes;
+      let locNotes = [];
+      if (notes.length > 0) {
+        locNotes = JSON.parse(userLoc.notes);
+      }
       locNotes.push(noteObj);
-      userLoc.notes = locNotes;
+      userLoc.notes = JSON.stringify(locNotes);
       this.locationService.updateLocation(userLoc.name, userLoc);
       userLoc.notes = JSON.stringify(locNotes);
     });

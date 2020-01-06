@@ -1,5 +1,6 @@
 import { Component, OnInit, NgModule } from '@angular/core';
 import { LocationService } from '../services/location.service';
+import { UserService } from '../services/user.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -11,20 +12,36 @@ export class HeaderComponent implements OnInit {
 
   title = "Cyanobacteria Assessment Network";
   titleAbr = "CyAN";
-  compare_locations = {};
+  compare_locations = [];
   locationSubscription: Subscription;
+  new_notifications = [];
+  notificationSubscription: Subscription;
 
-  constructor(private locationService: LocationService) { }
+  constructor(
+    private userService: UserService,
+    private locationService: LocationService
+  ) { }
 
   ngOnInit() {
-		this.locationSubscription = this.locationService.compare$.subscribe(
-			locations => {
-				this.compare_locations = locations
-		});
+
+    this.notificationSubscription = this.userService.allNotifications$.subscribe(
+    	notifications => {
+        // Only using new (ie, unread, is_new=true) notifications.
+        this.new_notifications = notifications.filter(x => x[5] === 1);
+     	}
+    );
+
+    this.locationSubscription = this.locationService.compare$.subscribe(
+  		locations => {
+  			this.compare_locations = locations
+  		}
+    );
+
   }
 
-	ngOnDestroy() {
-		this.locationSubscription.unsubscribe();
-	}
+  ngOnDestroy() {
+    this.notificationSubscription.unsubscribe();
+    this.locationSubscription.unsubscribe();
+  }
 
 }

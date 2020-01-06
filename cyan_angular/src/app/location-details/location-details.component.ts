@@ -538,9 +538,7 @@ export class LocationDetailsNotes {
 	 ) {}
 
 	ngOnInit() {
-		// Loads selected location's notes upon component initialization:
-		console.log("notes component init");
-		var test = this;
+		// Loads selected location's notes upon component initialization
 	}
 
 	openLink(event: MouseEvent): void {
