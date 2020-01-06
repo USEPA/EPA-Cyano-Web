@@ -19,8 +19,13 @@ import { DownloaderService } from '../services/downloader.service';
 })
 export class NotificationsComponent implements OnInit {
 
-	new_notifications = [];
+	new_notifications = [];  // only new notifications
+  all_notifications = [];  // new and read notifications
+  display_notifications = [];  // notifications being displayed
+
   new_notifications_counter: number = 0;
+
+  current_notification_index: number = 0;
 
   showNotification: boolean = false;  // shows notification detail
 
@@ -126,7 +131,7 @@ export class NotificationsComponent implements OnInit {
 })
 export class NotificationDetails {
 
-  current_notification_index = 1;
+  current_notification_index;
 
   constructor(
     public dialogRef: MatDialogRef<NotificationDetails>,
@@ -135,6 +140,11 @@ export class NotificationDetails {
   ) { }
 
   ngOnInit() {
+    // get the index of the selected notification object
+    console.log("notification details initialized.");
+    let notificationId = this.data.notificationObj[1];
+    // this.current_notification_index = this.data.allNotifications.find(item => item[1] === notificationId);
+    this.current_notification_index = this.data.allNotifications.map(item => item[1]).indexOf(notificationId);
   }
 
   exit(): void {
@@ -145,7 +155,7 @@ export class NotificationDetails {
   previousNotification(): void {
     this.current_notification_index = this.current_notification_index == 1 ? this.data.allNotifications.length : this.current_notification_index - 1;
     this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
-    this.updateUserNotification(this.data.notificationObj);
+    this.updateUserNotifications(this.data.notificationObj);
   }
 
   nextNotification(): void {
