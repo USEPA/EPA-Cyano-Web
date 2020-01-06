@@ -36,6 +36,17 @@ else
 		marked BIT NOT NULL,
 		notes TEXT NOT NULL
 	);"
+	# Creates notifications table:
+	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
+	"CREATE TABLE IF NOT EXISTS Notifications (
+		owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
+		id INTEGER NOT NULL AUTO_INCREMENT,
+		date DATETIME NOT NULL,
+		subject VARCHAR(256) NOT NULL,
+		body TEXT NOT NULL,
+		is_new BIT NOT NULL,
+		PRIMARY KEY (id, owner)
+	);"
 fi
 
 # Creating user for connecting to mysql cyan-responsive database:
