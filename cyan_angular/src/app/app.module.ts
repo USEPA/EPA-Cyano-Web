@@ -30,7 +30,7 @@ import { HeaderComponent } from './header/header.component';
 import { LinksLeftComponent } from './links-left/links-left.component';
 import { FooterComponent } from './footer/footer.component';
 import { LocationCompareComponent } from './location-compare/location-compare.component';
-import { NotificationsComponent } from './notifications/notifications.component';
+import { NotificationsComponent, NotificationDetails } from './notifications/notifications.component';
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { ChartsModule } from 'ng2-charts';
@@ -49,6 +49,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 import { CoordinatesComponent } from './coordinates/coordinates.component';
+import { LatestImageComponent } from './latest-image/latest-image.component';
 
 @NgModule({
   declarations: [
@@ -60,13 +61,15 @@ import { CoordinatesComponent } from './coordinates/coordinates.component';
     FooterComponent,
     LocationCompareComponent,
     NotificationsComponent,
+    NotificationDetails,
     MapPopupComponent,
     ConfigComponent,
     LocationDetailsComponent,
     LocationDetailsNotes,
     AccountComponent,
     LocationCompareDetailsComponent,
-    CoordinatesComponent
+    CoordinatesComponent,
+    LatestImageComponent
   ],
   imports: [
     BrowserModule,
@@ -90,13 +93,14 @@ import { CoordinatesComponent } from './coordinates/coordinates.component';
     MatBottomSheetModule,
     MatBadgeModule,
     MatCardModule,
+    MatBadgeModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [LocationService, MapService, CyanMap, Location, DatePipe],
   bootstrap: [AppComponent],
-  entryComponents: [MapPopupComponent, LocationDetailsNotes]
+  entryComponents: [MapPopupComponent, LocationDetailsNotes, NotificationDetails]
 })
 export class AppModule {
   constructor(private injector: Injector) {

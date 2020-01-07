@@ -166,6 +166,34 @@ class GetLocation(Resource):
 		results = simplejson.loads(simplejson.dumps(result_obj))
 		return results, status_code
 
+class AddNotification(Resource):
+	"""
+	Endpoint for adding notification from last sync time.
+	"""
+	pass
+
+class EditNotification(Resource):
+	"""
+	Endpoint for setting is_new false after read.
+	"""
+	def get(self, user='', _id=''):
+		results, status_code = web_app_api.edit_notifications(user, _id)
+		return results, status_code
+
+class DeleteNotification(Resource):
+	"""
+	Endpoint for "Clear" notifications.
+	"""
+	def get(self, user=''):
+		results, status_code = web_app_api.delete_notifications(user)
+		return results, status_code
+
+class GetNotification(Resource):
+	"""
+	Endpoint for populating notifications list.
+	"""
+	pass
+
 
 
 api.add_resource(StatusTest, '/test')
@@ -176,6 +204,15 @@ api.add_resource(AddLocation, '/cyan/app/api/location/add')
 api.add_resource(EditLocation, '/cyan/app/api/location/edit')
 api.add_resource(DeleteLocation, '/cyan/app/api/location/delete/<string:user>/<string:_id>')
 api.add_resource(GetLocation, '/cyan/app/api/location/<string:user>/<string:_id>')
+
+# Notifications Endpoints:
+api.add_resource(AddNotification, '/cyan/app/api/notification/add')
+api.add_resource(EditNotification, '/cyan/app/api/notification/edit/<string:user>/<string:_id>')
+api.add_resource(DeleteNotification, '/cyan/app/api/notification/delete/<string:user>')
+api.add_resource(GetNotification, '/cyan/app/api/notification/<string:user>/<string:_id>')
+
+
+
 
 logging.info("CyAN Flask app started.\nLive endpoints:")
 logging.info(base_url + '/test')

@@ -43,6 +43,13 @@
 .popup-compare-btn:hover {
     background: darkgray;
 }
+.popup-latest-image-btn {
+    background: gray;
+    color: white;  
+}
+.popup-latest-image-btn:hover {
+    background: darkgray;
+}
 .popup-remove-btn {
     background: gray;
     color: white;  

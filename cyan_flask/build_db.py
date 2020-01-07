@@ -89,6 +89,26 @@ class DBHandler(object):
 		"""
 		self.execute_query(query, self.db_name)
 
+	def create_notifications_table(self):
+		query = """
+		CREATE TABLE IF NOT EXISTS Notifications (
+			-- id INTEGER NOT NULL PRIMARY KEY,
+			owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
+			-- id INTEGER NOT NULL AUTO_INCREMENT,
+			id INTEGER NOT NULL AUTO_INCREMENT,
+			date DATETIME NOT NULL,
+			subject VARCHAR(256) NOT NULL,
+			body TEXT NOT NULL,
+			is_new BIT NOT NULL,
+			-- image_id INT NOT NULL,
+			-- thumb_id INT NOT NULL,
+			PRIMARY KEY (id, owner)
+			-- FOREIGN KEY (image_id) REFERENCES image(id),
+			-- FOREIGN KEY (thumb_id) REFERENCES image(id)
+		);
+		"""
+		self.execute_query(query, self.db_name)
+
 
 
 if __name__ == '__main__':
@@ -122,6 +142,8 @@ if __name__ == '__main__':
 			dbh.create_user_table()
 		elif table_name == 'location':
 			dbh.create_location_table()
+		elif table_name == 'notifications':
+			dbh.create_notifications_table()
 		else:
 			raise Exception("Table name should be 'user' or 'location'.")
 	elif option == 3:
@@ -133,8 +155,10 @@ if __name__ == '__main__':
 		print("Creating tables.")
 		dbh.create_user_table()
 		dbh.create_location_table()
+		dbh.create_notifications_table()
 	elif option == 5:
 		print("Removing database and tables.")
 		dbh.delete_table('user')
 		dbh.delete_table('location')
+		dbh.delete_table('notifications')
 		dbh.delete_database()

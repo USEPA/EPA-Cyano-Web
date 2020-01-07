@@ -1,0 +1,17 @@
+<!-- Dialog for notification details -->
+<button mat-button (click)="exit();" class="details_exit">x</button>
+<div class="notification_name">
+	<button mat-button (click)="previousNotification();" class="details_prev_notification">&#8249;</button>
+	<h4>{{data.notificationObj[3]}}</h4>
+	<button mat-button (click)="nextNotification();" class="details_next_notification">&#8250;</button>
+</div>
+<br>
+<div class="details_notification_counter">
+	{{current_notification_index + 1}} of {{data.allNotifications.length}}
+</div>
+<div class="location_block_1">
+  <b>{{data.notificationObj[2]}}</b>
+  <br>
+  {{data.notificationObj[4]}}<br>
+</div>
+<br><br>

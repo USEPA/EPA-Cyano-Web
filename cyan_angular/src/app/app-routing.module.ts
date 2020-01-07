@@ -8,6 +8,8 @@ import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent } from './location-details/location-details.component';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 import { CoordinatesComponent } from './coordinates/coordinates.component';
+import { NotificationsComponent } from './notifications/notifications.component';
+import { LatestImageComponent } from './latest-image/latest-image.component';
 
 const routes: Routes = [
     { path: 'account', component: AccountComponent },
@@ -16,7 +18,9 @@ const routes: Routes = [
     { path: 'configs', component: ConfigComponent },
     { path: 'locationdetails', component: LocationDetailsComponent },
     { path: 'locationcomparedetails', component: LocationCompareDetailsComponent },
-    { path: 'coordinates', component: CoordinatesComponent }
+    { path: 'coordinates', component: CoordinatesComponent },
+	{ path: 'notifications', component: NotificationsComponent },
+    { path: 'latestimage', component: LatestImageComponent }
 ];
 
 @NgModule({
