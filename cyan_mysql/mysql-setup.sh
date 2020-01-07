@@ -12,7 +12,7 @@ if (( file_size > 0 )); then
 	echo "SQL_DUMP env var provided, building database with this file."
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} < ${dump_file}
 else
-	echo "Building fresh ${DB_NAME} database instance with User and Location tables."
+	echo "Building fresh ${DB_NAME} database instance with User, Location and Notifications tables."
 	# Creates database:
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
 	# Creates user table:
@@ -36,4 +36,20 @@ else
 		marked BIT NOT NULL,
 		notes TEXT NOT NULL
 	);"
+	# Creates notifications table:
+	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
+	"CREATE TABLE IF NOT EXISTS Notifications (
+		owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
+		id INTEGER NOT NULL AUTO_INCREMENT,
+		date DATETIME NOT NULL,
+		subject VARCHAR(256) NOT NULL,
+		body TEXT NOT NULL,
+		is_new BIT NOT NULL,
+		PRIMARY KEY (id, owner)
+	);"
 fi
+
+# Creating user for connecting to mysql cyan-responsive database:
+echo "Creating DB user."
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT SELECT, INSERT, DELETE, UPDATE ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
