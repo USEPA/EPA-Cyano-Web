@@ -31,7 +31,7 @@ export class UserService {
         this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
       }
       else {
-        this.currentAccount.error = details.error;
+        this.currentAccount['error'] = details['error'];
       }
     });
   }
