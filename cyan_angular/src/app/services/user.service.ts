@@ -26,10 +26,13 @@ export class UserService {
 
   loginUser(username: string, password: string) {
     this.downloader.userLogin(username, password).subscribe((details: Account) => {
-      console.log("(user.service.ts) Logging in user.");
-      this.currentAccount = null;
-      this.currentAccount = details;
-      this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
+      if (!('error' in details)) {
+        this.currentAccount = details;
+        this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
+      }
+      else {
+        this.currentAccount.error = details.error;
+      }
     });
   }
 
