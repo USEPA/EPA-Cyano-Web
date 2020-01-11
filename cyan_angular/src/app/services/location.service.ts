@@ -165,6 +165,7 @@ export class LocationService {
     dataDate: string,
     source: string
   ): Location {
+
     let l = new Location();
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
@@ -240,9 +241,13 @@ export class LocationService {
     this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
   }
 
+  updateCompareLocation(name: string, ln: Location) {
+  }
+
   deleteCompareLocation(ln: Location): void {
     if (this.compare_locations.includes(ln)) {
       this.compare_locations.splice(this.compare_locations.indexOf(ln), 1);
+      this.compareLocationsSource.next(this.compare_locations);
     }
   }
 
