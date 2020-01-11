@@ -34,6 +34,8 @@ export class CoordinatesComponent implements OnInit {
 	lonMin: number;
 	lonSec: number;
 
+	location: Location;
+
   constructor(
 		private locationService: LocationService,
 		private mapService: MapService,
@@ -70,12 +72,16 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	compareLocation(): void {
-		console.log("coordinates compareLocation()");
-		this.getLocationData();
-		this.locationService.addCompareLocation(e);
+		this.location = this.getLocationData();
+		// this.locationService.addCompareLocation(e);
+		this.locationService.addCompareLocation(this.location);
 	}
 
 	getLocationData() {
+		/*
+		requestType: 'compare' or 'mark'
+		*/
+
 		let map = this.mapService.getMap();
 
 		let name = 'To Be Updated...';
@@ -95,12 +101,12 @@ export class CoordinatesComponent implements OnInit {
 		location.longitude_sec = this.lonSec;
 		location.longitude_dir = this.selectedLon;
 
-
 		console.log("coordinates getLocationData()");
 
 		let latLon = this.mapService.getLatLng(location);
 
 		location = this.locationService.createLocation(name, latLon.lat, latLon.lng, cellCon, maxCellCon, cellChange, dataDate, source);
+
 		map.setView(latLon, 12);
 		let m = marker(this.mapService.getLatLng(location), {
 			icon: icon({
@@ -125,6 +131,9 @@ export class CoordinatesComponent implements OnInit {
 		});
 		this.mapService.addMarker(location.id, m);
 		m.fireEvent('click');
+
+		return location;
+
 	}
 
 	getMarker(n: number, c: boolean): string {
