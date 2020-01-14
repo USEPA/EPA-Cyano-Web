@@ -89,7 +89,7 @@ export class LocationService {
             l.concentrationChange = 0;
             l.changeDate = '';
             l.dataDate = '';
-            l.marked = location.marked == 'true' ? true : false;
+            l.marked = location.marked == true ? true : false;
             l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
             l.sourceFrequency = '';
             l.validCellCount = 0;
@@ -341,10 +341,9 @@ export class LocationService {
 
   setMarked(l: Location, m: boolean): void {
     l.marked = m;
-
-    // let username = this.user.getUserName();
+    let username = this.user.getUserName();
     // let marked = (m) ? "true" : "false";
-    // this.downloader.editUserLocation(username, l.id, name, marked, JSON.stringify(l.notes));
+    this.downloader.editUserLocation(username, l.id, name, l.marked, JSON.stringify(l.notes));
   }
 
   addMarkers(map: Map): void {
