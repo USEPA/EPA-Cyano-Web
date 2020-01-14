@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -15,7 +16,8 @@ export class LocationCompareComponent implements OnInit {
   constructor(
     private locationService: LocationService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
    ) {}
 
   ngOnInit() {
@@ -66,12 +68,53 @@ export class LocationCompareComponent implements OnInit {
     /*
     Opens location compare details.
     */
-    console.log("compareLocations called.");
+    
+    // Checks that > 1 location exists before routing to location-compare-details:
+    if (this.selected_locations.length < 2) {
+      // alert("Must have at least two locations selected for comparing.");
+      this.dialog.open(LocationCompareAlert, {
+        // width: '50%',
+        data: {}
+      });
+      return;
+    }
+
     this.router.navigate(['/locationcomparedetails',
       {
         locations: this.selected_locations.map((ln: Location) => ln.id),
         current_location: this.selected_locations[0].id  // testing with current_location
       }
     ]);
+  }
+}
+
+
+
+@Component({
+  selector: 'location-compare-alert',
+  styleUrls: ['./location-compare.component.css'],
+  template: `
+  <button mat-button (click)="exit();" class="details_exit">x</button>
+  <br><br>
+  <h6>Must have at least two locations selected for comparing.</h6>
+  <br><br>
+  <div style="display: flex; justify-content: center;">
+  <button mat-button class="compare-btn mat-button" (click)="exit();">OK</button>
+  </div>
+  <br>
+  `
+})
+export class LocationCompareAlert {
+
+  constructor(
+    public dialogRef: MatDialogRef<LocationCompareAlert>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
+
+  ngOnInit() {
+  }
+
+  exit(): void {
+    this.dialogRef.close();
   }
 }
