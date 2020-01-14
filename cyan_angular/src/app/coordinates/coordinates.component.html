@@ -28,12 +28,6 @@
     <br>
     <br>
     <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
-    <span *ngIf=" marked == 'Unmark'; then unmark else mark"></span>
-    <ng-template #unmark>
-      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation()"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
-    </ng-template>
-    <ng-template #mark>
-      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation()"><span id="marked-icon" class="unmark"></span><span id="marked-label">Unmark</span> Location</button>
-    </ng-template>
+    <button type="button" class="popup-unmark-btn popup-btn" (click)="markLocation()"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
   </div>
 </div>

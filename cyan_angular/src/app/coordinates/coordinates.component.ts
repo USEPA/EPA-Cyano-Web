@@ -52,28 +52,15 @@ export class CoordinatesComponent implements OnInit {
 		this.configService.getLevels().subscribe(levels => (this.cyan_ranges = levels));
 	}
 
-	toggleMarkedLocation(ln: Location): void {
-		let m = this.marked == 'Mark' ? false : true;
-		this.locationService.setMarked(ln, m);
-		// Change mark button label
-		let label = document.getElementById('marked-label');
-		label.innerHTML = this.marked;
-		// Change mark button icon
-		let icon = document.getElementById('marked-icon');
-		let iconClasses = icon.classList;
-		if (iconClasses.contains('mark')) {
-			icon.className = 'unmark';
-		} else {
-			icon.className = 'mark';
-		}
-		this.marked = m ? 'Unmark' : 'Mark';
-		this.mapService.updateMarker(ln);
-		this.locationService.updateLocation(ln.name, ln);
+	markLocation(): void {
+		this.location = this.getLocationData();
+		this.locationService.setMarked(this.location, true);
+		this.mapService.updateMarker(this.location);
+		this.locationService.updateLocation(this.location.name, this.location);
 	}
 
 	compareLocation(): void {
 		this.location = this.getLocationData();
-		// this.locationService.addCompareLocation(e);
 		this.locationService.addCompareLocation(this.location);
 	}
 
