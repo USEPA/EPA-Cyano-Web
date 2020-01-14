@@ -2,9 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { MatBottomSheet, MatBottomSheetRef } from '@angular/material';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 
 import { Location } from '../models/location';
 // import { LocationService } from '../services/location.service';
@@ -33,7 +31,6 @@ export class NotificationsComponent implements OnInit {
 
   constructor(
 		private userService: UserService,
-    private bottomSheet: MatBottomSheet,
     private dialog: MatDialog
   ) { }
 
