@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Location } from '../models/location';
@@ -10,7 +10,9 @@ import { LocationService } from '../services/location.service';
   styleUrls: ['./location-compare.component.css']
 })
 export class LocationCompareComponent implements OnInit {
+
   selected_locations: Location[];
+  current_compare_locations: Location[];  // compare locations list prior to incoming locations update
 
   constructor(
     private locationService: LocationService,
@@ -19,7 +21,7 @@ export class LocationCompareComponent implements OnInit {
    ) {}
 
   ngOnInit() {
-    console.log(this.selected_locations);
+    // console.log(this.selected_locations);
     this.getLocations();
     if (this.selected_locations === undefined) {
       this.selected_locations = [];
@@ -27,7 +29,22 @@ export class LocationCompareComponent implements OnInit {
   }
 
   getLocations(): void {
-    this.locationService.getCompareLocations().subscribe(locations => (this.selected_locations = locations));
+    this.locationService.getCompareLocations().subscribe(locations => {
+      console.log("location compare loc service getCompareLocations sub called.");
+      this.selected_locations = locations
+    });
+    
+    this.locationService.getLocations('').subscribe(locations => {
+      // Update any data/info for compare locations.
+      locations.forEach(location => {
+        // Find matching ID, then update anything in selected_compare from location
+        let locIndex = this.selected_locations.map((item) => { return item.id; }).indexOf(location.id);
+        if (locIndex > -1) {
+          this.selected_locations[locIndex] = location;
+        }
+      });
+    });    
+
   }
 
   removeLocation(loc: Location): void {
@@ -66,7 +83,9 @@ export class LocationCompareComponent implements OnInit {
     /*
     Opens location compare details.
     */
-    console.log("compareLocations called.");
+    
+    // TODO: Make sure there's more than 1 location to compare.
+
     this.router.navigate(['/locationcomparedetails',
       {
         locations: this.selected_locations.map((ln: Location) => ln.id),
