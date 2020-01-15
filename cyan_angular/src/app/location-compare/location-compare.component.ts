@@ -1,5 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -17,7 +18,8 @@ export class LocationCompareComponent implements OnInit {
   constructor(
     private locationService: LocationService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
    ) {}
 
   ngOnInit() {
@@ -84,7 +86,13 @@ export class LocationCompareComponent implements OnInit {
     Opens location compare details.
     */
     
-    // TODO: Make sure there's more than 1 location to compare.
+    // Checks that > 1 location exists before routing to location-compare-details:
+    if (this.selected_locations.length < 2) {
+      this.dialog.open(LocationCompareAlert, {
+        data: {}
+      });
+      return;
+    }
 
     this.router.navigate(['/locationcomparedetails',
       {
@@ -92,5 +100,36 @@ export class LocationCompareComponent implements OnInit {
         current_location: this.selected_locations[0].id  // testing with current_location
       }
     ]);
+  }
+}
+
+
+
+@Component({
+  selector: 'location-compare-alert',
+  styleUrls: ['./location-compare.component.css'],
+  template: `
+  <button mat-button (click)="exit();" class="details_exit">x</button>
+  <br><br>
+  <h6>Must have at least two locations selected for comparing.</h6>
+  <br><br>
+  <div style="display: flex; justify-content: center;">
+  <button mat-button class="compare-btn mat-button" (click)="exit();">OK</button>
+  </div>
+  <br>
+  `
+})
+export class LocationCompareAlert {
+
+  constructor(
+    public dialogRef: MatDialogRef<LocationCompareAlert>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
+
+  ngOnInit() {
+  }
+
+  exit(): void {
+    this.dialogRef.close();
   }
 }

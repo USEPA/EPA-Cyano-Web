@@ -335,3 +335,8 @@
 #marked_locations {
     margin: 25px 10px;
 }
+.details_exit {
+    float: right;
+    font-size: x-large;
+    /*margin: 5px 5px;*/
+}
