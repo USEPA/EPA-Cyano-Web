@@ -120,7 +120,7 @@ export class UserLocations {
   name: string;
   latitude: number;
   longitude: number;
-  marked: string;
+  marked: boolean;
   notes: string;
 }
 

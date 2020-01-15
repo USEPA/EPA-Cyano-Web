@@ -93,7 +93,8 @@ export class DownloaderService {
       name: name,
       latitude: latitude,
       longitude: longitude,
-      marked: marked ? 'true' : 'false',
+      // marked: marked ? 'true' : 'false',
+      marked: marked,
       notes: notes
     };
     this.executeUserLocations(url, body).subscribe();
@@ -109,7 +110,8 @@ export class DownloaderService {
       owner: username,
       id: id,
       name: name,
-      marked: marked ? 'true' : 'false',
+      // marked: marked ? 'true' : 'false',
+      marked: marked,
       notes: notes
     };
     this.executeEditUserLocation(url, body).subscribe();

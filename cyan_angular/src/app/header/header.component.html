@@ -61,7 +61,7 @@
                     <span class="tab-title">Notifications</span>
                 </div>
             </button>
-            <button mat-menu-item disabled class="coordiantes menu-link">
+            <button mat-menu-item class="coordiantes menu-link">
                 <div class="menu-div">
                     <!-- <img class="tab-icon" src="assets/images/tab_geo_coord_icon.png"/> -->
                     <span class="tab-title">Geographic Coordinates</span>
@@ -88,7 +88,7 @@
                 <span matBadge="{{new_notifications.length || ''}}" matBadgeColor="warn" class="tab-title">Notifications</span>
             </div>
         </button>
-        <button mat-button disabled class="coordinates menu-item">
+        <button mat-button class="coordinates menu-item" [routerLink]="['/coordinates']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
                 <img class="tab-icon" src="assets/images/tab_geo_coord_icon.png"/>
                 <span class="tab-title">Geographic Coordinates</span>

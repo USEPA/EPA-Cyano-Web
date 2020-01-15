@@ -11,7 +11,9 @@ import { LocationService } from '../services/location.service';
   styleUrls: ['./location-compare.component.css']
 })
 export class LocationCompareComponent implements OnInit {
+
   selected_locations: Location[];
+  current_compare_locations: Location[];  // compare locations list prior to incoming locations update
 
   constructor(
     private locationService: LocationService,
@@ -21,7 +23,7 @@ export class LocationCompareComponent implements OnInit {
    ) {}
 
   ngOnInit() {
-    console.log(this.selected_locations);
+    // console.log(this.selected_locations);
     this.getLocations();
     if (this.selected_locations === undefined) {
       this.selected_locations = [];
@@ -29,7 +31,22 @@ export class LocationCompareComponent implements OnInit {
   }
 
   getLocations(): void {
-    this.locationService.getCompareLocations().subscribe(locations => (this.selected_locations = locations));
+    this.locationService.getCompareLocations().subscribe(locations => {
+      console.log("location compare loc service getCompareLocations sub called.");
+      this.selected_locations = locations
+    });
+    
+    this.locationService.getLocations('').subscribe(locations => {
+      // Update any data/info for compare locations.
+      locations.forEach(location => {
+        // Find matching ID, then update anything in selected_compare from location
+        let locIndex = this.selected_locations.map((item) => { return item.id; }).indexOf(location.id);
+        if (locIndex > -1) {
+          this.selected_locations[locIndex] = location;
+        }
+      });
+    });    
+
   }
 
   removeLocation(loc: Location): void {
@@ -71,9 +88,7 @@ export class LocationCompareComponent implements OnInit {
     
     // Checks that > 1 location exists before routing to location-compare-details:
     if (this.selected_locations.length < 2) {
-      // alert("Must have at least two locations selected for comparing.");
       this.dialog.open(LocationCompareAlert, {
-        // width: '50%',
         data: {}
       });
       return;

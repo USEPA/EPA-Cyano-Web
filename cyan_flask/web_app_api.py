@@ -159,6 +159,15 @@ def add_location(post_data):
 		notes = post_data['notes']  # array of strings in json format
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
+
+	# Checks if location already exists for user:
+	query = 'SELECT * FROM Location WHERE id = %s AND owner = %s'
+	values = (_id, user,)
+	location = query_database(query, values)  # returns list of tuples (user, id, name, lat, lon, marked, notes)
+	if isinstance(location, list) and len(location) > 0:
+		return {"status": "success"}, 200  # location already exists for owner
+
+	# Inserts new location into database:
 	query = 'INSERT INTO Location(owner, id, name, latitude, longitude, marked, notes) VALUES (%s, %s, %s, %s, %s, %s, %s)'
 	values = (user, _id, name, latitude, longitude, marked, notes,)
 	location = query_database(query, values)
