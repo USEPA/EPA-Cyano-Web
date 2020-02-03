@@ -3,8 +3,8 @@
 dump_file="/tmp/dump.sql"
 file_size=$(find "$dump_file" -printf "%s")
 
-echo "The value for SQL_DUMP is ${SQL_DUMP}"
-echo "The file size for potential sql dump file is ${file_size}"
+echo "The value for SQL_DUMP is ${SQL_DUMP}."
+echo "The file size for potential sql dump file is ${file_size}."
 
 # TODO: Add 3rd case - existing DB on host at /var/lib/mysql (e.g., VM deploys, prod, etc.)
 
