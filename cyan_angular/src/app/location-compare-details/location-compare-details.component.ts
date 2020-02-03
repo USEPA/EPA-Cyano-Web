@@ -55,7 +55,6 @@ export class LocationCompareDetailsComponent implements OnInit {
   // Variables for chart
   dataDownloaded: boolean = false;
   @Input() chartData: Array<any> = [];
-  @Input() chartDataLabels: Array<any> = [];
   public chartOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
@@ -162,32 +161,21 @@ export class LocationCompareDetailsComponent implements OnInit {
       coord.longitude,
       false
     );
-    this.chartDataLabels = [];
-    let self = this;
+
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
       let data = rawData[l.id].requestData;
-      let ts = [];
-      let labels = [];
-      data.outputs.map(timestep => {
-        if (timestep.satelliteImageFrequency == 'Weekly') {
-          ts.push(timestep.cellConcentration);
-          labels.push(timestep.imageDate.split(' ')[0]);
-        }
-      });
-      ts = ts.reverse();
-      labels = labels.reverse();
+      let timeSeriesData = [];
 
       console.log("Adding time series data to chart.");
-
-      // Builds data var like [{x: '', y: ''}, {}...]
-      let timeSeriesData = []
-      let i = 0;
-      ts.forEach(item => {
-      	let datum = {x: null, y: null};
-      	datum.x = labels[i];
-      	datum.y = item;
-      	timeSeriesData[i] = datum;
-      	i++;
+      data.outputs.map(timestep => {
+        if (timestep.satelliteImageFrequency == 'Weekly') {
+          // Builds data var like [{x: '', y: ''}, {}...]
+          let datum = {
+            x: timestep.imageDate.split(' ')[0],
+            y: timestep.cellConcentration
+          };
+          timeSeriesData.push(datum);
+        }
       });
 
       // Adds time series line to chart:
@@ -196,9 +184,6 @@ export class LocationCompareDetailsComponent implements OnInit {
       	label: l.name
       });
 
-      setTimeout(function() {
-        // self.chartDataLabels = labels;
-      }, 100);
       this.dataDownloaded = true;
     });
   }

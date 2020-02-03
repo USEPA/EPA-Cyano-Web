@@ -67,10 +67,15 @@ export class LocationDetailsComponent implements OnInit {
 			label: ''
 		}
 	];
-	@Input() chartDataLabels: Array<any> = [];
 	public chartOptions: any = {
 		responsive: true,
-		maintainAspectRatio: false
+		maintainAspectRatio: false,
+    scales: {
+      xAxes: [{
+        type: "time",
+        time: { parser: "MM-DD-YYYY" }
+      }]
+    }
 	};
 	public chartColors: Array<any> = [
 		{
@@ -138,7 +143,6 @@ export class LocationDetailsComponent implements OnInit {
 		this.getImages();
 		this.downloadTimeSeries();
 
-		
 		let locId = this.current_location.id;
 		this.user.getUserLocations().subscribe((userLocs) => {
 			let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
@@ -391,31 +395,28 @@ export class LocationDetailsComponent implements OnInit {
 			coord.longitude,
 			false
 		);
-		this.chartData = [
-			{
-				data: [],
-				label: ''
-			}
-		];
-		this.chartDataLabels = [];
+		this.chartData = [];
 		let self = this;
 		this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
 			let data = rawData[self.current_location.id].requestData;
-			let ts = [];
-			let labels = [];
+			let timeSeriesData = [];
 			data.outputs.map(timestep => {
 				if (timestep.satelliteImageFrequency == 'Weekly') {
-					ts.push(timestep.cellConcentration);
-					labels.push(timestep.imageDate.split(' ')[0]);
+          // Builds data var like [{x: '', y: ''}, {}...]
+          let datum = {
+            x: timestep.imageDate.split(' ')[0],
+            y: timestep.cellConcentration
+          };
+          timeSeriesData.push(datum);
 				}
 			});
-			ts = ts.reverse();
-			labels = labels.reverse();
-			this.chartData[0].data = ts;
-			this.chartData[0].label = 'Cell Concentration';
-			setTimeout(function() {
-				self.chartDataLabels = labels;
-			}, 100);
+
+      // Adds time series line to chart:
+      this.chartData.push({
+        data: timeSeriesData,
+        label: 'Cell Concentration'
+      });
+
 			this.dataDownloaded = true;
 		});
 	}
@@ -509,7 +510,7 @@ export class LocationDetailsComponent implements OnInit {
 
 	openNotes(l: Location): void {
 		this.bottomSheet.open(LocationDetailsNotes, {
-			data: { 
+			data: {
 				location: l
 			}
 		});
