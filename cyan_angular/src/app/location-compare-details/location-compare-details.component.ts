@@ -55,15 +55,14 @@ export class LocationCompareDetailsComponent implements OnInit {
   // Variables for chart
   dataDownloaded: boolean = false;
   @Input() chartData: Array<any> = [];
-  @Input() chartDataLabels: Array<any> = [];
   public chartOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-    	xAxes: [{
-    		type: "time",
-    		time: { parser: "MM-DD-YYYY" }
-    	}]
+      xAxes: [{
+        type: "time",
+        time: {parser: "MM-DD-YYYY"}
+      }]
     }
   };
   public chartColors: Array<any> = [
@@ -79,6 +78,7 @@ export class LocationCompareDetailsComponent implements OnInit {
   ];
   public chartLegend: boolean = true;
   public chartType: string = 'line';
+
   chartHover(event: any): void {
     console.log(event);
   }
@@ -98,20 +98,19 @@ export class LocationCompareDetailsComponent implements OnInit {
     center: latLng([this.lat_0, this.lng_0])
   };
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private locationService: LocationService,
-    private mapService: MapService,
-    private bottomSheet: MatBottomSheet,
-    private images: LocationImagesService,
-    private downloader: DownloaderService,
-    private user: UserService
-  ) {}
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private locationService: LocationService,
+              private mapService: MapService,
+              private bottomSheet: MatBottomSheet,
+              private images: LocationImagesService,
+              private downloader: DownloaderService,
+              private user: UserService) {
+  }
 
   ngOnInit() {
 
-  	console.log("Initializing location-compare-details component.");
+    console.log("Initializing location-compare-details component.");
 
     this.imageCollection = null;
     this.route.params.subscribe(
@@ -134,9 +133,9 @@ export class LocationCompareDetailsComponent implements OnInit {
     }
 
     // Gets time series data and plots it for each location:
-   	this.locations.forEach(location => {
-   		this.downloadTimeSeries(location);
-   	});
+    this.locations.forEach(location => {
+      this.downloadTimeSeries(location);
+    });
 
     let self = this;
     let timeout = this.tsTicker * 1000;
@@ -162,54 +161,40 @@ export class LocationCompareDetailsComponent implements OnInit {
       coord.longitude,
       false
     );
-    this.chartDataLabels = [];
-    let self = this;
+
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
       let data = rawData[l.id].requestData;
-      let ts = [];
-      let labels = [];
-      data.outputs.map(timestep => {
-        if (timestep.satelliteImageFrequency == 'Weekly') {
-          ts.push(timestep.cellConcentration);
-          labels.push(timestep.imageDate.split(' ')[0]);
-        }
-      });
-      ts = ts.reverse();
-      labels = labels.reverse();
+      let timeSeriesData = [];
 
       console.log("Adding time series data to chart.");
-
-      // Builds data var like [{x: '', y: ''}, {}...]
-      let timeSeriesData = []
-      let i = 0;
-      ts.forEach(item => {
-      	let datum = {x: null, y: null};
-      	datum.x = labels[i];
-      	datum.y = item;
-      	timeSeriesData[i] = datum;
-      	i++;
+      data.outputs.map(timestep => {
+        if (timestep.satelliteImageFrequency == 'Weekly') {
+          // Builds data var like [{x: '', y: ''}, {}...]
+          let datum = {
+            x: timestep.imageDate.split(' ')[0],
+            y: timestep.cellConcentration
+          };
+          timeSeriesData.push(datum);
+        }
       });
 
       // Adds time series line to chart:
       this.chartData.push({
-      	data: timeSeriesData,
-      	label: l.name
+        data: timeSeriesData,
+        label: l.name
       });
 
-      setTimeout(function() {
-        // self.chartDataLabels = labels;
-      }, 100);
       this.dataDownloaded = true;
     });
   }
 
   displayMap($event): void {
-  	if ($event.index == 2) {
-  		this.showMap = true;
-  	}
-  	else {
-  		this.showMap = false;
-  	}
+    if ($event.index == 2) {
+      this.showMap = true;
+    }
+    else {
+      this.showMap = false;
+    }
   }
 
   onMapReady(map: Map): void {
@@ -246,12 +231,15 @@ export class LocationCompareDetailsComponent implements OnInit {
   getArrow(l: Location) {
     return this.locationService.getArrow(l);
   }
+
   getColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
   }
+
   formatNumber(n: number) {
     return this.locationService.formatNumber(n);
   }
+
   getPercentage(l: Location) {
     return this.locationService.getPercentage(l);
   }
