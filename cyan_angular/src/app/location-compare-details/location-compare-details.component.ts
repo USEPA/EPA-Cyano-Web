@@ -73,7 +73,8 @@ export class LocationCompareDetailsComponent implements OnInit {
       pointBackgroundColor: 'rgba(0,255,255,1)',
       pointBorderColor: '#00FFFF',
       pointHoverBackgroundColor: '#00FFFF',
-      pointHoverBorderColor: 'rgba(0,255,255,0.8)'
+      pointHoverBorderColor: 'rgba(0,255,255,0.8)',
+      lineTension: 0
     }
   ];
   public chartLegend: boolean = true;
