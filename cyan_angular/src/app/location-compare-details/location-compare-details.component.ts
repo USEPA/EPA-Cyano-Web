@@ -74,7 +74,6 @@ export class LocationCompareDetailsComponent implements OnInit {
       pointBorderColor: '#00FFFF',
       pointHoverBackgroundColor: '#00FFFF',
       pointHoverBorderColor: 'rgba(0,255,255,0.8)',
-      lineTension: 0
     }
   ];
   public chartLegend: boolean = true;
@@ -182,7 +181,8 @@ export class LocationCompareDetailsComponent implements OnInit {
       // Adds time series line to chart:
       this.chartData.push({
         data: timeSeriesData,
-        label: l.name
+        label: l.name,
+        lineTension: 0
       });
 
       this.dataDownloaded = true;
