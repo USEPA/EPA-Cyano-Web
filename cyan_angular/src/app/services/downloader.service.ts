@@ -81,11 +81,10 @@ export class DownloaderService {
   userLogin(username: string, password: string) {
     let url = this.baseServerUrl + 'user';
     let body = { user: username, password: password };
-    // return this.http.post<Account>(url, body, headerOptions);
     return this.http.post(url, body, headerOptions);
   }
 
-  addUserLocation(username: string, id: number, name: string, latitude: number, longitude: number, marked: boolean, notes: string) {
+  addUserLocation(username: string, id: number, name: string, latitude: number, longitude: number, marked: boolean, notes: object[]) {
     let url = this.baseServerUrl + 'location/add';
     let body = {
       owner: username,
@@ -93,7 +92,6 @@ export class DownloaderService {
       name: name,
       latitude: latitude,
       longitude: longitude,
-      // marked: marked ? 'true' : 'false',
       marked: marked,
       notes: notes
     };
@@ -110,7 +108,6 @@ export class DownloaderService {
       owner: username,
       id: id,
       name: name,
-      // marked: marked ? 'true' : 'false',
       marked: marked,
       notes: notes
     };
@@ -153,7 +150,6 @@ export class DownloaderService {
     /*
     Clears all user's notifications.
     */
-    console.log("downloader service clearUserNotification()");
     let url = this.baseServerUrl + 'notification/delete/' + username;
     this.executeClearUserNotifications(url).subscribe();
   }
@@ -274,7 +270,7 @@ export class DownloaderService {
     }
 
     if (newLocation) {
-      this.addUserLocation(username, id, ln.name, data.metaInfo.locationLat, data.metaInfo.locationLng, ln.marked, '');
+      this.addUserLocation(username, id, ln.name, data.metaInfo.locationLat, data.metaInfo.locationLng, ln.marked, []);
     }
     return ln;
   }

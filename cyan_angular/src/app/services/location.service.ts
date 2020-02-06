@@ -90,7 +90,7 @@ export class LocationService {
             l.changeDate = '';
             l.dataDate = '';
             l.marked = location.marked == true ? true : false;
-            l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
+            l.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
             l.sourceFrequency = '';
             l.validCellCount = 0;
             loc.push(l);
@@ -342,7 +342,6 @@ export class LocationService {
   setMarked(l: Location, m: boolean): void {
     l.marked = m;
     let username = this.user.getUserName();
-    // let marked = (m) ? "true" : "false";
     this.downloader.editUserLocation(username, l.id, name, l.marked, JSON.stringify(l.notes));
   }
 
