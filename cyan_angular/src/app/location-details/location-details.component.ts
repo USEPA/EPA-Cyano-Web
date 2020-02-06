@@ -146,8 +146,10 @@ export class LocationDetailsComponent implements OnInit {
 
     let locId = this.current_location.id;
     this.user.getUserLocations().subscribe((userLocs) => {
+      console.log("location-details ngOnInit user.getUserLocations()");
       let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-      this.current_location.notes = JSON.parse(userLoc.notes);
+      // this.current_location.notes = JSON.parse(userLoc.notes);
+      this.current_location.notes = userLoc.notes;
     });
 
     let self = this;
@@ -510,6 +512,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   openNotes(l: Location): void {
+    console.log("location-details openNotes");
     this.bottomSheet.open(LocationDetailsNotes, {
       data: {
         location: l
@@ -578,17 +581,6 @@ export class LocationDetailsNotes {
     noteObj.note = noteObj.note.replace(/\r?\n|\r/g, '');  // remove any newlines
     l.notes.push(noteObj);
     this.locationService.updateLocation(l.name, l);  // adds note to location in db
-
-    let locId = l.id;  // gets id of selected location
-    this.user.getUserLocations()
-      .subscribe((userLocs) => {
-          let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-          let locNotes = JSON.parse(userLoc.notes);
-          locNotes.push(noteObj);
-          userLoc.notes = JSON.stringify(locNotes);
-        }
-      );
-
   }
 
 }

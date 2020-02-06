@@ -111,32 +111,15 @@ export class MapPopupComponent implements OnInit {
   }
 
   saveNoteToLocation(ln: Location): void {
-
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
     let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
-    console.log("date time: " + dateTime);
-
     let noteObj = {
       timestamp: dateTime,
       note: noteTextbox.value
     };
-
-
-    this.user.getUserLocations().subscribe((userLocs) => {
-      let userLoc = userLocs.find(locObj => locObj.id == ln.id);  // matches locId to userLocs location with same id
-      let notes = userLoc.notes;
-      let locNotes = [];
-      if (notes.length > 0) {
-        locNotes = JSON.parse(userLoc.notes);
-      }
-      locNotes.push(noteObj);
-      userLoc.notes = JSON.stringify(locNotes);
-      this.locationService.updateLocation(userLoc.name, userLoc);
-      userLoc.notes = JSON.stringify(locNotes);
-    });
+    this.location.notes.push(noteObj);
+    this.locationService.updateLocation(this.location.name, this.location);
     noteTextbox.value = "";
-
-
   }
 
   toggleMarkedLocation(ln: Location): void {
