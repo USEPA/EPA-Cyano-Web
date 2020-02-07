@@ -75,6 +75,8 @@ export class LocationService {
             l.id = location.id;
             l.name = location.name;
             let coord = self.convertCoordinates(location.latitude, location.longitude);
+            l.latitude = location.latitude;
+            l.longitude = location.longitude;
             l.latitude_deg = coord.latDeg;
             l.latitude_min = coord.latMin;
             l.latitude_sec = coord.latSec;
@@ -96,10 +98,13 @@ export class LocationService {
             loc.push(l);
           }
         });
+
+        self.downloader.loadLocations(loc);
         loc.forEach(function(ln) {
-          self.downloadLocation(ln, false);
+          self.downloadLocation(ln);
         });
         let map = self.mapService.getMap();
+        this.locations = loc;
         self.addMarkers(map);
       }
     });
@@ -123,15 +128,17 @@ export class LocationService {
     return of(this.locations);
   }
 
-  downloadLocation(location: Location, newLocation: boolean): void {
-    let deg = this.convertToDegrees(location);
+  downloadLocation(location: Location): void {
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(location.id, username, location.name, location.marked, deg.latitude, deg.longitude, newLocation);
+    this.downloader.getAjaxData(username, location);
     this.getData();
   }
 
   getData(): void {
-    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => (this.locations = locations));
+    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => {
+        this.locations = locations;
+      }
+    );
   }
 
   getLocationData(): Observable<Location[]> {
@@ -170,6 +177,8 @@ export class LocationService {
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
     l.name = name;
+    l.latitude = latitude;
+    l.longitude = longitude;
     l.latitude_deg = c.latDeg;
     l.latitude_min = c.latMin;
     l.latitude_sec = c.latSec;
@@ -188,42 +197,32 @@ export class LocationService {
     l.validCellCount = 9;
     l.notes = [];
     l.marked = false;
+
+    this.downloader.addUserLocation(this.user.getUserName(), l);
     this.locations.push(l);
+
     return l;
   }
 
   deleteLocation(ln: Location): void {
-    let i = 0;
-    let j = null;
-    this.locations.map(loc => {
-      if (loc.id == ln.id) {
-        j = i;
-      }
-      i = i + 1;
-    });
-
-    if (j !== null) {
-      let name = this.locations[j].name;
-      this.locations.splice(j, 1);
-      let username = this.user.getUserName();
-      this.downloader.deleteUserLocation(username, ln.id);
+    const index = this.locations.map(loc => loc.id).indexOf(ln.id);
+    if (index >= 0) {
+      this.downloader.deleteUserLocation(this.user.getUserName(), ln.id);
+      this.locations.splice(index, 1);
     }
+    // delete from compare also
+    this.deleteCompareLocation(ln);
   }
 
   // updateLocation(name: string, ln: Location): void {
   updateLocation(name: string, ln): void {
-    let i = 0;
-    let j = 0;
-    this.locations.map(loc => {
-      if (loc.id == ln.id) {
-        j = i;
+    this.locations.forEach((loc) => {
+      if (loc.id === ln.id) {
+        loc.name = name;
+        let username = this.user.getUserName();
+        this.downloader.editUserLocation(username, ln.id, name, ln.marked, JSON.stringify(ln.notes));
       }
-      i = i + 1;
     });
-    this.locations[j].name = name;
-
-    let username = this.user.getUserName();
-    this.downloader.editUserLocation(username, ln.id, name, ln.marked, JSON.stringify(ln.notes));
   }
 
   getCompareLocations(): Observable<Location[]> {
@@ -350,30 +349,9 @@ export class LocationService {
     this.locations.forEach(location => {
       let self = this;
       if (!self.mapService.hasMarker(location.id)) {
-        let m = marker(this.mapService.getLatLng(location), {
-          icon: icon({
-            iconSize: [30, 36],
-            iconAnchor: [13, 41],
-            iconUrl: this.mapService.getMarker(location),
-            shadowUrl: 'leaflet/marker-shadow.png'
-          }),
-          title: location.name,
-          riseOnHover: true,
-          zIndexOffset: 10000
-        });
-        m.on('click', function(e) {
-          let p = self.mapService.createPopup(self.getLocationByID(location.id));
-          map.setView(m.getLatLng(), 12);
-          m.bindPopup(p).openPopup();
-          m.unbindPopup();
-        });
-        this.mapService.addMarker(location.id, m);
+        this.mapService.addMarker(location);
       }
     });
-    let self = this;
-    setTimeout(function() {
-      self.addMarkers(map);
-    }, 100);
   }
 }
 

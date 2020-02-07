@@ -21,7 +21,6 @@ export class MarkerMapComponent implements OnInit {
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
-  locations: Location[];
   marker_layers: LayerGroup;
 
   esriImagery = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -74,15 +73,12 @@ export class MarkerMapComponent implements OnInit {
   }
 
   getLocations(): void {
-    this.locationService.getLocations(this.mapService.getSource()).subscribe(location => (this.locations = location));
+    this.locationService.getLocations(this.mapService.getSource()).subscribe();
   }
 
   onMapReady(map: Map) {
     // Initialize Map
     this.mapService.setMap(map);
-
-    // Add markers from list of user locations
-    this.addMarkers(map);
   }
 
   addMarkerOnClick(e: any): void {
@@ -99,62 +95,8 @@ export class MarkerMapComponent implements OnInit {
 
     let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
     map.setView(e.latlng, 12);
-    let m = marker(this.mapService.getLatLng(location), {
-      icon: icon({
-        iconSize: [30, 36],
-        iconAnchor: [13, 41],
-        iconUrl: this.getMarker(location.cellConcentration, location.marked),
-        shadowUrl: 'leaflet/marker-shadow.png'
-      }),
-      title: location.name,
-      riseOnHover: true,
-      zIndexOffset: 10000
-    });
-    let self = this;
-    m.on('click', function(e) {
-      let p = self.mapService.createPopup(self.locationService.getLocationByID(location.id));
-      let o = {
-        keepInView: true
-      };
-      map.setView(m.getLatLng(), 12);
-      m.bindPopup(p, o).openPopup();
-      m.unbindPopup();
-    });
-    this.mapService.addMarker(location.id, m);
+    let m = this.mapService.addMarker(location);
     m.fireEvent('click');
-  }
-
-  addMarkers(map: Map): void {
-    this.locations.forEach(location => {
-      let self = this;
-      if (!self.mapService.hasMarker(location.id)) {
-        let m = marker(this.mapService.getLatLng(location), {
-          icon: icon({
-            iconSize: [30, 36],
-            iconAnchor: [13, 41],
-            iconUrl: this.getMarker(location.cellConcentration, location.marked),
-            shadowUrl: 'leaflet/marker-shadow.png'
-          }),
-          title: location.name,
-          riseOnHover: true,
-          zIndexOffset: 10000
-        });
-        m.on('click', function(e) {
-          let p = self.mapService.createPopup(self.locationService.getLocationByID(location.id));
-          let o = {
-            keepInView: true
-          };
-          map.setView(m.getLatLng(), 12);
-          m.bindPopup(p, o).openPopup();
-          m.unbindPopup();
-        });
-        this.mapService.addMarker(location.id, m);
-      }
-    });
-    let self = this;
-    setTimeout(function() {
-      self.addMarkers(map);
-    }, 100);
   }
 
   getMarker(n: number, c: boolean): string {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map, LatLng, Marker, LayerGroup, icon, Layer } from 'leaflet';
+import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker } from 'leaflet';
 import { Location } from '../models/location';
 import { CyanMap } from '../utils/cyan-map';
 import { ConfigService } from '../services/config.service';
@@ -20,16 +20,13 @@ export class MapService {
 
   setMap(map: Map): void {
     this.cyanMap.map = map;
+    this.cyanMap.markers = new LayerGroup();
+    this.cyanMap.markers.addTo(this.cyanMap.map);
   }
 
   setMinimap(map: Map, mk: Marker): void {
     this.cyanMap.miniMap = map;
     this.setMiniMarker(mk);
-  }
-
-  setMarkers(mk: Marker): void {
-    this.cyanMap.markers = new LayerGroup([mk]);
-    this.cyanMap.markers.addTo(this.cyanMap.map);
   }
 
   setMiniMarker(mk: Marker): void {
@@ -47,7 +44,7 @@ export class MapService {
     if (mk != undefined) {
       this.cyanMap.miniMarker = mk;
       this.cyanMap.miniMap.addLayer(mk);
-    } 
+    }
   }
 
   getMap(): Map {
@@ -70,14 +67,34 @@ export class MapService {
     }
   }
 
-  addMarker(id: number, mk: Marker): void {
-    if (Object.keys(this.marker_list).length == 0) {
-      this.setMarkers(mk);
-    } else {
-      this.cyanMap.markers.addLayer(mk);
-    }
-    this.marker_list[id] = mk;
-    // console.log(this.marker_list);
+  addMarker(ln: Location): Marker {
+    let map = this.getMap();
+    let m = marker(this.getLatLng(ln), {
+      icon: icon({
+        iconSize: [30, 36],
+        iconAnchor: [13, 41],
+        iconUrl: this.getMarker(ln),
+        shadowUrl: 'leaflet/marker-shadow.png'
+      }),
+      riseOnHover: true,
+      zIndexOffset: 10000
+    });
+    let self = this;
+    m.on('click', function(e) {
+      let p = self.createPopup(ln);
+      map.setView(m.getLatLng(), 12);
+      m.bindPopup(p).openPopup();
+      m.unbindPopup();
+    });
+    m.bindTooltip(ln.name);
+    m.on('mouseover', function(e) {
+      m.openTooltip(m.getLatLng());
+    });
+
+    this.cyanMap.markers.addLayer(m);
+    this.marker_list[ln.id] = m;
+
+    return m;
   }
 
   updateMarker(ln: Location): void {
@@ -87,7 +104,11 @@ export class MapService {
       iconUrl: this.getMarker(ln),
       shadowUrl: 'leaflet/marker-shadow.png'
     });
-    this.marker_list[ln.id].setIcon(_icon);
+    let marker = this.marker_list[ln.id];
+    if (marker) {
+      marker.setTooltipContent(ln.name);
+      marker.setIcon(_icon);
+    }
   }
 
   deleteMarker(ln: Location): void {
@@ -95,13 +116,9 @@ export class MapService {
     let marker = this.marker_list[ln.id];
     // console.log(marker)
     this.cyanMap.markers.removeLayer(marker);
-    let m = this.cyanMap.map;
-    let self = this;
-    setTimeout(function() {
-      m.removeLayer(self.marker_list[ln.id]);
-    }, 100);
-    m.closePopup();
     delete this.marker_list[ln.id];
+
+    this.cyanMap.map.closePopup();
   }
 
   getSource(): string {

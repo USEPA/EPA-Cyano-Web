@@ -4,6 +4,8 @@ export const LOCATIONS: Location[] = [
   {
     id: 100001,
     name: 'Sand Creek Park',
+    latitude: 34.03472222,
+    longitude: -83.38138889,
     latitude_deg: 34,
     latitude_min: 2,
     latitude_sec: 5,
@@ -26,6 +28,8 @@ export const LOCATIONS: Location[] = [
   {
     id: 100002,
     name: 'Lake Okeechobee',
+    latitude: 27.03222222,
+    longitude: -80.77722222,
     latitude_deg: 27,
     latitude_min: 1,
     latitude_sec: 56,
@@ -48,6 +52,8 @@ export const LOCATIONS: Location[] = [
   {
     id: 100003,
     name: 'Devils Elbow Post Light',
+    latitude: 28.63361111,
+    longitude: -81.62500000,
     latitude_deg: 28,
     latitude_min: 38,
     latitude_sec: 1,
@@ -70,6 +76,8 @@ export const LOCATIONS: Location[] = [
   {
     id: 100004,
     name: 'Chestatee Bay',
+    latitude: 34.27055556,
+    longitude: -83.95583333,
     latitude_deg: 34,
     latitude_min: 16,
     latitude_sec: 14,

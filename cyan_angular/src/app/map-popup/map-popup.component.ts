@@ -6,8 +6,6 @@ import { Router } from '@angular/router';
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
-
-import { DownloaderService } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 
 @Component({
@@ -25,7 +23,6 @@ export class MapPopupComponent implements OnInit {
   constructor(
     private locationService: LocationService,
     private mapService: MapService,
-    private downloaderService: DownloaderService,
     private user: UserService,
     private datePipe: DatePipe,
     private router: Router
@@ -41,7 +38,7 @@ export class MapPopupComponent implements OnInit {
       setTimeout(function() {
         self.getLocation();
         self.marked = self.location.marked ? 'Mark' : 'Unmark';
-        self.locationService.downloadLocation(self.location, true);
+        self.locationService.downloadLocation(self.location);
       }, 300);
     }
   }
@@ -61,9 +58,13 @@ export class MapPopupComponent implements OnInit {
     }
     self.locationSubscription = self.locationService.getLocationData().subscribe({
       next(locations) {
-        self.locationData = locations.filter(l => {
-          return l.id == self.location.id;
-        })[0];
+        if (!self.location) {
+          self.locationData = null;
+        } else {
+          self.locationData = locations.filter(l => {
+            return l.id == self.location.id;
+          })[0];
+        }
         if (self.locationData == null) {
           setTimeout(function() {
             self.getLocation();
@@ -77,6 +78,7 @@ export class MapPopupComponent implements OnInit {
           }
           else {
             self.location = self.locationData;
+            self.mapService.updateMarker(self.location);
           }
         }
       },
@@ -172,10 +174,7 @@ export class MapPopupComponent implements OnInit {
   }
 
   deleteLocation(ln: Location): void {
-    let self = this;
     this.mapService.deleteMarker(ln);
-    setTimeout(function() {
-      self.locationService.deleteLocation(ln);
-    }, 1000);
+    this.locationService.deleteLocation(ln);
   }
 }
