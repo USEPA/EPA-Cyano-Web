@@ -70,6 +70,7 @@ export class LocationService {
       if (locations.length != 0) {
         let loc = [];
         locations.forEach(function(location) {
+
           if (!self.locationIDCheck(location.id)) {
             let l = new Location();
             l.id = location.id;
@@ -90,7 +91,8 @@ export class LocationService {
             l.changeDate = '';
             l.dataDate = '';
             l.marked = location.marked == true ? true : false;
-            l.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
+            // l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
+            l.notes = location.notes;
             l.sourceFrequency = '';
             l.validCellCount = 0;
             loc.push(l);
@@ -126,12 +128,14 @@ export class LocationService {
   downloadLocation(location: Location, newLocation: boolean): void {
     let deg = this.convertToDegrees(location);
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(location.id, username, location.name, location.marked, deg.latitude, deg.longitude, newLocation);
+    this.downloader.getAjaxData(location.id, username, location.name, location.marked, location.notes, deg.latitude, deg.longitude, newLocation);
     this.getData();
   }
 
   getData(): void {
-    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => (this.locations = locations));
+    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => {
+      this.locations = locations;
+    });
   }
 
   getLocationData(): Observable<Location[]> {

@@ -117,8 +117,17 @@ export class MapPopupComponent implements OnInit {
       timestamp: dateTime,
       note: noteTextbox.value
     };
-    this.location.notes.push(noteObj);
-    this.locationService.updateLocation(this.location.name, this.location);
+    this.locationService.getLocations('').subscribe(locations => {
+      let location = locations.find(locObj => locObj.id == ln.id);  // matches locId to locations location with same id
+      let notes = location.notes;
+      let locNotes = [];
+      if (notes.length > 0) {
+        locNotes = location.notes;
+      }
+      locNotes.push(noteObj);
+      location.notes = locNotes;
+      this.locationService.updateLocation(location.name, location);
+    });
     noteTextbox.value = "";
   }
 
@@ -147,11 +156,7 @@ export class MapPopupComponent implements OnInit {
   }
 
   viewLatestImage(ln: Location): void {
-    console.log("We're here at viewLatestImage");
-    console.log(ln);
-
     this.router.navigate(['/latestimage', { location: JSON.stringify(ln) }]);
-
   }
 
   deleteLocation(ln: Location): void {

@@ -28,7 +28,7 @@ export class UserService {
     this.downloader.userLogin(username, password).subscribe((details: Account) => {
       if (!('error' in details)) {
         this.currentAccount = details;
-        details.locations.forEach(location => {
+        this.currentAccount.locations.forEach(location => {
           location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
         });
         this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)

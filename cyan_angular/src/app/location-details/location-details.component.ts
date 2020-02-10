@@ -145,10 +145,9 @@ export class LocationDetailsComponent implements OnInit {
     this.downloadTimeSeries();
 
     let locId = this.current_location.id;
-    this.user.getUserLocations().subscribe((userLocs) => {
-      let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-      // this.current_location.notes = JSON.parse(userLoc.notes);
-      this.current_location.notes = userLoc.notes;
+    this.locationService.getLocations('').subscribe(locations => {
+      let location = locations.find(locObj => locObj.id == locId);  // finds matching location from locations array
+      this.current_location.notes = location.notes;
     });
 
     let self = this;
@@ -367,7 +366,6 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   updateFilter(): void {
-    // console.log("Filtering images by date");
     let self = this;
     let filtered = [];
     this.locationPNGs.map((image: ImageDetails) => {
@@ -393,6 +391,7 @@ export class LocationDetailsComponent implements OnInit {
       username,
       this.current_location.name,
       this.current_location.marked,
+      this.current_location.notes,
       coord.latitude,
       coord.longitude,
       false

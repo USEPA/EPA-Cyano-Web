@@ -93,7 +93,7 @@ export class DownloaderService {
       latitude: latitude,
       longitude: longitude,
       marked: marked,
-      notes: notes
+      notes: JSON.stringify(notes)
     };
     this.executeUserLocations(url, body).subscribe();
   }
@@ -159,12 +159,12 @@ export class DownloaderService {
   }
 
 
-  ajaxRequest(id: number, username: string, name: string, marked: boolean, url: string, newLocation: boolean) {
+  ajaxRequest(id: number, username: string, name: string, marked: boolean, notes: object[], url: string, newLocation: boolean) {
     let self = this;
     ajax(url).subscribe(data => {
       self.data = [];
       let d: LocationDataAll = data.response;
-      let loc = self.createLocation(id, username, name, marked, d, newLocation);
+      let loc = self.createLocation(id, username, name, marked, notes, d, newLocation);
       self.data.push({
         requestData: d,
         location: loc
@@ -189,7 +189,8 @@ export class DownloaderService {
     });
   }
 
-  getAjaxData(id: number, username: string, name: string, marked: boolean, latitude: number, longitude: number, newLocation: boolean) {
+  // getAjaxData(id: number, username: string, name: string, marked: boolean, latitude: number, longitude: number, newLocation: boolean) {
+  getAjaxData(id: number, username: string, name: string, marked: boolean, notes: object[], latitude: number, longitude: number, newLocation: boolean) {
     let hasData: boolean = false;
     this.data.map(d => {
       if (d.location.id == id) {
@@ -198,7 +199,7 @@ export class DownloaderService {
     });
     if (!hasData) {
       let url = this.baseUrl + this.dataUrl + latitude.toString() + '/' + longitude.toString() + '/all';
-      this.ajaxRequest(id, username, name, marked, url, newLocation);
+      this.ajaxRequest(id, username, name, marked, notes, url, newLocation);
     }
   }
 
@@ -210,7 +211,8 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-  createLocation(id: number, username: string, name: string, marked: boolean, data: LocationDataAll, newLocation: boolean): Location {
+  createLocation(id: number, username: string, name: string, marked: boolean, notes: object[], data: LocationDataAll, newLocation: boolean): Location {
+
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
 
     let ln = null;
@@ -262,7 +264,8 @@ export class DownloaderService {
       ln.sourceFrequency = '';
       ln.validCellCount = 0;
     }
-    ln.notes = [];
+    // ln.notes = [];
+    ln.notes = notes;
     if (marked != null) {
       ln.marked = marked;
     } else {
@@ -270,7 +273,7 @@ export class DownloaderService {
     }
 
     if (newLocation) {
-      this.addUserLocation(username, id, ln.name, data.metaInfo.locationLat, data.metaInfo.locationLng, ln.marked, []);
+      this.addUserLocation(username, id, ln.name, data.metaInfo.locationLat, data.metaInfo.locationLng, ln.marked, notes);
     }
     return ln;
   }

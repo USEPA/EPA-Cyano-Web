@@ -138,6 +138,8 @@ def login_user(post_data):
 					"marked": location[5],
 					"notes": location[6]
 				}
+				if not loc_data['notes'] or loc_data['notes'] == '""':
+					loc_data['notes'] = "[]"
 				data.append(loc_data)
 			return {'user': user_data, 'locations': data, 'notifications': notifications}, 200
 		except KeyError as e:
