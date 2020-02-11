@@ -152,8 +152,9 @@ class GetLocation(Resource):
 	Endoint for getting a user location by user and location id.
 	"""
 	def get(self, user='', _id=''):
-		# results, status_code = web_app_api.delete_location(user, _id)
 		results, status_code = web_app_api.get_location(user, _id)
+		if type(results) is dict and 'error' in list(results.keys()):
+			return results, status_code
 		result_obj = {
 			'owner': results[0],
 			'id': results[1],
