@@ -93,6 +93,7 @@ def login_user(post_data):
 	query = 'SELECT username, email, password, created, last_visit FROM User WHERE username = %s'
 	values = (user,)
 	users = query_database(query, values)
+
 	if len(users) == 0:
 		return {"error": "Invalid user credentials."}, 200
 	elif type(users) is dict:
@@ -212,7 +213,7 @@ def get_location(user='', _id=''):
 	"""
 	query = 'SELECT * FROM Location WHERE id = %s AND owner = %s'
 	values = (_id, user,)
-	location = query_database(query, values)
+	location = query_database(query, values)  # returns list of tuples
 	if type(location) is dict:
 		if "error" in location.keys():
 			return {"error": "Error getting location from database."}, 200
@@ -279,6 +280,7 @@ def edit_notifications(user, _id):
 	"""
 	Updates user's notification that has been read,
 	e.g., sets is_new to false.
+	TODO: Check for error when querying DB.
 	"""
 	query = 'UPDATE Notifications SET is_new = %s WHERE owner = %s AND id = %s'
 	values = (0, user, _id)
