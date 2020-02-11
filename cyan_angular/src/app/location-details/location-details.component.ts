@@ -385,17 +385,8 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   downloadTimeSeries() {
-    let coord = this.locationService.convertToDegrees(this.current_location);
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(
-      this.current_location.id,
-      username,
-      this.current_location.name,
-      this.current_location.marked,
-      coord.latitude,
-      coord.longitude,
-      false
-    );
+    this.downloader.getAjaxData(username, this.current_location);
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
