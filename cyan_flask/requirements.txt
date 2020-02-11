@@ -6,3 +6,4 @@ mysql-connector-python
 python-dotenv
 requests
 simplejson
+tabulate
