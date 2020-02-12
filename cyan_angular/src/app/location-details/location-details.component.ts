@@ -385,20 +385,7 @@ export class LocationDetailsComponent implements OnInit {
 
   downloadTimeSeries() {
     let username = this.user.getUserName();
-// <<<<<<< HEAD
-//     this.downloader.getAjaxData(
-//       this.current_location.id,
-//       username,
-//       this.current_location.name,
-//       this.current_location.marked,
-//       this.current_location.notes,
-//       coord.latitude,
-//       coord.longitude,
-//       false
-//     );
-// =======
     this.downloader.getAjaxData(username, this.current_location);
-// >>>>>>> develop
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {

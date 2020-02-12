@@ -48,9 +48,6 @@ export class RawData {
 
 const headerOptions = {
   headers: new HttpHeaders({
-    // 'Accept': 'application/json',
-    // 'Content-Type': 'text/plain',
-    // 'Access-Control-Allow-Origin': '*'
     'Content-Type': 'application/json'
   })
 };
@@ -176,41 +173,11 @@ export class DownloaderService {
     return this.http.get(url);
   }
 
-// <<<<<<< HEAD
-
-//   ajaxRequest(id: number, username: string, name: string, marked: boolean, notes: object[], url: string, newLocation: boolean) {
-// =======
-  // ajaxRequest(id: number, username: string, name: string, marked: boolean, url: string) {
   ajaxRequest(id: number, username: string, name: string, marked: boolean, notes: object[], url: string) {
-// >>>>>>> develop
     let self = this;
     ajax(url).subscribe(data => {
       let d: LocationDataAll = data.response;
-// <<<<<<< HEAD
-//       let loc = self.createLocation(id, username, name, marked, notes, d, newLocation);
-//       self.data.push({
-//         requestData: d,
-//         location: loc
-//       });
-//       self.locationsData[id] = {
-//         requestData: d,
-//         location: loc
-//       };
-//       let i = -1;
-//       let j = 0;
-//       self.locations.map(location => {
-//         if (location.id == id) {
-//           i = j;
-//         }
-//         j = j + 1;
-//       });
-//       if (i == -1) {
-//         self.locations.push(loc);
-//       } else {
-//         self.locations[i] = loc;
-// =======
       let loc = self.createLocation(id, username, name, marked, notes, d);
-
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
       if (index > -1) {
@@ -219,30 +186,15 @@ export class DownloaderService {
           requestData: d,
           location: loc
         };
-// >>>>>>> develop
       }
     });
   }
 
-// <<<<<<< HEAD
-//   // getAjaxData(id: number, username: string, name: string, marked: boolean, latitude: number, longitude: number, newLocation: boolean) {
-//   getAjaxData(id: number, username: string, name: string, marked: boolean, notes: object[], latitude: number, longitude: number, newLocation: boolean) {
-//     let hasData: boolean = false;
-//     this.data.map(d => {
-//       if (d.location.id == id) {
-//         hasData = true;
-//       }
-//     });
-//     if (!hasData) {
-//       let url = this.baseUrl + this.dataUrl + latitude.toString() + '/' + longitude.toString() + '/all';
-//       this.ajaxRequest(id, username, name, marked, notes, url, newLocation);
-// =======
   getAjaxData(username: string, ln: Location) {
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
       this.ajaxRequest(ln.id, username, ln.name, ln.marked, ln.notes, url);
-// >>>>>>> develop
     }
   }
 
@@ -262,13 +214,7 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-// <<<<<<< HEAD
-//   createLocation(id: number, username: string, name: string, marked: boolean, notes: object[], data: LocationDataAll, newLocation: boolean): Location {
-
-// =======
-  // createLocation(id: number, username: string, name: string, marked: boolean, data: LocationDataAll): Location {
   createLocation(id: number, username: string, name: string, marked: boolean, notes: object[], data: LocationDataAll): Location {
-// >>>>>>> develop
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
 
     let ln = new Location();
@@ -327,15 +273,11 @@ export class DownloaderService {
       ln.marked = false;
     }
 
-// <<<<<<< HEAD
-//     if (newLocation) {
-//       this.addUserLocation(username, id, ln.name, data.metaInfo.locationLat, data.metaInfo.locationLng, ln.marked, notes);
-// =======
     if (this.locationNotDeleted(ln)) {
       this.updateUserLocation(username, ln);
-// >>>>>>> develop
     }
     return ln;
+    
   }
 
   convertCoordinates(latitude: number, longitude: number): Coordinate {

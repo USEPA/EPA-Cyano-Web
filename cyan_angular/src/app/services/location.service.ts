@@ -36,7 +36,6 @@ export class LocationService {
   ) {
     this.getCyanLevels();
     this.loadUser();
-    // this.compareLocations = new Subject<Location[]>();
   }
 
   loadUser() {
@@ -132,24 +131,15 @@ export class LocationService {
 
   downloadLocation(location: Location): void {
     let username = this.user.getUserName();
-// <<<<<<< HEAD
-//     this.downloader.getAjaxData(location.id, username, location.name, location.marked, location.notes, deg.latitude, deg.longitude, newLocation);
-// =======
     this.downloader.getAjaxData(username, location);
-// >>>>>>> develop
     this.getData();
   }
 
   getData(): void {
     this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => {
-// <<<<<<< HEAD
-//       this.locations = locations;
-//     });
-// =======
         this.locations = locations;
       }
     );
-// >>>>>>> develop
   }
 
   getLocationData(): Observable<Location[]> {
@@ -225,8 +215,7 @@ export class LocationService {
     this.deleteCompareLocation(ln);
   }
 
-  // updateLocation(name: string, ln: Location): void {
-  updateLocation(name: string, ln): void {
+  updateLocation(name: string, ln: Location): void {
     this.locations.forEach((loc) => {
       if (loc.id === ln.id) {
         loc.name = name;
