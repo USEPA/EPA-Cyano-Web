@@ -48,9 +48,6 @@ export class RawData {
 
 const headerOptions = {
   headers: new HttpHeaders({
-    // 'Accept': 'application/json',
-    // 'Content-Type': 'text/plain',
-    // 'Access-Control-Allow-Origin': '*'
     'Content-Type': 'application/json'
   })
 };
@@ -64,10 +61,10 @@ export class DownloaderService {
 
   private baseServerUrl: string = environment.baseServerUrl;  // see src/environments for this value
 
-  data: RawData[] = [];
   locationsData: any = {};
   locations: Location[] = [];
-    
+
+
   constructor(
     private http: HttpClient
   ) {}
@@ -81,38 +78,48 @@ export class DownloaderService {
   userLogin(username: string, password: string) {
     let url = this.baseServerUrl + 'user';
     let body = { user: username, password: password };
-    // return this.http.post<Account>(url, body, headerOptions);
     return this.http.post(url, body, headerOptions);
   }
 
-  addUserLocation(username: string, id: number, name: string, latitude: number, longitude: number, marked: boolean, notes: string) {
+  addUserLocation(username: string, ln: Location) {
     let url = this.baseServerUrl + 'location/add';
     let body = {
       owner: username,
-      id: id,
-      name: name,
-      latitude: latitude,
-      longitude: longitude,
-      // marked: marked ? 'true' : 'false',
-      marked: marked,
-      notes: notes
+      id: ln.id,
+      name: ln.name,
+      latitude: ln.latitude,
+      longitude: ln.longitude,
+      marked: ln.marked,
+      notes: JSON.stringify(ln.notes)
     };
+
     this.executeUserLocations(url, body).subscribe();
+  }
+
+  updateUserLocation(username: string, ln: Location) {
+    let url = this.baseServerUrl + 'location/edit';
+    let body = {
+      owner: username,
+      id: ln.id,
+      name: ln.name,
+      marked: ln.marked,
+      notes: JSON.stringify(ln.notes)
+    };
+    this.executeEditUserLocation(url, body).subscribe();
   }
 
   executeUserLocations(url: string, body: any) {
     return this.http.post(url, body, headerOptions);
   }
 
-  editUserLocation(username: string, id: number, name: string, marked: boolean, notes: string) {
+  editUserLocation(username: string, id: number, name: string, marked: boolean, notes: object[]) {
     let url = this.baseServerUrl + 'location/edit';
     let body = {
       owner: username,
       id: id,
       name: name,
-      // marked: marked ? 'true' : 'false',
       marked: marked,
-      notes: notes
+      notes: JSON.stringify(notes)
     };
     this.executeEditUserLocation(url, body).subscribe();
   }
@@ -122,6 +129,7 @@ export class DownloaderService {
   }
 
   deleteUserLocation(username: string, id: number) {
+    delete this.locationsData[id];
     let url = this.baseServerUrl + 'location/delete/' + username + '/' + id;
     this.executeDeleteUserLocation(url).subscribe();
   }
@@ -135,7 +143,7 @@ export class DownloaderService {
     return this.http.get(url);
   }
 
-  
+
   updateNotification(username: string, id: number) {
     /*
     Updates user's notification, e.g., is_new set to false if clicked.
@@ -148,12 +156,10 @@ export class DownloaderService {
     return this.http.get(url);
   }
 
-
   clearUserNotifications(username: string) {
     /*
     Clears all user's notifications.
     */
-    console.log("downloader service clearUserNotification()");
     let url = this.baseServerUrl + 'notification/delete/' + username;
     this.executeClearUserNotifications(url).subscribe();
   }
@@ -162,48 +168,37 @@ export class DownloaderService {
     return this.http.get(url);
   }
 
-
-  ajaxRequest(id: number, username: string, name: string, marked: boolean, url: string, newLocation: boolean) {
+  ajaxRequest(id: number, username: string, name: string, marked: boolean, notes: object[], url: string) {
     let self = this;
     ajax(url).subscribe(data => {
-      self.data = [];
       let d: LocationDataAll = data.response;
-      let loc = self.createLocation(id, username, name, marked, d, newLocation);
-      self.data.push({
-        requestData: d,
-        location: loc
-      });
-      self.locationsData[id] = {
-        requestData: d,
-        location: loc
-      };
-      let i = -1;
-      let j = 0;
-      self.locations.map(location => {
-        if (location.id == id) {
-          i = j;
-        }
-        j = j + 1;
-      });
-      if (i == -1) {
-        self.locations.push(loc);
-      } else {
-        self.locations[i] = loc;
+      let loc = self.createLocation(id, username, name, marked, notes, d);
+      let index = this.getLocationIndex(loc);
+      // if index not found, location has been deleted by user
+      if (index > -1) {
+        self.locations[index] = loc;
+        self.locationsData[id] = {
+          requestData: d,
+          location: loc
+        };
       }
     });
   }
 
-  getAjaxData(id: number, username: string, name: string, marked: boolean, latitude: number, longitude: number, newLocation: boolean) {
-    let hasData: boolean = false;
-    this.data.map(d => {
-      if (d.location.id == id) {
-        hasData = true;
-      }
-    });
+  getAjaxData(username: string, ln: Location) {
+    let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
-      let url = this.baseUrl + this.dataUrl + latitude.toString() + '/' + longitude.toString() + '/all';
-      this.ajaxRequest(id, username, name, marked, url, newLocation);
+      let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
+      this.ajaxRequest(ln.id, username, ln.name, ln.marked, ln.notes, url);
     }
+  }
+
+  getLocationIndex(ln: Location) {
+    return this.locations.map(loc => loc.id).indexOf(ln.id);
+  }
+
+  locationNotDeleted(ln: Location) {
+    return this.getLocationIndex(ln) >= 0;
   }
 
   getData(): Observable<Location[]> {
@@ -214,11 +209,10 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-  createLocation(id: number, username: string, name: string, marked: boolean, data: LocationDataAll, newLocation: boolean): Location {
+  createLocation(id: number, username: string, name: string, marked: boolean, notes: object[], data: LocationDataAll): Location {
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
 
-    let ln = null;
-    ln = new Location();
+    let ln = new Location();
     ln.id = id;
     if (name.indexOf('Update') == -1 && name != null) {
       ln.name = name;
@@ -266,17 +260,19 @@ export class DownloaderService {
       ln.sourceFrequency = '';
       ln.validCellCount = 0;
     }
-    ln.notes = [];
+    // ln.notes = [];
+    ln.notes = notes;
     if (marked != null) {
       ln.marked = marked;
     } else {
       ln.marked = false;
     }
 
-    if (newLocation) {
-      this.addUserLocation(username, id, ln.name, data.metaInfo.locationLat, data.metaInfo.locationLng, ln.marked, '');
+    if (this.locationNotDeleted(ln)) {
+      this.updateUserLocation(username, ln);
     }
     return ln;
+    
   }
 
   convertCoordinates(latitude: number, longitude: number): Coordinate {

@@ -76,8 +76,6 @@ export class LatestImageComponent implements OnInit {
 		this.route.params.subscribe(
 			params => {
 				// Get latest image for location and overlay on map (like location-details component)
-				console.log("latest-image ngOnInit");
-				console.log(params);
 				this.location = JSON.parse(params.location);
 			}
 		);

@@ -73,7 +73,7 @@ export class LocationCompareDetailsComponent implements OnInit {
       pointBackgroundColor: 'rgba(0,255,255,1)',
       pointBorderColor: '#00FFFF',
       pointHoverBackgroundColor: '#00FFFF',
-      pointHoverBorderColor: 'rgba(0,255,255,0.8)'
+      pointHoverBorderColor: 'rgba(0,255,255,0.8)',
     }
   ];
   public chartLegend: boolean = true;
@@ -109,8 +109,6 @@ export class LocationCompareDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    console.log("Initializing location-compare-details component.");
 
     this.imageCollection = null;
     this.route.params.subscribe(
@@ -152,21 +150,12 @@ export class LocationCompareDetailsComponent implements OnInit {
   downloadTimeSeries(l: Location) {
     let coord = this.locationService.convertToDegrees(l);
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(
-      l.id,
-      username,
-      l.name,
-      l.marked,
-      coord.latitude,
-      coord.longitude,
-      false
-    );
+
+    this.downloader.getAjaxData(username, l);
 
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
       let data = rawData[l.id].requestData;
       let timeSeriesData = [];
-
-      console.log("Adding time series data to chart.");
       data.outputs.map(timestep => {
         if (timestep.satelliteImageFrequency == 'Weekly') {
           // Builds data var like [{x: '', y: ''}, {}...]
@@ -181,7 +170,8 @@ export class LocationCompareDetailsComponent implements OnInit {
       // Adds time series line to chart:
       this.chartData.push({
         data: timeSeriesData,
-        label: l.name
+        label: l.name,
+        lineTension: 0
       });
 
       this.dataDownloaded = true;

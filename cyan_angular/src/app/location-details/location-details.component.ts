@@ -85,7 +85,8 @@ export class LocationDetailsComponent implements OnInit {
       pointBackgroundColor: 'rgba(0,255,255,1)',
       pointBorderColor: '#00FFFF',
       pointHoverBackgroundColor: '#00FFFF',
-      pointHoverBorderColor: 'rgba(0,255,255,0.8)'
+      pointHoverBorderColor: 'rgba(0,255,255,0.8)',
+      lineTension: 0
     }
   ];
   public chartLegend: boolean = true;
@@ -144,9 +145,9 @@ export class LocationDetailsComponent implements OnInit {
     this.downloadTimeSeries();
 
     let locId = this.current_location.id;
-    this.user.getUserLocations().subscribe((userLocs) => {
-      let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-      this.current_location.notes = JSON.parse(userLoc.notes);
+    this.locationService.getLocations('').subscribe(locations => {
+      let location = locations.find(locObj => locObj.id == locId);  // finds matching location from locations array
+      this.current_location.notes = location.notes;
     });
 
     let self = this;
@@ -365,7 +366,6 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   updateFilter(): void {
-    // console.log("Filtering images by date");
     let self = this;
     let filtered = [];
     this.locationPNGs.map((image: ImageDetails) => {
@@ -384,17 +384,8 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   downloadTimeSeries() {
-    let coord = this.locationService.convertToDegrees(this.current_location);
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(
-      this.current_location.id,
-      username,
-      this.current_location.name,
-      this.current_location.marked,
-      coord.latitude,
-      coord.longitude,
-      false
-    );
+    this.downloader.getAjaxData(username, this.current_location);
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
@@ -577,17 +568,6 @@ export class LocationDetailsNotes {
     noteObj.note = noteObj.note.replace(/\r?\n|\r/g, '');  // remove any newlines
     l.notes.push(noteObj);
     this.locationService.updateLocation(l.name, l);  // adds note to location in db
-
-    let locId = l.id;  // gets id of selected location
-    this.user.getUserLocations()
-      .subscribe((userLocs) => {
-          let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-          let locNotes = JSON.parse(userLoc.notes);
-          locNotes.push(noteObj);
-          userLoc.notes = JSON.stringify(locNotes);
-        }
-      );
-
   }
 
 }

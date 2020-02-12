@@ -88,35 +88,12 @@ export class CoordinatesComponent implements OnInit {
 		location.longitude_sec = this.lonSec;
 		location.longitude_dir = this.selectedLon;
 
-		console.log("coordinates getLocationData()");
-
 		let latLon = this.mapService.getLatLng(location);
 
 		location = this.locationService.createLocation(name, latLon.lat, latLon.lng, cellCon, maxCellCon, cellChange, dataDate, source);
 
 		map.setView(latLon, 12);
-		let m = marker(this.mapService.getLatLng(location), {
-			icon: icon({
-				iconSize: [30, 36],
-				iconAnchor: [13, 41],
-				iconUrl: this.getMarker(location.cellConcentration, location.marked),
-				shadowUrl: 'leaflet/marker-shadow.png'
-			}),
-			title: location.name,
-			riseOnHover: true,
-			zIndexOffset: 10000
-		});
-		let self = this;
-		m.on('click', function(e) {
-			let p = self.mapService.createPopup(self.locationService.getLocationByID(location.id));
-			let o = {
-				keepInView: true
-			};
-			map.setView(m.getLatLng(), 12);
-			m.bindPopup(p, o).openPopup();
-			m.unbindPopup();
-		});
-		this.mapService.addMarker(location.id, m);
+		let m = this.mapService.addMarker(location);
 		m.fireEvent('click');
 
 		return location;

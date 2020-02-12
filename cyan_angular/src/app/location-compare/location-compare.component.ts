@@ -23,7 +23,6 @@ export class LocationCompareComponent implements OnInit {
    ) {}
 
   ngOnInit() {
-    // console.log(this.selected_locations);
     this.getLocations();
     if (this.selected_locations === undefined) {
       this.selected_locations = [];
@@ -32,7 +31,6 @@ export class LocationCompareComponent implements OnInit {
 
   getLocations(): void {
     this.locationService.getCompareLocations().subscribe(locations => {
-      console.log("location compare loc service getCompareLocations sub called.");
       this.selected_locations = locations
     });
     
