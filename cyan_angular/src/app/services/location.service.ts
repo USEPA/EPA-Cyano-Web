@@ -35,8 +35,8 @@ export class LocationService {
     private mapService: MapService
   ) {
     this.getCyanLevels();
+    this.getData();
     this.loadUser();
-    // this.compareLocations = new Subject<Location[]>();
   }
 
   loadUser() {
@@ -68,7 +68,6 @@ export class LocationService {
     let username = this.user.getUserName();
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
       if (locations.length != 0) {
-        let loc = [];
         locations.forEach(function(location) {
           if (!self.locationIDCheck(location.id)) {
             let l = new Location();
@@ -95,16 +94,13 @@ export class LocationService {
             l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
             l.sourceFrequency = '';
             l.validCellCount = 0;
-            loc.push(l);
+
+            self.locations.push(l);
+            self.downloadLocation(l);
           }
         });
 
-        self.downloader.loadLocations(loc);
-        loc.forEach(function(ln) {
-          self.downloadLocation(ln);
-        });
         let map = self.mapService.getMap();
-        this.locations = loc;
         self.addMarkers(map);
       }
     });
@@ -131,10 +127,12 @@ export class LocationService {
   downloadLocation(location: Location): void {
     let username = this.user.getUserName();
     this.downloader.getAjaxData(username, location);
-    this.getData();
   }
 
   getData(): void {
+    if (this.downloaderSub != null) {
+      this.downloaderSub.unsubscribe();
+    }
     this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => {
         this.locations = locations;
       }
