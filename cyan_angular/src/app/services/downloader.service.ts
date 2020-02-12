@@ -48,9 +48,6 @@ export class RawData {
 
 const headerOptions = {
   headers: new HttpHeaders({
-    // 'Accept': 'application/json',
-    // 'Content-Type': 'text/plain',
-    // 'Access-Control-Allow-Origin': '*'
     'Content-Type': 'application/json'
   })
 };
@@ -81,13 +78,11 @@ export class DownloaderService {
   userLogin(username: string, password: string) {
     let url = this.baseServerUrl + 'user';
     let body = { user: username, password: password };
-    // return this.http.post<Account>(url, body, headerOptions);
     return this.http.post(url, body, headerOptions);
   }
 
   addUserLocation(username: string, ln: Location) {
     let url = this.baseServerUrl + 'location/add';
-
     let body = {
       owner: username,
       id: ln.id,
@@ -117,15 +112,14 @@ export class DownloaderService {
     return this.http.post(url, body, headerOptions);
   }
 
-  editUserLocation(username: string, id: number, name: string, marked: boolean, notes: string) {
+  editUserLocation(username: string, id: number, name: string, marked: boolean, notes: object[]) {
     let url = this.baseServerUrl + 'location/edit';
     let body = {
       owner: username,
       id: id,
       name: name,
-      // marked: marked ? 'true' : 'false',
       marked: marked,
-      notes: notes
+      notes: JSON.stringify(notes)
     };
     this.executeEditUserLocation(url, body).subscribe();
   }
@@ -166,7 +160,6 @@ export class DownloaderService {
     /*
     Clears all user's notifications.
     */
-    console.log("downloader service clearUserNotification()");
     let url = this.baseServerUrl + 'notification/delete/' + username;
     this.executeClearUserNotifications(url).subscribe();
   }
@@ -175,12 +168,11 @@ export class DownloaderService {
     return this.http.get(url);
   }
 
-  ajaxRequest(id: number, username: string, name: string, marked: boolean, url: string) {
+  ajaxRequest(id: number, username: string, name: string, marked: boolean, notes: object[], url: string) {
     let self = this;
     ajax(url).subscribe(data => {
       let d: LocationDataAll = data.response;
-      let loc = self.createLocation(id, username, name, marked, d);
-
+      let loc = self.createLocation(id, username, name, marked, notes, d);
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
       if (index > -1) {
@@ -197,7 +189,7 @@ export class DownloaderService {
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
-      this.ajaxRequest(ln.id, username, ln.name, ln.marked, url);
+      this.ajaxRequest(ln.id, username, ln.name, ln.marked, ln.notes, url);
     }
   }
 
@@ -217,7 +209,7 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-  createLocation(id: number, username: string, name: string, marked: boolean, data: LocationDataAll): Location {
+  createLocation(id: number, username: string, name: string, marked: boolean, notes: object[], data: LocationDataAll): Location {
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
 
     let ln = new Location();
@@ -268,7 +260,8 @@ export class DownloaderService {
       ln.sourceFrequency = '';
       ln.validCellCount = 0;
     }
-    ln.notes = [];
+    // ln.notes = [];
+    ln.notes = notes;
     if (marked != null) {
       ln.marked = marked;
     } else {
@@ -279,6 +272,7 @@ export class DownloaderService {
       this.updateUserLocation(username, ln);
     }
     return ln;
+    
   }
 
   convertCoordinates(latitude: number, longitude: number): Coordinate {

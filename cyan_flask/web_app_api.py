@@ -15,6 +15,7 @@ import json
 import os
 import logging
 import requests
+import simplejson
 
 
 
@@ -137,6 +138,8 @@ def login_user(post_data):
 					"marked": location[5],
 					"notes": location[6]
 				}
+				if not loc_data['notes'] or loc_data['notes'] == '""':
+					loc_data['notes'] = "[]"
 				data.append(loc_data)
 			return {'user': user_data, 'locations': data, 'notifications': notifications}, 200
 		except KeyError as e:
@@ -156,7 +159,7 @@ def add_location(post_data):
 		latitude = post_data['latitude']
 		longitude = post_data['longitude']
 		marked = post_data['marked']
-		notes = post_data['notes']  # array of strings in json format
+		notes = post_data['notes'] or "[]"
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
 

@@ -110,8 +110,6 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   ngOnInit() {
 
-    console.log("Initializing location-compare-details component.");
-
     this.imageCollection = null;
     this.route.params.subscribe(
       params =>
@@ -152,13 +150,12 @@ export class LocationCompareDetailsComponent implements OnInit {
   downloadTimeSeries(l: Location) {
     let coord = this.locationService.convertToDegrees(l);
     let username = this.user.getUserName();
+
     this.downloader.getAjaxData(username, l);
 
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
       let data = rawData[l.id].requestData;
       let timeSeriesData = [];
-
-      console.log("Adding time series data to chart.");
       data.outputs.map(timestep => {
         if (timestep.satelliteImageFrequency == 'Weekly') {
           // Builds data var like [{x: '', y: ''}, {}...]

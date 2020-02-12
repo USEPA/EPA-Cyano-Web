@@ -113,32 +113,24 @@ export class MapPopupComponent implements OnInit {
   }
 
   saveNoteToLocation(ln: Location): void {
-
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
     let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
-    console.log("date time: " + dateTime);
-
     let noteObj = {
       timestamp: dateTime,
       note: noteTextbox.value
     };
-
-
-    this.user.getUserLocations().subscribe((userLocs) => {
-      let userLoc = userLocs.find(locObj => locObj.id == ln.id);  // matches locId to userLocs location with same id
-      let notes = userLoc.notes;
+    this.locationService.getLocations('').subscribe(locations => {
+      let location = locations.find(locObj => locObj.id == ln.id);  // matches locId to locations location with same id
+      let notes = location.notes;
       let locNotes = [];
       if (notes.length > 0) {
-        locNotes = JSON.parse(userLoc.notes);
+        locNotes = location.notes;
       }
       locNotes.push(noteObj);
-      userLoc.notes = JSON.stringify(locNotes);
-      this.locationService.updateLocation(userLoc.name, userLoc);
-      userLoc.notes = JSON.stringify(locNotes);
+      location.notes = locNotes;
+      this.locationService.updateLocation(location.name, location);
     });
     noteTextbox.value = "";
-
-
   }
 
   toggleMarkedLocation(ln: Location): void {
@@ -166,11 +158,7 @@ export class MapPopupComponent implements OnInit {
   }
 
   viewLatestImage(ln: Location): void {
-    console.log("We're here at viewLatestImage");
-    console.log(ln);
-
     this.router.navigate(['/latestimage', { location: JSON.stringify(ln) }]);
-
   }
 
   deleteLocation(ln: Location): void {

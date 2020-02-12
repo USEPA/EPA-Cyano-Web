@@ -88,8 +88,6 @@ export class CoordinatesComponent implements OnInit {
 		location.longitude_sec = this.lonSec;
 		location.longitude_dir = this.selectedLon;
 
-		console.log("coordinates getLocationData()");
-
 		let latLon = this.mapService.getLatLng(location);
 
 		location = this.locationService.createLocation(name, latLon.lat, latLon.lng, cellCon, maxCellCon, cellChange, dataDate, source);

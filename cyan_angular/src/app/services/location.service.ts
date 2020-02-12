@@ -69,6 +69,7 @@ export class LocationService {
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
       if (locations.length != 0) {
         locations.forEach(function(location) {
+
           if (!self.locationIDCheck(location.id)) {
             let l = new Location();
             l.id = location.id;
@@ -91,7 +92,8 @@ export class LocationService {
             l.changeDate = '';
             l.dataDate = '';
             l.marked = location.marked == true ? true : false;
-            l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
+            // l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
+            l.notes = location.notes;
             l.sourceFrequency = '';
             l.validCellCount = 0;
 
@@ -212,13 +214,12 @@ export class LocationService {
     this.deleteCompareLocation(ln);
   }
 
-  // updateLocation(name: string, ln: Location): void {
-  updateLocation(name: string, ln): void {
+  updateLocation(name: string, ln: Location): void {
     this.locations.forEach((loc) => {
       if (loc.id === ln.id) {
         loc.name = name;
         let username = this.user.getUserName();
-        this.downloader.editUserLocation(username, ln.id, name, ln.marked, JSON.stringify(ln.notes));
+        this.downloader.editUserLocation(username, ln.id, name, ln.marked, ln.notes);
       }
     });
   }
@@ -339,8 +340,7 @@ export class LocationService {
   setMarked(l: Location, m: boolean): void {
     l.marked = m;
     let username = this.user.getUserName();
-    // let marked = (m) ? "true" : "false";
-    this.downloader.editUserLocation(username, l.id, name, l.marked, JSON.stringify(l.notes));
+    this.downloader.editUserLocation(username, l.id, name, l.marked, l.notes);
   }
 
   addMarkers(map: Map): void {

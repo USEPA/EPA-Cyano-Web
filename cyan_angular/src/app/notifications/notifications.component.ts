@@ -45,7 +45,6 @@ export class NotificationsComponent implements OnInit {
 
 		this.notificationSubscription = this.userService.allNotifications$.subscribe(
 			notifications => {
-				console.log("Received notifications update in notifications component.");
         // this.new_notifications = notifications;
         this.all_notifications = notifications;
         this.new_notifications = notifications.filter(x => x[5] === 1)
@@ -92,11 +91,8 @@ export class NotificationsComponent implements OnInit {
     /*
     Removes all user's notifications.
     */
-    console.log("clearNotifications() function hit.");
     let user = this.userService.getUserName();
     this.userService.clearUserNotifications(user);
-
-    // TODO: Remove notifications from the list
     this.new_notifications = [];
     this.all_notifications = [];
     this.display_notifications = [];
@@ -138,7 +134,6 @@ export class NotificationDetails {
 
   ngOnInit() {
     // get the index of the selected notification object
-    console.log("notification details initialized.");
     let notificationId = this.data.notificationObj[1];
     // this.current_notification_index = this.data.allNotifications.find(item => item[1] === notificationId);
     this.current_notification_index = this.data.allNotifications.map(item => item[1]).indexOf(notificationId);

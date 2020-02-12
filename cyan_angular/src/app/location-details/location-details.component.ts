@@ -145,9 +145,9 @@ export class LocationDetailsComponent implements OnInit {
     this.downloadTimeSeries();
 
     let locId = this.current_location.id;
-    this.user.getUserLocations().subscribe((userLocs) => {
-      let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-      this.current_location.notes = JSON.parse(userLoc.notes);
+    this.locationService.getLocations('').subscribe(locations => {
+      let location = locations.find(locObj => locObj.id == locId);  // finds matching location from locations array
+      this.current_location.notes = location.notes;
     });
 
     let self = this;
@@ -366,7 +366,6 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   updateFilter(): void {
-    // console.log("Filtering images by date");
     let self = this;
     let filtered = [];
     this.locationPNGs.map((image: ImageDetails) => {
@@ -569,17 +568,6 @@ export class LocationDetailsNotes {
     noteObj.note = noteObj.note.replace(/\r?\n|\r/g, '');  // remove any newlines
     l.notes.push(noteObj);
     this.locationService.updateLocation(l.name, l);  // adds note to location in db
-
-    let locId = l.id;  // gets id of selected location
-    this.user.getUserLocations()
-      .subscribe((userLocs) => {
-          let userLoc = userLocs.find(locObj => locObj.id == locId);  // matches locId to userLocs location with same id
-          let locNotes = JSON.parse(userLoc.notes);
-          locNotes.push(noteObj);
-          userLoc.notes = JSON.stringify(locNotes);
-        }
-      );
-
   }
 
 }
