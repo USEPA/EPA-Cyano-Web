@@ -150,16 +150,20 @@ export class LocationCompareDetailsComponent implements OnInit {
   downloadTimeSeries(l: Location) {
     let coord = this.locationService.convertToDegrees(l);
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(
-      l.id,
-      username,
-      l.name,
-      l.marked,
-      l.notes,
-      coord.latitude,
-      coord.longitude,
-      false
-    );
+// <<<<<<< HEAD
+//     this.downloader.getAjaxData(
+//       l.id,
+//       username,
+//       l.name,
+//       l.marked,
+//       l.notes,
+//       coord.latitude,
+//       coord.longitude,
+//       false
+//     );
+// =======
+    this.downloader.getAjaxData(username, l);
+// >>>>>>> develop
 
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
       let data = rawData[l.id].requestData;
