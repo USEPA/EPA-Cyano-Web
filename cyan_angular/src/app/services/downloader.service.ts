@@ -81,11 +81,6 @@ export class DownloaderService {
     return this.http.post(url, body, headerOptions);
   }
 
-  loadLocations(locations: Location[]) {
-    this.locations = locations;
-  }
-
-  // addUserLocation(username: string, id: number, name: string, latitude: number, longitude: number, marked: boolean, notes: object[]) {
   addUserLocation(username: string, ln: Location) {
     let url = this.baseServerUrl + 'location/add';
     let body = {
