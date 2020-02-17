@@ -35,11 +35,9 @@ export class MapPopupComponent implements OnInit {
       this.locationData = loc[0];
       this.location = loc[0];
     } else {
-      setTimeout(function() {
-        self.getLocation();
-        self.marked = self.location.marked ? 'Mark' : 'Unmark';
-        self.locationService.downloadLocation(self.location);
-      }, 300);
+      self.getLocation();
+      self.marked = self.location.marked ? 'Mark' : 'Unmark';
+      self.locationService.downloadLocation(self.location);
     }
   }
 
@@ -68,17 +66,16 @@ export class MapPopupComponent implements OnInit {
         if (self.locationData == null) {
           setTimeout(function() {
             self.getLocation();
-          }, 100);
+          }, 300);
         }
         else {
           if (self.locationData.name.indexOf('Update') !== -1) {
             setTimeout(function() {
               self.getLocation();
-            }, 100);
+            }, 300);
           }
           else {
             self.location = self.locationData;
-            self.mapService.updateMarker(self.location);
           }
         }
       },

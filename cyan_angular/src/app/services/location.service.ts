@@ -25,6 +25,7 @@ export class LocationService {
   compare$ = this.compareLocationsSource.asObservable();  // observable Location[] streams
 
   downloaderSub: Subscription;
+  locationChangedSub: Subscription;
   userSub: Subscription;
 
   constructor(
@@ -132,13 +133,22 @@ export class LocationService {
   }
 
   getData(): void {
-    if (this.downloaderSub != null) {
+    if (this.downloaderSub) {
       this.downloaderSub.unsubscribe();
     }
     this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => {
         this.locations = locations;
       }
     );
+
+    if (this.locationChangedSub) {
+      this.locationChangedSub.unsubscribe();
+    }
+    this. locationChangedSub = this.downloader.locationsChanged.subscribe( (loc: Location) => {
+      if (loc != null) {
+        this.mapService.updateMarker(loc);
+      }
+    });
   }
 
   getLocationData(): Observable<Location[]> {
