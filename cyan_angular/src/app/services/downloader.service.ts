@@ -5,6 +5,7 @@ import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
 import { environment } from '../../environments/environment';
+import { Subscription, BehaviorSubject} from "rxjs";
 
 class UrlInfo {
   type: string;
@@ -60,6 +61,9 @@ export class DownloaderService {
   private dataUrl: string = 'cyan/cyano/location/data/'; //  complete url is baseUrl + dataUrl + LAT + "/" + LNG + "/all"
 
   private baseServerUrl: string = environment.baseServerUrl;  // see src/environments for this value
+
+  private locationSubject =  new BehaviorSubject<Location>(null);
+  locationsChanged = this.locationSubject.asObservable();
 
   locationsData: any = {};
   locations: Location[] = [];
@@ -181,6 +185,9 @@ export class DownloaderService {
           requestData: d,
           location: loc
         };
+
+        // raise event location changed
+        self.locationSubject.next(loc);
       }
     });
   }
@@ -272,7 +279,7 @@ export class DownloaderService {
       this.updateUserLocation(username, ln);
     }
     return ln;
-    
+
   }
 
   convertCoordinates(latitude: number, longitude: number): Coordinate {
