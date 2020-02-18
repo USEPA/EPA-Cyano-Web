@@ -87,12 +87,12 @@ def register_user(post_data):
 
 def login_user(post_data):
 	try:
-		user = post_data['user']
+		requested_user = post_data['user']
 		password = post_data['password']
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
 	query = 'SELECT username, email, password, created, last_visit FROM User WHERE username = %s'
-	values = (user,)
+	values = (requested_user,)
 	users = query_database(query, values)
 
 	if len(users) == 0:
@@ -112,43 +112,46 @@ def login_user(post_data):
 		last_visit = users[0][4]  # gets user's last visit date
 		last_visit_unix = time.mktime(last_visit.timetuple())
 
-		notifications = get_notifications(user, last_visit_unix)
+		notifications = get_notifications(requested_user, last_visit_unix)
 
 		query = 'UPDATE User SET last_visit = %s WHERE username = %s'
 		date = datetime.date.today().isoformat()
-		values = (date, user)
+		values = (date, requested_user)
 		query_result = query_database(query, values)
 
-		query = 'SELECT * FROM Location WHERE owner = %s'
-		values = (user,)
-		locations = query_database(query, values)
-		data = []
-		try:
-			users = users[0]
-			user_data = {
-				"username": users[0],
-				"email": users[1]
+		return load_user_locations(requested_user, users, notifications)
+
+def load_user_locations(requested_user, users, notifications):
+	query = 'SELECT * FROM Location WHERE owner = %s'
+	values = (requested_user,)
+	locations = query_database(query, values)
+	data = []
+	try:
+		users = users[0]
+		user_data = {
+			"username": users[0],
+			"email": users[1]
+		}
+		for location in locations:
+			loc_data = {
+				"owner": location[0],
+				"id": location[1],
+				"name": location[2],
+				"latitude": location[3],
+				"longitude": location[4],
+				"marked": location[5],
+				"notes": location[6]
 			}
-			for location in locations:
-				loc_data = {
-					"owner": location[0],
-					"id": location[1],
-					"name": location[2],
-					"latitude": location[3],
-					"longitude": location[4],
-					"marked": location[5],
-					"notes": location[6]
-				}
-				if not loc_data['notes'] or loc_data['notes'] == '""':
-					loc_data['notes'] = "[]"
-				data.append(loc_data)
-			return {'user': user_data, 'locations': data, 'notifications': notifications}, 200
-		except KeyError as e:
-			logging.warning("login_user key error: {}".format(e))
-			return {"error": "Invalid key in database data"}, 200
-		except Exception as e:
-			logging.warning("login_user exception: {}".format(e))
-			return {'user': user_data, 'locations': None}, 200
+			if not loc_data['notes'] or loc_data['notes'] == '""':
+				loc_data['notes'] = "[]"
+			data.append(loc_data)
+		return {'user': user_data, 'locations': data, 'notifications': notifications}, 200
+	except KeyError as e:
+		logging.warning("login_user key error: {}".format(e))
+		return {"error": "Invalid key in database data"}, 200
+	except Exception as e:
+		logging.warning("login_user exception: {}".format(e))
+		return {"error": "Error getting user locations"}, 200
 
 
 

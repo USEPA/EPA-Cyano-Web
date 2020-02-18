@@ -7,15 +7,17 @@ import logging
 # import json
 import simplejson
 
+script_path = os.path.dirname(os.path.abspath(__file__))
+
 # Loads environment based on deployment location:
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
-# from config.set_environment import DeployEnv
+sys.path.insert(1, os.path.join(script_path, '..'))
+
 from config.set_environment import DeployEnv
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 
 # Local imports:
-import web_app_api
+from cyan_flask import web_app_api
 
 # Declares Flask application:
 app = Flask(__name__)

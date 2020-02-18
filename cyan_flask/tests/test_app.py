@@ -7,8 +7,10 @@ import inspect
 from tabulate import tabulate
 import requests
 
-# Loads environment based on deployment location:
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+script_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(1, os.path.join(script_path, '..', '..'))  # adds EPA-Cyano-Web project to sys.path
+
+# Local imports:
 from config.set_environment import DeployEnv
 from cyan_flask.app import StatusTest, Register, Login, AddLocation, EditLocation, DeleteLocation, GetLocation, EditNotification, DeleteNotification
 
