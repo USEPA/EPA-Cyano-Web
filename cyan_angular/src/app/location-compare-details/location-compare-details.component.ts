@@ -182,9 +182,6 @@ export class LocationCompareDetailsComponent implements OnInit {
     if ($event.index == 2) {
       this.showMap = true;
     }
-    else {
-      this.showMap = false;
-    }
   }
 
   onMapReady(map: Map): void {
