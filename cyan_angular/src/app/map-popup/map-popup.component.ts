@@ -131,9 +131,8 @@ export class MapPopupComponent implements OnInit {
   }
 
   toggleMarkedLocation(ln: Location): void {
-    let m = this.marked == 'Mark' ? false : true;
-    this.locationService.setMarked(ln, m);
-
+    let m = ln.marked;
+    this.locationService.setMarked(ln, !m);
     // Change mark button label
     let label = document.getElementById('marked-label');
     label.innerHTML = this.marked;
