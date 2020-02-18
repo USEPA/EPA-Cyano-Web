@@ -70,9 +70,9 @@
       </div>
     </mat-tab>
 
-    <mat-tab label="Map" class="imagery_tab">
+    <mat-tab label="Map">
       <div *ngIf="showMap" class="mini_map_block">
-          <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
+        <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
       </div>
     </mat-tab>
 
