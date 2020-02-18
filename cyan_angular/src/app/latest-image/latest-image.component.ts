@@ -97,7 +97,7 @@ export class LatestImageComponent implements OnInit {
 		let self = this;
 
 		this.imageSub = this.images
-			.getAllImages(coords.latitude, coords.longitude)
+			.getAllImages(coords.latitude, coords.longitude, this.locationService.getDataType())
 			.subscribe((data: ImageDetails[]) => {
 				this.imageCollection = data;
 			});

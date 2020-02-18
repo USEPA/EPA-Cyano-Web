@@ -15,20 +15,20 @@
     <mat-tab label="Overview" >
       <div class="details_tab">
         <div class="details_overview_satellite">Satellite:<span class="satellite">{{current_location.source}}</span></div>
-        <div class="details_overview_product">Product:<span class="product">{{ productFrequency }}</span></div>
+        <div class="details_overview_product">Product:<span class="product">{{ current_location.sourceFrequency }}</span></div>
         <div class="mini_map_block">
           <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
         </div>
         <div class="details_cyan_left">
           <div class="details_cyan_arrow_box">
-            <div class="details_cyan_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location?.concentrationChange)}}</div>       
+            <div class="details_cyan_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location?.concentrationChange)}}</div>
             <span *ngIf="getArrow(current_location); then location_up else location_down"></span>
             <ng-template #location_up>
               <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(current_location, true)]"></span>
             </ng-template>
             <ng-template #location_down>
-              <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(current_location, true)]"></span>            
-            </ng-template>    
+              <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(current_location, true)]"></span>
+            </ng-template>
           </div>
         </div>
         <div class="details_cyan_right">
@@ -76,7 +76,7 @@
               <span class="tab-title">Notes ({{current_location.notes ? current_location.notes.length : '0'}})</span>
             </div>
             <div class="details_note_body"></div>
-            <div class="details_note_add"></div> 
+            <div class="details_note_add"></div>
         </div>
       </div>
     </mat-tab>
@@ -104,7 +104,7 @@
           <div *ngFor="let thumb of filteredPNGs">
             <div class="image_thumb" (click)="downloadImage($event, thumb)">
               <img class="png_image" title="Download image for {{ getImageDate2(thumb) }}" src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
-            </div>           
+            </div>
           </div>
         </div>
       </ng-template>

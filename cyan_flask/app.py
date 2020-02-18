@@ -84,6 +84,7 @@ class Login(Resource):
 	parser = parser_base.copy()
 	parser.add_argument('user', type=str)
 	parser.add_argument('password', type=str)
+	parser.add_argument('dataType', type=int)
 
 	def get(self):
 		return {"status": "login endpoint"}
@@ -103,6 +104,7 @@ class AddLocation(Resource):
 	parser = parser_base.copy()
 	parser.add_argument('owner', type=str)
 	parser.add_argument('id', type=int)
+	parser.add_argument('type', type=int)
 	parser.add_argument('name', type=str)
 	parser.add_argument('latitude', type=float)
 	parser.add_argument('longitude', type=float)
@@ -126,6 +128,7 @@ class EditLocation(Resource):
 	parser = parser_base.copy()
 	parser.add_argument('owner', type=str)
 	parser.add_argument('id', type=int)
+	parser.add_argument('type', type=int)
 	parser.add_argument('name', type=str)
 	parser.add_argument('marked', type=bool)
 	parser.add_argument('notes', type=str)
@@ -143,27 +146,26 @@ class DeleteLocation(Resource):
 	Endpoint for deleting user location.
 	URL: /app/api/location/delete/<string:user>/<string:_id>
 	"""
-	def get(self, user='', _id=''):
-		results, status_code = web_app_api.delete_location(user, _id)
+	def get(self, user='', _id='', type=''):
+		results, status_code = web_app_api.delete_location(user, _id, type)
 		return results, status_code
+
+class GetUserLocations(Resource):
+	"""
+	Endpoint for get all user locations.
+	"""
+	def get(self, user='', type=''):
+		results = web_app_api.get_user_locations(user, type)
+		results = simplejson.loads(simplejson.dumps(results))
+		return results, 200
 
 class GetLocation(Resource):
 	"""
 	Endoint for getting a user location by user and location id.
 	"""
-	def get(self, user='', _id=''):
-		# results, status_code = web_app_api.delete_location(user, _id)
-		results, status_code = web_app_api.get_location(user, _id)
-		result_obj = {
-			'owner': results[0],
-			'id': results[1],
-			'name': results[2],
-			'latitude': results[3],
-			'longitude': results[4],
-			'marked': results[5],
-			'notes': results[6]
-		}
-		results = simplejson.loads(simplejson.dumps(result_obj))
+	def get(self, user='', _id='', type=''):
+		results, status_code = web_app_api.get_location(user, _id, type)
+		results = simplejson.loads(simplejson.dumps(results))
 		return results, status_code
 
 class AddNotification(Resource):
@@ -202,8 +204,9 @@ api.add_resource(Login, '/cyan/app/api/user')
 api.add_resource(Register, '/cyan/app/api/user/register')
 api.add_resource(AddLocation, '/cyan/app/api/location/add')
 api.add_resource(EditLocation, '/cyan/app/api/location/edit')
-api.add_resource(DeleteLocation, '/cyan/app/api/location/delete/<string:user>/<string:_id>')
-api.add_resource(GetLocation, '/cyan/app/api/location/<string:user>/<string:_id>')
+api.add_resource(DeleteLocation, '/cyan/app/api/location/delete/<string:user>/<string:_id>/<string:type>')
+api.add_resource(GetLocation, '/cyan/app/api/location/<string:user>/<string:_id>/<string:type>')
+api.add_resource(GetUserLocations, '/cyan/app/api/locations/<string:user>/<string:type>')
 
 # Notifications Endpoints:
 api.add_resource(AddNotification, '/cyan/app/api/notification/add')

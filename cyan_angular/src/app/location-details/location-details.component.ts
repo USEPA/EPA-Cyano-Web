@@ -34,8 +34,6 @@ export class LocationDetailsComponent implements OnInit {
 
   filteredPNGs: ImageDetails[];
 
-  productFrequency: string = 'Weekly';
-
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
@@ -169,7 +167,7 @@ export class LocationDetailsComponent implements OnInit {
     let coords = this.locationService.convertToDegrees(this.current_location);
     let self = this;
     this.imageSub = this.images
-      .getImageDetails(coords.latitude, coords.longitude)
+      .getImageDetails(coords.latitude, coords.longitude, this.locationService.getDataType())
       .subscribe((data: ImageDetails[]) => (this.imageCollection = data));
     let timeout = this.loadTicker * 1000;
     setTimeout(function() {
@@ -392,14 +390,12 @@ export class LocationDetailsComponent implements OnInit {
       let data = rawData[self.current_location.id].requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
-        if (timestep.satelliteImageFrequency == 'Weekly') {
-          // Builds data var like [{x: '', y: ''}, {}...]
-          let datum = {
-            x: timestep.imageDate.split(' ')[0],
-            y: timestep.cellConcentration
-          };
-          timeSeriesData.push(datum);
-        }
+        // Builds data var like [{x: '', y: ''}, {}...]
+        let datum = {
+          x: timestep.imageDate.split(' ')[0],
+          y: timestep.cellConcentration
+        };
+        timeSeriesData.push(datum);
       });
 
       // Adds time series line to chart:

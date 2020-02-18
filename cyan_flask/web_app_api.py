@@ -89,7 +89,9 @@ def login_user(post_data):
 	try:
 		user = post_data['user']
 		password = post_data['password']
-	except KeyError:
+		data_type = post_data['dataType']
+	except KeyError as e:
+		logging.error(e)
 		return {"error": "Invalid key in request"}, 200
 	query = 'SELECT username, email, password, created, last_visit FROM User WHERE username = %s'
 	values = (user,)
@@ -116,31 +118,16 @@ def login_user(post_data):
 		query = 'UPDATE User SET last_visit = %s WHERE username = %s'
 		date = datetime.date.today().isoformat()
 		values = (date, user)
-		query_result = query_database(query, values)
+		query_database(query, values)
 
-		query = 'SELECT * FROM Location WHERE owner = %s'
-		values = (user,)
-		locations = query_database(query, values)
-		data = []
 		try:
 			users = users[0]
 			user_data = {
 				"username": users[0],
 				"email": users[1]
 			}
-			for location in locations:
-				loc_data = {
-					"owner": location[0],
-					"id": location[1],
-					"name": location[2],
-					"latitude": location[3],
-					"longitude": location[4],
-					"marked": location[5],
-					"notes": location[6]
-				}
-				if not loc_data['notes'] or loc_data['notes'] == '""':
-					loc_data['notes'] = "[]"
-				data.append(loc_data)
+			data = get_user_locations(user, data_type)
+
 			return {'user': user_data, 'locations': data, 'notifications': notifications}, 200
 		except KeyError as e:
 			logging.warning("login_user key error: {}".format(e))
@@ -150,11 +137,11 @@ def login_user(post_data):
 			return {'user': user_data, 'locations': None}, 200
 
 
-
 def add_location(post_data):
 	try:
 		user = post_data['owner']
 		_id = post_data['id']
+		data_type = post_data['type']
 		name = post_data['name']
 		latitude = post_data['latitude']
 		longitude = post_data['longitude']
@@ -164,15 +151,15 @@ def add_location(post_data):
 		return {"error": "Invalid key in request"}, 200
 
 	# Checks if location already exists for user:
-	query = 'SELECT * FROM Location WHERE id = %s AND owner = %s'
-	values = (_id, user,)
+	query = 'SELECT * FROM Location WHERE id = %s AND owner = %s AND type = %s'
+	values = (_id, user, data_type,)
 	location = query_database(query, values)  # returns list of tuples (user, id, name, lat, lon, marked, notes)
 	if isinstance(location, list) and len(location) > 0:
-		return {"status": "success"}, 200  # location already exists for owner
+		return {"Record with same key exists"}, 409  # location already exists for owner
 
 	# Inserts new location into database:
-	query = 'INSERT INTO Location(owner, id, name, latitude, longitude, marked, notes) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-	values = (user, _id, name, latitude, longitude, marked, notes,)
+	query = 'INSERT INTO Location(owner, id, name, type, latitude, longitude, marked, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+	values = (user, _id, name, data_type, latitude, longitude, marked, notes,)
 	location = query_database(query, values)
 	if type(location) is dict:
 		if "error" in location.keys():
@@ -182,13 +169,14 @@ def add_location(post_data):
 	else:
 		return {"status": "success"}, 201
 
-def delete_location(user='', _id=''):
-	query = 'DELETE FROM Location WHERE id = %s AND owner = %s'
-	values = (_id, user,)
+
+def delete_location(user='', _id='', data_type=''):
+	query = 'DELETE FROM Location WHERE id = %s AND owner = %s AND type = %s'
+	values = (_id, user, data_type,)
 	delete = query_database(query, values)
 	if type(delete) is dict:
 		if "error" in delete.keys():
-			return {"error": "Error accessing database"}, 200
+			return {"error": "Error accessing database"}, 500
 		else:
 			return {"status": "success"}, 200
 	else:
@@ -198,33 +186,67 @@ def edit_location(post_data):
 	try:
 		user = post_data['owner']
 		_id = post_data['id']
+		data_type = post_data['type']
 		name = post_data['name']
 		marked = post_data['marked']
 		notes = post_data['notes']  # array of strings in json format
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
-	query = 'UPDATE Location SET name = %s, marked = %s, notes = %s WHERE owner = %s AND id = %s'
-	values = (name, marked, notes, user, _id,)
-	location = query_database(query, values)
+	query = 'UPDATE Location SET name = %s, marked = %s, notes = %s WHERE owner = %s AND id = %s AND type = %s'
+	values = (name, marked, notes, user, _id, data_type,)
+	query_database(query, values)
 	return {"status": "success"}, 200
 
-def get_location(user='', _id=''):
+
+def get_user_locations(user='', data_type=''):
+	"""
+	Returns user locations based on user and data type.
+	TODO: How to prevent any user getting user locations if they could guess a username?
+	"""
+	query = 'SELECT owner, id, type, name, latitude, longitude, marked, notes FROM Location WHERE owner = %s and type = %s'
+	values = (user, data_type,)
+	locations = query_database(query, values)
+	results = []
+
+	for location in locations:
+		results.append(readLocationRow(location))
+
+	return results
+
+def readLocationRow(location):
+	loc_data = {
+		"owner": location[0],
+		"id": location[1],
+		"type": location[2],
+		"name": location[3],
+		"latitude": location[4],
+		"longitude": location[5],
+		"marked": location[6],
+		"notes": location[7]
+	}
+	if not loc_data['notes'] or loc_data['notes'] == '""':
+		loc_data['notes'] = "[]"
+
+	return loc_data
+
+
+def get_location(user='', _id='', data_type=''):
 	"""
 	Returns user location based on user and location ID.
 	TODO: How to prevent any user getting user locations if they could guess a username?
 	"""
-	query = 'SELECT * FROM Location WHERE id = %s AND owner = %s'
-	values = (_id, user,)
+	query = 'SELECT owner, id, type, name, latitude, longitude, marked, notes FROM Location WHERE id = %s AND owner = %s AND type = %s'
+	values = (_id, user, data_type,)
 	location = query_database(query, values)
 	if type(location) is dict:
 		if "error" in location.keys():
-			return {"error": "Error getting location from database."}, 200
+			return {"error": "Error getting location from database."}, 500
 		else:
-			return location, 200
+			return readLocationRow(location), 200
 	elif type(location) is list and len(location) > 0:
-		return location[0], 200
+		return readLocationRow(location[0]), 200
 	else:
-		return location, 200
+		return "Not Found", 404
 
 
 

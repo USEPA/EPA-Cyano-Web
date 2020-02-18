@@ -80,12 +80,13 @@ class DBHandler(object):
 		CREATE TABLE IF NOT EXISTS Location (
 			owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
 			id INTEGER NOT NULL AUTO_INCREMENT,
+			type TINYINT NOT NULL DEFAULT 1,
 			name VARCHAR(256) NOT NULL,
 			latitude DECIMAL(12,10) NOT NULL,
 			longitude DECIMAL(13,10) NOT NULL,
 			marked BIT NOT NULL,
 			notes TEXT NOT NULL,
-			PRIMARY KEY (id, owner)
+			PRIMARY KEY (id, owner, type)
 		);
 		"""
 		self.execute_query(query, self.db_name)
