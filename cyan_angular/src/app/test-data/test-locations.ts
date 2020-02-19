@@ -3,6 +3,7 @@ import { Location } from '../models/location';
 export const LOCATIONS: Location[] = [
   {
     id: 100001,
+    type: 2,
     name: 'Sand Creek Park',
     latitude: 34.03472222,
     longitude: -83.38138889,
@@ -27,6 +28,7 @@ export const LOCATIONS: Location[] = [
   },
   {
     id: 100002,
+    type: 1,
     name: 'Lake Okeechobee',
     latitude: 27.03222222,
     longitude: -80.77722222,
@@ -51,6 +53,7 @@ export const LOCATIONS: Location[] = [
   },
   {
     id: 100003,
+    type: 1,
     name: 'Devils Elbow Post Light',
     latitude: 28.63361111,
     longitude: -81.62500000,
@@ -75,6 +78,7 @@ export const LOCATIONS: Location[] = [
   },
   {
     id: 100004,
+    type: 2,
     name: 'Chestatee Bay',
     latitude: 34.27055556,
     longitude: -83.95583333,

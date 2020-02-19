@@ -9,12 +9,14 @@ import { ConfigService } from '../services/config.service';
 import { DownloaderService } from '../services/downloader.service';
 import { ConcentrationRanges } from '../test-data/test-levels';
 import { MapService } from '../services/map.service';
+import {LocationType} from "../models/location";
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
   userLocations: UserLocations = null;
+  private data_type: LocationType = LocationType.OLCI_WEEKLY;
 
   test_levels: any;
   @Input() locations: Location[] = [];
@@ -38,6 +40,51 @@ export class LocationService {
     this.getCyanLevels();
     this.getData();
     this.loadUser();
+  }
+
+  setDataType(dataType: number) {
+    let origin_type = this.data_type;
+    let self = this;
+
+    switch (dataType) {
+      case 1:
+        this.data_type = LocationType.OLCI_WEEKLY;
+        break;
+      case 2:
+        this.data_type = LocationType.OLCI_DAILY;
+        break;
+    }
+    if (origin_type != this.data_type) {
+      // data type changed, reload locations
+      this.refreshData();
+    }
+  }
+
+  refreshData() {
+    let self = this;
+    // clear all markers
+    this.locations.forEach((location) => {
+      self.mapService.deleteMarker(location);
+    });
+
+    // clear locations data
+    this.downloader.locationsData = {};
+    while(this.locations.length){
+      this.locations.pop();
+    }
+    while(this.compare_locations.length){
+      this.compare_locations.pop();
+    }
+
+    // fetch data
+    this.downloader.getUserLocations(this.user.getUserName(), this.data_type).subscribe((locations: UserLocations[]) => {
+      self.user.currentAccount.locations = locations;
+      self.getUserLocations();
+    });
+  }
+
+  getDataType() {
+    return this.data_type;
   }
 
   loadUser() {
@@ -66,7 +113,6 @@ export class LocationService {
 
   getUserLocations() {
     let self = this;
-    let username = this.user.getUserName();
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
       if (locations.length != 0) {
         locations.forEach(function(location) {
@@ -75,6 +121,7 @@ export class LocationService {
             let l = new Location();
             l.id = location.id;
             l.name = location.name;
+            l.type = location.type;
             let coord = self.convertCoordinates(location.latitude, location.longitude);
             l.latitude = location.latitude;
             l.longitude = location.longitude;
@@ -187,6 +234,7 @@ export class LocationService {
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
     l.name = name;
+    l.type = this.getDataType();
     l.latitude = latitude;
     l.longitude = longitude;
     l.latitude_deg = c.latDeg;
@@ -217,7 +265,7 @@ export class LocationService {
   deleteLocation(ln: Location): void {
     const index = this.locations.map(loc => loc.id).indexOf(ln.id);
     if (index >= 0) {
-      this.downloader.deleteUserLocation(this.user.getUserName(), ln.id);
+      this.downloader.deleteUserLocation(this.user.getUserName(), ln.id, ln.type);
       this.locations.splice(index, 1);
     }
     // delete from compare also
@@ -229,7 +277,7 @@ export class LocationService {
       if (loc.id === ln.id) {
         loc.name = name;
         let username = this.user.getUserName();
-        this.downloader.editUserLocation(username, ln.id, name, ln.marked, ln.notes);
+        this.downloader.editUserLocation(username, name, ln);
       }
     });
   }
@@ -350,7 +398,7 @@ export class LocationService {
   setMarked(l: Location, m: boolean): void {
     l.marked = m;
     let username = this.user.getUserName();
-    this.downloader.editUserLocation(username, l.id, name, l.marked, l.notes);
+    this.downloader.editUserLocation(username, name, l);
   }
 
   addMarkers(map: Map): void {

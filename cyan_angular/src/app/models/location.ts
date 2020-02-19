@@ -1,6 +1,7 @@
 export class Location {
   id: number;
   name: string;
+  type: number;
   latitude: number;
   longitude: number;
   latitude_deg: number;
@@ -21,4 +22,9 @@ export class Location {
   validCellCount: number;
   notes: object[];
   marked: boolean;
+}
+
+export enum LocationType {
+  OLCI_WEEKLY = 1,
+  OLCI_DAILY = 2,
 }

@@ -157,14 +157,12 @@ export class LocationCompareDetailsComponent implements OnInit {
       let data = rawData[l.id].requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
-        if (timestep.satelliteImageFrequency == 'Weekly') {
-          // Builds data var like [{x: '', y: ''}, {}...]
-          let datum = {
-            x: timestep.imageDate.split(' ')[0],
-            y: timestep.cellConcentration
-          };
-          timeSeriesData.push(datum);
-        }
+        // Builds data var like [{x: '', y: ''}, {}...]
+        let datum = {
+          x: timestep.imageDate.split(' ')[0],
+          y: timestep.cellConcentration
+        };
+        timeSeriesData.push(datum);
       });
 
       // Adds time series line to chart:
