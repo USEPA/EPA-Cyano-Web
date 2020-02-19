@@ -44,7 +44,6 @@ export class LocationService {
 
   setDataType(dataType: number) {
     let origin_type = this.data_type;
-    let self = this;
 
     switch (dataType) {
       case 1:
@@ -204,8 +203,6 @@ export class LocationService {
 
   // NOTE: Will not filter locations within service, set source type in my-locations
   getLocations(src: string): Observable<Location[]> {
-    src = src == 'MERIS' ? 'MERIS' : 'OLCI';
-    //TODO: add filtering for data source
     return of(this.locations);
   }
 

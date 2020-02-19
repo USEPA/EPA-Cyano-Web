@@ -217,7 +217,7 @@ export class DownloaderService {
   }
 
   getLocationIndex(ln: Location) {
-    return this.locations.map(loc => loc.id).indexOf(ln.id);
+    return this.locations.findIndex(loc => loc.id == ln.id && loc.type == ln.type);
   }
 
   locationNotDeleted(ln: Location) {
