@@ -124,7 +124,7 @@ export class NotificationsComponent implements OnInit {
 })
 export class NotificationDetails {
 
-  current_notification_index;
+  current_notification_index: number = 0;
 
   constructor(
     public dialogRef: MatDialogRef<NotificationDetails>,
@@ -133,26 +133,27 @@ export class NotificationDetails {
   ) { }
 
   ngOnInit() {
-    // get the index of the selected notification object
+    // Gets the index of the selected notification object
     let notificationId = this.data.notificationObj[1];
-    // this.current_notification_index = this.data.allNotifications.find(item => item[1] === notificationId);
     this.current_notification_index = this.data.allNotifications.map(item => item[1]).indexOf(notificationId);
   }
 
   exit(): void {
-    // close the notification detail
+    // Closes the notification detail
     this.dialogRef.close();
   }
 
   previousNotification(): void {
-    this.current_notification_index = this.current_notification_index == 1 ? this.data.allNotifications.length : this.current_notification_index - 1;
-    this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
+    console.log("notifications previousNotification() called.");
+    this.current_notification_index = this.current_notification_index == 0 ? this.data.allNotifications.length - 1 : this.current_notification_index - 1;
+    this.data.notificationObj = this.data.allNotifications[this.current_notification_index];
     this.updateUserNotifications(this.data.notificationObj);
   }
 
   nextNotification(): void {
-    this.current_notification_index = this.current_notification_index == this.data.allNotifications.length ? 1 : this.current_notification_index + 1;
-    this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
+    console.log("notifications nextNotification() called.");
+    this.current_notification_index = this.current_notification_index == this.data.allNotifications.length - 1 ? 0 : this.current_notification_index + 1;
+    this.data.notificationObj = this.data.allNotifications[this.current_notification_index];
     this.updateUserNotifications(this.data.notificationObj);
   }
 
