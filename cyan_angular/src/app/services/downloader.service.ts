@@ -96,7 +96,7 @@ export class DownloaderService {
       latitude: ln.latitude,
       longitude: ln.longitude,
       marked: ln.marked,
-      notes: JSON.stringify(ln.notes)
+      notes: ln.notes
     };
 
     this.executeUserLocations(url, body).subscribe();
@@ -110,7 +110,7 @@ export class DownloaderService {
       type: ln.type,
       name: ln.name,
       marked: ln.marked,
-      notes: JSON.stringify(ln.notes)
+      notes: ln.notes
     };
     this.executeEditUserLocation(url, body).subscribe();
   }
@@ -127,7 +127,7 @@ export class DownloaderService {
       type: ln.type,
       name: name,
       marked: ln.marked,
-      notes: JSON.stringify(ln.notes)
+      notes: ln.notes
     };
     this.executeEditUserLocation(url, body).subscribe();
   }
@@ -217,7 +217,7 @@ export class DownloaderService {
   }
 
   getLocationIndex(ln: Location) {
-    return this.locations.map(loc => loc.id).indexOf(ln.id);
+    return this.locations.findIndex(loc => loc.id == ln.id && loc.type == ln.type);
   }
 
   locationNotDeleted(ln: Location) {
