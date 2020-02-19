@@ -146,7 +146,7 @@ def add_location(post_data):
 		latitude = post_data['latitude']
 		longitude = post_data['longitude']
 		marked = post_data['marked']
-		notes = post_data['notes'] or "[]"
+		notes = post_data['notes'] or []
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
 
@@ -159,7 +159,7 @@ def add_location(post_data):
 
 	# Inserts new location into database:
 	query = 'INSERT INTO Location(owner, id, name, type, latitude, longitude, marked, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-	values = (user, _id, name, data_type, latitude, longitude, marked, notes,)
+	values = (user, _id, name, data_type, latitude, longitude, marked, json.dumps(notes),)
 	location = query_database(query, values)
 	if type(location) is dict:
 		if "error" in location.keys():
@@ -189,11 +189,11 @@ def edit_location(post_data):
 		data_type = post_data['type']
 		name = post_data['name']
 		marked = post_data['marked']
-		notes = post_data['notes']  # array of strings in json format
+		notes = post_data['notes'] or []  # array of strings in json format
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
 	query = 'UPDATE Location SET name = %s, marked = %s, notes = %s WHERE owner = %s AND id = %s AND type = %s'
-	values = (name, marked, notes, user, _id, data_type,)
+	values = (name, marked, json.dumps(notes), user, _id, data_type,)
 	query_database(query, values)
 	return {"status": "success"}, 200
 
@@ -222,10 +222,10 @@ def readLocationRow(location):
 		"latitude": location[4],
 		"longitude": location[5],
 		"marked": location[6],
-		"notes": location[7]
+		"notes": json.loads(location[7])
 	}
 	if not loc_data['notes'] or loc_data['notes'] == '""':
-		loc_data['notes'] = "[]"
+		loc_data['notes'] = []
 
 	return loc_data
 

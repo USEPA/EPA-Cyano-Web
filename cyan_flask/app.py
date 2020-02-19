@@ -109,7 +109,7 @@ class AddLocation(Resource):
 	parser.add_argument('latitude', type=float)
 	parser.add_argument('longitude', type=float)
 	parser.add_argument('marked', type=bool)
-	parser.add_argument('notes', type=str)
+	parser.add_argument('notes', type=list, location='json')
 
 	def get(self):
 		return {"status": "location endpoint"}
@@ -131,7 +131,7 @@ class EditLocation(Resource):
 	parser.add_argument('type', type=int)
 	parser.add_argument('name', type=str)
 	parser.add_argument('marked', type=bool)
-	parser.add_argument('notes', type=str)
+	parser.add_argument('notes', type=list, location='json')
 
 	def get(self):
 		return {"status": "edit location endpoint"}
