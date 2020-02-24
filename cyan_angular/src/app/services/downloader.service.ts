@@ -119,19 +119,6 @@ export class DownloaderService {
     return this.http.post(url, body, headerOptions);
   }
 
-  editUserLocation(username: string, name: string, ln: Location) {
-    let url = this.baseServerUrl + 'location/edit';
-    let body = {
-      owner: username,
-      id: ln.id,
-      type: ln.type,
-      name: name,
-      marked: ln.marked,
-      notes: ln.notes
-    };
-    this.executeEditUserLocation(url, body).subscribe();
-  }
-
   executeEditUserLocation(url: string, body: any) {
     return this.http.post(url, body, headerOptions);
   }
@@ -293,7 +280,8 @@ export class DownloaderService {
       ln.marked = false;
     }
 
-    if (this.locationNotDeleted(ln)) {
+    // update only if name changed and user did not remove location before API returns
+    if (ln.name != loc.name && this.locationNotDeleted(ln)) {
       this.updateUserLocation(username, ln);
     }
     return ln;

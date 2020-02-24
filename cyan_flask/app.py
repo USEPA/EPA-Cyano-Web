@@ -1,10 +1,11 @@
 from flask import Flask, Response
+from flask import request
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 import os
 import sys
 import logging
-# import json
+import json
 import simplejson
 
 # Loads environment based on deployment location:
@@ -90,8 +91,13 @@ class Login(Resource):
 		return {"status": "login endpoint"}
 
 	def post(self):
+		print (request.is_json)
+		content = request.get_json()
+		print (content)
+		print(content['user'])
 		# Gets user from user table:
-		args = self.parser.parse_args()
+		args = request.get_json() #self.parser.parse_args()
+		print (args)
 		results, status_code = web_app_api.login_user(args)
 		results = simplejson.loads(simplejson.dumps(results))  # NOTE: Standard json lib unable to handle Decimal type (using simplejson)
 		return results, status_code
@@ -101,22 +107,12 @@ class AddLocation(Resource):
 	Endpoint for adding user location.
 	URL: /app/api/location/add
 	"""
-	parser = parser_base.copy()
-	parser.add_argument('owner', type=str)
-	parser.add_argument('id', type=int)
-	parser.add_argument('type', type=int)
-	parser.add_argument('name', type=str)
-	parser.add_argument('latitude', type=float)
-	parser.add_argument('longitude', type=float)
-	parser.add_argument('marked', type=bool)
-	parser.add_argument('notes', type=list, location='json')
-
 	def get(self):
 		return {"status": "location endpoint"}
 
 	def post(self, user=None, id=None):
 		# Adds a new location to location table:
-		args = self.parser.parse_args()
+		args = request.get_json()
 		results, status_code = web_app_api.add_location(args)
 		return results, status_code
 
@@ -125,19 +121,11 @@ class EditLocation(Resource):
 	Endpoint for editing user location.
 	URL: /app/api/location/edit
 	"""
-	parser = parser_base.copy()
-	parser.add_argument('owner', type=str)
-	parser.add_argument('id', type=int)
-	parser.add_argument('type', type=int)
-	parser.add_argument('name', type=str)
-	parser.add_argument('marked', type=bool)
-	parser.add_argument('notes', type=list, location='json')
-
 	def get(self):
 		return {"status": "edit location endpoint"}
 
 	def post(self):
-		args = self.parser.parse_args()
+		args = request.get_json()
 		results, status_code = web_app_api.edit_location(args)
 		return results, status_code
 
