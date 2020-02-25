@@ -291,6 +291,9 @@ def get_users_notifications(user):
 
 def parse_notifications_response(new_notifications, latest_time, user):
 	values = []
+	if new_notifications is None:
+		return values
+
 	for notification in new_notifications:
 		# NOTE: Assuming ascending order of dates
 		notification_time = int(str(notification['dateSent'])[:-3])  # NOTE: trimming off 3 trailing 0s

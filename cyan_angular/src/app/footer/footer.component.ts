@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {LocationService} from "../services/location.service";
-import {LocationType} from "../models/location";
 
 @Component({
   selector: 'app-footer',
@@ -9,17 +7,9 @@ import {LocationType} from "../models/location";
 })
 export class FooterComponent implements OnInit {
 
-  public data_type: LocationType;
-
-  constructor(private locationService: LocationService) { }
+  constructor() { }
 
   ngOnInit() {
-    this.data_type = this.locationService.getDataType();
-  }
-
-  dataTypeClick(type: number): void {
-    this.data_type = type;
-    this.locationService.setDataType(type);
   }
 
   linksClick(l: any): void {

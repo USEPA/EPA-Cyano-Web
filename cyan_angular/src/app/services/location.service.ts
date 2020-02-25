@@ -274,7 +274,7 @@ export class LocationService {
       if (loc.id === ln.id) {
         loc.name = name;
         let username = this.user.getUserName();
-        this.downloader.editUserLocation(username, name, ln);
+        this.downloader.updateUserLocation(username, ln);
       }
     });
   }
@@ -395,7 +395,7 @@ export class LocationService {
   setMarked(l: Location, m: boolean): void {
     l.marked = m;
     let username = this.user.getUserName();
-    this.downloader.editUserLocation(username, name, l);
+    this.downloader.updateUserLocation(username, l);
   }
 
   addMarkers(map: Map): void {
