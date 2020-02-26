@@ -92,9 +92,6 @@ export class AccountComponent implements OnInit {
   }
 
   loginUser(): void {
-
-    console.log("account.component loginUser() called.");
-
     this.userService.loginUser(this.username, this.password);
     let self = this;
     setTimeout(function() {

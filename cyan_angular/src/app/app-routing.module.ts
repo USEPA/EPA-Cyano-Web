@@ -11,16 +11,18 @@ import { CoordinatesComponent } from './coordinates/coordinates.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { LatestImageComponent } from './latest-image/latest-image.component';
 
+import { AuthGuardService } from './services/auth-guard.service';
+
 const routes: Routes = [
     { path: 'account', component: AccountComponent },
-    { path: 'mylocations', component: MyLocationsComponent },
-    { path: 'comparelocations', component: LocationCompareComponent },
-    { path: 'configs', component: ConfigComponent },
-    { path: 'locationdetails', component: LocationDetailsComponent },
-    { path: 'locationcomparedetails', component: LocationCompareDetailsComponent },
-    { path: 'coordinates', component: CoordinatesComponent },
-	{ path: 'notifications', component: NotificationsComponent },
-    { path: 'latestimage', component: LatestImageComponent }
+    { path: 'mylocations', component: MyLocationsComponent, canActivate: [AuthGuardService] },
+    { path: 'comparelocations', component: LocationCompareComponent, canActivate: [AuthGuardService] },
+    { path: 'configs', component: ConfigComponent, canActivate: [AuthGuardService] },
+    { path: 'locationdetails', component: LocationDetailsComponent, canActivate: [AuthGuardService] },
+    { path: 'locationcomparedetails', component: LocationCompareDetailsComponent, canActivate: [AuthGuardService] },
+    { path: 'coordinates', component: CoordinatesComponent, canActivate: [AuthGuardService] },
+	{ path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuardService] },
+    { path: 'latestimage', component: LatestImageComponent, canActivate: [AuthGuardService] }
 ];
 
 @NgModule({

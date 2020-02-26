@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, Injector } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createCustomElement } from '@angular/elements';
@@ -22,6 +22,7 @@ import {
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { Ng5SliderModule } from 'ng5-slider';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 import { AppComponent } from './app.component';
 import { MarkerMapComponent } from './marker-map/marker-map.component';
@@ -39,6 +40,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { LocationService } from './services/location.service';
 import { MapService } from './services/map.service';
+import { AuthService } from './services/auth.service';
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
@@ -50,6 +52,9 @@ import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 import { CoordinatesComponent } from './coordinates/coordinates.component';
 import { LatestImageComponent } from './latest-image/latest-image.component';
+
+import { AuthInterceptor, JwtInterceptor } from './interceptors';
+import { AuthGuardService } from './services/auth-guard.service';
 
 @NgModule({
   declarations: [
@@ -99,7 +104,18 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
-  providers: [LocationService, MapService, CyanMap, Location, DatePipe],
+  providers: [
+    LocationService,
+    MapService,
+    AuthService,
+    CyanMap,
+    Location,
+    DatePipe,
+    JwtHelperService,
+    AuthGuardService,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
   entryComponents: [
     MapPopupComponent,
