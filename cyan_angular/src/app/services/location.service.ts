@@ -3,13 +3,15 @@ import { Observable, of, Subscription, Subject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { marker, icon, Map } from 'leaflet';
 
-import { Location } from '../models/location';
+import { Location, LocationType } from '../models/location';
+import { ConcentrationRanges } from '../test-data/test-levels';
+
 import { UserService, UserLocations, User } from '../services/user.service';
 import { ConfigService } from '../services/config.service';
 import { DownloaderService } from '../services/downloader.service';
-import { ConcentrationRanges } from '../test-data/test-levels';
 import { MapService } from '../services/map.service';
-import {LocationType} from "../models/location";
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +37,7 @@ export class LocationService {
     private user: UserService,
     private configService: ConfigService,
     private downloader: DownloaderService,
-    private mapService: MapService
+    private mapService: MapService,
   ) {
     this.getCyanLevels();
     this.getData();
@@ -59,7 +61,7 @@ export class LocationService {
     }
   }
 
-  refreshData() {
+  clearUserData() {
     let self = this;
     // clear all markers
     this.locations.forEach((location) => {
@@ -74,6 +76,12 @@ export class LocationService {
     while(this.compare_locations.length){
       this.compare_locations.pop();
     }
+  }
+
+  refreshData() {
+    let self = this;
+
+    this.clearUserData();
 
     // fetch data
     this.downloader.getUserLocations(this.user.getUserName(), this.data_type).subscribe((locations: UserLocations[]) => {
