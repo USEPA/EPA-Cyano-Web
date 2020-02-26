@@ -253,9 +253,7 @@ def get_notifications(user, last_visit):
 
 	new_notifications = make_notifications_request(latest_time)  # gets all notifications at /cyan/cyano/notifications
 
-	db_values = []
-	if not 'error' in new_notifications:
-		db_values = parse_notifications_response(new_notifications, latest_time, user)
+	db_values = parse_notifications_response(new_notifications, latest_time, user)
 		
 	if len(db_values) > 0:
 		query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
@@ -279,6 +277,9 @@ def get_users_notifications(user):
 
 def parse_notifications_response(new_notifications, latest_time, user):
 	values = []
+	if new_notifications is None:
+		return values
+
 	for notification in new_notifications:
 		# NOTE: Assuming ascending order of dates
 		notification_time = int(str(notification['dateSent'])[:-3])  # NOTE: trimming off 3 trailing 0s

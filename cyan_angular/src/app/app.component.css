@@ -8,6 +8,9 @@ router-outlet ~ * {
     height:10%;
     /* padding-bottom: 5px; */
 }
+.bottom-menu-bar {
+  height:5%;
+}
 app-header {
     z-index: 5;
 }
@@ -15,7 +18,7 @@ app-header {
     height: 10%;
 }
 .map-window {
-    height: 80%;
+    height: 75%;
     z-index: 2;
     position: relative;
 }

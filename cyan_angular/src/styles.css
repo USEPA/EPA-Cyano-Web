@@ -19,7 +19,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-menu-panel {
     background: #205493;
     color: white ;
-    margin-bottom: 15px;
+    margin-bottom: .5em;
 }
 .mat-menu-item:focus {
     outline: none;
