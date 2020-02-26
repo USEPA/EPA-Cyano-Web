@@ -3,9 +3,6 @@ NOTE: From qed_cyan/cyan_app django application.
 
 Handles user account interactions.
 """
-
-import hashlib
-import binascii
 import uuid
 import time
 import datetime
@@ -17,24 +14,12 @@ import logging
 import requests
 import simplejson
 
+# Local imports:
+import auth
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
-
-def hash_password(password):
-	salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
-	password_hash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
-	password_hex = binascii.hexlify(password_hash)
-	password_salted = (salt + password_hex).decode('ascii')
-	return password_salted
-
-def test_password(password_0, password_1):
-	salt = password_0[:64]
-	password_1_hash = hashlib.pbkdf2_hmac('sha512', password_1.encode('utf-8'), salt.encode('ascii'), 100000)
-	password_1_hex = binascii.hexlify(password_1_hash).decode('ascii')
-	return password_0[64:] == password_1_hex
 
 def query_database(query, values, execution_type=None):
 	conn = mysql.connector.connect(
@@ -79,7 +64,7 @@ def register_user(post_data):
 		return {"error": "Username already exists"}, 200
 	else:
 		date = datetime.date.today().isoformat()
-		password_salted = hash_password(password)
+		password_salted = auth.hash_password(password)
 		query = 'INSERT INTO User(id, username, email, password, created, last_visit) VALUES (%s, %s, %s, %s, %s, %s)'
 		values = (None, user, email, password_salted, date, date,)
 		register = query_database(query, values)
@@ -106,7 +91,7 @@ def login_user(post_data):
 	else:
 		# date = users[0][3]
 
-		if not test_password(users[0][2], password):
+		if not auth.test_password(users[0][2], password):
 			return {"error": "Invalid password"}, 200
 
 
@@ -123,8 +108,9 @@ def login_user(post_data):
 		try:
 			users = users[0]
 			user_data = {
-				"username": users[0],
-				"email": users[1]
+				'username': users[0],
+				'email': users[1],
+				'auth_token': auth.encode_auth_token(user)
 			}
 			data = get_user_locations(user, data_type)
 
@@ -267,7 +253,9 @@ def get_notifications(user, last_visit):
 
 	new_notifications = make_notifications_request(latest_time)  # gets all notifications at /cyan/cyano/notifications
 
-	db_values = parse_notifications_response(new_notifications, latest_time, user)
+	db_values = []
+	if not 'error' in new_notifications:
+		db_values = parse_notifications_response(new_notifications, latest_time, user)
 		
 	if len(db_values) > 0:
 		query = 'INSERT INTO Notifications (owner, id, date, subject, body, is_new) VALUES (%s, %s, %s, %s, %s, %s)'
@@ -336,7 +324,7 @@ def make_notifications_request(latest_time):
 		logging.warning("Request to {} timed out.".format(notification_url))
 		# TODO: Retry request.
 		return None
-	except requests.exceptions.RequestException:
+	except requests.exceptions.RequestException as e:
 		logging.warning("Error making request to {}.".format(notification_url))
 		# TODO: Handle error.
 		return None
