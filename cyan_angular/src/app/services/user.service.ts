@@ -12,7 +12,8 @@ export class UserService {
   currentAccount: Account = {
     user : {
       username: "",
-      email: ""
+      email: "",
+      auth_token: ""
     },
     locations : [],
     notifications: []
@@ -22,7 +23,21 @@ export class UserService {
   private allNotificationsSource = new Subject<UserNotifications[]>();  // obserable Notifications[] sources
   allNotifications$ = this.allNotificationsSource.asObservable();  // observable Notifications[] streams
 
-  constructor(private downloader: DownloaderService) { }
+  constructor(
+    private downloader: DownloaderService,
+  ) { }
+
+  initializeCurrentAccount(): void {
+    this.currentAccount = {
+      user : {
+        username: "",
+        email: "",
+        auth_token: ""
+      },
+      locations : [],
+      notifications: []
+    };
+  }
 
   loginUser(username: string, password: string) {
     this.downloader.userLogin(username, password).subscribe((details: Account) => {
@@ -32,11 +47,20 @@ export class UserService {
           location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
         });
         this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
+        localStorage.setItem('auth_token', details.user.auth_token);  // sets token for requests        
       }
       else {
         this.currentAccount['error'] = details['error'];
       }
     });
+  }
+
+  logoutUser() {
+    /*
+    Clears current account data, locations, notifcations, etc.
+    */
+    this.initializeCurrentAccount();  // clears currentAccount object
+    this.allNotificationsSource.next([]);  // clears notifications source
   }
 
   registerUser(username: string, email: string, password: string) {
@@ -105,7 +129,6 @@ export class UserService {
     Clears user's notifications.
     */
     this.downloader.clearUserNotifications(username);
-    // Update user's notifications array to a new/blank array?
     this.currentAccount.notifications = [];
     this.allNotificationsSource.next(this.currentAccount.notifications);
   }
@@ -115,6 +138,7 @@ export class UserService {
 export class User {
   username: string;
   email: string;
+  auth_token: string;
 }
 
 export class UserLocations {
