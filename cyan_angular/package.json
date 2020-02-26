@@ -28,6 +28,7 @@
     "@angular/router": "8.2.9",
     "@angular/service-worker": "8.2.9",
     "@asymmetrik/ngx-leaflet": "6.0.1",
+    "@auth0/angular-jwt": "^4.0.0",
     "@types/leaflet": "1.5",
     "bootstrap": "4.3.1",
     "chart.js": "2.8.0",
@@ -42,7 +43,7 @@
     "zone.js": "0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "0.803.8",
+    "@angular-devkit/build-angular": "0.803.24",
     "@angular/cli": "8.3.8",
     "@angular/compiler-cli": "8.2.9",
     "@angular/language-service": "8.2.9",
