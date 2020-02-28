@@ -67,11 +67,9 @@ export class MapPopupComponent implements OnInit {
     if (this.location == null) { return; }
     let locIndex = compareLocations.map((item) => { return item.id; }).indexOf(this.location.id);
     if (locIndex > -1) {
-      // this.compareSelected = true;
       return true;
     }
     else {
-      // this.compareSelected = false;
       return false;
     }
   }
