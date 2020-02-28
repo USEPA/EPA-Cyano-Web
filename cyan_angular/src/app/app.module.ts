@@ -55,7 +55,7 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
 import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
 
 import { AuthInterceptor, JwtInterceptor } from './interceptors';
-import { AuthGuardService } from './services/auth-guard.service';
+import { AuthGuard } from './guards/auth.guard';
 
 @NgModule({
   declarations: [
@@ -114,7 +114,7 @@ import { AuthGuardService } from './services/auth-guard.service';
     Location,
     DatePipe,
     JwtHelperService,
-    AuthGuardService,
+    AuthGuard,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],

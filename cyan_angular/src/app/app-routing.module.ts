@@ -11,18 +11,18 @@ import { CoordinatesComponent } from './coordinates/coordinates.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { LatestImageComponent } from './latest-image/latest-image.component';
 
-import { AuthGuardService } from './services/auth-guard.service';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
-    { path: 'account', component: AccountComponent },
-    { path: 'mylocations', component: MyLocationsComponent, canActivate: [AuthGuardService] },
-    { path: 'comparelocations', component: LocationCompareComponent, canActivate: [AuthGuardService] },
-    { path: 'configs', component: ConfigComponent, canActivate: [AuthGuardService] },
-    { path: 'locationdetails', component: LocationDetailsComponent, canActivate: [AuthGuardService] },
-    { path: 'locationcomparedetails', component: LocationCompareDetailsComponent, canActivate: [AuthGuardService] },
-    { path: 'coordinates', component: CoordinatesComponent, canActivate: [AuthGuardService] },
-	{ path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuardService] },
-    { path: 'latestimage', component: LatestImageComponent, canActivate: [AuthGuardService] }
+	{ path: 'account', component: AccountComponent },
+	{ path: 'mylocations', component: MyLocationsComponent, canActivate: [AuthGuard] },
+	{ path: 'comparelocations', component: LocationCompareComponent, canActivate: [AuthGuard] },
+	{ path: 'configs', component: ConfigComponent, canActivate: [AuthGuard] },
+	{ path: 'locationdetails', component: LocationDetailsComponent, canActivate: [AuthGuard] },
+	{ path: 'locationcomparedetails', component: LocationCompareDetailsComponent, canActivate: [AuthGuard] },
+	{ path: 'coordinates', component: CoordinatesComponent, canActivate: [AuthGuard] },
+	{ path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
+	{ path: 'latestimage', component: LatestImageComponent, canActivate: [AuthGuard] }
 ];
 
 @NgModule({
