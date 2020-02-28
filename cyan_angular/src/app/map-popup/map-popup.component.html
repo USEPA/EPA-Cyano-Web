@@ -47,8 +47,14 @@
     </ng-template>
     <ng-template #mark>
         <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="unmark"></span><span id="marked-label">Unmark</span> Location</button>
-      </ng-template>
-    <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation(location)"><span class="compare_icon"></span>Select to Compare</button>
+    </ng-template>
+    <span *ngIf="compareSelected; then selected else select"></span>
+    <ng-template #select>
+      <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation(location)"><span class="compare_icon"></span>Select to Compare</button>
+    </ng-template>
+    <ng-template #selected>
+      <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation(location)"><span class="compare_icon"></span>Selected to Compare</button>
+    </ng-template>
     <button type="button" class="popup-latest-image-btn popup-btn" (click)="viewLatestImage(location)">View Latest Image</button>
     <button type="button" class="popup-remove-btn popup-btn" (click)="deleteLocation(location)"><span class="remove_icon"></span>Remove</button>
   </div>
