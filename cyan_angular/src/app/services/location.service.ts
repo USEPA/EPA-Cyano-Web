@@ -201,6 +201,7 @@ export class LocationService {
     this. locationChangedSub = this.downloader.locationsChanged.subscribe( (loc: Location) => {
       if (loc != null) {
         this.mapService.updateMarker(loc);
+        this.updateCompareLocation(loc);
       }
     });
   }
@@ -302,7 +303,16 @@ export class LocationService {
     this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
   }
 
-  updateCompareLocation(name: string, ln: Location) {
+  updateCompareLocation(ln: Location) {
+    /*
+    Updates a location in compare location array when data for the
+    location is obtained.
+    */
+    let locIndex = this.compare_locations.map((item) => { return item.id; }).indexOf(ln.id);
+    if (locIndex > -1) {
+      this.compare_locations[locIndex] = ln;
+      this.compareLocationsSource.next(this.compare_locations);
+    }
   }
 
   deleteCompareLocation(ln: Location): void {

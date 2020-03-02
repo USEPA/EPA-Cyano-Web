@@ -17,8 +17,11 @@ export class MapPopupComponent implements OnInit {
   marked: string = 'Mark';
   @Input() location: Location;
   @Input() locationData: Location;
+  compareSelected: boolean = false;
+  compare_locations: Location[];
 
   locationSubscription: Subscription;
+  locationCompareSub: Subscription;
 
   constructor(
     private locationService: LocationService,
@@ -29,6 +32,7 @@ export class MapPopupComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+
     let self = this;
     if (!this.location) {
       let loc = this.locationService.getStaticLocations();
@@ -39,6 +43,13 @@ export class MapPopupComponent implements OnInit {
       self.marked = self.location.marked ? 'Mark' : 'Unmark';
       self.locationService.downloadLocation(self.location);
     }
+
+    this.compareSelected = this.locationInCompareArray(self.locationService.compare_locations);
+
+    this.locationCompareSub = this.locationService.compare$.subscribe(locations => {
+      this.compareSelected = this.locationInCompareArray(locations);
+    });
+
   }
 
   ngOnDestroy() {
@@ -46,6 +57,20 @@ export class MapPopupComponent implements OnInit {
     this.locationData = null;
     if (this.locationSubscription) {
       this.locationSubscription.unsubscribe();
+    }
+    if (this.locationCompareSub) {
+      this.locationCompareSub.unsubscribe();
+    }
+  }
+
+  locationInCompareArray(compareLocations): boolean {
+    if (this.location == null) { return; }
+    let locIndex = compareLocations.map((item) => { return item.id; }).indexOf(this.location.id);
+    if (locIndex > -1) {
+      return true;
+    }
+    else {
+      return false;
     }
   }
 
@@ -150,7 +175,13 @@ export class MapPopupComponent implements OnInit {
   }
 
   compareLocation(ln: Location): void {
-    this.locationService.addCompareLocation(ln);
+    this.compareSelected = !this.compareSelected;
+    if (this.compareSelected) {
+      this.locationService.addCompareLocation(ln);
+    }
+    else{
+       this.locationService.deleteCompareLocation(ln);  // removes from compare array if it exists
+    }
   }
 
   viewLatestImage(ln: Location): void {
@@ -161,4 +192,5 @@ export class MapPopupComponent implements OnInit {
     this.mapService.deleteMarker(ln);
     this.locationService.deleteLocation(ln);
   }
+
 }

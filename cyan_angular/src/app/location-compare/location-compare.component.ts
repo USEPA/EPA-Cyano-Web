@@ -13,7 +13,6 @@ import { LocationService } from '../services/location.service';
 export class LocationCompareComponent implements OnInit {
 
   selected_locations: Location[];
-  current_compare_locations: Location[];  // compare locations list prior to incoming locations update
 
   constructor(
     private locationService: LocationService,
@@ -51,7 +50,8 @@ export class LocationCompareComponent implements OnInit {
     // Removes location from selected locations array:
     let locIndex = this.selected_locations.map((item) => { return item.id; }).indexOf(loc.id);
     if (locIndex > -1) {
-      this.selected_locations.splice(locIndex, 1);
+      // this.selected_locations.splice(locIndex, 1);
+      this.locationService.deleteCompareLocation(loc);
     }
   }
 
