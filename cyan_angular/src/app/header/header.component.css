@@ -294,3 +294,9 @@
   float: inherit;
   margin: 0 auto;
 }
+.search {
+  display: none;
+}
+.help {
+  display: none;
+}
