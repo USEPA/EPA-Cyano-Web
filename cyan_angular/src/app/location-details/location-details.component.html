@@ -12,74 +12,102 @@
     </div>
   </div>
   <mat-tab-group mat-stretch-tabs class="details_tab_group">
+
+    <!-- Overview-tab -->
     <mat-tab label="Overview" >
       <div class="details_tab">
-        <div class="details_overview_satellite">Satellite:<span class="satellite">{{current_location.source}}</span></div>
-        <div class="details_overview_product">Product:<span class="product">{{ current_location.sourceFrequency }}</span></div>
-        <div class="mini_map_block">
-          <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
-        </div>
-        <div class="details_cyan_left">
-          <div class="details_cyan_arrow_box">
-            <div class="details_cyan_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location?.concentrationChange)}}</div>
-            <span *ngIf="getArrow(current_location); then location_up else location_down"></span>
-            <ng-template #location_up>
-              <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(current_location, true)]"></span>
-            </ng-template>
-            <ng-template #location_down>
-              <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(current_location, true)]"></span>
-            </ng-template>
-          </div>
-        </div>
-        <div class="details_cyan_right">
-          <div class="details_cell_units">cells/mL</div>
-          <div class="details_date">since {{current_location?.changeDate}}</div>
-          <div class="details_counts">(Max: {{current_location.maxCellConcentration}}, Valid: {{current_location.validCellCount}})</div>
-        </div>
-        <div *ngIf="selectedLayer">
-          <div class="details_slider">
-            <div class="slider_title">Image Opacity</div>
-            <mat-slider class="opacity_slider" [thumbLabel]="showSliderValue" [(ngModel)]="opacityValue" min="0" max="1" value="0.7" step="0.01" color="primary" (change)="changeOpacity($event);"></mat-slider>
-          </div>
-          <div class="details_image_name">
-            <div class="details_name">Satellite {{ getImageName() }}</div>
-            <div class="details_date">{{ getImageDate() }}</div>
-          </div>
-          <div class="details_slideshow">
-            <mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">Slideshow</mat-checkbox>
-          </div>
-        </div>
-        <div class="details_image_thumbs">
-          <div *ngIf="loading; else loaded">
-            <div class="details_image_thumbs_loader">
-              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <!-- map-card -->
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              Satellite: {{current_location.source}}
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="mini_map_block">
+              <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
             </div>
-          </div>
-          <ng-template #loaded>
-            <div class="details_image_info">
-            </div>
-            <div class="details_block">
-              <div class="details_thumbs_block">
-                <div *ngFor="let thumb of locationThumbs">
-                  <div class="details_thumb" (click)="toggleImage($event, thumb)">
-                    <img src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
-                    <div class="details_thumb_title">{{ getImageTitle(thumb) }}</div>
-                  </div>
-                </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- details-card -->
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              Product: {{ current_location.sourceFrequency }}
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="details_cyan_left">
+              <div class="details_cyan_arrow_box">
+                <div class="details_cyan_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location?.concentrationChange)}}</div>
+                <span *ngIf="getArrow(current_location); then location_up else location_down"></span>
+                <ng-template #location_up>
+                  <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(current_location, true)]"></span>
+                </ng-template>
+                <ng-template #location_down>
+                  <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(current_location, true)]"></span>
+                </ng-template>
               </div>
             </div>
-          </ng-template>
-        </div>
-        <div class="details_notes">
-            <div class="details_note_title" (click)="openNotes(current_location)">
-              <img class="tab-icon" src="assets/images/details_notes.png"/>
-              <span class="tab-title">Notes ({{current_location.notes ? current_location.notes.length : '0'}})</span>
+            <div class="details_cyan_right">
+              <div class="details_cell_units">cells/mL</div>
+              <div class="details_date">since {{current_location?.changeDate}}</div>
+              <div class="details_counts">(Max: {{current_location.maxCellConcentration}}, Valid: {{current_location.validCellCount}})</div>
             </div>
-            <div class="details_note_body"></div>
-            <div class="details_note_add"></div>
-        </div>
+
+            <div class="image-carousel">
+              <div *ngIf="selectedLayer">
+                <div class="details_slider">
+                  <div class="slider_title">Image Opacity</div>
+                  <mat-slider class="opacity_slider" [thumbLabel]="showSliderValue" [(ngModel)]="opacityValue" min="0" max="1" value="0.7" step="0.01" color="primary" (change)="changeOpacity($event);"></mat-slider>
+                </div>
+                <div class="details_image_name">
+                  <div class="details_name">Satellite {{ getImageName() }}</div>
+                  <div class="details_date">{{ getImageDate() }}</div>
+                </div>
+                <div class="details_slideshow">
+                  <mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">Slideshow</mat-checkbox>
+                </div>
+              </div>
+              <div class="details_image_thumbs">
+                <div *ngIf="loading; else loaded">
+                  <div class="details_image_thumbs_loader">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                  </div>
+                </div>
+                <ng-template #loaded>
+                  <div class="details_image_info">
+                  </div>
+                  <div class="details_block">
+                    <div class="details_thumbs_block">
+                      <div *ngFor="let thumb of locationThumbs">
+                        <div class="details_thumb" (click)="toggleImage($event, thumb)">
+                          <img src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
+                          <div class="details_thumb_title">{{ getImageTitle(thumb) }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+
+            <!-- Notes-button -->
+            <div class="details_notes">
+                <div class="details_note_title" (click)="openNotes(current_location)">
+                  <img class="tab-icon" src="assets/images/details_notes.png"/>
+                  <span class="tab-title">Notes ({{current_location.notes ? current_location.notes.length : '0'}})</span>
+                </div>
+                <div class="details_note_body"></div>
+                <div class="details_note_add"></div>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
     </mat-tab>
+
+    <!-- Imagry-tab -->
     <mat-tab label="Imagery" class="imagery_tab">
       <div class="imagery_dates">
         <div class="imagery_date_title">Date Range:</div>
@@ -109,6 +137,8 @@
         </div>
       </ng-template>
     </mat-tab>
+
+    <!-- Chart-tab -->
     <mat-tab label="Chart">
       <div class="chart_header">
         <div class="chart_title">Blooming Chart</div>
