@@ -22,6 +22,10 @@ export class Location {
   validCellCount: number;
   notes: object[];
   marked: boolean;
+
+  get hasData(): boolean {
+    return !this.name.startsWith("Unknown Location");
+  }
 }
 
 export enum LocationType {
