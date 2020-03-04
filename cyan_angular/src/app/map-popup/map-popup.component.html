@@ -6,12 +6,18 @@
     {{locationData?.latitude_deg}}&deg;{{locationData?.latitude_min}}'{{locationData?.latitude_sec}}"{{locationData?.latitude_dir}},
     {{locationData?.longitude_deg}}&deg;{{locationData?.longitude_min}}'{{locationData?.longitude_sec}}"{{locationData?.longitude_dir}}
   </div>
-  <div class="popup-count-title">
-    Counts of cyanobacteria
-  </div>
-  <div class="popup-data-date">
-    Date: {{locationData?.dataDate}}
-  </div>
+  <div *ngIf="locationData.hasData then data_block else no_data_block"></div>
+  <ng-template #data_block>
+    <div class="popup-count-title">
+      Counts of cyanobacteria
+    </div>
+    <div class="popup-data-date">
+      Date: {{locationData?.dataDate}}
+    </div>
+  </ng-template>
+  <ng-template #no_data_block>
+    <div class="popup-count-title">No data at this location</div>
+  </ng-template>
   <div class="location_block_0">
     <div class="location_block_1 left">
       <div class="location_cell">
@@ -19,12 +25,13 @@
             <div class="location_cellC_meter_center"></div>
             <div class="location_meter_img"></div>
             <div class="location_meter_value" [style.background]="getPercentage()"></div>
-            <span class="location_cellCon" [style.color]="getColor(false)">{{formatNumber(locationData?.cellConcentration)}}</span><br />
+            <span *ngIf="locationData.hasData" class="location_cellCon" [style.color]="getColor(false)">
+              {{formatNumber(locationData?.cellConcentration)}}</span><br />
             <span class="location_units">cells/mL</span>
         </div>
       </div>
     </div>
-    <div class="location_block_1 right">
+    <div *ngIf="locationData.hasData" class="location_block_1 right">
       <span class="location_trend">
         <!-- <span class="location_max">(Max: {{formatNumber(locationData?.maxCellConcentration)}})</span> -->
         <span *ngIf="getArrow(); then location_up else location_down"></span>
@@ -33,8 +40,8 @@
           </ng-template>
           <ng-template #location_down>
             <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(true)]"></span>
-        </ng-template>          
-        <span class="location_cellChange" [style.color]="getColor(true)">{{formatNumber(locationData?.concentrationChange)}}</span><br /> 
+        </ng-template>
+        <span class="location_cellChange" [style.color]="getColor(true)">{{formatNumber(locationData?.concentrationChange)}}</span><br />
         <span class="location_cellDescript">cells/mL<br />since {{locationData?.changeDate}}</span><br />
       </span>
     </div>
