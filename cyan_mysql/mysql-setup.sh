@@ -18,6 +18,7 @@ else
 	# Creates user table:
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
 	"CREATE TABLE IF NOT EXISTS User (
+		id INTEGER NOT NULL AUTO_INCREMENT,
 		username VARCHAR(20) CHARACTER SET utf8 NOT NULL UNIQUE,
 		email VARCHAR(50) NOT NULL UNIQUE,
 		password VARCHAR(300) NOT NULL UNIQUE,
