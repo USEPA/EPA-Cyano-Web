@@ -1,12 +1,12 @@
 echo off
-::set /P QED_CONFIG=Enter config file to use:
-::set QED_CONFIG=../config/%QED_CONFIG%
+::set /P CYANO_CONFIG=Enter config file to use:
+::set CYANO_CONFIG=../config/%CYANO_CONFIG%
 :: Input argument is env filename:
-set QED_CONFIG=%1
+set CYANO_CONFIG=%1
 
-echo ***** Setting enviroment variables from %QED_CONFIG% *****
+echo ***** Setting enviroment variables from %CYANO_CONFIG% *****
 
-if exist %QED_CONFIG% (
-	::for /F "tokens=*" %%A in (%QED_CONFIG%) do set %%A&& echo %%A
-	for /F "tokens=*" %%A in (%QED_CONFIG%) do set %%A&& echo %%A
+if exist %CYANO_CONFIG% (
+	::for /F "tokens=*" %%A in (%CYANO_CONFIG%) do set %%A&& echo %%A
+	for /F "tokens=*" %%A in (%CYANO_CONFIG%) do set %%A&& echo %%A
 )
