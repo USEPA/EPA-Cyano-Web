@@ -18,23 +18,26 @@ else
 	# Creates user table:
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
 	"CREATE TABLE IF NOT EXISTS User (
-		id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		id INTEGER NOT NULL AUTO_INCREMENT,
 		username VARCHAR(20) CHARACTER SET utf8 NOT NULL UNIQUE,
 		email VARCHAR(50) NOT NULL UNIQUE,
 		password VARCHAR(300) NOT NULL UNIQUE,
 		created  DATE NOT NULL,
-		last_visit DATE NOT NULL
+		last_visit DATE NOT NULL,
+		PRIMARY KEY (id)
 	);"
 	# Creates location table:
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
 	"CREATE TABLE IF NOT EXISTS Location (
 		owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
-		id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		id INTEGER NOT NULL AUTO_INCREMENT,
+		type TINYINT NOT NULL DEFAULT 1,
 		name VARCHAR(256) NOT NULL,
 		latitude DECIMAL(12,10) NOT NULL,
 		longitude DECIMAL(13,10) NOT NULL,
 		marked BIT NOT NULL,
-		notes TEXT NOT NULL
+		notes TEXT NOT NULL,
+		PRIMARY KEY (id, owner, type)
 	);"
 	# Creates notifications table:
 	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
