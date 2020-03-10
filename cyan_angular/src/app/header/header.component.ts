@@ -1,7 +1,9 @@
 import { Component, OnInit, NgModule } from '@angular/core';
+import { Subscription } from 'rxjs';
+
+import { environment } from '../../environments/environment';
 import { LocationService } from '../services/location.service';
 import { UserService } from '../services/user.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +14,7 @@ export class HeaderComponent implements OnInit {
 
   title = "Cyanobacteria Assessment Network";
   titleAbr = "CyAN";
+  titleColor = "white";
   compare_locations = [];
   locationSubscription: Subscription;
   new_notifications = [];
@@ -23,6 +26,11 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
+    console.log("header ngOnInit environment: ");
+    console.log(environment);
+
+    this.setTitle();
 
     this.notificationSubscription = this.userService.allNotifications$.subscribe(
     	notifications => {
@@ -42,6 +50,20 @@ export class HeaderComponent implements OnInit {
   ngOnDestroy() {
     this.notificationSubscription.unsubscribe();
     this.locationSubscription.unsubscribe();
+  }
+
+  setTitle() {
+    /*
+    Sets title based on regular vs testing deploy.
+    */
+    if (environment.testing) {
+      this.title = "Cyanobacteria Assessment Network (TESTING)";
+      this.titleColor = "red";
+    }
+    else {
+      this.title = "Cyanobacteria Assessment Network";
+      this.titleColor = "white";
+    }
   }
 
 }

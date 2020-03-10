@@ -5,7 +5,7 @@
             <a href="https://www.epa.gov" class="header-logo-link header-logo"></a>
                 <div class="header-title-abr">{{ titleAbr }}</div>
             </div>
-            <div class="header-title">{{ title }}</div>
+            <div class="header-title" [ngStyle]="{'color':titleColor}">{{ title }}</div>
         </div>
         <div id="search-config-button">
             <button mat-button [matMenuTriggerFor]="settingsMenu" class="settings-block-button">...</button>
