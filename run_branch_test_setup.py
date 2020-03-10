@@ -52,15 +52,12 @@ class BranchTests:
 
 		self.setup_env()  # sets up env from config
 
-		# self.root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or input("Please enter root password for database: ")
 		self.root_pass = os.environ.get('MYSQL_ROOT_PASSWORD')
 		self.user_pass = None
 
 	def setup_env(self):
 		runtime_env = DeployEnv()
 		runtime_env.load_deployment_environment()
-		# os.environ.setdefault('DB_NAME', self.test_db_name)
-		# os.environ.setdefault('DB_USER', self.test_db_user)
 		
 	def setup_repo(self):
 		subprocess.run(
@@ -82,7 +79,6 @@ class BranchTests:
 		"""
 		self.root_pass = self.root_pass or getpass(prompt="Please enter root password for database: ")
 		self.test_db_user = self.test_db_user or input("Please enter user name for database (e.g., 'cyano' from config's local_dev.env): ")
-		# self.user_pass = self.user_pass or getpass("Please enter password for {}: ".format(self.test_db_user))
 		self.user_pass = os.environ.get('DB_PASS') or getpass("Please enter password for {}: ".format(self.test_db_user))
 
 	def setup_mysql(self):

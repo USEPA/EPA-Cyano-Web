@@ -27,9 +27,6 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
 
-    console.log("header ngOnInit environment: ");
-    console.log(environment);
-
     this.setTitle();
 
     this.notificationSubscription = this.userService.allNotifications$.subscribe(
