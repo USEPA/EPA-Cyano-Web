@@ -1,9 +1,10 @@
 import os
 import datetime
+import time
 import hashlib
 import binascii
 import jwt
-import json
+import math
 
 
 
@@ -28,7 +29,7 @@ def encode_auth_token(user):
 	"""
 	try:
 		payload = {
-			'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
+			'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=int(os.environ.get('SESSION_EXPIRE_SECONDS', 300))),
 			'iat': datetime.datetime.utcnow(),
 			'sub': user
 		}
@@ -53,3 +54,35 @@ def decode_auth_token(auth_token):
 		return {'error': "Invalid token. Please log in again."}
 	except jwt.exceptions.DecodeError as identifier:
 		return {'error': 'invalid authorization token'}
+
+
+def check_time_delta(token_expiry):
+	"""
+	Calculates seconds between current time and
+	token's expiration time. > 0 indicates number of seconds
+	until expiration, < 0 indicates an expired token.
+	"""
+	time_delta = token_expiry - time.time()
+	# if time_delta < 0:
+	# 	raise jwt.exceptions.ExpiredSignatureError({'error': "Signature expired. Please log in again."})
+	return time_delta
+
+
+def get_user_from_token(request):
+	"""
+	Gets user/owner name from token.
+	"""
+	token = request.headers.get('Authorization', None)
+	if token:
+		return decode_auth_token(token.split(' ')[1])['sub']
+	return None
+
+
+def get_user_token(request):
+	"""
+	Gets user's token.
+	"""
+	token = request.headers.get('Authorization', None)
+	if token:
+		return decode_auth_token(token.split(' ')[1])
+	return None
