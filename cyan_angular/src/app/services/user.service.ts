@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, Subscription, Subject } from 'rxjs';
 
 import { DownloaderService } from './downloader.service';
+import { AuthService } from './auth.service';
 
 
 @Injectable({
@@ -25,6 +26,7 @@ export class UserService {
 
   constructor(
     private downloader: DownloaderService,
+    private authService: AuthService
   ) { }
 
   initializeCurrentAccount(): void {
@@ -47,7 +49,7 @@ export class UserService {
           location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
         });
         this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
-        localStorage.setItem('auth_token', details.user.auth_token);  // sets token for requests        
+        this.authService.setSession(details.user.auth_token);
       }
       else {
         this.currentAccount['error'] = details['error'];

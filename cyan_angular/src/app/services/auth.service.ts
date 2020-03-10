@@ -30,8 +30,15 @@ export class AuthService {
   }
         
   public setSession(authResult) {
-    localStorage.setItem('auth_token', authResult.idToken);
-  }          
+    if (authResult.includes("Bearer ")) {
+      authResult = authResult.split(" ")[1];
+    }
+    localStorage.setItem('auth_token', authResult);
+  }
+
+  public getSession(authResult) {
+    return localStorage.getItem('auth_token');
+  }        
 
   logout(errorMessage: object) {
     console.log("auth.service logout() called");
