@@ -24,6 +24,18 @@ export class AuthService {
     private router: Router
   ) { }
 
+  public checkUserAuthentication(): boolean {
+    // Checks if token is valid before making requests:
+    if (!this.isAuthenticated()) {
+      console.log("downloader.service getAjaxData session expired triggered.");
+      this.logout({'error': "User session has expired."});
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
   public isAuthenticated(): boolean {
     const token = localStorage.getItem('auth_token');
     return !this.jwtHelper.isTokenExpired(token);

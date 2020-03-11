@@ -116,12 +116,12 @@ export class DownloaderService {
   }
 
   executeUserLocations(url: string, body: any) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, headerOptions);
   }
 
   executeEditUserLocation(url: string, body: any) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, headerOptions);
   }
 
@@ -132,18 +132,18 @@ export class DownloaderService {
   }
 
   executeDeleteUserLocation(url: string) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
   getUserLocation(username: string, id: number) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.baseServerUrl + 'location/' + id;
     return this.http.get(url);
   }
 
   getUserLocations(username: string, type: number) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.baseServerUrl + 'locations/' + type;
     return this.http.get(url);
   }
@@ -157,7 +157,7 @@ export class DownloaderService {
   }
 
   executeUpdateNotification(url: string) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
@@ -170,7 +170,7 @@ export class DownloaderService {
   }
 
   executeClearUserNotifications(url: string) {
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
@@ -197,7 +197,7 @@ export class DownloaderService {
   getAjaxData(username: string, ln: Location) {
 
     // Checks if token is valid before making requests:
-    if (!this.userAuthenticated) { return; }
+    if (!this.authService.checkUserAuthentication()) { return; }
 
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
