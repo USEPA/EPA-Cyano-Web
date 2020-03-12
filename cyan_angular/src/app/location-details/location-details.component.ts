@@ -16,6 +16,7 @@ import { LocationImagesService } from '../services/location-images.service';
 import { ImageDetails } from '../models/image-details';
 import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-location-details',
@@ -109,17 +110,22 @@ export class LocationDetailsComponent implements OnInit {
     center: latLng([this.lat_0, this.lng_0])
   };
 
-  constructor(private route: ActivatedRoute,
-              private router: Router,
-              private locationService: LocationService,
-              private mapService: MapService,
-              private bottomSheet: MatBottomSheet,
-              private images: LocationImagesService,
-              private downloader: DownloaderService,
-              private user: UserService) {
-  }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private locationService: LocationService,
+    private mapService: MapService,
+    private bottomSheet: MatBottomSheet,
+    private images: LocationImagesService,
+    private downloader: DownloaderService,
+    private user: UserService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
+
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     this.imageCollection = null;
     this.route.params.subscribe(
       params =>
@@ -249,6 +255,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   clearLayerImages() {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let thumbs = document.getElementsByClassName('details_thumb');
     for (let i = 0; i < thumbs.length; i++) {
       let thumb = thumbs.item(i);
@@ -265,6 +272,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   toggleImage(event: any, image: ImageDetails) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let thumbs = document.getElementsByClassName('details_thumb');
     for (let i = 0; i < thumbs.length; i++) {
       let thumb = thumbs.item(i);
@@ -376,6 +384,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   downloadImage(event: any, image: ImageDetails): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
     let imageURL = 'https://cyan.epa.gov/cyan/cyano/location/images/' + tifName;
     window.open(imageURL, '_blank');
@@ -409,6 +418,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   previousLocation(): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.current_location_index = this.current_location_index == 1 ? this.locations.length : this.current_location_index - 1;
     this.current_location = this.locations[this.current_location_index - 1];
     this.changeMarker();
@@ -430,6 +440,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   nextLocation(): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.current_location_index = this.current_location_index == this.locations.length ? 1 : this.current_location_index + 1;
     this.current_location = this.locations[this.current_location_index - 1];
     this.changeMarker();

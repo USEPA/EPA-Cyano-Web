@@ -7,6 +7,8 @@ import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
+
 
 @Component({
   selector: 'app-map-popup',
@@ -28,10 +30,12 @@ export class MapPopupComponent implements OnInit {
     private mapService: MapService,
     private user: UserService,
     private datePipe: DatePipe,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    if (!this.authService.checkUserAuthentication()) { return; }
 
     let self = this;
     if (!this.location) {
@@ -130,11 +134,13 @@ export class MapPopupComponent implements OnInit {
   }
 
   updateName(e: any): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let name = e.target.value;
     this.locationService.updateLocation(name, this.location);
   }
 
   saveNoteToLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
     let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
     let noteObj = {
@@ -156,6 +162,7 @@ export class MapPopupComponent implements OnInit {
   }
 
   toggleMarkedLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let m = ln.marked;
     ln.marked = !m;
     // Change mark button label
@@ -175,6 +182,7 @@ export class MapPopupComponent implements OnInit {
   }
 
   compareLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.compareSelected = !this.compareSelected;
     if (this.compareSelected) {
       this.locationService.addCompareLocation(ln);
@@ -185,10 +193,12 @@ export class MapPopupComponent implements OnInit {
   }
 
   viewLatestImage(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.router.navigate(['/latestimage', { location: JSON.stringify(ln) }]);
   }
 
   deleteLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.mapService.deleteMarker(ln);
     this.locationService.deleteLocation(ln);
   }

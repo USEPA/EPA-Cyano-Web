@@ -9,6 +9,7 @@ import { MapService } from '../services/map.service';
 import { DownloaderService } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { ConfigService } from '../services/config.service';
+import { AuthService } from '../services/auth.service';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -41,11 +42,13 @@ export class CoordinatesComponent implements OnInit {
 		private mapService: MapService,
 		private downloaderService: DownloaderService,
 		private user: UserService,
-		private configService: ConfigService
+		private configService: ConfigService,
+		private authService: AuthService
   ) { }
 
   ngOnInit() {
-		this.getCyanRanges();
+  	if (!this.authService.checkUserAuthentication()) { return; }
+	this.getCyanRanges();
   }
 
 	getCyanRanges(): void {
@@ -53,6 +56,7 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	markLocation(): void {
+		if (!this.authService.checkUserAuthentication()) { return; }
 		this.location = this.getLocationData();
 		this.locationService.setMarked(this.location, true);
 		this.mapService.updateMarker(this.location);
@@ -60,6 +64,7 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	compareLocation(): void {
+		if (!this.authService.checkUserAuthentication()) { return; }
 		this.location = this.getLocationData();
 		this.locationService.addCompareLocation(this.location);
 	}
