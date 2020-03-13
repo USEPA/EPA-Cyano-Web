@@ -214,18 +214,6 @@ export class DownloaderService {
     }
   }
 
-  userAuthenticated() {
-    // Checks if token is valid before making requests:
-    if (!this.authService.isAuthenticated()) {
-      console.log("downloader.service getAjaxData session expired triggered.");
-      this.authService.logout({'error': "User session has expired."});
-      return false;
-    }
-    else {
-      return true;
-    }
-  }
-
   getLocationIndex(ln: Location) {
     return this.locations.findIndex(loc => loc.id == ln.id && loc.type == ln.type);
   }
@@ -243,6 +231,7 @@ export class DownloaderService {
   }
 
   createLocation(loc: Location, username: string, data: LocationDataAll): Location {
+
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
     let name = loc.name;
 
@@ -254,12 +243,6 @@ export class DownloaderService {
       ln.name = data.metaInfo.locationName;
     }
     ln.type = loc.type;
-
-    // Check for "Unknown Location" as name, if so, then
-    // add an incremental integer to name (e.g., "Unknown Location -- 1"):
-    if (ln.name == "Unknown Location") {
-      ln.name = ln.name + " -- " + ln.id;
-    }
 
     ln.latitude_deg = coordinates.latDeg;
     ln.latitude_min = coordinates.latMin;
@@ -305,7 +288,10 @@ export class DownloaderService {
 
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {
+
+      ln.name = this.addUniqueId(ln);
       this.updateUserLocation(username, ln);
+
     }
     return ln;
 
@@ -331,6 +317,30 @@ export class DownloaderService {
 
     return coordinate;
   }
+
+  addUniqueId(ln: Location): string {
+    /*
+    Creates a unique ID for location name.
+    */
+    let matchedLocations: Number[] = [];
+    this.locations.forEach((location) => {
+      if (location.name.includes(ln.name)) {
+        let idNum = location.name.split(" -- ")[1];
+        matchedLocations.push(Number(idNum));
+      }
+    });
+    if (matchedLocations.length == 0) {
+      ln.name = ln.name + " -- 1";  
+    }
+    else if (matchedLocations.length > 0) {
+      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();  
+    }
+    else {
+      ln.name = ln.name;
+    }
+    return ln.name;
+  }
+
 }
 
 class Coordinate {
