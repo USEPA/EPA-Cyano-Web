@@ -39,7 +39,7 @@
               </mat-form-field>
             </div>
             <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
-            <button mat-button class="register-button"(click)="registerForm = !registerForm">Login Existing User</button>
+            <button mat-button class="register-button"(click)="registerForm = !registerForm; errorMessage=''">Login Existing User</button>
             <div class="register-notification-block">
               <div class="register-message"></div>
             </div>
@@ -63,7 +63,7 @@
         <button mat-raised-button class="start-app" (click)="exitAccount()">Start using CyAN</button>
       </ng-template>
       <div class="login-notification-block" *ngIf="!registerForm">
-        <div class="login-message"></div>
+        <div class="login-message">{{ errorMessage }}</div>
       </div>
       <div class="register-notification-block" *ngIf="registerForm">
         <div class="register-message"></div>

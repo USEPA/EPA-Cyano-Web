@@ -7,6 +7,7 @@ import { MapService } from '../services/map.service';
 import { ConfigService } from '../services/config.service';
 import { Location } from '../models/location';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -56,7 +57,8 @@ export class MarkerMapComponent implements OnInit {
     private router: Router,
     private mapService: MapService,
     private configService: ConfigService,
-    private user: UserService
+    private user: UserService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -82,6 +84,8 @@ export class MarkerMapComponent implements OnInit {
   }
 
   addMarkerOnClick(e: any): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     let map = this.mapService.getMap();
     let lat = e.latlng.lat;
     let lng = e.latlng.lng;

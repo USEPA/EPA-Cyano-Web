@@ -1,5 +1,4 @@
-from flask import Flask, Response
-from flask import request
+from flask import Flask, Response, request, g
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 import os
@@ -10,23 +9,28 @@ import simplejson
 
 # Loads environment based on deployment location:
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-# from config.set_environment import DeployEnv
+
 from config.set_environment import DeployEnv
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 
 # Local imports:
 import web_app_api
+import auth
+from middleware import login_required
+
+os.environ.setdefault('SECRET_KEY', os.urandom(24).hex())
 
 # Declares Flask application:
 app = Flask(__name__)
 app.config.update(
 	DEBUG=True
 )
+
 api = Api(app)
 
 # Allows cross-origin requests (TODO: only allow certain domains in future?):
-CORS(app)
+CORS(app, origins=["http://localhost:4200"])
 
 # Adds module location to env as project root:
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -34,12 +38,24 @@ os.environ.update({
 	'PROJECT_ROOT': PROJECT_ROOT
 })
 
-logging.basicConfig(level=logging.DEBUG)  # sets logging level for logger
+logging.basicConfig(level=logging.DEBUG)  # sets logging level for logger (vary with dev vs prod?)
 
 parser_base = reqparse.RequestParser()  # defines flask-restful request parser
 
 base_url = "{}:{}".format(os.environ.get('FLASK_HOST'), os.environ.get('FLASK_PORT'))
+api_url = '/cyan/app/api/'
 
+
+
+def get_auth_headers():
+	if isinstance(g.token, bytes):
+		g.token = g.token.decode('utf-8')
+	headers = {
+		'Access-Control-Expose-Headers': 'Authorization',
+		'Access-Control-Allow-Headers': 'Authorization',
+		'Authorization': "Bearer {}".format(g.token)
+	}
+	return headers
 
 
 class StatusTest(Resource):
@@ -49,14 +65,6 @@ class StatusTest(Resource):
 	"""
 	def get(self):
 		return {"status": "cyan flask up and running."}
-
-# class CyanProxy(Resource):
-# 	"""
-# 	Proxies Angular requests to cyan.epa.gov/cyan/cyano API endpoints.
-#   URL: /cyan/<string:request_url>
-# 	"""
-# 	def get(self, request_url):
-# 		pass
 
 class Register(Resource):
 	"""
@@ -91,13 +99,8 @@ class Login(Resource):
 		return {"status": "login endpoint"}
 
 	def post(self):
-		print (request.is_json)
-		content = request.get_json()
-		print (content)
-		print(content['user'])
 		# Gets user from user table:
 		args = request.get_json() #self.parser.parse_args()
-		print (args)
 		results, status_code = web_app_api.login_user(args)
 		results = simplejson.loads(simplejson.dumps(results))  # NOTE: Standard json lib unable to handle Decimal type (using simplejson)
 		return results, status_code
@@ -110,11 +113,14 @@ class AddLocation(Resource):
 	def get(self):
 		return {"status": "location endpoint"}
 
-	def post(self, user=None, id=None):
+	@login_required
+	def post(self, id=None):
 		# Adds a new location to location table:
 		args = request.get_json()
+		args['owner'] = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results, status_code = web_app_api.add_location(args)
-		return results, status_code
+		return results, status_code, headers
 
 class EditLocation(Resource):
 	"""
@@ -124,95 +130,104 @@ class EditLocation(Resource):
 	def get(self):
 		return {"status": "edit location endpoint"}
 
+	@login_required
 	def post(self):
 		args = request.get_json()
+		args['owner'] = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results, status_code = web_app_api.edit_location(args)
-		return results, status_code
+		return results, status_code, headers
 
 class DeleteLocation(Resource):
 	"""
 	Endpoint for deleting user location.
-	URL: /app/api/location/delete/<string:user>/<string:_id>
+	URL: /app/api/location/delete/<string:_id>
 	"""
-	def get(self, user='', _id='', type=''):
+	@login_required
+	def get(self, _id='', type=''):
+		user = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results, status_code = web_app_api.delete_location(user, _id, type)
-		return results, status_code
+		return results, status_code, headers
 
 class GetUserLocations(Resource):
 	"""
 	Endpoint for get all user locations.
 	"""
-	def get(self, user='', type=''):
+	@login_required
+	def get(self, type=''):
+		user = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results = web_app_api.get_user_locations(user, type)
 		results = simplejson.loads(simplejson.dumps(results))
-		return results, 200
+		return results, 200, headers
 
 class GetLocation(Resource):
 	"""
 	Endoint for getting a user location by user and location id.
 	"""
-	def get(self, user='', _id='', type=''):
+	@login_required
+	def get(self, _id='', type=''):
+		user = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results, status_code = web_app_api.get_location(user, _id, type)
 		results = simplejson.loads(simplejson.dumps(results))
-		return results, status_code
-
-class AddNotification(Resource):
-	"""
-	Endpoint for adding notification from last sync time.
-	"""
-	pass
+		return results, status_code, headers
 
 class EditNotification(Resource):
 	"""
 	Endpoint for setting is_new false after read.
 	"""
-	def get(self, user='', _id=''):
+	@login_required
+	def get(self, _id=''):
+		user = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results, status_code = web_app_api.edit_notifications(user, _id)
-		return results, status_code
+		return results, status_code, headers
 
 class DeleteNotification(Resource):
 	"""
 	Endpoint for "Clear" notifications.
 	"""
-	def get(self, user=''):
+	@login_required
+	def get(self):
+		user = auth.get_user_from_token(request)
+		headers = get_auth_headers()
 		results, status_code = web_app_api.delete_notifications(user)
-		return results, status_code
-
-class GetNotification(Resource):
-	"""
-	Endpoint for populating notifications list.
-	"""
-	pass
+		return results, status_code, headers
 
 
 
+# Test endpoint:
 api.add_resource(StatusTest, '/test')
-# api.add_resource(CyanProxy, '/cyan/<string:request_url>')
-api.add_resource(Login, '/cyan/app/api/user')
-api.add_resource(Register, '/cyan/app/api/user/register')
-api.add_resource(AddLocation, '/cyan/app/api/location/add')
-api.add_resource(EditLocation, '/cyan/app/api/location/edit')
-api.add_resource(DeleteLocation, '/cyan/app/api/location/delete/<string:user>/<string:_id>/<string:type>')
-api.add_resource(GetLocation, '/cyan/app/api/location/<string:user>/<string:_id>/<string:type>')
-api.add_resource(GetUserLocations, '/cyan/app/api/locations/<string:user>/<string:type>')
 
-# Notifications Endpoints:
-api.add_resource(AddNotification, '/cyan/app/api/notification/add')
-api.add_resource(EditNotification, '/cyan/app/api/notification/edit/<string:user>/<string:_id>')
-api.add_resource(DeleteNotification, '/cyan/app/api/notification/delete/<string:user>')
-api.add_resource(GetNotification, '/cyan/app/api/notification/<string:user>/<string:_id>')
+# User endpoints:
+api.add_resource(Login, api_url + 'user')
+api.add_resource(Register, api_url + 'user/register')
 
+# Location endpoints:
+api.add_resource(AddLocation, api_url + 'location/add')
+api.add_resource(EditLocation, api_url + 'location/edit')
+api.add_resource(DeleteLocation, api_url + 'location/delete/<string:_id>/<string:type>')
+api.add_resource(GetLocation, api_url + 'location/<string:_id>/<string:type>')
+api.add_resource(GetUserLocations, api_url + 'locations/<string:type>')
 
+# Notifications endpoints:
+api.add_resource(EditNotification, api_url + 'notification/edit/<string:_id>')
+api.add_resource(DeleteNotification, api_url + 'notification/delete')
 
 
 logging.info("CyAN Flask app started.\nLive endpoints:")
 logging.info(base_url + '/test')
-# logging.info(base_url + '/cyan/<string:request_url>')
-logging.info(base_url + '/cyan/app/api/user')
-logging.info(base_url + '/cyan/app/api/user/register')
-logging.info(base_url + '/cyan/app/api/location/add')
-logging.info(base_url + '/cyan/app/api/location/edit')
-logging.info(base_url + '/cyan/app/api/location/delete/<string:user>/<string:_id>')
+logging.info(base_url + api_url + 'user')
+logging.info(base_url + api_url + 'user/register')
+logging.info(base_url + api_url + 'location/add')
+logging.info(base_url + api_url + 'location/edit')
+logging.info(base_url + api_url + 'location/delete/<string:_id>')
+logging.info(base_url + api_url + 'location/<string:_id>/<string:type>')
+logging.info(base_url + api_url + 'locations/<string:type>')
+logging.info(base_url + api_url + 'notification/edit/<string:_id>')
+logging.info(base_url + api_url + 'notification/delete')
 
 
 

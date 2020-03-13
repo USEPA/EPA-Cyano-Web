@@ -3,6 +3,7 @@ flask
 flask-cors
 flask-restful
 mysql-connector-python
+pyjwt
 python-dotenv
 requests
 simplejson

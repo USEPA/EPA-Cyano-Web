@@ -6,6 +6,7 @@ import { latLng, latLngBounds, tileLayer, marker, icon, Map, Layer, Marker, Imag
 import { LocationService } from '../services/location.service';
 import { LocationImagesService } from '../services/location-images.service';
 import { MapService } from '../services/map.service';
+import { AuthService } from '../services/auth.service';
 
 import { Location } from '../models/location';
 import { ImageDetails } from '../models/image-details';
@@ -68,10 +69,13 @@ export class LatestImageComponent implements OnInit {
 		private router: Router,
 		private locationService: LocationService,
 		private images: LocationImagesService,
-		private mapService: MapService
+		private mapService: MapService,
+		private authService: AuthService
 	) { }
 
 	ngOnInit() {
+
+		if (!this.authService.checkUserAuthentication()) { return; }
 
 		this.route.params.subscribe(
 			params => {
@@ -145,6 +149,8 @@ export class LatestImageComponent implements OnInit {
 	}
 
 	toggleImage(image: ImageDetails) {
+
+		if (!this.authService.checkUserAuthentication()) { return; }
 
 		let thumbs = document.getElementsByClassName('details_thumb');
 		for (let i = 0; i < thumbs.length; i++) {

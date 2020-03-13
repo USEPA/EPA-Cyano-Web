@@ -9,6 +9,7 @@ import { Location } from '../models/location';
 // import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
 import { DownloaderService } from '../services/downloader.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-notifications',
@@ -31,10 +32,13 @@ export class NotificationsComponent implements OnInit {
 
   constructor(
 		private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
+
+    // if (!this.authService.checkUserAuthentication()) { return; }
 
     this.all_notifications = this.userService.currentAccount.notifications
     this.new_notifications = this.userService.currentAccount.notifications.filter(x => x[5] === 1);
@@ -91,6 +95,7 @@ export class NotificationsComponent implements OnInit {
     /*
     Removes all user's notifications.
     */
+    if (!this.authService.checkUserAuthentication()) { return; }
     let user = this.userService.getUserName();
     this.userService.clearUserNotifications(user);
     this.new_notifications = [];
@@ -100,6 +105,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   openNotification(notification, notificationCount) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(NotificationDetails, {
       width: '50%',
       data: {

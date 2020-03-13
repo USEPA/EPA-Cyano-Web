@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription, BehaviorSubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
 import { environment } from '../../environments/environment';
-import { Subscription, BehaviorSubject} from "rxjs";
 import {LocationType} from "../models/location";
+import { AuthService } from '../services/auth.service';
 
 class UrlInfo {
   type: string;
@@ -71,7 +71,8 @@ export class DownloaderService {
 
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
   registerUser(username: string, email: string, password: string) {
@@ -98,7 +99,6 @@ export class DownloaderService {
       marked: ln.marked,
       notes: ln.notes
     };
-
     this.executeUserLocations(url, body).subscribe();
   }
 
@@ -116,30 +116,35 @@ export class DownloaderService {
   }
 
   executeUserLocations(url: string, body: any) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, headerOptions);
   }
 
   executeEditUserLocation(url: string, body: any) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, headerOptions);
   }
 
   deleteUserLocation(username: string, id: number, type: number) {
     delete this.locationsData[id];
-    let url = this.baseServerUrl + 'location/delete/' + username + '/' + id + '/' + type;
+    let url = this.baseServerUrl + 'location/delete/' + id + '/' + type;
     this.executeDeleteUserLocation(url).subscribe();
   }
 
   executeDeleteUserLocation(url: string) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
   getUserLocation(username: string, id: number) {
-    let url = this.baseServerUrl + 'location/' + username + '/' + id;
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.baseServerUrl + 'location/' + id;
     return this.http.get(url);
   }
 
   getUserLocations(username: string, type: number) {
-    let url = this.baseServerUrl + 'locations/' + username + '/' + type;
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.baseServerUrl + 'locations/' + type;
     return this.http.get(url);
   }
 
@@ -147,11 +152,12 @@ export class DownloaderService {
     /*
     Updates user's notification, e.g., is_new set to false if clicked.
     */
-    let url = this.baseServerUrl + 'notification/edit/' + username + '/' + id;
+    let url = this.baseServerUrl + 'notification/edit/' + id;
     return this.executeUpdateNotification(url).subscribe();
   }
 
   executeUpdateNotification(url: string) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
@@ -159,11 +165,12 @@ export class DownloaderService {
     /*
     Clears all user's notifications.
     */
-    let url = this.baseServerUrl + 'notification/delete/' + username;
+    let url = this.baseServerUrl + 'notification/delete';
     this.executeClearUserNotifications(url).subscribe();
   }
 
   executeClearUserNotifications(url: string) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
@@ -188,6 +195,10 @@ export class DownloaderService {
   }
 
   getAjaxData(username: string, ln: Location) {
+
+    // Checks if token is valid before making requests:
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
@@ -200,6 +211,18 @@ export class DownloaderService {
               break;
       }
       this.ajaxRequest(ln, username, url);
+    }
+  }
+
+  userAuthenticated() {
+    // Checks if token is valid before making requests:
+    if (!this.authService.isAuthenticated()) {
+      console.log("downloader.service getAjaxData session expired triggered.");
+      this.authService.logout({'error': "User session has expired."});
+      return false;
+    }
+    else {
+      return true;
     }
   }
 
