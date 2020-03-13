@@ -7,6 +7,7 @@ import { Location } from '../models/location';
 import { environment } from '../../environments/environment';
 import {LocationType} from "../models/location";
 import { AuthService } from '../services/auth.service';
+import {UserSettings} from "../models/settings";
 
 class UrlInfo {
   type: string;
@@ -99,7 +100,7 @@ export class DownloaderService {
       marked: ln.marked,
       notes: ln.notes
     };
-    this.executeUserLocations(url, body).subscribe();
+    this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
   updateUserLocation(username: string, ln: Location) {
@@ -112,17 +113,7 @@ export class DownloaderService {
       marked: ln.marked,
       notes: ln.notes
     };
-    this.executeEditUserLocation(url, body).subscribe();
-  }
-
-  executeUserLocations(url: string, body: any) {
-    if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.post(url, body, headerOptions);
-  }
-
-  executeEditUserLocation(url: string, body: any) {
-    if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.post(url, body, headerOptions);
+    this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
   deleteUserLocation(username: string, id: number, type: number) {
@@ -150,7 +141,7 @@ export class DownloaderService {
 
   updateNotification(username: string, id: number) {
     /*
-    Updates user's notification, e.g., is_new set to false if clicked.
+     Updates user's notification, e.g., is_new set to false if clicked.
     */
     let url = this.baseServerUrl + 'notification/edit/' + id;
     return this.executeUpdateNotification(url).subscribe();
@@ -172,6 +163,19 @@ export class DownloaderService {
   executeClearUserNotifications(url: string) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
+  }
+
+  updateUserSettings(settings: UserSettings) {
+    /*
+     Updates user's settings for color configuration/alert threshold.
+     */
+    let url = this.baseServerUrl + 'settings/edit';
+    return this.executeAuthorizedPostRequest(url, settings).subscribe();
+  }
+
+  executeAuthorizedPostRequest(url: string, body: any) {
+    if (!this.authService.checkUserAuthentication()) { return; }
+    return this.http.post(url, body, headerOptions);
   }
 
   ajaxRequest(ln: Location, username: string, url: string) {

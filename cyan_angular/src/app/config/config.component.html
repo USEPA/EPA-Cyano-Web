@@ -12,17 +12,12 @@
       <div class="circle green"></div>
     </div>
     <div class="cyan-inputs">
-      <div class="from-inputs inputs">
-        <mat-form-field class="mat-number-input">
-          <input matInput placeholder="From" type="number" [(ngModel)]="low_level_0" size="9" (keyup)="validateValue($event, 'low');" (change)="validateValue($event, 'low');">
-        </mat-form-field>
-      </div>
       <div class="to-inputs inputs">
         <mat-form-field class="mat-number-input">
-          <input matInput placeholder="To" type="number" [(ngModel)]="low_level_1" size="9" (keyup)="validateValue($event, 'low');" (change)="validateValue($event, 'low');">
+          <input matInput placeholder="To" type="number" [(ngModel)]="user_settings.level_low" size="9" (keyup)="validateValue($event, 'low');" (change)="validateValue($event, 'low');">
         </mat-form-field>
       </div>
-      <ng5-slider class="low-level-slider" [(value)]="low_level_0" [(highValue)]="low_level_1" [options]="slider_options" (userChangeEnd)="validateValue($event, 'low')"></ng5-slider>
+      <ng5-slider class="low-level-slider" [(value)]="user_settings.level_low" [options]="slider_options" (userChangeEnd)="validateValue($event, 'low')"></ng5-slider>
     </div>
   </div>
   <div class="cyan-level medium-block">
@@ -33,15 +28,15 @@
     <div class="cyan-inputs">
       <div class="from-inputs inputs">
           <mat-form-field class="mat-number-input">
-            <input matInput palcehodler="From" class="number-input" type="number" [(ngModel)]="med_level_0" size="9" (keyup)="validateValue($event, 'med');" (change)="validateValue($event, 'med');">
+            <input matInput palcehodler="From" class="number-input" type="number" [(ngModel)]="user_settings.level_low" size="9" (keyup)="validateValue($event, 'med');" (change)="validateValue($event, 'med');">
           </mat-form-field>
       </div>
-      <div class="to-inputs inputs"> 
+      <div class="to-inputs inputs">
           <mat-form-field class="mat-number-input">
-            <input matInput placeholder="To" class="number-input" type="number" [(ngModel)]="med_level_1" size="9" (keyup)="validateValue($event, 'med');" (change)="validateValue($event, 'med');">
-          </mat-form-field>           
+            <input matInput placeholder="To" class="number-input" type="number" [(ngModel)]="user_settings.level_medium" size="9" (keyup)="validateValue($event, 'med');" (change)="validateValue($event, 'med');">
+          </mat-form-field>
       </div>
-      <ng5-slider class="med-level-slider" [(value)]="med_level_0" [(highValue)]="med_level_1" [options]="slider_options" (userChangeEnd)="validateValue($event, 'med')"></ng5-slider>
+      <ng5-slider class="med-level-slider" [(value)]="user_settings.level_low" [(highValue)]="user_settings.level_medium" [options]="slider_options" (userChangeEnd)="validateValue($event, 'med')"></ng5-slider>
     </div>
   </div>
   <div class="cyan-level high-block">
@@ -52,15 +47,15 @@
     <div class="cyan-inputs">
       <div class="from-inputs inputs">
           <mat-form-field class="mat-number-input">
-            <input matInput placeholder="From" class="number-input" type="number" [(ngModel)]="hi_level_0" size="9" (keyup)="validateValue($event, 'hi');" (change)="validateValue($event, 'hi');">
+            <input matInput placeholder="From" class="number-input" type="number" [(ngModel)]="user_settings.level_medium" size="9" (keyup)="validateValue($event, 'hi');" (change)="validateValue($event, 'hi');">
           </mat-form-field>
       </div>
-      <div class="to-inputs inputs"> 
+      <div class="to-inputs inputs">
           <mat-form-field class="mat-number-input">
-            <input matInput placeholder="To" class="number-input" type="number" [(ngModel)]="hi_level_1" size="9" (keyup)="validateValue($event, 'hi');" (change)="validateValue($event, 'hi');">
-          </mat-form-field>           
+            <input matInput placeholder="To" class="number-input" type="number" [(ngModel)]="user_settings.level_high" size="9" (keyup)="validateValue($event, 'hi');" (change)="validateValue($event, 'hi');">
+          </mat-form-field>
       </div>
-      <ng5-slider class="hi-level-slider" [(value)]="hi_level_0" [(highValue)]="hi_level_1" [options]="slider_options" (userChangeEnd)="validateValue($event, 'hi')"></ng5-slider>
+      <ng5-slider class="hi-level-slider" [(value)]="user_settings.level_medium" [(highValue)]="user_settings.level_high" [options]="slider_options" (userChangeEnd)="validateValue($event, 'hi')"></ng5-slider>
     </div>
   </div>
   <div class="cyan-level veryhigh-block">
@@ -71,25 +66,27 @@
     <div class="cyan-inputs">
       <div class="from-inputs inputs">
           <mat-form-field class="mat-number-input">
-            <input matInput placeholder="Higher than" [(ngModel)]="vhi_level" size="9" (change)="validateValue($event, 'vhi')">
+            <input matInput placeholder="Higher than" [(ngModel)]="user_settings.level_high" size="9" (change)="validateValue($event, 'vhi')">
           </mat-form-field>
       </div>
-      <ng5-slider class="vhi-level-slider" [(value)]="vhi_level" [options]="slider_options_end" (userChangeEnd)="validateValue($event, 'vhi')"></ng5-slider>
+      <ng5-slider class="vhi-level-slider" [(value)]="user_settings.level_high" [options]="slider_options_end" (userChangeEnd)="validateValue($event, 'vhi')"></ng5-slider>
     </div>
   </div>
   <div class="cyan-level alert">
     <div class="cyan-icon veryhigh">
-      <input type="checkbox" [(ngModel)]="no_alert" (change)="onChangeReadOnly()">
+      <input type="checkbox" [(ngModel)]="user_settings.enable_alert" (change)="onChangeReadOnly()">
     </div>
     <div class="cyan-inputs">
       <div class="alert-inputs">
           <mat-form-field class="mat-number-input">
-            <input matInput placeholder="Alert when higher than" [(ngModel)]="alert_level" size="15">
+            <input matInput placeholder="Alert when higher than" [(ngModel)]="user_settings.alert_value" size="15">
           </mat-form-field>
       </div>
-      <ng5-slider class="alert-level-slider" [(value)]="alert_level" [options]="slider_options_alert"></ng5-slider>
-    </div>   
+      <ng5-slider class="alert-level-slider" [(value)]="user_settings.alert_value" [options]="slider_options_alert"></ng5-slider>
+    </div>
   </div>
-  <div class="reset-levels"></div>
+  <div class="footer-block">
+    <button mat-button class="" (click)="saveConfig()">Save</button>
+  </div>
 </div>
 </div>
