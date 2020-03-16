@@ -100,6 +100,10 @@ export class UserService {
     return this.currentAccount.user.username;
   }
 
+  getUserSettings(): UserSettings {
+    return this.currentAccount.settings;
+  }
+
   getUserDetails(): Observable<User> {
     return of(this.currentAccount.user)
   }

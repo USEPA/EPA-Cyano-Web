@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker } from 'leaflet';
 import { Location } from '../models/location';
 import { CyanMap } from '../utils/cyan-map';
-import { ConfigService } from '../services/config.service';
+import { UserService } from '../services/user.service';
 import { ConcentrationRanges } from '../test-data/test-levels';
 import { MapPopupComponent } from '../map-popup/map-popup.component';
 import { NgElement, WithProperties } from '@angular/elements';
@@ -16,7 +16,7 @@ export class MapService {
   marker_list = {};
   private data_source = 'OLCI';
 
-  constructor(private cyanMap: CyanMap, private configService: ConfigService) {}
+  constructor(private cyanMap: CyanMap, private userService: UserService) {}
 
   setMap(map: Map): void {
     this.cyanMap.map = map;
@@ -142,26 +142,27 @@ export class MapService {
   getMarker(ln: Location): string {
     let n = ln.cellConcentration;
     let c = ln.marked;
-    this.cyan_ranges = this.configService.getStaticLevels();
-    if (n <= this.cyan_ranges.low[1]) {
+    let userSettings = this.userService.getUserSettings();
+
+    if (n <= userSettings.level_low) {
       if (c) {
         return 'assets/images/map_pin_green_checked.png';
       } else {
         return 'assets/images/map_pin_green_unchecked.png';
       }
-    } else if (n <= this.cyan_ranges.medium[1] && n >= this.cyan_ranges.medium[0]) {
+    } else if (n <= userSettings.level_medium && n > userSettings.level_low) {
       if (c) {
         return 'assets/images/map_pin_yellow_checked.png';
       } else {
         return 'assets/images/map_pin_yellow_unchecked.png';
       }
-    } else if (n <= this.cyan_ranges.high[1] && n >= this.cyan_ranges.high[0]) {
+    } else if (n <= userSettings.level_high && n > userSettings.level_medium) {
       if (c) {
         return 'assets/images/map_pin_orange_checked.png';
       } else {
         return 'assets/images/map_pin_orange_unchecked.png';
       }
-    } else if (n >= this.cyan_ranges.veryhigh[0]) {
+    } else if (n >  userSettings.level_high) {
       if (c) {
         return 'assets/images/map_pin_red_checked.png';
       } else {
