@@ -3,6 +3,7 @@ import { Observable, of, Subscription, Subject } from 'rxjs';
 
 import { DownloaderService } from './downloader.service';
 import { AuthService } from './auth.service';
+import {UserSettings} from "../models/settings";
 
 
 @Injectable({
@@ -17,7 +18,8 @@ export class UserService {
       auth_token: ""
     },
     locations : [],
-    notifications: []
+    notifications: [],
+    settings: new UserSettings()
   };
   response: any = null;
 
@@ -37,7 +39,8 @@ export class UserService {
         auth_token: ""
       },
       locations : [],
-      notifications: []
+      notifications: [],
+      settings: new UserSettings()
     };
   }
 
@@ -97,6 +100,10 @@ export class UserService {
     return this.currentAccount.user.username;
   }
 
+  getUserSettings(): UserSettings {
+    return this.currentAccount.settings;
+  }
+
   getUserDetails(): Observable<User> {
     return of(this.currentAccount.user)
   }
@@ -124,6 +131,10 @@ export class UserService {
     });
     // TODO: Set notifications in currentAccount?
     this.allNotificationsSource.next(_notifications);  // push updated notifications
+  }
+
+  updateUserSettings(settings: UserSettings) {
+    return this.downloader.updateUserSettings(settings);
   }
 
   clearUserNotifications(username: string) {
@@ -166,4 +177,5 @@ export class Account {
   user: User;
   locations: UserLocations[];
   notifications: UserNotifications[];
+  settings: UserSettings;
 }

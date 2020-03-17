@@ -125,7 +125,7 @@
     flex-direction: column;
     width: 50%;
     margin-left: 20px;
-} 
+}
 .location_checked {
     margin-left: 0;
     opacity: .80;
@@ -211,7 +211,7 @@
     font-weight: 400;
     color: #205493;
     display: inline-flex
-} 
+}
 .location_cellDescript {
     font-size: small;
     display: inline-block;
@@ -327,4 +327,7 @@
 }
 #marked_locations {
     margin: 25px 10px;
+}
+.alert {
+  color: red;
 }

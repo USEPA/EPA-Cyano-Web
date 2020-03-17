@@ -111,6 +111,20 @@ class DBHandler(object):
 		"""
 		self.execute_query(query, self.db_name)
 
+	def create_settings_table(self):
+		query = """
+		CREATE TABLE IF NOT EXISTS Settings (
+			user_id INTEGER NOT NULL PRIMARY KEY,
+			level_low INTEGER NOT NULL,
+			level_medium INTEGER NOT NULL,
+			level_high INTEGER NOT NULL,
+			enable_alert BIT NOT NULL,
+			alert_value INTEGER,
+			FOREIGN KEY (user_id) REFERENCES User(id)
+		);
+		"""
+		self.execute_query(query, self.db_name)
+
 	def create_user(self, user, password):
 		"""
 		Creates a user for flask backend.
@@ -145,7 +159,7 @@ if __name__ == '__main__':
 		print("No table name specified, which is only needed for options 2 and 3.")
 		pass
 
-	if option == 4 or option == 6:
+	if option == 2 or option == 4 or option == 6:
 		try:
 			user_name = os.environ.get('DB_USER') or input("Please enter a username: ")
 			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
@@ -169,8 +183,10 @@ if __name__ == '__main__':
 			dbh.create_location_table()
 		elif table_name == 'notifications':
 			dbh.create_notifications_table()
+		elif table_name == 'settings':
+			dbh.create_settings_table()
 		else:
-			raise Exception("Table name should be 'user' or 'location'.")
+			raise Exception("Table name should be 'user', 'location', 'notifications', or 'settings'.")
 	elif option == 3:
 		print("Deleting table: {}".format(table_name))
 		dbh.delete_table(table_name)
@@ -181,6 +197,7 @@ if __name__ == '__main__':
 		dbh.create_user_table()
 		dbh.create_location_table()
 		dbh.create_notifications_table()
+		dbh.create_settings_table()
 		print("Creating user: {}".format(user_name))
 		dbh.create_user(user_name, user_pass)
 		dbh.add_privilege(user_name)
@@ -189,6 +206,7 @@ if __name__ == '__main__':
 		dbh.delete_table('user')
 		dbh.delete_table('location')
 		dbh.delete_table('notifications')
+		dbh.delete_table('settings')
 		dbh.delete_database()
 	elif option == 6:
 		print("Creating user: {}".format(user_name))

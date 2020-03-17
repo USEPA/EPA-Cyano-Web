@@ -74,6 +74,8 @@ def get_user_from_token(request):
 	"""
 	token = request.headers.get('Authorization', None)
 	if token:
+		print (token)
+		print (decode_auth_token(token.split(' ')[1]))
 		return decode_auth_token(token.split(' ')[1])['sub']
 	return None
 

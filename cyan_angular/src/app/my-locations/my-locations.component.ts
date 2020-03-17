@@ -30,7 +30,6 @@ export class MyLocationsComponent implements OnInit {
     private router: Router,
     private locationService: LocationService,
     private mapService: MapService,
-    private _sanitizer: DomSanitizer,
     private authService: AuthService
   ) {}
 
@@ -98,6 +97,10 @@ export class MyLocationsComponent implements OnInit {
 
   getArrow(l: Location) {
     return this.locationService.getArrow(l);
+  }
+
+  exceedAlertValue(l: Location) {
+    return this.locationService.exceedAlertValue(l);
   }
 
   formatNumber(n: number) {

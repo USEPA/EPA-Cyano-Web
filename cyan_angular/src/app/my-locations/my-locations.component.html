@@ -29,7 +29,8 @@
             {{location.longitude_deg}}&deg;{{location.longitude_min}}'{{location.longitude_sec}}"{{location.longitude_dir}}
           </div>
           <div class="location_max">(Max adjacent cells: {{formatNumber(location.maxCellConcentration)}})</div>
-      </div>
+          <mat-icon class="alert" *ngIf="exceedAlertValue(location)">error_outline</mat-icon>
+        </div>
       <div class="location_block_1">
         <div class="location_cell">
             <div class="location_cellC_meter">
@@ -52,7 +53,7 @@
               </ng-template>
               <ng-template #location_down>
                 <div [ngClass]="['location_arrow_img', 'arrow_down', getColor(location, true)]"></div>
-              </ng-template>         
+              </ng-template>
               <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
             </div>
             <div class="location_cellDescript">cells/mL</div>
