@@ -93,14 +93,9 @@
 .mat-number-input {
     width: 80%;
 }
-.config-exit {
-    margin: 3px;
-    padding: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
-.footer-block {
-  text-align: center;
+.config-control {
+    float: right;
+    width: 40px;
+    min-width: 40px;
+    padding: 0 10px;
 }

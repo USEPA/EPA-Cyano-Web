@@ -57,7 +57,7 @@ export class ConfigComponent implements OnInit {
   }
 
   getRanges(): void {
-    this.user_settings = this.userService.currentAccount.settings;
+    this.user_settings = Object.assign({}, this.userService.currentAccount.settings);
   }
 
   validateValue(c: ChangeContext, slider: any): void {
@@ -96,8 +96,16 @@ export class ConfigComponent implements OnInit {
 
   saveConfig() {
     // save settings
-    this.userService.updateUserSettings(this.user_settings);
-    this.exitConfig()
+    let self = this;
+    this.userService.updateUserSettings(this.user_settings).subscribe({
+      next: () => {
+        self.userService.currentAccount.settings = Object.assign({}, self.user_settings);
+        self.exitConfig();
+      },
+      error: error => {
+        console.error('Error saving user settings', error);
+      }
+    });
   }
 
   exitConfig() {

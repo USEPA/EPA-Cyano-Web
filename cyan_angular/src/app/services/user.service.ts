@@ -134,7 +134,7 @@ export class UserService {
   }
 
   updateUserSettings(settings: UserSettings) {
-    this.downloader.updateUserSettings(settings);
+    return this.downloader.updateUserSettings(settings);
   }
 
   clearUserNotifications(username: string) {

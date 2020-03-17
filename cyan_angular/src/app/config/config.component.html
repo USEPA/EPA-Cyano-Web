@@ -2,9 +2,16 @@
   <div class="config-background-click" [routerLink]="['']"></div>
 <div class="config-block">
   <div class="top-block">
-    <button mat-button class="config-exit" (click)="exitConfig()">x</button>
     <div class="app-version"></div>
-    <div class="config-title">Modify Marker Color Configuration</div>
+    <div class="config-title">
+      <span>Modify Marker Color Configuration</span>
+      <button mat-button class="config-control">
+        <mat-icon aria-label="Close" (click)="exitConfig()">close</mat-icon>
+      </button>
+      <button mat-button class="config-control">
+        <mat-icon aria-label="Save" (click)="saveConfig()">save</mat-icon>
+      </button>
+    </div>
   </div>
   <div class="cyan-level low-block">
     <div class="cyan-icon low">
@@ -84,9 +91,6 @@
       </div>
       <ng5-slider class="alert-level-slider" [(value)]="user_settings.alert_value" [options]="slider_options_alert"></ng5-slider>
     </div>
-  </div>
-  <div class="footer-block">
-    <button mat-button class="" (click)="saveConfig()">Save</button>
   </div>
 </div>
 </div>

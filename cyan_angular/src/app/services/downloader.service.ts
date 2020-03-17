@@ -170,7 +170,7 @@ export class DownloaderService {
      Updates user's settings for color configuration/alert threshold.
      */
     let url = this.baseServerUrl + 'settings/edit';
-    return this.executeAuthorizedPostRequest(url, settings).subscribe();
+    return this.executeAuthorizedPostRequest(url, settings);
   }
 
   executeAuthorizedPostRequest(url: string, body: any) {
