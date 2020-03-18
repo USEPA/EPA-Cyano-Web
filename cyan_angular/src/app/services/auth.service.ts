@@ -2,7 +2,7 @@ import { Injectable, Inject, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import * as moment from "moment";
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 
@@ -15,7 +15,7 @@ export class AuthService {
     error: ""
   }
 
-  private authSubject =  new BehaviorSubject<AuthError>(null);
+  private authSubject =  new Subject<AuthError>();
   userLoginState = this.authSubject.asObservable();
 
   private jwtHelper = new JwtHelperService();
@@ -27,7 +27,6 @@ export class AuthService {
   public checkUserAuthentication(): boolean {
     // Checks if token is valid before making requests:
     if (!this.isAuthenticated()) {
-      console.log("downloader.service getAjaxData session expired triggered.");
       this.logout({'error': "User session has expired."});
       return false;
     }
@@ -53,7 +52,6 @@ export class AuthService {
   }        
 
   logout(errorMessage: object) {
-    console.log("auth.service logout() called");
     localStorage.removeItem('auth_token');
     this.authError.userLoggedIn = false;
     this.authError.error = errorMessage['error'];

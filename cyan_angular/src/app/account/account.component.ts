@@ -41,6 +41,8 @@ export class AccountComponent implements OnInit {
   authSub: Subscription = null;
   firstLoad: boolean = true;
 
+  loggingOut: boolean = false;
+
   errorMessage: string = "";  // error messages for login page
 
   constructor(
@@ -55,10 +57,12 @@ export class AccountComponent implements OnInit {
     let self = this;
     self.requestUser();
     self.userAuthListener();
-    // Catching authorization error message:
     this.activeRoute.params.subscribe((params) => {
         if (params['error'] != undefined) {
-          self.errorMessage = params.error;
+          self.errorMessage = params.error;  // catches authorization error message
+        }
+        if (params['loggingOut'] != undefined) {
+          this.loggingOut = params.loggingOut;  // shows logout button
         }
     });
   }
@@ -83,6 +87,7 @@ export class AccountComponent implements OnInit {
   performLogoutRoutine(authError): void {
     this.userLoggedIn = false;
     this.currentUser = null;
+    this.loggingOut = false;
     this.username = "";
     this.password = "";
     this.locationService.clearUserData();
