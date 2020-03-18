@@ -4,11 +4,13 @@ import { Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LocationService } from '../services/location.service';
 import { UserService } from '../services/user.service';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+	selector: 'app-header',
+	templateUrl: './header.component.html',
+	styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
 
@@ -48,6 +50,11 @@ export class HeaderComponent implements OnInit {
     this.notificationSubscription.unsubscribe();
     this.locationSubscription.unsubscribe();
   }
+
+	displayLogout() {
+		// Navigates to /account for user to log out.
+		this.router.navigate(['/account', {loggingOut: true}]);
+	}
 
   setTitle() {
     /*

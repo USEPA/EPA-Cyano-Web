@@ -50,6 +50,17 @@ else
 		is_new BIT NOT NULL,
 		PRIMARY KEY (id, owner)
 	);"
+	# Creates settings table:
+	mysql -u root -p${MYSQL_ROOT_PASSWORD} -D ${DB_NAME} -e \
+	"CREATE TABLE IF NOT EXISTS Settings (
+		user_id INTEGER NOT NULL PRIMARY KEY,
+		level_low INTEGER NOT NULL,
+		level_medium INTEGER NOT NULL,
+		level_high INTEGER NOT NULL,
+		enable_alert BIT NOT NULL,
+		alert_value INTEGER,
+		FOREIGN KEY (user_id) REFERENCES User(id)
+	);"
 fi
 
 # Creating user for connecting to mysql cyan-responsive database:
