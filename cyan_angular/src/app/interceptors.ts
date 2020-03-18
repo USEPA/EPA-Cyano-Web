@@ -33,7 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
 	to the request's Authorization header before going to the backend.
 	*/
 
-	nonAuthUrls: string[] = ["cyan.epa.gov"];  // request urls that don't need auth (e.g., external requests)
+	nonAuthUrls: string[] = ["cyan.epa.gov", "/cyan/app/api/user", "/cyan/app/api/user/register"];  // request urls that don't need auth (e.g., external requests)
 
 	constructor (
 		private authService: AuthService
@@ -41,9 +41,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		const auth_token = localStorage.getItem('auth_token');
-		let isExternalUrl = this.nonAuthUrls.findIndex(url => req.url.includes(url)) > -1;
-		if (isExternalUrl) {
-			// console.log("Making external requests, no need to add token.");
+		let isNonAuthUrl = this.nonAuthUrls.findIndex(url => req.url.includes(url)) > -1;
+		if (isNonAuthUrl) {
+			// console.log("Making non auth request, no need to add token.");
 			return next.handle(req);
 		}
 		else if (auth_token && this.authService.isAuthenticated()) {
@@ -84,6 +84,7 @@ export class JwtInterceptor implements HttpInterceptor {
 				const auth_token = event.headers.get('Authorization');
 				if (auth_token) {
 					// Reset the token in localStorage here since it's valid
+					// console.log("interceptors JwtInterceptor renewing token.");
 					this.authService.setSession(auth_token);
 				}
 			}

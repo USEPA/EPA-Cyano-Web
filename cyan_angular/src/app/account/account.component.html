@@ -60,7 +60,12 @@
           <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
           <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
         </div>
-        <button mat-raised-button class="start-app" (click)="exitAccount()">Start using CyAN</button>
+        <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()">Start using CyAN</button>
+        <div *ngIf="loggingOut">
+          <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
+          <br>
+          <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})">Log Out</button>
+        </div>
       </ng-template>
       <div class="login-notification-block" *ngIf="!registerForm">
         <div class="login-message">{{ errorMessage }}</div>

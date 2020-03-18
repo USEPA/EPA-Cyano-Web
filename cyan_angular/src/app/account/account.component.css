@@ -154,7 +154,8 @@
 }
 .start-app {
     margin-top: 10px;
-    font-weight: bolder
+    font-weight: bolder;
+    min-width: 20%;
 }
 .app-state-block {
     float: left;
