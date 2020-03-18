@@ -85,6 +85,8 @@ class BranchTests:
 		from cyan_flask.build_db import DBHandler
 		self.set_mysql_creds()
 		db_handler = DBHandler(self.test_db_name, self.root_pass)
+		db_handler.delete_user(self.test_db_user)  # deletes test user
+		db_handler.delete_database()  # deletes test db
 		status = db_handler.full_build(self.test_db_user, self.user_pass)
 		if status != True:
 			print("\nERROR: Building test database and tables failed.")

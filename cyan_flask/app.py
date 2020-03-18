@@ -30,7 +30,7 @@ app.config.update(
 api = Api(app)
 
 # Allows cross-origin requests (TODO: only allow certain domains in future?):
-CORS(app, origins=["http://localhost:4200"])
+CORS(app, origins=["http://localhost:4200", "http://localhost:4242"])
 
 # Adds module location to env as project root:
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -196,7 +196,21 @@ class DeleteNotification(Resource):
 		results, status_code = web_app_api.delete_notifications(user)
 		return results, status_code, headers
 
+class EditSettings(Resource):
+	"""
+	Endpoint for editing user settings.
+	URL: /app/api/settings/edit
+	"""
+	def get(self):
+		return {"status": "edit settings endpoint"}
 
+	@login_required
+	def post(self):
+		args = request.get_json()
+		args['owner'] = auth.get_user_from_token(request)
+		headers = get_auth_headers()
+		results, status_code = web_app_api.edit_settings(args)
+		return results, status_code, headers
 
 # Test endpoint:
 api.add_resource(StatusTest, '/test')
@@ -215,6 +229,9 @@ api.add_resource(GetUserLocations, api_url + 'locations/<string:type>')
 # Notifications endpoints:
 api.add_resource(EditNotification, api_url + 'notification/edit/<string:_id>')
 api.add_resource(DeleteNotification, api_url + 'notification/delete')
+
+# Settings endpoint:
+api.add_resource(EditSettings, api_url + 'settings/edit')
 
 
 logging.info("CyAN Flask app started.\nLive endpoints:")

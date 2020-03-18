@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 
 import { Options, ChangeContext } from 'ng5-slider';
 
-import { ConfigService } from '../services/config.service';
-import { ConcentrationRanges } from '../test-data/test-levels';
+import { UserService } from '../services/user.service';
+import {UserSettings} from "../models/settings";
 
 @Component({
   selector: 'app-config',
@@ -12,25 +12,17 @@ import { ConcentrationRanges } from '../test-data/test-levels';
   styleUrls: ['./config.component.css']
 })
 export class ConfigComponent implements OnInit {
-  cyan_levels: ConcentrationRanges;
+  private SLIDER_STEP = 10000;
 
-  low_level_0: number;
-  low_level_1: number;
-  med_level_0: number;
-  med_level_1: number;
-  hi_level_0: number;
-  hi_level_1: number;
-  vhi_level: number;
-
-  no_alert: boolean = false;
-  alert_level: number = 1000000;
+  user_settings: UserSettings;
 
   slider_options: Options = {
     hideLimitLabels: true,
     hidePointerLabels: true,
     noSwitching: true,
     floor: 10000,
-    ceil: 1000000
+    ceil: 1000000,
+    step: this.SLIDER_STEP,
   };
 
   slider_options_end: Options = {
@@ -39,6 +31,7 @@ export class ConfigComponent implements OnInit {
     noSwitching: true,
     floor: 10000,
     ceil: 1000000,
+    step: this.SLIDER_STEP,
     showSelectionBarEnd: true
   };
 
@@ -48,99 +41,71 @@ export class ConfigComponent implements OnInit {
     noSwitching: true,
     floor: 0,
     ceil: 5000000,
+    step: this.SLIDER_STEP,
     showSelectionBarEnd: true,
     readOnly: true
   };
 
-  constructor(private configService: ConfigService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private router: Router) {
+  }
 
   ngOnInit() {
     this.getRanges();
-    this.setRanges();
-  }
-
-  setRanges(): void {
-    this.low_level_0 = this.cyan_levels.low[0];
-    this.low_level_1 = this.cyan_levels.low[1];
-    this.med_level_0 = this.cyan_levels.medium[0];
-    this.med_level_1 = this.cyan_levels.medium[1];
-    this.hi_level_0 = this.cyan_levels.high[0];
-    this.hi_level_1 = this.cyan_levels.high[1];
-    this.vhi_level = this.cyan_levels.veryhigh[0];
+    this.onChangeReadOnly();
   }
 
   getRanges(): void {
-    this.configService.getLevels().subscribe(levels => (this.cyan_levels = levels));
+    this.user_settings = Object.assign({}, this.userService.currentAccount.settings);
   }
 
   validateValue(c: ChangeContext, slider: any): void {
     switch (slider) {
       case 'low':
-        if (this.low_level_0 >= this.low_level_1) {
-          this.low_level_0 = this.low_level_1 - 1;
-          this.med_level_0 = this.low_level_1 + 1;
-        } else if (this.low_level_1 >= this.med_level_1 - 1) {
-          this.med_level_0 = this.med_level_1 - 1;
-          this.low_level_1 = this.med_level_0 - 1;
-        } else {
-          this.med_level_0 = this.low_level_1 + 1;
+        if (this.user_settings.level_low >= this.user_settings.level_medium) {
+          this.user_settings.level_low = this.user_settings.level_medium - this.SLIDER_STEP;
         }
         break;
       case 'med':
-        if (this.med_level_0 <= this.low_level_0) {
-          this.med_level_0 = this.low_level_1 + 1;
-        } else if (this.med_level_0 >= this.med_level_1) {
-          this.med_level_0 = this.low_level_1 + 1;
-          this.med_level_1 = this.med_level_0 + 1;
-          this.hi_level_0 = this.med_level_1 + 1;
-        } else if (this.med_level_1 >= this.hi_level_1 - 1) {
-          this.hi_level_0 = this.hi_level_1 - 1;
-          this.med_level_1 = this.hi_level_0 - 1;
-        } else {
-          this.low_level_1 = this.med_level_0 - 1;
-          this.hi_level_0 = this.med_level_1 + 1;
+        if (this.user_settings.level_low >= this.user_settings.level_medium) {
+          this.user_settings.level_low = this.user_settings.level_medium - this.SLIDER_STEP;
+        }
+        if (this.user_settings.level_medium >= this.user_settings.level_high) {
+          this.user_settings.level_medium = this.user_settings.level_high - this.SLIDER_STEP;
         }
         break;
       case 'hi':
-        if (this.hi_level_0 <= this.med_level_0) {
-          this.med_level_1 = this.med_level_0 + 1;
-          this.hi_level_0 = this.med_level_1 + 1;
-        } else if (this.hi_level_0 >= this.hi_level_1) {
-          this.hi_level_1 = this.hi_level_0 + 1;
-          this.med_level_1 = this.hi_level_0 - 1;
-        } else {
-          this.med_level_1 = this.hi_level_0 - 1;
+        if (this.user_settings.level_medium >= this.user_settings.level_high) {
+          this.user_settings.level_medium = this.user_settings.level_high - this.SLIDER_STEP;
         }
-        this.vhi_level = this.hi_level_1;
         break;
       case 'vhi':
-        if (this.vhi_level <= this.hi_level_0) {
-          this.hi_level_1 = this.hi_level_0 + 1;
-          this.vhi_level = this.hi_level_1 + 1;
-        } else {
-          this.hi_level_1 = this.vhi_level;
+        if (this.user_settings.level_medium >= this.user_settings.level_high) {
+          this.user_settings.level_medium = this.user_settings.level_high - this.SLIDER_STEP;
         }
         break;
       default:
         break;
     }
-    this.updateRanges();
-  }
-
-  updateRanges(): void {
-    let low = [this.low_level_0, this.low_level_1];
-    let medium = [this.med_level_0, this.med_level_1];
-    let high = [this.hi_level_0, this.hi_level_1];
-    let veryhigh = [this.vhi_level];
-    this.configService.changeLevels(low, medium, high, veryhigh);
-  }
-
-  resetRanges(): void {
-    this.configService.resetLevels();
   }
 
   onChangeReadOnly(): void {
-    this.slider_options_alert = Object.assign({}, this.slider_options_alert, { readOnly: !this.no_alert });
+    this.slider_options_alert = Object.assign({}, this.slider_options_alert, { readOnly: !this.user_settings.enable_alert });
+  }
+
+  saveConfig() {
+    // save settings
+    let self = this;
+    this.userService.updateUserSettings(this.user_settings).subscribe({
+      next: () => {
+        self.userService.currentAccount.settings = Object.assign({}, self.user_settings);
+        self.exitConfig();
+      },
+      error: error => {
+        console.error('Error saving user settings', error);
+      }
+    });
   }
 
   exitConfig() {

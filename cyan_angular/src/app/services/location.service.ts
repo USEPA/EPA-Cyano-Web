@@ -7,20 +7,18 @@ import { Location, LocationType } from '../models/location';
 import { ConcentrationRanges } from '../test-data/test-levels';
 
 import { UserService, UserLocations, User } from '../services/user.service';
-import { ConfigService } from '../services/config.service';
 import { DownloaderService } from '../services/downloader.service';
 import { MapService } from '../services/map.service';
-
+import { UserSettings } from "../models/settings";
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
-  userLocations: UserLocations = null;
+
   private data_type: LocationType = LocationType.OLCI_WEEKLY;
 
-  test_levels: any;
   @Input() locations: Location[] = [];
   @Input() compare_locations: Location[] = [];
 
@@ -35,11 +33,9 @@ export class LocationService {
   constructor(
     private _sanitizer: DomSanitizer,
     private user: UserService,
-    private configService: ConfigService,
     private downloader: DownloaderService,
     private mapService: MapService,
   ) {
-    this.getCyanLevels();
     this.getData();
     this.loadUser();
   }
@@ -171,10 +167,6 @@ export class LocationService {
       }
     });
     return inLocations;
-  }
-
-  getCyanLevels(): void {
-    this.configService.getLevels().subscribe(levels => (this.test_levels = levels));
   }
 
   getAllLocations(): Observable<Location[]> {
@@ -369,7 +361,9 @@ export class LocationService {
 
   getPercentage(l: Location) {
     let cells = l.cellConcentration;
-    let p = (cells / this.test_levels.veryhigh[0]) * 100;
+    let userSettings = this.user.getUserSettings();
+
+    let p = (cells / userSettings.level_high) * 100;
     if (p > 100) {
       p = 100;
     }
@@ -377,21 +371,20 @@ export class LocationService {
   }
 
   getColor(l: Location, delta: boolean) {
-    let cc = new ConcentrationRanges();
+    let userSettings = this.user.getUserSettings();
+
     let cells = l.cellConcentration;
     if (delta) {
       cells = Math.abs(l.concentrationChange);
     }
     let c = 'green';
-    if (cells <= this.test_levels.low[0]) {
+    if (cells <= userSettings.level_low) {
       c = 'green';
-    } else if (cells > this.test_levels.low[0] && cells <= this.test_levels.low[1]) {
-      c = 'green';
-    } else if (cells > this.test_levels.medium[0] && cells <= this.test_levels.medium[1]) {
+    } else if (cells > userSettings.level_low && cells <= userSettings.level_medium) {
       c = 'yellow';
-    } else if (cells > this.test_levels.high[0] && cells <= this.test_levels.high[1]) {
+    } else if (cells > userSettings.level_medium && cells <= userSettings.level_high) {
       c = 'orange';
-    } else if (cells > this.test_levels.veryhigh[0]) {
+    } else if (cells > userSettings.level_high) {
       c = 'red';
     }
     return c;
@@ -402,6 +395,12 @@ export class LocationService {
       return true;
     }
     return false;
+  }
+  exceedAlertValue(l: Location): boolean {
+    let userSettings = this.user.getUserSettings();
+    let cells = l.cellConcentration;
+
+    return userSettings.enable_alert && (cells >= userSettings.alert_value);
   }
 
   formatNumber(n: number): string {

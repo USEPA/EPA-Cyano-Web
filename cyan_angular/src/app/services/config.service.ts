@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
+import { DownloaderService } from './downloader.service';
 
 @Injectable({
   providedIn: 'root'

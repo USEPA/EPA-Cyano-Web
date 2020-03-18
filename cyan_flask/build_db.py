@@ -106,6 +106,20 @@ class DBHandler(object):
 		"""
 		self.execute_query(query, self.db_name)
 
+	def create_settings_table(self):
+		query = """
+		CREATE TABLE IF NOT EXISTS Settings (
+			user_id INTEGER NOT NULL PRIMARY KEY,
+			level_low INTEGER NOT NULL,
+			level_medium INTEGER NOT NULL,
+			level_high INTEGER NOT NULL,
+			enable_alert BIT NOT NULL,
+			alert_value INTEGER,
+			FOREIGN KEY (user_id) REFERENCES User(id)
+		);
+		"""
+		self.execute_query(query, self.db_name)
+
 	def create_user(self, user, password):
 		"""
 		Creates a user for flask backend.
@@ -132,17 +146,22 @@ class DBHandler(object):
 			self.create_location_table()
 		elif table_name == 'notifications':
 			self.create_notifications_table()
+		elif table_name == 'settings':
+			self.create_settings_table()
 		else:
-			raise Exception("Table name should be 'user', 'location', or 'notifications'.")
+			raise Exception("Table name should be 'user', 'location', 'notifications', or 'settings'")
 
 	def full_build(self, user, password):
-		self.delete_database()
-		self.delete_user(user)
+		print("Creating database: {}".format(self.db_name))
 		self.create_database()
+		print("Creating tables.")
 		self.create_user_table()
 		self.create_location_table()
 		self.create_notifications_table()
+		self.create_settings_table()
+		print("Creating user: {}".format(user))
 		self.create_user(user, password)
+		print("Adding privilege to user {}".format(user))
 		self.add_privilege(user)
 		return True
 
@@ -170,21 +189,25 @@ if __name__ == '__main__':
 		db_name = sys.argv[2]
 	except IndexError:
 		db_name = input("\nEnter database name: ")
-		# raise Exception("No db name arg specified.")
 	try:
 		table_name = sys.argv[3]
 	except IndexError:
+		if option == 2 or option == 3:
+			table_name = input("\nEnter table name: ")
 		print("No table name specified, which is only needed for options 2 and 3.")
 		pass
 
 	if option == 4 or option == 6:
+		# Options that involve user creation
 		try:
-			user_name = os.environ.get('DB_USER') or input("Please enter a username: ")
+			user_name = os.environ.get('DB_USER') or input("Please enter a username to be created: ")
 			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
-			root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or input("Please enter root password for database: ")
 		except IndexError:
 			print("No user name specified, which is only needed for option 6.")
 			pass
+
+	# MySQL root password (used for most db operations):
+	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or input("Please enter root password for database: ")
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 
@@ -203,7 +226,7 @@ if __name__ == '__main__':
 		print("Running full setup.")
 		dbh.full_build(user_name, user_pass)
 	elif option == 5:
-		print("Removing database.")
+		print("Removing database and tables.")
 		dbh.delete_database()
 	elif option == 6:
 		print("Creating user: {}".format(user_name))
