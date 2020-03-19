@@ -11,7 +11,6 @@ import glob
 import virtualenv
 import runpy
 from getpass import getpass
-from dotenv import load_dotenv
 
 # Local imports:
 from config.set_environment import DeployEnv
