@@ -30,7 +30,7 @@ app.config.update(
 api = Api(app)
 
 # Allows cross-origin requests (TODO: only allow certain domains in future?):
-CORS(app, origins=["http://localhost:4200"])
+CORS(app, origins=["http://localhost:4200", "http://localhost:4242"])
 
 # Adds module location to env as project root:
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
