@@ -330,7 +330,7 @@ export class DownloaderService {
     this.locations.forEach((location) => {
       if (location.name.includes(ln.name)) {
         let idNum = location.name.split(" -- ")[1];
-        if (idNum != undefined && !isNaN(idNum)) {
+        if (idNum != undefined && !isNaN(Number(idNum)) && !isNaN(parseInt(idNum))) {
           matchedLocations.push(Number(idNum));
         }
       }
