@@ -212,6 +212,16 @@ class EditSettings(Resource):
 		results, status_code = web_app_api.edit_settings(args)
 		return results, status_code, headers
 
+class Refresh(Resource):
+	"""
+	Endpoint for getting fresh token.
+	"""
+	@login_required
+	def get(self):
+		user = auth.get_user_from_token(request)
+		headers = get_auth_headers()
+		return {'success': True}, 200, headers
+
 # Test endpoint:
 api.add_resource(StatusTest, '/test')
 
@@ -232,6 +242,9 @@ api.add_resource(DeleteNotification, api_url + 'notification/delete')
 
 # Settings endpoint:
 api.add_resource(EditSettings, api_url + 'settings/edit')
+
+# Refresh endpoint:
+api.add_resource(Refresh, api_url + 'refresh')
 
 
 logging.info("CyAN Flask app started.\nLive endpoints:")

@@ -17,6 +17,9 @@ import { ConcentrationRanges } from '../test-data/test-levels';
 })
 export class MarkerMapComponent implements OnInit {
 
+  panDelay: number = 5000;  // panning event delay (ms)
+  isEnabled: boolean = true;
+
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
@@ -63,6 +66,17 @@ export class MarkerMapComponent implements OnInit {
     let username = this.user.getUserName();
     if (username == '') {
       this.router.navigate(['/account']);
+    }
+  }
+
+  mapPanEvent(e: any): void {
+    
+    if (!this.authService.isAuthenticated()) { return; }  // won't auto log out, just skips refresh
+
+    if (this.isEnabled == true) {
+      this.isEnabled = false;
+      this.authService.refresh();
+      setTimeout(() => { this.isEnabled = true; }, this.panDelay);  // blocks refresh() call for panDelay milliseconds
     }
   }
 
