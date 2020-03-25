@@ -17,21 +17,21 @@ export class AccountComponent implements OnInit {
   version: number = 0.1;
   lastUpdate: string = '02/11/2019';
 
-  registerForm: Boolean = false;
+  registerForm: boolean = false;
   registerUsername: string = null;
   registerEmail: string = null;
   registerPassword: string = null;
-  hideRegisterPassword: Boolean = true;
+  hideRegisterPassword: boolean = true;
   registerPasswordCheck: string = null;
-  hideRegisterPasswordCheck: Boolean = true;
+  hideRegisterPasswordCheck: boolean = true;
 
   registerSub: Subscription = null;
 
   description: string =
     'This experimental web application provides provisional satellite derived measures of cyanobacteria, which may contain errors and should be considered a research tool. Users should refer to the app help menu for more details. The focus of this application is to provide cyanobacteria measure for larger lakes and reservoirs within the continental US. Data products are 7-day maximum cyanobacteria measures updated weekly.';
 
-  public userLoggedIn: Boolean = false;
-  hidePassword: Boolean = true;
+  public userLoggedIn: boolean = false;
+  hidePassword: boolean = true;
 
   username: string = null;
   password: string = null;
@@ -44,6 +44,9 @@ export class AccountComponent implements OnInit {
   loggingOut: boolean = false;
 
   errorMessage: string = "";  // error messages for login page
+
+  resetForm: boolean = false;
+  loginForm: boolean = true;
 
   constructor(
     private router: Router,
@@ -65,6 +68,13 @@ export class AccountComponent implements OnInit {
           this.loggingOut = params.loggingOut;  // shows logout button
         }
     });
+  }
+
+  resetPassword(): void {
+    console.log("account resetPassword() called.");
+    this.resetForm = true;
+    this.loginForm = false;
+    this.registerForm = false;
   }
 
   userAuthListener(): void {

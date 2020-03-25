@@ -7,7 +7,8 @@
     </div>
     <div class="login-block">
       <div *ngIf="!userLoggedIn; else userDetailsBlock">
-        <div *ngIf="!registerForm; else registerFormBlock">
+        <!-- <div *ngIf="!registerForm; else registerFormBlock"> -->
+        <div *ngIf="loginForm">
           <mat-form-field class="login-input username">
             <input matInput placeholder="User Name" [(ngModel)]="username" required>
           </mat-form-field>
@@ -18,9 +19,11 @@
           <div class="login-create_block">
             <button mat-raised-button color="primary" (click)="loginUser()" class="login-button">Login</button>
             <button mat-button class="register-user" (click)="registerForm = !registerForm">Create New User</button>
+            <button mat-button class="reset-password" (click)="resetPassword()">Reset Password</button>
           </div>
         </div>
-        <ng-template #registerFormBlock>
+        <!-- <ng-template #registerFormBlock> -->
+        <div *ngIf="registerForm">
           <div class="user-register-block">
             <mat-form-field class="register-input username">
               <input matInput placeholder="User Name" required [(ngModel)]="registerUsername">
@@ -47,7 +50,21 @@
           <div class="register-details">
             Disclaimer: User name should not contain any personally identifiable information and is only used for retrieving saved locations and custom settings of the CyAN web application.
           </div>
-        </ng-template>
+        <!-- </ng-template> -->
+        </div>
+
+        <!-- <ng-template #userResetPassword *ngIf="showResetPassword"> -->
+        <div *ngIf="resetForm">
+          <mat-form-field class="register-input username">
+            <input matInput placeholder="User Name" required [(ngModel)]="registerUsername">
+          </mat-form-field>
+          <mat-form-field class="register-input email">
+            <input matInput email placeholder="Email" [(ngModel)]="registerEmail" required>
+          </mat-form-field>
+          <button mat-raised-button class="start-app" (click)="sendResetEmail()">Send</button>
+        <!-- </ng-template> -->
+        </div>  
+
       </div>
       <ng-template #userDetailsBlock>
         <div class="app-state-block">
@@ -64,9 +81,12 @@
         <div *ngIf="loggingOut">
           <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
           <br>
+          <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button>
+          <br>
           <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})">Log Out</button>
         </div>
       </ng-template>
+
       <div class="login-notification-block" *ngIf="!registerForm">
         <div class="login-message">{{ errorMessage }}</div>
       </div>
