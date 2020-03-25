@@ -123,20 +123,17 @@ export class DownloaderService {
   }
 
   executeDeleteUserLocation(url: string) {
-    if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   getUserLocation(username: string, id: number) {
-    if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.baseServerUrl + 'location/' + id;
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   getUserLocations(username: string, type: number) {
-    if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.baseServerUrl + 'locations/' + type;
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   updateNotification(username: string, id: number) {
@@ -148,8 +145,7 @@ export class DownloaderService {
   }
 
   executeUpdateNotification(url: string) {
-    if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   clearUserNotifications(username: string) {
@@ -161,8 +157,7 @@ export class DownloaderService {
   }
 
   executeClearUserNotifications(url: string) {
-    if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   updateUserSettings(settings: UserSettings) {
@@ -176,6 +171,11 @@ export class DownloaderService {
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, headerOptions);
+  }
+
+  executeAuthorizedGetRequest(url: string) {
+    if (!this.authService.checkUserAuthentication()) { return; }
+    return this.http.get(url);
   }
 
   ajaxRequest(ln: Location, username: string, url: string) {
