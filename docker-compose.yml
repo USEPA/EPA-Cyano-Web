@@ -34,10 +34,8 @@ services:
       context: .
       dockerfile: Dockerfile_Database
     volumes:
-      # NOTE: Optional volume for existing DB dump, defaults to blank dummy file if no dump
       - ${SQL_DUMP:-./cyan_mysql/no_dump.txt}:/tmp/dump.sql  # use optional dump file to build container DB
-      # - /var/lib/mysql:/var/lib/mysql  # prod server existing host DB mapping
-      # - /c/ProgramData/MySQL/MySQL Server 5.6/data:/var/lib/mysql  # local windows existing DB mapping (currently throwing "not writable" error due to privilege)
+      - /var/www/app_data/cyano:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-""}
       # - MYSQL_DATABASE=${DB_NAME}

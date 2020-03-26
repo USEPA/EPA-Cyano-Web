@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  testing: true,
+  testing: false,
   baseServerUrl: '/cyan/app/api/'
 };
