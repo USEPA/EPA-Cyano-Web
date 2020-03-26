@@ -162,10 +162,17 @@ export class AccountComponent implements OnInit {
       }, 100);
       if (response != null) {
         if (response.hasOwnProperty('status')) {
-          self.registerForm = false;
-          self.username = self.registerUsername;
-          self.password = self.registerPassword;
-          self.loginUser();
+          if(response.status == "failure"){
+            console.log(response.status);
+            setTimeout(function() {
+              self.setRegisterMessage('Email adress already taken.');
+            }, 300);
+          } else {
+              self.registerForm = false;
+              self.username = self.registerUsername;
+              self.password = self.registerPassword;
+              self.loginUser();
+            }
         } else {
           setTimeout(function() {
             self.setRegisterMessage('User name already taken.');

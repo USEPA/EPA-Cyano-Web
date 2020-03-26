@@ -72,7 +72,7 @@ export class UserService {
     let self = this;
     this.downloader.registerUser(username, email, password).subscribe(response => {
       if(response.hasOwnProperty("status")){
-        if(response['status'] == "success"){
+        if(response['status'] == "success" || response['status'] == "failure"){
           this.currentAccount.user.username = response['username'];
           this.currentAccount.user.email = response['email'];
           this.currentAccount.locations = [];
