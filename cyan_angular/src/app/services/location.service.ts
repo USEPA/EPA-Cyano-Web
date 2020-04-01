@@ -423,6 +423,15 @@ export class LocationService {
       }
     });
   }
+
+  updateMarkers(): void {
+    this.locations.forEach(location => {
+      let self = this;
+      if (self.mapService.hasMarker(location.id)) {
+        this.mapService.updateMarker(location);
+      }
+    });
+  }
 }
 
 class Coordinate {
