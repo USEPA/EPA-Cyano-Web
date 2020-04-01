@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Options, ChangeContext } from 'ng5-slider';
 
 import { UserService } from '../services/user.service';
+import { LocationService } from '../services/location.service';
 import {UserSettings} from "../models/settings";
 
 @Component({
@@ -12,16 +13,19 @@ import {UserSettings} from "../models/settings";
   styleUrls: ['./config.component.css']
 })
 export class ConfigComponent implements OnInit {
-  private SLIDER_STEP = 10000;
+  private SLIDER_STEP = 1;
+  private LEVEL_MAX = 1000000;
+  private ALERT_MAX = 5000000;
 
   user_settings: UserSettings;
+  user_inputs: UserSettings;
 
   slider_options: Options = {
     hideLimitLabels: true,
     hidePointerLabels: true,
     noSwitching: true,
-    floor: 10000,
-    ceil: 1000000,
+    floor: 0,
+    ceil: this.LEVEL_MAX,
     step: this.SLIDER_STEP,
   };
 
@@ -30,7 +34,7 @@ export class ConfigComponent implements OnInit {
     hidePointerLabels: true,
     noSwitching: true,
     floor: 10000,
-    ceil: 1000000,
+    ceil: this.LEVEL_MAX,
     step: this.SLIDER_STEP,
     showSelectionBarEnd: true
   };
@@ -40,24 +44,43 @@ export class ConfigComponent implements OnInit {
     hidePointerLabels: true,
     noSwitching: true,
     floor: 0,
-    ceil: 5000000,
+    ceil: this.ALERT_MAX,
     step: this.SLIDER_STEP,
-    showSelectionBarEnd: true,
-    readOnly: true
+    showSelectionBarEnd: true
   };
 
   constructor(
     private userService: UserService,
+    private locationService: LocationService,
     private router: Router) {
   }
 
   ngOnInit() {
     this.getRanges();
-    this.onChangeReadOnly();
   }
 
   getRanges(): void {
     this.user_settings = Object.assign({}, this.userService.currentAccount.settings);
+    this.user_inputs = Object.assign({}, this.userService.currentAccount.settings);
+  }
+
+  validateInputValue(c: ChangeContext): void {
+    if (this.user_inputs.level_high > this.LEVEL_MAX) {
+      this.user_inputs.level_high = this.LEVEL_MAX;
+    }
+    if (this.user_inputs.level_medium >= this.user_inputs.level_high) {
+      this.user_inputs.level_medium = this.user_inputs.level_high - this.SLIDER_STEP;
+    }
+    if (this.user_inputs.level_low >= this.user_inputs.level_medium) {
+      this.user_inputs.level_low = this.user_inputs.level_medium - this.SLIDER_STEP;
+    }
+
+    if (this.user_inputs.alert_value > this.ALERT_MAX) {
+      this.user_inputs.alert_value = this.ALERT_MAX;
+    }
+
+    // sync user input values to update slider
+    this.user_settings = Object.assign({}, this.user_inputs);
   }
 
   validateValue(c: ChangeContext, slider: any): void {
@@ -88,10 +111,9 @@ export class ConfigComponent implements OnInit {
       default:
         break;
     }
-  }
 
-  onChangeReadOnly(): void {
-    this.slider_options_alert = Object.assign({}, this.slider_options_alert, { readOnly: !this.user_settings.enable_alert });
+    // sync to update the input fields
+    this.user_inputs = Object.assign({}, this.user_settings);
   }
 
   saveConfig() {
@@ -100,6 +122,8 @@ export class ConfigComponent implements OnInit {
     this.userService.updateUserSettings(this.user_settings).subscribe({
       next: () => {
         self.userService.currentAccount.settings = Object.assign({}, self.user_settings);
+        // refresh marker colors
+        this.locationService.updateMarkers();
         self.exitConfig();
       },
       error: error => {
