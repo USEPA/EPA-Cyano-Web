@@ -68,6 +68,8 @@ def register_user(post_data):
 		query = 'INSERT INTO User(id, username, email, password, created, last_visit) VALUES (%s, %s, %s, %s, %s, %s)'
 		values = (None, user, email, password_salted, date, date,)
 		register = query_database(query, values)
+		if (register == {"error": "Error accessing database"}):
+			return {"status": "failure", "username": user, "email": email}, 200
 		return {"status": "success", "username": user, "email": email}, 200
 
 def login_user(post_data):
