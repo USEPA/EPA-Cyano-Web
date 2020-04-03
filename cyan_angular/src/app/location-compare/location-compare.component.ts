@@ -4,6 +4,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-location-compare',
@@ -18,10 +19,14 @@ export class LocationCompareComponent implements OnInit {
     private locationService: LocationService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
    ) {}
 
   ngOnInit() {
+
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     this.getLocations();
     if (this.selected_locations === undefined) {
       this.selected_locations = [];
@@ -47,6 +52,7 @@ export class LocationCompareComponent implements OnInit {
   }
 
   removeLocation(loc: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     // Removes location from selected locations array:
     let locIndex = this.selected_locations.map((item) => { return item.id; }).indexOf(loc.id);
     if (locIndex > -1) {
@@ -83,6 +89,7 @@ export class LocationCompareComponent implements OnInit {
     /*
     Opens location compare details.
     */
+    if (!this.authService.checkUserAuthentication()) { return; }
     
     // Checks that > 1 location exists before routing to location-compare-details:
     if (this.selected_locations.length < 2) {

@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
-import { ConfigService } from '../services/config.service';
 import { Location } from '../models/location';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -16,7 +16,9 @@ import { ConcentrationRanges } from '../test-data/test-levels';
   styleUrls: ['./marker-map.component.css']
 })
 export class MarkerMapComponent implements OnInit {
-  cyan_ranges: ConcentrationRanges;
+
+  panDelay: number = 5000;  // panning event delay (ms)
+  isEnabled: boolean = true;
 
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
@@ -55,21 +57,27 @@ export class MarkerMapComponent implements OnInit {
     private locationService: LocationService,
     private router: Router,
     private mapService: MapService,
-    private configService: ConfigService,
-    private user: UserService
+    private user: UserService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.getLocations();
-    this.getCyanRanges();
     let username = this.user.getUserName();
     if (username == '') {
       this.router.navigate(['/account']);
     }
   }
 
-  getCyanRanges(): void {
-    this.configService.getLevels().subscribe(levels => (this.cyan_ranges = levels));
+  mapPanEvent(e: any): void {
+    
+    if (!this.authService.isAuthenticated()) { return; }  // won't auto log out, just skips refresh
+
+    if (this.isEnabled == true) {
+      this.isEnabled = false;
+      this.authService.refresh();
+      setTimeout(() => { this.isEnabled = true; }, this.panDelay);  // blocks refresh() call for panDelay milliseconds
+    }
   }
 
   getLocations(): void {
@@ -82,6 +90,8 @@ export class MarkerMapComponent implements OnInit {
   }
 
   addMarkerOnClick(e: any): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     let map = this.mapService.getMap();
     let lat = e.latlng.lat;
     let lng = e.latlng.lng;
@@ -99,37 +109,4 @@ export class MarkerMapComponent implements OnInit {
     m.fireEvent('click');
   }
 
-  getMarker(n: number, c: boolean): string {
-    if (n <= this.cyan_ranges.low[1]) {
-      if (c) {
-        return 'assets/images/map_pin_green_checked.png';
-      } else {
-        return 'assets/images/map_pin_green_unchecked.png';
-      }
-    } else if (n <= this.cyan_ranges.medium[1] && n >= this.cyan_ranges.medium[0]) {
-      if (c) {
-        return 'assets/images/map_pin_yellow_checked.png';
-      } else {
-        return 'assets/images/map_pin_yellow_unchecked.png';
-      }
-    } else if (n <= this.cyan_ranges.high[1] && n >= this.cyan_ranges.high[0]) {
-      if (c) {
-        return 'assets/images/map_pin_orange_checked.png';
-      } else {
-        return 'assets/images/map_pin_orange_unchecked.png';
-      }
-    } else if (n >= this.cyan_ranges.veryhigh[0]) {
-      if (c) {
-        return 'assets/images/map_pin_red_checked.png';
-      } else {
-        return 'assets/images/map_pin_red_unchecked.png';
-      }
-    } else {
-      if (c) {
-        return 'assets/images/map_pin_green_checked.png';
-      } else {
-        return 'assets/images/map_pin_green_unchecked.png';
-      }
-    }
-  }
 }

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription, BehaviorSubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
 import { environment } from '../../environments/environment';
-import { Subscription, BehaviorSubject} from "rxjs";
 import {LocationType} from "../models/location";
+import { AuthService } from '../services/auth.service';
+import {UserSettings} from "../models/settings";
 
 class UrlInfo {
   type: string;
@@ -71,7 +72,8 @@ export class DownloaderService {
 
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
   registerUser(username: string, email: string, password: string) {
@@ -98,8 +100,7 @@ export class DownloaderService {
       marked: ln.marked,
       notes: ln.notes
     };
-
-    this.executeUserLocations(url, body).subscribe();
+    this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
   updateUserLocation(username: string, ln: Location) {
@@ -112,58 +113,68 @@ export class DownloaderService {
       marked: ln.marked,
       notes: ln.notes
     };
-    this.executeEditUserLocation(url, body).subscribe();
-  }
-
-  executeUserLocations(url: string, body: any) {
-    return this.http.post(url, body, headerOptions);
-  }
-
-  executeEditUserLocation(url: string, body: any) {
-    return this.http.post(url, body, headerOptions);
+    this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
   deleteUserLocation(username: string, id: number, type: number) {
     delete this.locationsData[id];
-    let url = this.baseServerUrl + 'location/delete/' + username + '/' + id + '/' + type;
+    let url = this.baseServerUrl + 'location/delete/' + id + '/' + type;
     this.executeDeleteUserLocation(url).subscribe();
   }
 
   executeDeleteUserLocation(url: string) {
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   getUserLocation(username: string, id: number) {
-    let url = this.baseServerUrl + 'location/' + username + '/' + id;
-    return this.http.get(url);
+    let url = this.baseServerUrl + 'location/' + id;
+    return this.executeAuthorizedGetRequest(url);
   }
 
   getUserLocations(username: string, type: number) {
-    let url = this.baseServerUrl + 'locations/' + username + '/' + type;
-    return this.http.get(url);
+    let url = this.baseServerUrl + 'locations/' + type;
+    return this.executeAuthorizedGetRequest(url);
   }
 
   updateNotification(username: string, id: number) {
     /*
-    Updates user's notification, e.g., is_new set to false if clicked.
+     Updates user's notification, e.g., is_new set to false if clicked.
     */
-    let url = this.baseServerUrl + 'notification/edit/' + username + '/' + id;
+    let url = this.baseServerUrl + 'notification/edit/' + id;
     return this.executeUpdateNotification(url).subscribe();
   }
 
   executeUpdateNotification(url: string) {
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   clearUserNotifications(username: string) {
     /*
     Clears all user's notifications.
     */
-    let url = this.baseServerUrl + 'notification/delete/' + username;
+    let url = this.baseServerUrl + 'notification/delete';
     this.executeClearUserNotifications(url).subscribe();
   }
 
   executeClearUserNotifications(url: string) {
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  updateUserSettings(settings: UserSettings) {
+    /*
+     Updates user's settings for color configuration/alert threshold.
+     */
+    let url = this.baseServerUrl + 'settings/edit';
+    return this.executeAuthorizedPostRequest(url, settings);
+  }
+
+  executeAuthorizedPostRequest(url: string, body: any) {
+    if (!this.authService.checkUserAuthentication()) { return; }
+    return this.http.post(url, body, headerOptions);
+  }
+
+  executeAuthorizedGetRequest(url: string) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
@@ -188,6 +199,10 @@ export class DownloaderService {
   }
 
   getAjaxData(username: string, ln: Location) {
+
+    // Checks if token is valid before making requests:
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
@@ -220,6 +235,7 @@ export class DownloaderService {
   }
 
   createLocation(loc: Location, username: string, data: LocationDataAll): Location {
+
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
     let name = loc.name;
 
@@ -231,12 +247,6 @@ export class DownloaderService {
       ln.name = data.metaInfo.locationName;
     }
     ln.type = loc.type;
-
-    // Check for "Unknown Location" as name, if so, then
-    // add an incremental integer to name (e.g., "Unknown Location -- 1"):
-    if (ln.name == "Unknown Location") {
-      ln.name = ln.name + " -- " + ln.id;
-    }
 
     ln.latitude_deg = coordinates.latDeg;
     ln.latitude_min = coordinates.latMin;
@@ -282,7 +292,10 @@ export class DownloaderService {
 
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {
+
+      ln.name = this.addUniqueId(ln);
       this.updateUserLocation(username, ln);
+
     }
     return ln;
 
@@ -308,6 +321,32 @@ export class DownloaderService {
 
     return coordinate;
   }
+
+  addUniqueId(ln: Location): string {
+    /*
+    Creates a unique ID for location name.
+    */
+    let matchedLocations: Number[] = [];
+    this.locations.forEach((location) => {
+      if (location.name.includes(ln.name)) {
+        let idNum = location.name.split(" -- ")[1];
+        if (idNum != undefined && !isNaN(Number(idNum)) && !isNaN(parseInt(idNum))) {
+          matchedLocations.push(Number(idNum));
+        }
+      }
+    });
+    if (matchedLocations.length == 0) {
+      ln.name = ln.name + " -- 1";  
+    }
+    else if (matchedLocations.length > 0) {
+      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();  
+    }
+    else {
+      ln.name = ln.name;
+    }
+    return ln.name;
+  }
+
 }
 
 class Coordinate {

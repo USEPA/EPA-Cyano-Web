@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { User, UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
+import { LocationService } from '../services/location.service';
 
 @Component({
   selector: 'app-account',
@@ -28,7 +30,7 @@ export class AccountComponent implements OnInit {
   description: string =
     'This experimental web application provides provisional satellite derived measures of cyanobacteria, which may contain errors and should be considered a research tool. Users should refer to the app help menu for more details. The focus of this application is to provide cyanobacteria measure for larger lakes and reservoirs within the continental US. Data products are 7-day maximum cyanobacteria measures updated weekly.';
 
-  userLoggedIn: Boolean = false;
+  public userLoggedIn: Boolean = false;
   hidePassword: Boolean = true;
 
   username: string = null;
@@ -36,22 +38,69 @@ export class AccountComponent implements OnInit {
 
   currentUser: User = null;
   loginSub: Subscription = null;
+  authSub: Subscription = null;
   firstLoad: boolean = true;
 
-  constructor(private router: Router, private userService: UserService) {}
+  loggingOut: boolean = false;
+
+  errorMessage: string = "";  // error messages for login page
+
+  constructor(
+    private router: Router,
+    private activeRoute: ActivatedRoute,
+    private userService: UserService,
+    private authService: AuthService,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit() {
     let self = this;
-    setTimeout(function() {
-      self.requestUser();
-    }, 100);
+    self.requestUser();
+    self.userAuthListener();
+    this.activeRoute.params.subscribe((params) => {
+        if (params['error'] != undefined) {
+          self.errorMessage = params.error;  // catches authorization error message
+        }
+        if (params['loggingOut'] != undefined) {
+          this.loggingOut = params.loggingOut;  // shows logout button
+        }
+    });
+  }
+
+  userAuthListener(): void {
+    if (this.authSub) {
+      this.authSub.unsubscribe();
+    }
+    this.authSub = this.authService.userLoginState.subscribe( (authError) => {
+      if (authError == null) {
+        return;
+      }
+      if (authError.userLoggedIn != null) {
+        this.userLoggedIn = authError.userLoggedIn;
+      }
+      if (authError.userLoggedIn === false) {
+        this.performLogoutRoutine(authError);
+      }
+    });
+  }
+
+  performLogoutRoutine(authError): void {
+    this.userLoggedIn = false;
+    this.currentUser = null;
+    this.loggingOut = false;
+    this.username = "";
+    this.password = "";
+    this.locationService.clearUserData();
+    this.userService.logoutUser();
+    this.locationService.loadUser();  // initiates user login loop
+    this.router.navigate(['/account', {error: authError.error}]);
   }
 
   loginUser(): void {
     this.userService.loginUser(this.username, this.password);
     let self = this;
     setTimeout(function() {
-      self.setLoginMessage('');
+      self.errorMessage = "";
       self.requestUser();
     }, 1200);
   }
@@ -62,16 +111,13 @@ export class AccountComponent implements OnInit {
       this.loginSub.unsubscribe();
     }
     this.loginSub = this.userService.getUser().subscribe((user: any) => {
-      setTimeout(function() {
-        self.setLoginMessage('');
-      }, 100);
       if (user != null) {
         console.log(user);
         console.log(1);
         if (user.hasOwnProperty('error')) {
           console.log(2);
           setTimeout(function() {
-            self.setLoginMessage('Invalid username and/or password.');
+            self.errorMessage = "Invalid username and/or password.";
           }, 300);
         } else if (user.user.username === '' || user.user.username === undefined) {
           console.log(3);
@@ -116,10 +162,17 @@ export class AccountComponent implements OnInit {
       }, 100);
       if (response != null) {
         if (response.hasOwnProperty('status')) {
-          self.registerForm = false;
-          self.username = self.registerUsername;
-          self.password = self.registerPassword;
-          self.loginUser();
+          if(response.status == "failure"){
+            console.log(response.status);
+            setTimeout(function() {
+              self.setRegisterMessage('Email adress already taken.');
+            }, 300);
+          } else {
+              self.registerForm = false;
+              self.username = self.registerUsername;
+              self.password = self.registerPassword;
+              self.loginUser();
+            }
         } else {
           setTimeout(function() {
             self.setRegisterMessage('User name already taken.');
@@ -135,16 +188,10 @@ export class AccountComponent implements OnInit {
 
   exitAccount() {
     if (this.userLoggedIn) {
-      this.setLoginMessage('');
+      this.errorMessage = "";
       this.router.navigate(['']);
     } else {
-      this.setLoginMessage('Please login to use the CyAN web app.');
-    }
-  }
-
-  setLoginMessage(message: string): void {
-    if (!this.registerForm) {
-      document.getElementsByClassName('login-message')[0].innerHTML = message;
+      this.errorMessage = "Please login to use the CyAN web app.";
     }
   }
 

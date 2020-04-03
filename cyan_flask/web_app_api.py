@@ -3,9 +3,6 @@ NOTE: From qed_cyan/cyan_app django application.
 
 Handles user account interactions.
 """
-
-import hashlib
-import binascii
 import uuid
 import time
 import datetime
@@ -17,24 +14,12 @@ import logging
 import requests
 import simplejson
 
+# Local imports:
+import auth
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
-
-def hash_password(password):
-	salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
-	password_hash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
-	password_hex = binascii.hexlify(password_hash)
-	password_salted = (salt + password_hex).decode('ascii')
-	return password_salted
-
-def test_password(password_0, password_1):
-	salt = password_0[:64]
-	password_1_hash = hashlib.pbkdf2_hmac('sha512', password_1.encode('utf-8'), salt.encode('ascii'), 100000)
-	password_1_hex = binascii.hexlify(password_1_hash).decode('ascii')
-	return password_0[64:] == password_1_hex
 
 def query_database(query, values, execution_type=None):
 	conn = mysql.connector.connect(
@@ -55,7 +40,7 @@ def query_database(query, values, execution_type=None):
 		logging.warning("query_database error: {}".format(e))
 		return {"error": "Error accessing database"}
 
-	if "INSERT" in query or "UPDATE" in query or "DELETE" in query:
+	if "INSERT" in query or "UPDATE" in query or "DELETE" in query or "REPLACE" in query:
 		results = []  # todo: investigate why INSERT is throwing exception for c.fetchall()
 	else:
 		results = c.fetchall()
@@ -79,10 +64,12 @@ def register_user(post_data):
 		return {"error": "Username already exists"}, 200
 	else:
 		date = datetime.date.today().isoformat()
-		password_salted = hash_password(password)
+		password_salted = auth.hash_password(password)
 		query = 'INSERT INTO User(id, username, email, password, created, last_visit) VALUES (%s, %s, %s, %s, %s, %s)'
 		values = (None, user, email, password_salted, date, date,)
 		register = query_database(query, values)
+		if (register == {"error": "Error accessing database"}):
+			return {"status": "failure", "username": user, "email": email}, 200
 		return {"status": "success", "username": user, "email": email}, 200
 
 def login_user(post_data):
@@ -93,7 +80,7 @@ def login_user(post_data):
 	except KeyError as e:
 		logging.error(e)
 		return {"error": "Invalid key in request"}, 200
-	query = 'SELECT username, email, password, created, last_visit FROM User WHERE username = %s'
+	query = 'SELECT username, email, password, created, last_visit, id FROM User WHERE username = %s'
 	values = (user,)
 	users = query_database(query, values)
 	if len(users) == 0:
@@ -106,7 +93,7 @@ def login_user(post_data):
 	else:
 		# date = users[0][3]
 
-		if not test_password(users[0][2], password):
+		if not auth.test_password(users[0][2], password):
 			return {"error": "Invalid password"}, 200
 
 
@@ -114,6 +101,7 @@ def login_user(post_data):
 		last_visit_unix = time.mktime(last_visit.timetuple())
 
 		notifications = get_notifications(user, last_visit_unix)
+		settings = get_user_settings(users[0][5])
 
 		query = 'UPDATE User SET last_visit = %s WHERE username = %s'
 		date = datetime.date.today().isoformat()
@@ -123,12 +111,13 @@ def login_user(post_data):
 		try:
 			users = users[0]
 			user_data = {
-				"username": users[0],
-				"email": users[1]
+				'username': users[0],
+				'email': users[1],
+				'auth_token': auth.encode_auth_token(user)
 			}
 			data = get_user_locations(user, data_type)
 
-			return {'user': user_data, 'locations': data, 'notifications': notifications}, 200
+			return {'user': user_data, 'locations': data, 'notifications': notifications, 'settings': settings}, 200
 		except KeyError as e:
 			logging.warning("login_user key error: {}".format(e))
 			return {"error": "Invalid key in database data"}, 200
@@ -322,6 +311,53 @@ def delete_notifications(user):
 	query_database(query, values)
 	return {"status": "success"}, 200
 
+def get_user_settings(user_id):
+	query = """
+		SELECT level_low, level_medium, level_high, enable_alert, alert_value
+		FROM Settings WHERE user_id = %s
+	"""
+	values = (user_id,)
+	settings = query_database(query, values)
+	if len(settings) == 0:
+		# user does not have custom settings yet, use default one
+		return {
+			"level_low": 100000,
+			"level_medium": 300000,
+			"level_high": 1000000,
+			"enable_alert": False,
+			"alert_value": 1000000
+		}
+	else:
+		data_row = settings[0]
+		return {
+			"level_low": data_row[0],
+			"level_medium": data_row[1],
+			"level_high": data_row[2],
+			"enable_alert": data_row[3],
+			"alert_value": data_row[4]
+		}
+
+def edit_settings(post_data):
+	try:
+		user = post_data['owner']
+		level_low = post_data['level_low']
+		level_medium = post_data['level_medium']
+		level_high = post_data['level_high']
+		enable_alert = post_data['enable_alert']
+		alert_value = post_data['alert_value']
+	except KeyError:
+		return {"error": "Invalid key in request"}, 400
+
+	query = """
+		REPLACE INTO settings
+		(user_id, level_low, level_medium, level_high, enable_alert, alert_value)
+		VALUES
+		((SELECT id from User where username = %s), %s, %s, %s, %s, %s)
+	"""
+	values = (user, level_low, level_medium, level_high, enable_alert, alert_value)
+
+	query_database(query, values)
+	return {"status": "success"}, 200
 	
 
 def make_notifications_request(latest_time):
@@ -339,7 +375,7 @@ def make_notifications_request(latest_time):
 		logging.warning("Request to {} timed out.".format(notification_url))
 		# TODO: Retry request.
 		return None
-	except requests.exceptions.RequestException:
+	except requests.exceptions.RequestException as e:
 		logging.warning("Error making request to {}.".format(notification_url))
 		# TODO: Handle error.
 		return None

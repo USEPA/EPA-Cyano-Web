@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
+import { AuthService } from '../services/auth.service';
 
 export interface Sort {
   value: string;
@@ -29,10 +30,11 @@ export class MyLocationsComponent implements OnInit {
     private router: Router,
     private locationService: LocationService,
     private mapService: MapService,
-    private _sanitizer: DomSanitizer
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.getLocations();
     this.sortLocations();
   }
@@ -97,11 +99,16 @@ export class MyLocationsComponent implements OnInit {
     return this.locationService.getArrow(l);
   }
 
+  exceedAlertValue(l: Location) {
+    return this.locationService.exceedAlertValue(l);
+  }
+
   formatNumber(n: number) {
     return this.locationService.formatNumber(n);
   }
 
   locationSelect(event: any, l: Location) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.router.navigate(['/locationdetails', { location: l.id, locations: this.sorted_locations.map((ln: Location) => ln.id) }]);
   }
 }
