@@ -44,9 +44,13 @@ export class AccountComponent implements OnInit {
   loggingOut: boolean = false;
 
   errorMessage: string = "";  // error messages for login page
+  resetMessage: string = "";
 
   resetForm: boolean = false;
   loginForm: boolean = true;
+
+  resetEmail: string = "";
+  allowReset: boolean = true;
 
   constructor(
     private router: Router,
@@ -60,21 +64,44 @@ export class AccountComponent implements OnInit {
     let self = this;
     self.requestUser();
     self.userAuthListener();
-    this.activeRoute.params.subscribe((params) => {
-        if (params['error'] != undefined) {
-          self.errorMessage = params.error;  // catches authorization error message
-        }
-        if (params['loggingOut'] != undefined) {
-          this.loggingOut = params.loggingOut;  // shows logout button
-        }
+  this.activeRoute.params.subscribe((params) => {
+      if (params['error'] != undefined) {
+        self.errorMessage = params.error;  // catches authorization error message
+      }
+      if (params['loggingOut'] != undefined) {
+        this.loggingOut = params.loggingOut;  // shows logout button
+      }
     });
   }
 
-  resetPassword(): void {
-    console.log("account resetPassword() called.");
+  showResetView(): void {
     this.resetForm = true;
     this.loginForm = false;
     this.registerForm = false;
+    this.resetMessage = "";
+    this.allowReset = true;
+  }
+
+  sendResetEmail(): void {
+    /*
+    Makes request to backend for sending user email
+    with link and reset token.
+    */
+    this.errorMessage = "";
+    this.resetMessage = "";
+    if (!this.authService.emailIsValid(this.resetEmail)) {
+      this.errorMessage = "Email is invalid";
+      return;
+    }
+    this.authService.sendResetEmail(this.resetEmail).subscribe((response) => {
+      if ('error' in response) {
+        this.errorMessage = response['error'];
+      }
+      else if ('status' in response) {
+        this.resetMessage = response['status'];
+        this.allowReset = false;
+      }
+    });
   }
 
   userAuthListener(): void {
@@ -218,9 +245,9 @@ export class AccountComponent implements OnInit {
       }, 100);
       return false;
     }
-    if (this.registerPassword.length < 6 || this.registerPassword.length > 12) {
+    if (this.registerPassword.length < 6 || this.registerPassword.length > 24) {
       setTimeout(function() {
-        self.setRegisterMessage('Password must contain between 6 and 12 characters.');
+        self.setRegisterMessage('Password must contain between 6 and 24 characters.');
       }, 100);
     }
     return true;

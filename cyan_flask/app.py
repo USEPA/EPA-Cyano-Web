@@ -245,6 +245,7 @@ class Reset(Resource):
 	def put(self):
 		"""
 		Reset password form handler (after user has verified email).
+		Updates user's password.
 		"""
 		parser = parser_base.copy()
 		parser.add_argument('newPassword', type=str)

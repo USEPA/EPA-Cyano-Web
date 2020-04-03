@@ -18,8 +18,9 @@
           </mat-form-field>
           <div class="login-create_block">
             <button mat-raised-button color="primary" (click)="loginUser()" class="login-button">Login</button>
-            <button mat-button class="register-user" (click)="registerForm = !registerForm">Create New User</button>
-            <button mat-button class="reset-password" (click)="resetPassword()">Reset Password</button>
+            <!-- <button mat-button class="register-user" (click)="registerForm = !registerForm">Create New User</button> -->
+            <button mat-button class="register-user" (click)="loginForm=false;registerForm=true;resetForm=false;">Create New User</button>
+            <button mat-button class="reset-password" (click)="showResetView()">Reset Password</button>
           </div>
         </div>
         <!-- <ng-template #registerFormBlock> -->
@@ -42,7 +43,8 @@
               </mat-form-field>
             </div>
             <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
-            <button mat-button class="register-button"(click)="registerForm = !registerForm; errorMessage=''">Login Existing User</button>
+            <!-- <button mat-button class="register-button"(click)="registerForm = !registerForm; errorMessage=''">Login Existing User</button> -->
+            <button mat-button class="register-button"(click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
             <div class="register-notification-block">
               <div class="register-message"></div>
             </div>
@@ -53,17 +55,17 @@
         <!-- </ng-template> -->
         </div>
 
-        <!-- <ng-template #userResetPassword *ngIf="showResetPassword"> -->
         <div *ngIf="resetForm">
-          <mat-form-field class="register-input username">
-            <input matInput placeholder="User Name" required [(ngModel)]="registerUsername">
-          </mat-form-field>
-          <mat-form-field class="register-input email">
-            <input matInput email placeholder="Email" [(ngModel)]="registerEmail" required>
-          </mat-form-field>
-          <button mat-raised-button class="start-app" (click)="sendResetEmail()">Send</button>
-        <!-- </ng-template> -->
-        </div>  
+          <div *ngIf="allowReset">
+            <br>Provide an email address for resetting password:<br><br>
+            <mat-form-field class="register-input email">
+              <input matInput email placeholder="Email" [(ngModel)]="resetEmail" required>
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="start-app" (click)="sendResetEmail()">Send Email</button>
+          </div>
+          <div class="reset-message">{{ resetMessage }}</div>
+          <button mat-button class="start-app" (click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
+        </div>
 
       </div>
       <ng-template #userDetailsBlock>
@@ -81,8 +83,8 @@
         <div *ngIf="loggingOut">
           <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
           <br>
-          <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button>
-          <br>
+          <!-- <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button> -->
+          <!-- <br> -->
           <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})">Log Out</button>
         </div>
       </ng-template>
@@ -94,7 +96,7 @@
         <div class="register-message"></div>
       </div>
     </div>
-    <div *ngIf="!registerForm" class="app-information-block">
+    <div *ngIf="loginForm" class="app-information-block">
       <div class="app-title">
         Cyanobacteria Assessment Network
       </div>
