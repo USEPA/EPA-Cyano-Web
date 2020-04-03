@@ -15,7 +15,7 @@ import requests
 import simplejson
 
 # Local imports:
-import auth
+from auth import PasswordHandler, JwtHandler
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -64,7 +64,7 @@ def register_user(post_data):
 		return {"error": "Username already exists"}, 200
 	else:
 		date = datetime.date.today().isoformat()
-		password_salted = auth.hash_password(password)
+		password_salted = PasswordHandler().hash_password(password)
 		query = 'INSERT INTO User(id, username, email, password, created, last_visit) VALUES (%s, %s, %s, %s, %s, %s)'
 		values = (None, user, email, password_salted, date, date,)
 		register = query_database(query, values)
@@ -91,7 +91,7 @@ def login_user(post_data):
 	else:
 		# date = users[0][3]
 
-		if not auth.test_password(users[0][2], password):
+		if not PasswordHandler().test_password(users[0][2], password):
 			return {"error": "Invalid password"}, 200
 
 
@@ -111,7 +111,7 @@ def login_user(post_data):
 			user_data = {
 				'username': users[0],
 				'email': users[1],
-				'auth_token': auth.encode_auth_token(user)
+				'auth_token': JwtHandler().encode_auth_token(user)
 			}
 			data = get_user_locations(user, data_type)
 
@@ -355,6 +355,44 @@ def edit_settings(post_data):
 	values = (user, level_low, level_medium, level_high, enable_alert, alert_value)
 
 	query_database(query, values)
+	return {"status": "success"}, 200
+
+def reset_password(request):
+	"""
+	Resets user password routine using
+	reset_password.py module.
+	"""
+	try:
+		user_email = request['email']
+	except KeyError:
+		return {"error": "No email provided."}, 400
+
+	query = 'SELECT * FROM User WHERE email = %s'
+	values = (user_email,)
+	user = query_database(query, values)
+
+	if not user:
+		# Send invalid email response
+		return {'error': "User email address not found."}, 401
+
+	response = PasswordHandler().send_password_reset_email({'user_email': user_email})
+	if 'error' in response:
+		return response, 500
+
+	return {"status": "Email sent to {}".format(user_email)}, 200
+
+def set_new_password(request):
+	"""
+	Sets new password for user.
+	"""
+	password_salted = PasswordHandler().hash_password(request['newPassword'])
+	query = 'UPDATE User SET password = %s WHERE email = %s'
+	values = (password_salted, request['email'])
+	result = query_database(query, values)
+
+	if 'error' in result:
+		return {"error": "Failed to update password"}, 500
+
 	return {"status": "success"}, 200
 	
 
