@@ -53,6 +53,7 @@ import { LocationCompareDetailsComponent } from './location-compare-details/loca
 import { CoordinatesComponent } from './coordinates/coordinates.component';
 import { LatestImageComponent } from './latest-image/latest-image.component';
 import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
+import { ResetComponent } from './reset/reset.component';
 
 import { AuthInterceptor, JwtInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
@@ -77,7 +78,8 @@ import { AuthGuard } from './guards/auth.guard';
     LocationCompareDetailsComponent,
     CoordinatesComponent,
     LatestImageComponent,
-    BottomMenuComponent
+    BottomMenuComponent,
+    ResetComponent
   ],
   imports: [
     BrowserModule,
