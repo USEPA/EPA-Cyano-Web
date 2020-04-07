@@ -15,7 +15,7 @@
       <button mat-raised-button (click)="resetUserPassword()">Reset Password</button>
     </div>
   </div>
-  <div class="login-notification-block" *ngIf="!registerForm">
+  <div class="login-notification-block">
     <div [ngStyle]="{color: messageColor}">{{ resetMessage }}</div>
   </div>
   <br>

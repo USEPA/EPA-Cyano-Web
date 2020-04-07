@@ -35,8 +35,7 @@ class PasswordHandler:
 
 	def _create_reset_link(self, user_email):
 		jwt_token = JwtHandler().encode_auth_token(user_email)  # NOTE: usering email for 'sub' in token
-		# TODO: Generalize URL in config
-		return "http://localhost:4200/reset?token=" + jwt_token.decode('utf-8')
+		return os.environ.get('HOST_DOMAIN', "http://localhost:4200") + "/reset?token=" + jwt_token.decode('utf-8')
 
 	def _send_mail(self, smtp_email, smtp_pass, user_email, msg):
 		try:

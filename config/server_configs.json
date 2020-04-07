@@ -1,7 +1,7 @@
 [
 	{
 		"SERVER_NAME": "UberTool-Dev",
-		"ENV": "cgi_azure_docker_dev.env",
+		"ENV": "cdx_azure_dev.env",
 		"DESCRIPTION": "CGI Azure Linux server for testing."
 	},
 	{
