@@ -34,10 +34,10 @@
             <div class="arrow_block">
               <div *ngIf="getArrow(location); then location_up else location_down"></div>
               <ng-template #location_up>
-                <div [ngClass]="['location_arrow_img', 'arrow_up', getColor(location, true)]"></div>
+                <div [ngClass]="['location_arrow_img', 'arrow_up', setArrowImage(location, true)]"></div>
               </ng-template>
               <ng-template #location_down>
-                <div [ngClass]="['location_arrow_img', 'arrow_down', getColor(location, true)]"></div>
+                <div [ngClass]="['location_arrow_img', 'arrow_down', setArrowImage(location, true)]"></div>
               </ng-template>         
               <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
             </div>
