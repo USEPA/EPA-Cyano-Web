@@ -8,40 +8,44 @@
     <div class="login-block">
       <div *ngIf="!userLoggedIn; else userDetailsBlock">
         <div *ngIf="!registerForm; else registerFormBlock">
-          <mat-form-field class="login-input username">
-            <input matInput placeholder="User Name" [(ngModel)]="username" required>
-          </mat-form-field>
-          <mat-form-field class="login-input password">
-            <input matInput placeholder="Password" [(ngModel)]="password" [type]="hidePassword ? 'password' : 'text'" required>
-            <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-          </mat-form-field>
-          <div class="login-create_block">
-            <button mat-raised-button color="primary" (click)="loginUser()" class="login-button">Login</button>
-            <button mat-button class="register-user" (click)="registerForm = !registerForm">Create New User</button>
+          <div (keyup.enter)="loginUser()">
+            <mat-form-field class="login-input username">
+              <input matInput placeholder="User Name" [(ngModel)]="username" required>
+            </mat-form-field>
+            <mat-form-field class="login-input password">
+              <input matInput placeholder="Password" [(ngModel)]="password" [type]="hidePassword ? 'password' : 'text'" required>
+              <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </mat-form-field>
+            <div class="login-create_block">
+              <button mat-raised-button color="primary" (click)="loginUser()" class="login-button">Login</button>
+              <button mat-button class="register-user" (click)="registerForm = !registerForm">Create New User</button>
+            </div>
           </div>
         </div>
         <ng-template #registerFormBlock>
           <div class="user-register-block">
-            <mat-form-field class="register-input username">
-              <input matInput placeholder="User Name" required [(ngModel)]="registerUsername">
-            </mat-form-field>
-            <mat-form-field class="register-input email">
-              <input matInput email placeholder="Email" [(ngModel)]="registerEmail" required>
-            </mat-form-field>
-            <div class="register-password-block">
-              <mat-form-field class="register-input password">
-                <input matInput placeholder="Password" [(ngModel)]="registerPassword" [type]="hideRegisterPassword ? 'password' : 'text'" required>
-                <mat-icon matSuffix (click)="hideRegisterPassword = !hideRegisterPassword">{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <div (keyup.enter)="registerUser()">
+              <mat-form-field class="register-input username">
+                <input matInput placeholder="User Name" required [(ngModel)]="registerUsername">
               </mat-form-field>
-              <mat-form-field class="register-input password">
-                <input matInput placeholder="Confirm Password" [(ngModel)]="registerPasswordCheck" [type]="hideRegisterPasswordCheck ? 'password' : 'text'" required>
-                <mat-icon matSuffix (click)="hideRegisterPasswordCheck = !hideRegisterPasswordCheck">{{hideRegisterPasswordCheck ? 'visibility_off' : 'visibility'}}</mat-icon>
+              <mat-form-field class="register-input email">
+                <input matInput email placeholder="Email" [(ngModel)]="registerEmail" required>
               </mat-form-field>
-            </div>
-            <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
-            <button mat-button class="register-button"(click)="registerForm = !registerForm; errorMessage=''">Login Existing User</button>
-            <div class="register-notification-block">
-              <div class="register-message"></div>
+              <div class="register-password-block">
+                <mat-form-field class="register-input password">
+                  <input matInput placeholder="Password" [(ngModel)]="registerPassword" [type]="hideRegisterPassword ? 'password' : 'text'" required>
+                  <mat-icon matSuffix (click)="hideRegisterPassword = !hideRegisterPassword">{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+                <mat-form-field class="register-input password">
+                  <input matInput placeholder="Confirm Password" [(ngModel)]="registerPasswordCheck" [type]="hideRegisterPasswordCheck ? 'password' : 'text'" required>
+                  <mat-icon matSuffix (click)="hideRegisterPasswordCheck = !hideRegisterPasswordCheck">{{hideRegisterPasswordCheck ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+              </div>
+              <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
+              <button mat-button class="register-button"(click)="registerForm = !registerForm; errorMessage=''">Login Existing User</button>
+              <div class="register-notification-block">
+                <div class="register-message"></div>
+              </div>
             </div>
           </div>
           <div class="register-details">
@@ -49,24 +53,24 @@
           </div>
         </ng-template>
       </div>
-      <ng-template #userDetailsBlock>
-        <div class="app-state-block">
-          <div class="app-state-title">Application Details</div>
-          <div class="app-state">Version: <div class="dev-state">{{ devState }}</div> - {{ version }}</div>
-          <div clsas="app-last-update">Last Update: <div class="last-update">{{ lastUpdate }}</div></div>
-        </div>
-        <div class="user-details">
-          <div class="user-details-title">Account Details</div>
-          <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
-          <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
-        </div>
-        <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()">Start using CyAN</button>
-        <div *ngIf="loggingOut">
-          <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
-          <br>
-          <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})">Log Out</button>
-        </div>
-      </ng-template>
+        <ng-template #userDetailsBlock>
+          <div class="app-state-block">
+            <div class="app-state-title">Application Details</div>
+            <div class="app-state">Version: <div class="dev-state">{{ devState }}</div> - {{ version }}</div>
+            <div clsas="app-last-update">Last Update: <div class="last-update">{{ lastUpdate }}</div></div>
+          </div>
+          <div class="user-details">
+            <div class="user-details-title">Account Details</div>
+            <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
+            <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
+          </div>
+          <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
+          <div *ngIf="loggingOut">
+            <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
+            <br>
+            <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
+          </div>
+        </ng-template>
       <div class="login-notification-block" *ngIf="!registerForm">
         <div class="login-message">{{ errorMessage }}</div>
       </div>
