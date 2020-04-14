@@ -32,6 +32,16 @@
               <mat-form-field class="register-input email">
                 <input matInput email placeholder="Email" [(ngModel)]="registerEmail" required>
               </mat-form-field>
+              <div class="register-password-block">
+                <mat-form-field class="register-input password">
+                  <input matInput placeholder="Password" [(ngModel)]="registerPassword" [type]="hideRegisterPassword ? 'password' : 'text'" required>
+                  <mat-icon matSuffix (click)="hideRegisterPassword = !hideRegisterPassword">{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+                <mat-form-field class="register-input password">
+                  <input matInput placeholder="Confirm Password" [(ngModel)]="registerPasswordCheck" [type]="hideRegisterPasswordCheck ? 'password' : 'text'" required>
+                  <mat-icon matSuffix (click)="hideRegisterPasswordCheck = !hideRegisterPasswordCheck">{{hideRegisterPasswordCheck ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+              </div>
             </div>
             <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
             <button mat-button class="register-button"(click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
