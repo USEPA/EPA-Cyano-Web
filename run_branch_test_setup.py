@@ -109,7 +109,8 @@ class BranchTests:
 			'DB_NAME': self.test_db_name,
 			'DB_USER': self.test_db_user,
 			'FLASK_PORT': self.test_flask_port,
-			'FLASK_HOST': self.test_flask_host
+			'FLASK_HOST': self.test_flask_host,
+			'HOST_DOMAIN': self.test_angular_host
 		})
 		os.environ.update(current_env)
 		subprocess.run([self.python, "app.py"], cwd=self.cyan_flask_location)
