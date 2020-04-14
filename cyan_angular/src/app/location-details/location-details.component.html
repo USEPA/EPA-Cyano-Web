@@ -81,8 +81,8 @@
                   </div>
                   <div class="details_block">
                     <div class="details_thumbs_block">
-                      <div *ngFor="let thumb of locationThumbs">
-                        <div class="details_thumb" (click)="toggleImage($event, thumb)">
+                      <div class="details_thumb_parent" *ngFor="let thumb of locationThumbs">
+                        <div class="details_thumb" #thumbDiv (click)="toggleImage(thumbDiv, thumb)">
                           <img src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
                           <div class="details_thumb_title">{{ getImageTitle(thumb) }}</div>
                         </div>
