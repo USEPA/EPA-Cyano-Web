@@ -1,0 +1,23 @@
+<div class="login-window">
+  <div *ngIf="!success">
+    <br>
+    Enter a new password {{emailAddress}}
+    <br>
+    <mat-form-field class="login-input newPassword">
+      <input matInput placeholder="New Password" [(ngModel)]="newPassword" [type]="hidePassword ? 'password' : 'text'" required>
+      <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </mat-form-field>
+    <mat-form-field class="login-input confirmPassword">
+      <input matInput placeholder="Confirm Password" [(ngModel)]="confirmPassword" [type]="hidePassword ? 'password' : 'text'" required>
+      <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </mat-form-field>
+    <div class="login-create_block">
+      <button mat-raised-button (click)="resetUserPassword()">Reset Password</button>
+    </div>
+  </div>
+  <div class="login-notification-block">
+    <div [ngStyle]="{color: messageColor}">{{ resetMessage }}</div>
+  </div>
+  <br>
+  <button *ngIf="success" mat-raised-button (click)="goToLogin()">Go to login</button>
+</div>

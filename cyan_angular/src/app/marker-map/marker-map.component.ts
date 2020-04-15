@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location as NgLocation } from '@angular/common';
 import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map } from 'leaflet';
 import { Router } from '@angular/router';
 
@@ -58,13 +59,15 @@ export class MarkerMapComponent implements OnInit {
     private router: Router,
     private mapService: MapService,
     private user: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private ngLocation: NgLocation,
   ) {}
 
   ngOnInit() {
     this.getLocations();
     let username = this.user.getUserName();
-    if (username == '') {
+    let path = this.ngLocation.path();
+    if (username == '' && !path.includes('reset')) {
       this.router.navigate(['/account']);
     }
   }

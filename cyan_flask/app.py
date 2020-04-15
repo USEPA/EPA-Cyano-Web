@@ -16,7 +16,7 @@ runtime_env.load_deployment_environment()
 
 # Local imports:
 import web_app_api
-import auth
+from auth import JwtHandler
 from middleware import login_required
 
 os.environ.setdefault('SECRET_KEY', os.urandom(24).hex())
@@ -117,7 +117,7 @@ class AddLocation(Resource):
 	def post(self, id=None):
 		# Adds a new location to location table:
 		args = request.get_json()
-		args['owner'] = auth.get_user_from_token(request)
+		args['owner'] = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.add_location(args)
 		return results, status_code, headers
@@ -133,7 +133,7 @@ class EditLocation(Resource):
 	@login_required
 	def post(self):
 		args = request.get_json()
-		args['owner'] = auth.get_user_from_token(request)
+		args['owner'] = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.edit_location(args)
 		return results, status_code, headers
@@ -145,7 +145,7 @@ class DeleteLocation(Resource):
 	"""
 	@login_required
 	def get(self, _id='', type=''):
-		user = auth.get_user_from_token(request)
+		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.delete_location(user, _id, type)
 		return results, status_code, headers
@@ -156,7 +156,7 @@ class GetUserLocations(Resource):
 	"""
 	@login_required
 	def get(self, type=''):
-		user = auth.get_user_from_token(request)
+		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results = web_app_api.get_user_locations(user, type)
 		results = simplejson.loads(simplejson.dumps(results))
@@ -168,7 +168,7 @@ class GetLocation(Resource):
 	"""
 	@login_required
 	def get(self, _id='', type=''):
-		user = auth.get_user_from_token(request)
+		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.get_location(user, _id, type)
 		results = simplejson.loads(simplejson.dumps(results))
@@ -180,7 +180,7 @@ class EditNotification(Resource):
 	"""
 	@login_required
 	def get(self, _id=''):
-		user = auth.get_user_from_token(request)
+		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.edit_notifications(user, _id)
 		return results, status_code, headers
@@ -191,7 +191,7 @@ class DeleteNotification(Resource):
 	"""
 	@login_required
 	def get(self):
-		user = auth.get_user_from_token(request)
+		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.delete_notifications(user)
 		return results, status_code, headers
@@ -207,20 +207,54 @@ class EditSettings(Resource):
 	@login_required
 	def post(self):
 		args = request.get_json()
-		args['owner'] = auth.get_user_from_token(request)
+		args['owner'] = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		results, status_code = web_app_api.edit_settings(args)
 		return results, status_code, headers
 
 class Refresh(Resource):
 	"""
-	Endpoint for getting fresh token.
+	Endpoint for getting new token.
+	Example usage: map panning uses this to get a
+	new token, middleware.py ensures user is valid
+	before providing a new token.
 	"""
 	@login_required
 	def get(self):
-		user = auth.get_user_from_token(request)
+		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
 		return {'success': True}, 200, headers
+
+class Reset(Resource):
+	"""
+	Reset password endpoint. Sends reset link to user's
+	email with token in URL.
+	"""
+	def post(self):
+		"""
+		Reset password request.
+		"""
+		parser = parser_base.copy()
+		parser.add_argument('email', type=str)
+		args = parser.parse_args()
+		# TODO: security checks, header injections, etc.??
+		results, status_code = web_app_api.reset_password(args)
+		return results, status_code
+
+	@login_required
+	def put(self):
+		"""
+		Reset password form handler (after user has verified email).
+		Updates user's password.
+		"""
+		parser = parser_base.copy()
+		parser.add_argument('newPassword', type=str)
+		args = parser.parse_args()
+		args['email'] = JwtHandler().get_user_token(request)['sub']  # 'sub' key should have user's email address
+		results, status_code = web_app_api.set_new_password(args)  # update user's email in db (middleware validates user)
+		return results, status_code
+
+	
 
 # Test endpoint:
 api.add_resource(StatusTest, '/test')
@@ -245,6 +279,10 @@ api.add_resource(EditSettings, api_url + 'settings/edit')
 
 # Refresh endpoint:
 api.add_resource(Refresh, api_url + 'refresh')
+
+# Reset endpoint:
+api.add_resource(Reset, api_url + 'reset')
+
 
 
 logging.info("CyAN Flask app started.\nLive endpoints:")

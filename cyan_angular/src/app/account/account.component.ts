@@ -17,21 +17,21 @@ export class AccountComponent implements OnInit {
   version: number = 0.1;
   lastUpdate: string = '02/11/2019';
 
-  registerForm: Boolean = false;
+  registerForm: boolean = false;
   registerUsername: string = null;
   registerEmail: string = null;
   registerPassword: string = null;
-  hideRegisterPassword: Boolean = true;
+  hideRegisterPassword: boolean = true;
   registerPasswordCheck: string = null;
-  hideRegisterPasswordCheck: Boolean = true;
+  hideRegisterPasswordCheck: boolean = true;
 
   registerSub: Subscription = null;
 
   description: string =
     'This experimental web application provides provisional satellite derived measures of cyanobacteria, which may contain errors and should be considered a research tool. Users should refer to the app help menu for more details. The focus of this application is to provide cyanobacteria measure for larger lakes and reservoirs within the continental US. Data products are 7-day maximum cyanobacteria measures updated weekly.';
 
-  public userLoggedIn: Boolean = false;
-  hidePassword: Boolean = true;
+  public userLoggedIn: boolean = false;
+  hidePassword: boolean = true;
 
   username: string = null;
   password: string = null;
@@ -44,6 +44,13 @@ export class AccountComponent implements OnInit {
   loggingOut: boolean = false;
 
   errorMessage: string = "";  // error messages for login page
+  resetMessage: string = "";
+
+  resetForm: boolean = false;
+  loginForm: boolean = true;
+
+  resetEmail: string = "";
+  allowReset: boolean = true;
 
   constructor(
     private router: Router,
@@ -57,13 +64,43 @@ export class AccountComponent implements OnInit {
     let self = this;
     self.requestUser();
     self.userAuthListener();
-    this.activeRoute.params.subscribe((params) => {
-        if (params['error'] != undefined) {
-          self.errorMessage = params.error;  // catches authorization error message
-        }
-        if (params['loggingOut'] != undefined) {
-          this.loggingOut = params.loggingOut;  // shows logout button
-        }
+  this.activeRoute.params.subscribe((params) => {
+      if (params['error'] != undefined) {
+        self.errorMessage = params.error;  // catches authorization error message
+      }
+      if (params['loggingOut'] != undefined) {
+        this.loggingOut = params.loggingOut;  // shows logout button
+      }
+    });
+  }
+
+  showResetView(): void {
+    this.resetForm = true;
+    this.loginForm = false;
+    this.registerForm = false;
+    this.resetMessage = "";
+    this.allowReset = true;
+  }
+
+  sendResetEmail(): void {
+    /*
+    Makes request to backend for sending user email
+    with link and reset token.
+    */
+    this.errorMessage = "";
+    this.resetMessage = "";
+    if (!this.authService.emailIsValid(this.resetEmail)) {
+      this.errorMessage = "Email is invalid";
+      return;
+    }
+    this.authService.sendResetEmail(this.resetEmail).subscribe((response) => {
+      if ('error' in response) {
+        this.errorMessage = response['error'];
+      }
+      else if ('status' in response) {
+        this.resetMessage = response['status'];
+        this.allowReset = false;
+      }
     });
   }
 
@@ -215,9 +252,9 @@ export class AccountComponent implements OnInit {
       }, 100);
       return false;
     }
-    if (this.registerPassword.length < 6 || this.registerPassword.length > 12) {
+    if (this.registerPassword.length < 6 || this.registerPassword.length > 24) {
       setTimeout(function() {
-        self.setRegisterMessage('Password must contain between 6 and 12 characters.');
+        self.setRegisterMessage('Password must contain between 6 and 24 characters.');
       }, 100);
     }
     return true;

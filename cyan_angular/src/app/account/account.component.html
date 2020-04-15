@@ -7,8 +7,8 @@
     </div>
     <div class="login-block">
       <div *ngIf="!userLoggedIn; else userDetailsBlock">
-        <div *ngIf="!registerForm; else registerFormBlock">
-          <div (keyup.enter)="loginUser()">
+        <div *ngIf="loginForm">
+          <div (keyup.enter)="loginUser();">
             <mat-form-field class="login-input username">
               <input matInput placeholder="User Name" [(ngModel)]="username" required>
             </mat-form-field>
@@ -18,11 +18,12 @@
             </mat-form-field>
             <div class="login-create_block">
               <button mat-raised-button color="primary" (click)="loginUser()" class="login-button">Login</button>
-              <button mat-button class="register-user" (click)="registerForm = !registerForm">Create New User</button>
+              <button mat-button class="register-user" (click)="loginForm=false;registerForm=true;resetForm=false;">Create New User</button>
+              <button mat-button class="reset-password" (click)="showResetView()">Reset Password</button>
             </div>
           </div>
         </div>
-        <ng-template #registerFormBlock>
+        <div *ngIf="registerForm">
           <div class="user-register-block">
             <div (keyup.enter)="registerUser()">
               <mat-form-field class="register-input username">
@@ -41,36 +42,48 @@
                   <mat-icon matSuffix (click)="hideRegisterPasswordCheck = !hideRegisterPasswordCheck">{{hideRegisterPasswordCheck ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </mat-form-field>
               </div>
-              <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
-              <button mat-button class="register-button"(click)="registerForm = !registerForm; errorMessage=''">Login Existing User</button>
-              <div class="register-notification-block">
-                <div class="register-message"></div>
-              </div>
+            </div>
+            <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
+            <button mat-button class="register-button"(click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
+            <div class="register-notification-block">
+              <div class="register-message"></div>
             </div>
           </div>
           <div class="register-details">
             Disclaimer: User name should not contain any personally identifiable information and is only used for retrieving saved locations and custom settings of the CyAN web application.
           </div>
-        </ng-template>
+        </div>
+        <div *ngIf="resetForm">
+          <div *ngIf="allowReset">
+            <br>Provide an email address for resetting password:<br><br>
+            <mat-form-field class="register-input email">
+              <input matInput email placeholder="Email" [(ngModel)]="resetEmail" required>
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="start-app" (click)="sendResetEmail()">Send Email</button>
+          </div>
+          <div class="reset-message">{{ resetMessage }}</div>
+          <button mat-button class="start-app" (click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
+        </div>
       </div>
-        <ng-template #userDetailsBlock>
-          <div class="app-state-block">
-            <div class="app-state-title">Application Details</div>
-            <div class="app-state">Version: <div class="dev-state">{{ devState }}</div> - {{ version }}</div>
-            <div clsas="app-last-update">Last Update: <div class="last-update">{{ lastUpdate }}</div></div>
-          </div>
-          <div class="user-details">
-            <div class="user-details-title">Account Details</div>
-            <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
-            <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
-          </div>
-          <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
-          <div *ngIf="loggingOut">
-            <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
-            <br>
-            <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
-          </div>
-        </ng-template>
+      <ng-template #userDetailsBlock>
+        <div class="app-state-block">
+          <div class="app-state-title">Application Details</div>
+          <div class="app-state">Version: <div class="dev-state">{{ devState }}</div> - {{ version }}</div>
+          <div clsas="app-last-update">Last Update: <div class="last-update">{{ lastUpdate }}</div></div>
+        </div>
+        <div class="user-details">
+          <div class="user-details-title">Account Details</div>
+          <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
+          <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
+        </div>
+        <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
+        <div *ngIf="loggingOut">
+          <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
+          <br>
+          <!-- <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button> -->
+          <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
+        </div>
+      </ng-template>
       <div class="login-notification-block" *ngIf="!registerForm">
         <div class="login-message">{{ errorMessage }}</div>
       </div>
@@ -78,7 +91,7 @@
         <div class="register-message"></div>
       </div>
     </div>
-    <div *ngIf="!registerForm" class="app-information-block">
+    <div *ngIf="loginForm" class="app-information-block">
       <div class="app-title">
         Cyanobacteria Assessment Network
       </div>
