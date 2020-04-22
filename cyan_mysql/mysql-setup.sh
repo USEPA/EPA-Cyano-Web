@@ -36,6 +36,7 @@ else
 		latitude DECIMAL(12,10) NOT NULL,
 		longitude DECIMAL(13,10) NOT NULL,
 		marked BIT NOT NULL,
+		compare BIT NOT NULL DEFAULT 0,
 		notes TEXT NOT NULL,
 		PRIMARY KEY (id, owner, type)
 	);"

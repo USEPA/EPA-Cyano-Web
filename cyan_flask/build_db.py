@@ -86,6 +86,7 @@ class DBHandler(object):
 			latitude DECIMAL(12,10) NOT NULL,
 			longitude DECIMAL(13,10) NOT NULL,
 			marked BIT NOT NULL,
+			compare BIT NOT NULL DEFAULT 0,
 			notes TEXT NOT NULL,
 			PRIMARY KEY (id, owner, type)
 		);
@@ -194,8 +195,6 @@ if __name__ == '__main__':
 	except IndexError:
 		if option == 2 or option == 3:
 			table_name = input("\nEnter table name: ")
-		print("No table name specified, which is only needed for options 2 and 3.")
-		pass
 
 	if option == 4 or option == 6:
 		# Options that involve user creation
@@ -204,7 +203,6 @@ if __name__ == '__main__':
 			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
 		except IndexError:
 			print("No user name specified, which is only needed for option 6.")
-			pass
 
 	# MySQL root password (used for most db operations):
 	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or input("Please enter root password for database: ")

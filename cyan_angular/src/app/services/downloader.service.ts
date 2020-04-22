@@ -98,6 +98,7 @@ export class DownloaderService {
       latitude: ln.latitude,
       longitude: ln.longitude,
       marked: ln.marked,
+      compare: ln.compare,
       notes: ln.notes
     };
     this.executeAuthorizedPostRequest(url, body).subscribe();
@@ -111,6 +112,7 @@ export class DownloaderService {
       type: ln.type,
       name: ln.name,
       marked: ln.marked,
+      compare: ln.compare,
       notes: ln.notes
     };
     this.executeAuthorizedPostRequest(url, body).subscribe();
@@ -289,6 +291,7 @@ export class DownloaderService {
     } else {
       ln.marked = false;
     }
+    ln.compare = false;
 
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {

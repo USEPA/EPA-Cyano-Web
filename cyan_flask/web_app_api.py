@@ -120,7 +120,7 @@ def login_user(post_data):
 			return {'user': user_data, 'locations': data, 'notifications': notifications, 'settings': settings}, 200
 		except KeyError as e:
 			logging.warning("login_user key error: {}".format(e))
-			return {"error": "Invalid key in database data"}, 200
+			return {"error": "Invalid key in database data"}, 500
 		except Exception as e:
 			logging.warning("login_user exception: {}".format(e))
 			return {'user': user_data, 'locations': None}, 200
@@ -135,6 +135,7 @@ def add_location(post_data):
 		latitude = post_data['latitude']
 		longitude = post_data['longitude']
 		marked = post_data['marked']
+		compare = post_data.get('compare') or False  # is conditional needed? or useful for legacy location table?
 		notes = post_data['notes'] or []
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
@@ -144,15 +145,15 @@ def add_location(post_data):
 	values = (_id, user, data_type,)
 	location = query_database(query, values)  # returns list of tuples (user, id, name, lat, lon, marked, notes)
 	if isinstance(location, list) and len(location) > 0:
-		return {"Record with same key exists"}, 409  # location already exists for owner
+		return {"error": "Record with same key exists"}, 409  # location already exists for owner
 
 	# Inserts new location into database:
-	query = 'INSERT INTO Location(owner, id, name, type, latitude, longitude, marked, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-	values = (user, _id, name, data_type, latitude, longitude, marked, json.dumps(notes),)
+	query = 'INSERT INTO Location(owner, id, name, type, latitude, longitude, marked, compare, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+	values = (user, _id, name, data_type, latitude, longitude, marked, compare, json.dumps(notes),)
 	location = query_database(query, values)
 	if type(location) is dict:
 		if "error" in location.keys():
-			return {"error": "Specified location for this user already exists"}, 200
+			return {"error": "Specified location for this user already exists"}, 409
 		else:
 			return {"status": "success"}, 201
 	else:
@@ -178,11 +179,12 @@ def edit_location(post_data):
 		data_type = post_data['type']
 		name = post_data['name']
 		marked = post_data['marked']
+		compare = post_data.get('compare') or False  # need or? trying to account for pre-existing db without "compare" column
 		notes = post_data['notes'] or []  # array of strings in json format
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
-	query = 'UPDATE Location SET name = %s, marked = %s, notes = %s WHERE owner = %s AND id = %s AND type = %s'
-	values = (name, marked, json.dumps(notes), user, _id, data_type,)
+	query = 'UPDATE Location SET name = %s, marked = %s, compare = %s, notes = %s WHERE owner = %s AND id = %s AND type = %s'
+	values = (name, marked, compare, json.dumps(notes), user, _id, data_type,)
 	query_database(query, values)
 	return {"status": "success"}, 200
 
@@ -192,7 +194,7 @@ def get_user_locations(user='', data_type=''):
 	Returns user locations based on user and data type.
 	TODO: How to prevent any user getting user locations if they could guess a username?
 	"""
-	query = 'SELECT owner, id, type, name, latitude, longitude, marked, notes FROM Location WHERE owner = %s and type = %s'
+	query = 'SELECT owner, id, type, name, latitude, longitude, marked, compare, notes FROM Location WHERE owner = %s and type = %s'
 	values = (user, data_type,)
 	locations = query_database(query, values)
 	results = []
@@ -211,7 +213,8 @@ def readLocationRow(location):
 		"latitude": location[4],
 		"longitude": location[5],
 		"marked": location[6],
-		"notes": json.loads(location[7])
+		"compare": location[7],
+		"notes": json.loads(location[8])
 	}
 	if not loc_data['notes'] or loc_data['notes'] == '""':
 		loc_data['notes'] = []
@@ -224,7 +227,7 @@ def get_location(user='', _id='', data_type=''):
 	Returns user location based on user and location ID.
 	TODO: How to prevent any user getting user locations if they could guess a username?
 	"""
-	query = 'SELECT owner, id, type, name, latitude, longitude, marked, notes FROM Location WHERE id = %s AND owner = %s AND type = %s'
+	query = 'SELECT owner, id, type, name, latitude, longitude, marked, compare, notes FROM Location WHERE id = %s AND owner = %s AND type = %s'
 	values = (_id, user, data_type,)
 	location = query_database(query, values)
 	if type(location) is dict:
