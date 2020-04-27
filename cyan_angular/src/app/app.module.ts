@@ -17,7 +17,8 @@ import {
   MatBottomSheetModule,
   MatIconModule,
   MatBadgeModule,
-  MatCardModule
+  MatCardModule,
+  MatProgressSpinnerModule
 } from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -55,8 +56,11 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
 import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
 import { ResetComponent } from './reset/reset.component';
 
-import { AuthInterceptor, JwtInterceptor } from './interceptors';
+import { AuthInterceptor, JwtInterceptor, LoaderInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
+
+import { LoaderComponent } from './shared/loader/loader.component';
+import { LoaderService } from './services/loader.service';
 
 @NgModule({
   declarations: [
@@ -79,7 +83,8 @@ import { AuthGuard } from './guards/auth.guard';
     CoordinatesComponent,
     LatestImageComponent,
     BottomMenuComponent,
-    ResetComponent
+    ResetComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -97,6 +102,7 @@ import { AuthGuard } from './guards/auth.guard';
     MatInputModule,
     MatNativeDateModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatDatepickerModule,
     MatTabsModule,
     MatIconModule,
@@ -109,6 +115,8 @@ import { AuthGuard } from './guards/auth.guard';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
+    LoaderService,
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
     LocationService,
     MapService,
     AuthService,
