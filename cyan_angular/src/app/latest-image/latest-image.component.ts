@@ -206,7 +206,7 @@ export class LatestImageComponent implements OnInit {
 		let date = null;
 		if (image.satelliteImageFrequency == 'Daily') {
 			let year = dateStr.substring(0, 4);
-			let day = dateStr.substring(4, dateStr.length - 1);
+			let day = dateStr.substring(4, 7);
 			date = new Date(year);
 			date.setDate(date.getDate() + Number(day));
 			title = title + ' ' + date.toLocaleDateString();

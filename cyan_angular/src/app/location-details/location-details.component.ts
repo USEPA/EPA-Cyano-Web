@@ -348,7 +348,7 @@ export class LocationDetailsComponent implements OnInit {
       map.flyTo(this.mapService.getLatLng(this.current_location));
       // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
-    } 
+    }
     else if (this.selectedLayer == pngImage) {
       this.selectedLayer = null;
       this.selectedLayerIndex = null;
@@ -377,7 +377,7 @@ export class LocationDetailsComponent implements OnInit {
     let date = null;
     if (image.satelliteImageFrequency == 'Daily') {
       let year = dateStr.substring(0, 4);
-      let day = dateStr.substring(4, dateStr.length - 1);
+      let day = dateStr.substring(4, 7);
       date = new Date(year);
       date.setDate(date.getDate() + Number(day));
       title = title + ' ' + date.toLocaleDateString();
