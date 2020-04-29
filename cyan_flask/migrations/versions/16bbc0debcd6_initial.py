@@ -27,7 +27,6 @@ def upgrade():
     sa.Column('longitude', sa.Numeric(precision=13, scale=10), nullable=False),
     sa.Column('marked', sa.Boolean(), nullable=False),
     sa.Column('notes', sa.Text(), nullable=False),
-    sa.Column('compare', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('owner', 'id', 'type')
     )
     op.create_table('notifications',
