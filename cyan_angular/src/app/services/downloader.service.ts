@@ -291,14 +291,12 @@ export class DownloaderService {
     } else {
       ln.marked = false;
     }
-    ln.compare = false;
+    ln.compare = loc.compare;
 
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {
-
       ln.name = this.addUniqueId(ln);
       this.updateUserLocation(username, ln);
-
     }
     return ln;
 
