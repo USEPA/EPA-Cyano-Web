@@ -8,7 +8,7 @@ from auth import JwtHandler
 
 
 
-def check_for_refresh(auth_token):
+def _check_for_refresh(auth_token):
 	"""
 	Gets new token for valid user if token
 	is near expiring.
@@ -29,7 +29,7 @@ def login_required(f):
 			resp = JwtHandler().decode_auth_token(auth_token)
 			if 'error' not in resp:
 				g.user = resp['sub']
-				_token = check_for_refresh(resp)  # gets new token if almost expired
+				_token = _check_for_refresh(resp)  # gets new token if almost expired
 				g.token = _token
 			else:
 				return resp, 401, {'Content-Type': 'application/json'}

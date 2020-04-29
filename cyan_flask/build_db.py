@@ -4,6 +4,7 @@ Builds tables for local DB that handles user account and user location informati
 
 import os
 import sys
+import getpass
 import mysql.connector
 
 
@@ -185,11 +186,11 @@ if __name__ == '__main__':
 		option = int(sys.argv[1])
 	except IndexError:
 		print("Options:\n{}".format(options))
-		option = input("\nEnter an option from above: ")
+		option = int(input("\nEnter an option from above: "))
 	try:
 		db_name = sys.argv[2]
 	except IndexError:
-		db_name = input("\nEnter database name: ")
+		db_name = os.environ.get('DB_NAME') or input("\nEnter database name: ")
 	try:
 		table_name = sys.argv[3]
 	except IndexError:
@@ -205,7 +206,7 @@ if __name__ == '__main__':
 			print("No user name specified, which is only needed for option 6.")
 
 	# MySQL root password (used for most db operations):
-	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or input("Please enter root password for database: ")
+	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or getpass.getpass("Please enter root password for database: ")
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 
