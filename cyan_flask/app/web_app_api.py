@@ -133,7 +133,7 @@ def edit_location(post_data):
 	except KeyError:
 		return {"error": "Invalid key in request"}, 200
 	updated_values = dict(name=name, marked=marked, compare=compare, notes=json.dumps(notes))
-	location_obj = Location.query.filter_by(owner=user, id=_id, type=data_type).update(dict(is_new=False))
+	location_obj = Location.query.filter_by(owner=user, id=_id, type=data_type).update(updated_values)
 	db.session.commit()
 	# TODO: Exception handling.
 	return {"status": "success"}, 200
