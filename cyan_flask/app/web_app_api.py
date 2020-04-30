@@ -17,6 +17,7 @@ import simplejson
 # Local imports:
 from auth import PasswordHandler, JwtHandler
 from models import User, Location, Notifications, Settings, db
+import utils
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
