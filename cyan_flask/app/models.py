@@ -12,7 +12,7 @@ class User(db.Model):
 	id = db.Column(db.Integer, nullable=False, primary_key=True)
 	username = db.Column(db.String(35), nullable=False, unique=True)
 	email = db.Column(db.String(50), nullable=False, unique=True)
-	password = db.Column(db.String(256), nullable=False, unique=True)
+	password = db.Column(db.String(256), nullable=False)
 	created = db.Column(db.Date, nullable=False)
 	last_visit = db.Column(db.Date, nullable=False)
 
