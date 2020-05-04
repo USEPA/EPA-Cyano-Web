@@ -69,7 +69,7 @@ class DBHandler(object):
 			id INT(11) NOT NULL AUTO_INCREMENT,
 			username VARCHAR(15) CHARACTER SET utf8 NOT NULL UNIQUE,
 			email VARCHAR(50) NOT NULL UNIQUE,
-			password VARCHAR(256) NOT NULL UNIQUE,
+			password VARCHAR(256) NOT NULL,
 			created  DATE NOT NULL,
 			last_visit DATE NOT NULL,
 			PRIMARY KEY (id)
