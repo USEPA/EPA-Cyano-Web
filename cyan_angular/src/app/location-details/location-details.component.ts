@@ -58,6 +58,7 @@ export class LocationDetailsComponent implements OnInit {
 
   loadTicker = 1;
   opacityValue = 0.7;
+  showLegend = false;
 
   // Variables for chart
   dataDownloaded: boolean = false;
@@ -510,6 +511,10 @@ export class LocationDetailsComponent implements OnInit {
 
   exit(): void {
     this.router.navigate(['/mylocations']);
+  }
+
+  toggleLegend(): void {
+    this.showLegend = !this.showLegend;
   }
 
   onMapReady(map: Map): void {
