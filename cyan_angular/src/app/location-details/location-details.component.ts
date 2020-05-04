@@ -284,6 +284,7 @@ export class LocationDetailsComponent implements OnInit {
     /*
     Updates current location's data for slideshow.
    */
+    if (!this.authService.checkUserAuthentication()) { return; }
     if (selectedIndex == undefined || selectedIndex < 0) { return; }
     let locationDataArray = this.downloader.locationsData[this.current_location.id].requestData.outputs;
     let locationData = locationDataArray[selectedIndex];
