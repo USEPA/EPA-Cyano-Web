@@ -1,5 +1,6 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import expression
 from flask_migrate import Migrate
 
 
@@ -20,13 +21,13 @@ class Location(db.Model):
 	__tablename__ = 'location'
 	owner = db.Column(db.String(35), nullable=False, primary_key=True)
 	id = db.Column(db.Integer, nullable=False, primary_key=True)
-	type = db.Column(db.SmallInteger, nullable=False, default=1, primary_key=True)
+	type = db.Column(db.SmallInteger, nullable=False, server_default=expression.true(), primary_key=True)
 	name = db.Column(db.String(256), nullable=False)
 	latitude = db.Column(db.Numeric(12,10), nullable=False)
 	longitude = db.Column(db.Numeric(13,10), nullable=False)
-	marked = db.Column(db.Boolean, nullable=False, default=False)
+	marked = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 	notes = db.Column(db.Text, nullable=False)
-	compare = db.Column(db.Boolean, nullable=False, default=False)
+	compare = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 
 class Notifications(db.Model):
 	__tablename__ = 'notifications'
