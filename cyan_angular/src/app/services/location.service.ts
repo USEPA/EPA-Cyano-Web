@@ -143,6 +143,7 @@ export class LocationService {
             l.changeDate = '';
             l.dataDate = '';
             l.marked = location.marked == true ? true : false;
+            l.compare = location.compare == true ? true: false;
             // l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
             l.notes = location.notes;
             l.sourceFrequency = '';
@@ -152,9 +153,9 @@ export class LocationService {
             self.downloadLocation(l);
           }
         });
-
         let map = self.mapService.getMap();
         self.addMarkers(map);
+        self.updateCompareList();
       }
     });
   }
@@ -253,6 +254,7 @@ export class LocationService {
     l.validCellCount = 9;
     l.notes = [];
     l.marked = false;
+    l.compare = false;
 
     this.downloader.addUserLocation(this.user.getUserName(), l);
     this.locations.push(l);
@@ -280,6 +282,15 @@ export class LocationService {
     });
   }
 
+  updateCompareList(): void {
+    /*
+    Sends updated compare list via Observable once user's
+    locations are collected.
+    */
+    this.compare_locations = this.locations.filter(location => location.compare == true);
+    this.compareLocationsSource.next(this.compare_locations)
+  }
+
   getCompareLocations(): Observable<Location[]> {
     return of(this.compare_locations);
   }
@@ -293,6 +304,8 @@ export class LocationService {
       this.compare_locations.push(ln);
     }
     this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
+    ln['compare'] = true;
+    this.updateLocation(ln.name, ln);  // updates location's 'compare' parameter
   }
 
   updateCompareLocation(ln: Location) {
@@ -311,6 +324,8 @@ export class LocationService {
     if (this.compare_locations.includes(ln)) {
       this.compare_locations.splice(this.compare_locations.indexOf(ln), 1);
       this.compareLocationsSource.next(this.compare_locations);
+      ln['compare'] = false;
+      this.updateLocation(ln.name, ln);  // updates location's 'compare' parameter
     }
   }
 
