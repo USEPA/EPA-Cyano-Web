@@ -33,13 +33,12 @@
     </div>
     <div *ngIf="locationData.hasData" class="location_block_1 right">
       <span class="location_trend">
-        <!-- <span class="location_max">(Max: {{formatNumber(locationData?.maxCellConcentration)}})</span> -->
         <span *ngIf="getArrow(); then location_up else location_down"></span>
         <ng-template #location_up>
-            <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(true)]"></span>
-          </ng-template>
-          <ng-template #location_down>
-            <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(true)]"></span>
+          <div [ngClass]="['location_arrow_img', 'arrow_up', setArrowImage(location, true)]"></div>
+        </ng-template>
+        <ng-template #location_down>
+          <div [ngClass]="['location_arrow_img', 'arrow_down', setArrowImage(location, true)]"></div>
         </ng-template>
         <span class="location_cellChange" [style.color]="getColor(true)">{{formatNumber(locationData?.concentrationChange)}}</span><br />
         <span class="location_cellDescript">cells/mL<br />since {{locationData?.changeDate}}</span><br />

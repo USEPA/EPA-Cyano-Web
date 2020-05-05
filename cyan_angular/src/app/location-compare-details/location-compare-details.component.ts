@@ -12,6 +12,7 @@ import { ImageDetails } from '../models/image-details';
 import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: 'app-location-compare-details',
@@ -108,7 +109,8 @@ export class LocationCompareDetailsComponent implements OnInit {
     private images: LocationImagesService,
     private downloader: DownloaderService,
     private user: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private configService: ConfigService
   ) { }
 
   ngOnInit() {
@@ -224,7 +226,8 @@ export class LocationCompareDetailsComponent implements OnInit {
   }
 
   getColor(l: Location, delta: boolean) {
-    return this.locationService.getColor(l, delta);
+    let color = this.locationService.getColor(l, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   formatNumber(n: number) {
@@ -233,6 +236,22 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   getPercentage(l: Location) {
     return this.locationService.getPercentage(l);
+  }
+
+  setArrowImage(l: Location, delta: boolean) {
+    const color = this.locationService.getColor(l, delta);
+    if (color === "green") {
+      return "green";
+    }
+    if (color === "yellow") {
+      return "yellow";
+    }
+    if (color === "orange") {
+      return "orange";
+    }
+    if (color === "red") {
+      return "red";
+    }
   }
 
 }
