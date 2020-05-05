@@ -343,14 +343,13 @@ export class LocationDetailsComponent implements OnInit {
     let layerOptions = {
       opacity: this.opacityValue
     };
+
     let newLayer = new ImageOverlay(imageURL, imageBounds, layerOptions);
     if (this.selectedLayer == null) {
       this.selectedLayer = pngImage;
       this.layer = newLayer;
       this.layer.addTo(map);
-      map.setZoom(10);
       map.flyTo(this.mapService.getLatLng(this.current_location));
-      // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
     }
     else if (this.selectedLayer == pngImage) {
@@ -359,7 +358,6 @@ export class LocationDetailsComponent implements OnInit {
       this.slidershow = false;
       this.layer.removeFrom(map);
       this.layer = null;
-      map.setZoom(6);
       map.flyTo(this.mapService.getLatLng(this.current_location));
     }
     else {
@@ -367,9 +365,7 @@ export class LocationDetailsComponent implements OnInit {
       this.layer.removeFrom(map);
       this.layer = newLayer;
       this.layer.addTo(map);
-      map.setZoom(10);
       map.flyTo(this.mapService.getLatLng(this.current_location));
-      // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
     }
     this.updateDetails(this.selectedLayerIndex);
