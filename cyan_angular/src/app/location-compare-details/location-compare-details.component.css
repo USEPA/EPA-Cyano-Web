@@ -602,6 +602,7 @@
 .mini_map_block {
     display: inline-flex;
     float: left;
+    width: 100%;
 }
 .mini_map {
     padding: 0;
