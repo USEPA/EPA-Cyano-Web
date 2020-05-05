@@ -170,8 +170,6 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    // Sets current_location back to latest - prev:
-    this.updateDetails(0);
     this.clearLayerImages();
   }
 
@@ -192,7 +190,9 @@ export class LocationDetailsComponent implements OnInit {
     */
     setTimeout(() => {
       let thumbs = this.removeThumbHighlights();
-      this.toggleImage(thumbs[0], this.locationThumbs[0]);
+      if (thumbs.length > 0) {
+        this.toggleImage(thumbs[0], this.locationThumbs[0]);
+      }
     }, 1000);
   }
 
@@ -261,7 +261,9 @@ export class LocationDetailsComponent implements OnInit {
       opacity: this.opacityValue
     };
     this.selectedLayerIndex = this.selectedLayerIndex == 0 ? this.locationPNGs.length - 1 : this.selectedLayerIndex - 1;
-    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) { return; }
+    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) {
+      return;
+    }
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
@@ -373,6 +375,9 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   getImageTitle(image: ImageDetails): string {
+    if (!image) {
+      return "";
+    }
     let dateStr = image.name.split('.')[0].substring(1);
     let title = image.name.charAt(0);
     let date = null;
