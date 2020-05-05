@@ -1,49 +1,22 @@
-from flask import Flask, Response, request, g
-from flask_restful import Api, Resource, reqparse
-from flask_cors import CORS
 import os
-import sys
 import logging
-import json
 import simplejson
-
-# Loads environment based on deployment location:
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
-
-from config.set_environment import DeployEnv
-runtime_env = DeployEnv()
-runtime_env.load_deployment_environment()
+from flask import Blueprint, request, jsonify, g
+from flask_restful import Api, Resource, reqparse
 
 # Local imports:
-import web_app_api
 from auth import JwtHandler
 from middleware import login_required
+import web_app_api
 
-os.environ.setdefault('SECRET_KEY', os.urandom(24).hex())
 
-# Declares Flask application:
-app = Flask(__name__)
-app.config.update(
-	DEBUG=True
-)
+api = Api()
 
-api = Api(app)
-
-# Allows cross-origin requests (TODO: only allow certain domains in future?):
-CORS(app, origins=["http://localhost:4200", "http://localhost:4242"])
-
-# Adds module location to env as project root:
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-os.environ.update({
-	'PROJECT_ROOT': PROJECT_ROOT
-})
-
-logging.basicConfig(level=logging.DEBUG)  # sets logging level for logger (vary with dev vs prod?)
-
-parser_base = reqparse.RequestParser()  # defines flask-restful request parser
 
 base_url = "{}:{}".format(os.environ.get('FLASK_HOST'), os.environ.get('FLASK_PORT'))
 api_url = '/cyan/app/api/'
+
+parser_base = reqparse.RequestParser()  # defines flask-restful request parser
 
 
 
@@ -283,21 +256,17 @@ api.add_resource(Refresh, api_url + 'refresh')
 # Reset endpoint:
 api.add_resource(Reset, api_url + 'reset')
 
-
-
-logging.info("CyAN Flask app started.\nLive endpoints:")
-logging.info(base_url + '/test')
-logging.info(base_url + api_url + 'user')
-logging.info(base_url + api_url + 'user/register')
-logging.info(base_url + api_url + 'location/add')
-logging.info(base_url + api_url + 'location/edit')
-logging.info(base_url + api_url + 'location/delete/<string:_id>')
-logging.info(base_url + api_url + 'location/<string:_id>/<string:type>')
-logging.info(base_url + api_url + 'locations/<string:type>')
-logging.info(base_url + api_url + 'notification/edit/<string:_id>')
-logging.info(base_url + api_url + 'notification/delete')
-
-
-
-if __name__ == '__main__':
-	app.run(port=os.environ.get('FLASK_PORT', 5001), debug=True)
+print("CyAN Flask app started.\nLive endpoints:")
+print(base_url + '/test')
+print(base_url + api_url + 'user')
+print(base_url + api_url + 'user/register')
+print(base_url + api_url + 'location/add')
+print(base_url + api_url + 'location/edit')
+print(base_url + api_url + 'location/delete/<string:_id>')
+print(base_url + api_url + 'location/<string:_id>/<string:type>')
+print(base_url + api_url + 'locations/<string:type>')
+print(base_url + api_url + 'notification/edit/<string:_id>')
+print(base_url + api_url + 'notification/delete')
+print(base_url + api_url + 'settings/edit')
+print(base_url + api_url + 'refresh')
+print(base_url + api_url + 'reset')
