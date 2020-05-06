@@ -239,19 +239,7 @@ export class LocationCompareDetailsComponent implements OnInit {
   }
 
   setArrowImage(l: Location, delta: boolean) {
-    const color = this.locationService.getColor(l, delta);
-    if (color === "green") {
-      return "green";
-    }
-    if (color === "yellow") {
-      return "yellow";
-    }
-    if (color === "orange") {
-      return "orange";
-    }
-    if (color === "red") {
-      return "red";
-    }
+    return this.locationService.getColor(l, delta);
   }
 
 }
