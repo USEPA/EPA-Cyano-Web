@@ -8,8 +8,14 @@ import { DownloaderService } from './downloader.service';
   providedIn: 'root'
 })
 export class ConfigService {
+
   private cyan_levels = new ConcentrationRanges();
   modified_cyan_levels = new ConcentrationRanges();
+
+  green: string = 'rgb(0, 128, 0)';
+  yellow: string = 'rgb(200, 200, 0)';
+  orange: string = 'rgb(255, 165, 0)';
+  red: string = 'rgb(255, 0, 0)';
 
   constructor() {}
 
@@ -33,6 +39,21 @@ export class ConfigService {
         this.modified_cyan_levels.high = hi;
         this.modified_cyan_levels.veryhigh = vhi;
       }
+    }
+  }
+
+  getColorRgbValue(color: string) {
+    if (color === 'green') {
+      return this.green;
+    }
+    else if (color === 'yellow') {
+      return this.yellow;
+    }
+    else if (color === 'orange') {
+      return this.orange;
+    }
+    else if (color === 'red') {
+      return this.red;
     }
   }
 

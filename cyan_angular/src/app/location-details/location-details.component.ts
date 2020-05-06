@@ -17,6 +17,7 @@ import { ImageDetails } from '../models/image-details';
 import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: 'app-location-details',
@@ -119,7 +120,8 @@ export class LocationDetailsComponent implements OnInit {
     private images: LocationImagesService,
     private downloader: DownloaderService,
     private user: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private configService: ConfigService
   ) { }
 
   ngOnInit() {
@@ -284,6 +286,7 @@ export class LocationDetailsComponent implements OnInit {
     /*
     Updates current location's data for slideshow.
    */
+    if (!this.authService.checkUserAuthentication()) { return; }
     if (selectedIndex == undefined || selectedIndex < 0) { return; }
     let locationDataArray = this.downloader.locationsData[this.current_location.id].requestData.outputs;
     let locationData = locationDataArray[selectedIndex];
@@ -293,17 +296,18 @@ export class LocationDetailsComponent implements OnInit {
       this.current_location.changeDate = "N/A";
     }
     else {
-      this.getArrow(this.current_location);  // updates arrow
       this.getColor(this.current_location, true);  // updates arrow and cyano change color
       this.current_location.concentrationChange = Math.round(locationDataArray[selectedIndex].cellConcentration - locationDataArray[selectedIndex + 1].cellConcentration);
       this.current_location.changeDate = locationDataArray[selectedIndex + 1].imageDate.split(' ')[0];
     }
+    this.getArrow(this.current_location);  // updates arrow
     this.getImageDate();  // updates image date
     this.getImageName();  // updates image name
     this.current_location.cellConcentration = Math.round(locationData.cellConcentration);
     this.current_location.maxCellConcentration = Math.round(locationData.maxCellConcentration);
     this.current_location.validCellCount = locationData.validCellsCount;
     this.current_location.dataDate = locationData.imageDate.split(' ')[0];
+    this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
   }
 
   clearLayerImages() {
@@ -339,14 +343,13 @@ export class LocationDetailsComponent implements OnInit {
     let layerOptions = {
       opacity: this.opacityValue
     };
+
     let newLayer = new ImageOverlay(imageURL, imageBounds, layerOptions);
     if (this.selectedLayer == null) {
       this.selectedLayer = pngImage;
       this.layer = newLayer;
       this.layer.addTo(map);
-      map.setZoom(10);
       map.flyTo(this.mapService.getLatLng(this.current_location));
-      // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
     }
     else if (this.selectedLayer == pngImage) {
@@ -355,7 +358,6 @@ export class LocationDetailsComponent implements OnInit {
       this.slidershow = false;
       this.layer.removeFrom(map);
       this.layer = null;
-      map.setZoom(6);
       map.flyTo(this.mapService.getLatLng(this.current_location));
     }
     else {
@@ -363,9 +365,7 @@ export class LocationDetailsComponent implements OnInit {
       this.layer.removeFrom(map);
       this.layer = newLayer;
       this.layer.addTo(map);
-      map.setZoom(10);
       map.flyTo(this.mapService.getLatLng(this.current_location));
-      // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
     }
     this.updateDetails(this.selectedLayerIndex);
@@ -546,11 +546,32 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   getColor(l: Location, delta: boolean) {
-    return this.locationService.getColor(l, delta);
+    let color = this.locationService.getColor(l, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   formatNumber(n: number) {
     return this.locationService.formatNumber(n);
+  }
+
+  getPercentage(l: Location) {
+    return this.locationService.getPercentage(l);
+  }
+
+  getArrowColor(l: Location, delta: boolean) {
+    const color = this.locationService.getColor(l, delta);
+    if (color === "green") {
+      return "green";
+    }
+    if (color === "yellow") {
+      return "yellow";
+    }
+    if (color === "orange") {
+      return "orange";
+    }
+    if (color === "red") {
+      return "red";
+    }
   }
 
   openNotes(l: Location): void {
