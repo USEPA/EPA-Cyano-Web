@@ -558,7 +558,7 @@ export class LocationDetailsComponent implements OnInit {
     return this.locationService.getPercentage(l);
   }
 
-  setArrowImage(l: Location, delta: boolean) {
+  getArrowColor(l: Location, delta: boolean) {
     const color = this.locationService.getColor(l, delta);
     if (color === "green") {
       return "green";

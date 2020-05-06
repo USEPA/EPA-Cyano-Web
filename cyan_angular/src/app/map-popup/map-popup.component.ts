@@ -132,7 +132,7 @@ export class MapPopupComponent implements OnInit {
     return this.locationService.getArrow(this.location);
   }
 
-  setArrowImage(l: Location, delta: boolean) {
+  getArrowColor(l: Location, delta: boolean) {
     const color = this.locationService.getColor(l, delta);
     if (color === "green") {
       return "green";

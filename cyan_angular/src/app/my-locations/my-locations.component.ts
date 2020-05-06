@@ -116,7 +116,7 @@ export class MyLocationsComponent implements OnInit {
   }
 
   // returns a css class with arrow image background
-  setArrowImage(l: Location, delta: boolean) {
+  getArrowColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
   }
 
