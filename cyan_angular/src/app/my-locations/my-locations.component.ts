@@ -7,6 +7,7 @@ import { Location } from "../models/location";
 import { LocationService } from "../services/location.service";
 import { MapService } from "../services/map.service";
 import { AuthService } from "../services/auth.service";
+import { ConfigService } from "../services/config.service";
 
 export interface Sort {
   value: string;
@@ -33,7 +34,8 @@ export class MyLocationsComponent implements OnInit {
     private router: Router,
     private locationService: LocationService,
     private mapService: MapService,
-    private authService: AuthService
+    private authService: AuthService,
+    private configService: ConfigService
   ) {}
 
   ngOnInit() {
@@ -105,20 +107,8 @@ export class MyLocationsComponent implements OnInit {
   }
 
   getColor(l: Location, delta: boolean) {
-    // const color = this.locationService.getColor(l, delta);
-    // if (color === 'green') { return this.colorService.green();}
-    // if (color === 'yellow') { return this.colorService.yellow();}
-    // if (color === 'orange') { return this.colorService.orange();}
-    // if (color === 'red') { return this.colorService.red();}
-    // else return this.colorService.debug();
-
-    let color = this.locationService.getColor(l, delta);
-    
-    if (color === 'green') { color = 'rgb(0, 128, 0)'; }
-    if (color === 'yellow') { color = 'rgb(200, 200, 0)'; }
-    if (color === 'orange') { color = 'rgb(255, 165, 0)'; }
-    if (color === 'red') { color = 'rgb(255, 0, 0)'; }
-    return color;
+    let color = this.locationService.getColor(l, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   getArrow(l: Location) {
@@ -126,20 +116,8 @@ export class MyLocationsComponent implements OnInit {
   }
 
   // returns a css class with arrow image background
-  setArrowImage(l: Location, delta: boolean) {
-    const color = this.locationService.getColor(l, delta);
-    if (color === "green") {
-      return "green";
-    }
-    if (color === "yellow") {
-      return "yellow";
-    }
-    if (color === "orange") {
-      return "orange";
-    }
-    if (color === "red") {
-      return "red";
-    }
+  getArrowColor(l: Location, delta: boolean) {
+    return this.locationService.getColor(l, delta);
   }
 
   exceedAlertValue(l: Location) {

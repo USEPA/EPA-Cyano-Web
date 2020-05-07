@@ -470,8 +470,8 @@ mat-card-content {
     background-size: contain;
 }
 .yellow {
-    background: url('src/assets/images/arrow_yellow.png') no-repeat;
-    background-size: contain;
+  background: url("src/assets/images/arrow_drk_yellow.png") no-repeat;
+  background-size: contain;
 }
 .orange {
     background: url('src/assets/images/arrow_orange.png') no-repeat;
@@ -626,4 +626,132 @@ mat-card-content {
 } */
 .chart_title {
     padding-left: 5%;
+}
+
+.left_block {
+  float: left;
+  width: fit-content;
+  margin-top: 8%;
+}
+.right_block {
+  font-size: smaller;
+  float: left;
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8%;
+  margin-left: 15px;
+}
+.location_cellChange {
+  display: inline-block;
+  text-align: right;
+  font-size: x-large;
+  font-weight: 200;
+  float: right;
+}
+.location_meter_img {
+  width: 80px;
+  height: 80px;
+  display: inline-grid;
+  position: absolute;
+  background: conic-gradient(green, yellow, orange 50%, red 100%);
+  border-radius: 50%;
+  z-index: 4;
+}
+.location_meter_value {
+  position: absolute;
+  display: inline-grid;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  z-index: 5;
+}
+.location_block_1 {
+  display: inline-block;
+  height: 100%;
+  float: left;
+}
+.location_coord {
+  opacity: 0.8;
+  font-size: small;
+}
+.location_max {
+  display: inline-block;
+  font-size: small;
+  opacity: 0.8;
+  width: 100px;
+}
+.location_cellC_meter {
+  background: gray;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  float: right;
+  display: inline-grid;
+}
+.location_cellC_meter_center {
+  width: 72px;
+  height: 72px;
+  background-color: white;
+  position: relative;
+  top: 4px;
+  left: 4px;
+  border-radius: 50%;
+  z-index: 6;
+}
+.location_meter_img {
+  width: 80px;
+  height: 80px;
+  display: inline-grid;
+  position: absolute;
+  background: conic-gradient(green, yellow, orange 50%, red 100%);
+  border-radius: 50%;
+  z-index: 4;
+}
+.location_meter_value {
+  position: absolute;
+  display: inline-grid;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  z-index: 5;
+}
+.location_cellCon {
+  position: absolute;
+  margin-top: 25px;
+  width: 80px;
+  text-align: center;
+  z-index: 7;
+  font-size: smaller;
+  font-weight: 200;
+}
+.location_units {
+  position: absolute;
+  margin-top: 40px;
+  text-align: center;
+  width: 80px;
+  font-size: small;
+  opacity: 0.8;
+  z-index: 7;
+}
+.location_trend {
+  text-align: right;
+  display: inline-block;
+}
+.location_cellDescript {
+  font-size: small;
+  display: inline-block;
+  text-align: right;
+  opacity: 0.8;
+}
+.location_date_since {
+  font-size: x-small;
+  opacity: 0.8;
+}
+.location_date {
+  font-size: x-small;
+  opacity: 0.8;
+}
+.location_details_center {
+    display: table;
+    margin: 10% auto 0 auto;
 }
