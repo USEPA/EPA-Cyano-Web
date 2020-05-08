@@ -451,7 +451,10 @@ export class LocationDetailsComponent implements OnInit {
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
-      let data = rawData[self.current_location.id].requestData;
+      if (Object.keys(rawData).length === 0) {
+        return;
+      }
+      let data = rawDataObj[self.current_location.id].requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
         // Builds data var like [{x: '', y: ''}, {}...]
