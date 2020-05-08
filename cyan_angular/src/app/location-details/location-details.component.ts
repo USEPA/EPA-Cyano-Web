@@ -191,6 +191,9 @@ export class LocationDetailsComponent implements OnInit {
     */
     setTimeout(() => {
       let thumbs = this.removeThumbHighlights();
+      if (!thumbs || thumbs.length <= 0) {
+        return;
+      }
       this.toggleImage(thumbs[0], this.locationThumbs[0]);
     }, 1000);
   }
@@ -301,13 +304,16 @@ export class LocationDetailsComponent implements OnInit {
       this.current_location.changeDate = locationDataArray[selectedIndex + 1].imageDate.split(' ')[0];
     }
     this.getArrow(this.current_location);  // updates arrow
-    this.getImageDate();  // updates image date
-    this.getImageName();  // updates image name
     this.current_location.cellConcentration = Math.round(locationData.cellConcentration);
     this.current_location.maxCellConcentration = Math.round(locationData.maxCellConcentration);
     this.current_location.validCellCount = locationData.validCellsCount;
     this.current_location.dataDate = locationData.imageDate.split(' ')[0];
-    this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+
+    if (this.selectedLayer != undefined) {
+      this.getImageDate();  // updates image date
+      this.getImageName();  // updates image name
+      this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+    }
   }
 
   clearLayerImages() {
@@ -445,7 +451,11 @@ export class LocationDetailsComponent implements OnInit {
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
-      let data = rawData[self.current_location.id].requestData;
+      let rawDataObj = rawData[self.current_location.id];
+      if (rawDataObj == undefined) {
+        return;
+      } 
+      let data = rawDataObj.requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
         // Builds data var like [{x: '', y: ''}, {}...]
