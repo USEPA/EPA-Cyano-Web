@@ -113,7 +113,7 @@ class BranchTests:
 			'HOST_DOMAIN': self.test_angular_host
 		})
 		os.environ.update(current_env)
-		subprocess.run([self.python, "app.py"], cwd=self.cyan_flask_location)
+		subprocess.run([self.python, "__init__.py"], cwd=self.cyan_flask_location / "app")
 
 	def start_angular(self):
 
