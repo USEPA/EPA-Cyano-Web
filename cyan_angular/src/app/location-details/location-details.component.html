@@ -60,7 +60,7 @@
                         <div class="location_cellC_meter_center"></div>
                         <div class="location_meter_img"></div>
                         <div class="location_meter_value" [style.background]="getPercentage(current_location)"></div>
-                        <div class="location_cellCon" [style.color]="getColor(current_location, true)">{{formatNumber(current_location.cellConcentration)}}</div>
+                        <div class="location_cellCon" [style.color]="getColor(current_location, false)">{{formatNumber(current_location?.cellConcentration)}}</div>
                         <div class="location_units">cells/mL</div>
                     </div>
                   </div>
