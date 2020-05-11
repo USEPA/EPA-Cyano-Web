@@ -58,6 +58,7 @@ export class LocationDetailsComponent implements OnInit {
 
   loadTicker = 1;
   opacityValue = 0.7;
+  showLegend = false;
 
   // Variables for chart
   dataDownloaded: boolean = false;
@@ -169,8 +170,6 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    // Sets current_location back to latest - prev:
-    this.updateDetails(0);
     this.clearLayerImages();
   }
 
@@ -191,7 +190,9 @@ export class LocationDetailsComponent implements OnInit {
     */
     setTimeout(() => {
       let thumbs = this.removeThumbHighlights();
-      this.toggleImage(thumbs[0], this.locationThumbs[0]);
+      if (thumbs.length > 0) {
+        this.toggleImage(thumbs[0], this.locationThumbs[0]);
+      }
     }, 1000);
   }
 
@@ -260,7 +261,9 @@ export class LocationDetailsComponent implements OnInit {
       opacity: this.opacityValue
     };
     this.selectedLayerIndex = this.selectedLayerIndex == 0 ? this.locationPNGs.length - 1 : this.selectedLayerIndex - 1;
-    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) { return; }
+    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) {
+      return;
+    }
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
@@ -301,13 +304,16 @@ export class LocationDetailsComponent implements OnInit {
       this.current_location.changeDate = locationDataArray[selectedIndex + 1].imageDate.split(' ')[0];
     }
     this.getArrow(this.current_location);  // updates arrow
-    this.getImageDate();  // updates image date
-    this.getImageName();  // updates image name
     this.current_location.cellConcentration = Math.round(locationData.cellConcentration);
     this.current_location.maxCellConcentration = Math.round(locationData.maxCellConcentration);
     this.current_location.validCellCount = locationData.validCellsCount;
     this.current_location.dataDate = locationData.imageDate.split(' ')[0];
-    this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+
+    if (this.selectedLayer != undefined) {
+      this.getImageDate();  // updates image date
+      this.getImageName();  // updates image name
+      this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+    }
   }
 
   clearLayerImages() {
@@ -372,6 +378,9 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   getImageTitle(image: ImageDetails): string {
+    if (!image) {
+      return "";
+    }
     let dateStr = image.name.split('.')[0].substring(1);
     let title = image.name.charAt(0);
     let date = null;
@@ -445,6 +454,9 @@ export class LocationDetailsComponent implements OnInit {
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
+      if (Object.keys(rawData).length === 0) {
+        return;
+      }
       let data = rawData[self.current_location.id].requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
@@ -510,6 +522,10 @@ export class LocationDetailsComponent implements OnInit {
 
   exit(): void {
     this.router.navigate(['/mylocations']);
+  }
+
+  toggleLegend(): void {
+    this.showLegend = !this.showLegend;
   }
 
   onMapReady(map: Map): void {
