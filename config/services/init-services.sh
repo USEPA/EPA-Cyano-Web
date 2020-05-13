@@ -3,7 +3,7 @@
 systemctl daemon-reload
 
 # Enables services:
-systemctl enable start-app.service
+systemctl enable cyano.service
 
 # Starts services:
-systemctl start start-app.service
+systemctl start cyano.service
