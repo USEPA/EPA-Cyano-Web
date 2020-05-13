@@ -103,6 +103,7 @@ h1{
     padding: 10px 0 0 10px;
 }
 h2{
+    display:inline-block;
     font-size:medium;
     font-weight: 400;
     padding: 10px 0 0 10px;

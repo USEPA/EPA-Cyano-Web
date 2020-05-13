@@ -5,24 +5,19 @@
   <div class="location_top_bar">
     <h2> Enter the latitude and longitude below to find a new location </h2>
     <br>
+    <br>
     <h1>Latitude:</h1>
     <input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
     <input type="number" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
     <input type="number" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
-    <mat-form-field>
-      <mat-select [(value)]="selectedLat">
-        <mat-option value="N">N</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <h2>N</h2>
+    <br>
+    <br>
     <h1> Longitude: </h1>
     <input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
     <input type="number" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
     <input type="number" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
-    <mat-form-field>
-      <mat-select [(value)]="selectedLon">
-        <mat-option value="W">W</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <h2>W</h2>
     <br>
     <br>
     <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
