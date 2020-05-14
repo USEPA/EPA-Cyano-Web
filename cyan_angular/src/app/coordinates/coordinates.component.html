@@ -3,28 +3,21 @@
     <button mat-button class="location_exit" [routerLink]="['']">x</button>
   </div>
   <div class="location_top_bar">
-    Enter the latitude and longitude below to find a new location
+    <h2> Enter the latitude and longitude below to find a new location </h2>
     <br>
     <br>
-    Latitude <input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
+    <h1>Latitude:</h1>
+    <input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
     <input type="number" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
-    <input type="number" placeholder="Sec" [(ngModel)]="latSec">
-    <mat-form-field>
-      <mat-select [(value)]="selectedLat">
-        <mat-option value="N">N</mat-option>
-        <mat-option value="S">S</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <input type="number" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
+    <h2>N</h2>
     <br>
-    Longitude <input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
+    <br>
+    <h1> Longitude: </h1>
+    <input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
     <input type="number" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
-    <input type="number" placeholder="Sec" [(ngModel)]="lonSec">
-    <mat-form-field>
-      <mat-select [(value)]="selectedLon">
-        <mat-option value="W">W</mat-option>
-        <mat-option value="E">E</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <input type="number" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
+    <h2>W</h2>
     <br>
     <br>
     <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
