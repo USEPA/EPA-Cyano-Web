@@ -22,8 +22,11 @@ services:
       - "5001"
     depends_on:
       - cyan-db
+    volumes:
+      - ./config/:/config
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-""}
     env_file:
       - ${CYANO_ENV:-./config/environments/local_docker_dev.env}
     links:
