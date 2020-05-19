@@ -51,7 +51,7 @@ mat-card-content {
     }
     .details_overview_satellite {
         padding: 7px 0;
-    }    
+    }
     .details_cyan_left {
         position: absolute;
         top: 10%;
@@ -244,7 +244,7 @@ mat-card-content {
     .details_title_block_2 {
         margin: 0;
     }
-    
+
     .details_overview_product {
         padding: 2px 0;
     }
@@ -260,7 +260,7 @@ mat-card-content {
         width: 30%;
         font-size: 11px;
         text-align: right;
-        padding-right: 10px; 
+        padding-right: 10px;
     }
     .details_cyan_cellChange {
         font-size: medium;
@@ -754,4 +754,14 @@ mat-card-content {
 .location_details_center {
     display: table;
     margin: 10% auto 0 auto;
+}
+.map-legend {
+    width: 25%;
+}
+.map-legend img {
+    object-fit: contain;
+    min-width: 100%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
 }
