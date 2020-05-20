@@ -88,20 +88,8 @@ export class LocationCompareComponent implements OnInit {
   }
   
   // returns a css class with arrow image background
-  setArrowImage(l: Location, delta: boolean) {
-    const color = this.locationService.getColor(l, delta);
-    if (color === "green") {
-      return "green";
-    }
-    if (color === "yellow") {
-      return "yellow";
-    }
-    if (color === "orange") {
-      return "orange";
-    }
-    if (color === "red") {
-      return "red";
-    }
+  getArrowColor(l: Location, delta: boolean) {
+    return this.locationService.getColor(l, delta);
   }
 
   formatNumber(n: number) {

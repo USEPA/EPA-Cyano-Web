@@ -17,6 +17,7 @@ import { ImageDetails } from '../models/image-details';
 import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: 'app-location-details',
@@ -57,6 +58,7 @@ export class LocationDetailsComponent implements OnInit {
 
   loadTicker = 1;
   opacityValue = 0.7;
+  showLegend = false;
 
   // Variables for chart
   dataDownloaded: boolean = false;
@@ -119,7 +121,8 @@ export class LocationDetailsComponent implements OnInit {
     private images: LocationImagesService,
     private downloader: DownloaderService,
     private user: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private configService: ConfigService
   ) { }
 
   ngOnInit() {
@@ -167,8 +170,6 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    // Sets current_location back to latest - prev:
-    this.updateDetails(0);
     this.clearLayerImages();
   }
 
@@ -189,7 +190,9 @@ export class LocationDetailsComponent implements OnInit {
     */
     setTimeout(() => {
       let thumbs = this.removeThumbHighlights();
-      this.toggleImage(thumbs[0], this.locationThumbs[0]);
+      if (thumbs.length > 0) {
+        this.toggleImage(thumbs[0], this.locationThumbs[0]);
+      }
     }, 1000);
   }
 
@@ -258,7 +261,9 @@ export class LocationDetailsComponent implements OnInit {
       opacity: this.opacityValue
     };
     this.selectedLayerIndex = this.selectedLayerIndex == 0 ? this.locationPNGs.length - 1 : this.selectedLayerIndex - 1;
-    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) { return; }
+    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) {
+      return;
+    }
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
@@ -284,6 +289,7 @@ export class LocationDetailsComponent implements OnInit {
     /*
     Updates current location's data for slideshow.
    */
+    if (!this.authService.checkUserAuthentication()) { return; }
     if (selectedIndex == undefined || selectedIndex < 0) { return; }
     let locationDataArray = this.downloader.locationsData[this.current_location.id].requestData.outputs;
     let locationData = locationDataArray[selectedIndex];
@@ -293,17 +299,21 @@ export class LocationDetailsComponent implements OnInit {
       this.current_location.changeDate = "N/A";
     }
     else {
-      this.getArrow(this.current_location);  // updates arrow
       this.getColor(this.current_location, true);  // updates arrow and cyano change color
       this.current_location.concentrationChange = Math.round(locationDataArray[selectedIndex].cellConcentration - locationDataArray[selectedIndex + 1].cellConcentration);
       this.current_location.changeDate = locationDataArray[selectedIndex + 1].imageDate.split(' ')[0];
     }
-    this.getImageDate();  // updates image date
-    this.getImageName();  // updates image name
+    this.getArrow(this.current_location);  // updates arrow
     this.current_location.cellConcentration = Math.round(locationData.cellConcentration);
     this.current_location.maxCellConcentration = Math.round(locationData.maxCellConcentration);
     this.current_location.validCellCount = locationData.validCellsCount;
     this.current_location.dataDate = locationData.imageDate.split(' ')[0];
+
+    if (this.selectedLayer != undefined) {
+      this.getImageDate();  // updates image date
+      this.getImageName();  // updates image name
+      this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+    }
   }
 
   clearLayerImages() {
@@ -339,23 +349,21 @@ export class LocationDetailsComponent implements OnInit {
     let layerOptions = {
       opacity: this.opacityValue
     };
+
     let newLayer = new ImageOverlay(imageURL, imageBounds, layerOptions);
     if (this.selectedLayer == null) {
       this.selectedLayer = pngImage;
       this.layer = newLayer;
       this.layer.addTo(map);
-      map.setZoom(10);
       map.flyTo(this.mapService.getLatLng(this.current_location));
-      // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
-    } 
+    }
     else if (this.selectedLayer == pngImage) {
       this.selectedLayer = null;
       this.selectedLayerIndex = null;
       this.slidershow = false;
       this.layer.removeFrom(map);
       this.layer = null;
-      map.setZoom(6);
       map.flyTo(this.mapService.getLatLng(this.current_location));
     }
     else {
@@ -363,21 +371,22 @@ export class LocationDetailsComponent implements OnInit {
       this.layer.removeFrom(map);
       this.layer = newLayer;
       this.layer.addTo(map);
-      map.setZoom(10);
       map.flyTo(this.mapService.getLatLng(this.current_location));
-      // event.path[1].classList.add('selected');
       thumbDiv.classList.add('selected');
     }
     this.updateDetails(this.selectedLayerIndex);
   }
 
   getImageTitle(image: ImageDetails): string {
+    if (!image) {
+      return "";
+    }
     let dateStr = image.name.split('.')[0].substring(1);
     let title = image.name.charAt(0);
     let date = null;
     if (image.satelliteImageFrequency == 'Daily') {
       let year = dateStr.substring(0, 4);
-      let day = dateStr.substring(4, dateStr.length - 1);
+      let day = dateStr.substring(4, 7);
       date = new Date(year);
       date.setDate(date.getDate() + Number(day));
       title = title + ' ' + date.toLocaleDateString();
@@ -445,6 +454,9 @@ export class LocationDetailsComponent implements OnInit {
     this.chartData = [];
     let self = this;
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
+      if (Object.keys(rawData).length === 0) {
+        return;
+      }
       let data = rawData[self.current_location.id].requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
@@ -512,6 +524,10 @@ export class LocationDetailsComponent implements OnInit {
     this.router.navigate(['/mylocations']);
   }
 
+  toggleLegend(): void {
+    this.showLegend = !this.showLegend;
+  }
+
   onMapReady(map: Map): void {
     let marker = this.createMarker();
     this.mapService.setMinimap(map, marker);
@@ -546,11 +562,32 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   getColor(l: Location, delta: boolean) {
-    return this.locationService.getColor(l, delta);
+    let color = this.locationService.getColor(l, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   formatNumber(n: number) {
     return this.locationService.formatNumber(n);
+  }
+
+  getPercentage(l: Location) {
+    return this.locationService.getPercentage(l);
+  }
+
+  getArrowColor(l: Location, delta: boolean) {
+    const color = this.locationService.getColor(l, delta);
+    if (color === "green") {
+      return "green";
+    }
+    if (color === "yellow") {
+      return "yellow";
+    }
+    if (color === "orange") {
+      return "orange";
+    }
+    if (color === "red") {
+      return "red";
+    }
   }
 
   openNotes(l: Location): void {

@@ -41,7 +41,7 @@ export class NotificationsComponent implements OnInit {
     // if (!this.authService.checkUserAuthentication()) { return; }
 
     this.all_notifications = this.userService.currentAccount.notifications;
-    this.new_notifications = this.userService.currentAccount.notifications.filter(x => x[5] === 1);
+    this.new_notifications = this.userService.currentAccount.notifications.filter(x => x[5] == true);
     this.display_notifications = this.all_notifications;
     this.new_notifications_counter = this.new_notifications.length;
 
@@ -51,7 +51,7 @@ export class NotificationsComponent implements OnInit {
 			notifications => {
         // this.new_notifications = notifications;
         this.all_notifications = notifications;
-        this.new_notifications = notifications.filter(x => x[5] === 1)
+        this.new_notifications = notifications.filter(x => x[5] == true)
         this.new_notifications_counter = this.new_notifications.length;
 			}
 		);

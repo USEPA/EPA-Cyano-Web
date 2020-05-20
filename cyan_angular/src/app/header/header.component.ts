@@ -32,7 +32,7 @@ export class HeaderComponent implements OnInit {
     this.notificationSubscription = this.userService.allNotifications$.subscribe(
       notifications => {
         // Only using new (ie, unread, is_new=true) notifications.
-        this.new_notifications = notifications.filter(x => x[5] === 1);
+        this.new_notifications = notifications.filter(x => x[5] == true);
       }
     );
 
