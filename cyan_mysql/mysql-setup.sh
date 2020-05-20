@@ -67,4 +67,4 @@ fi
 # Creating user for connecting to mysql cyan-responsive database:
 echo "Creating DB user."
 mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT CREATE, DROP, ALTER, REFERENCES, SELECT, INSERT, DELETE, UPDATE ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT SELECT, INSERT, DELETE, UPDATE ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
