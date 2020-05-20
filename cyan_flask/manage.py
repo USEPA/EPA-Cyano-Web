@@ -120,6 +120,8 @@ def db_upgrade(migrations_path='migrations'):
 			print("Unknown database error, trying to create database then build tables.")
 			db_handler.create_database()  # tries to create db (if it doesn't already exist)
 			as_root(flask_migrate.upgrade, directory=migrations_path)  # retries db upgrade with newly created db
+		else:
+			raise
 
 @app.cli.command('db-downgrade')
 @click.argument('migrations_path', required=False)
