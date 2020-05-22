@@ -47,7 +47,7 @@ import { Location } from './models/location';
 import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details/location-details.component';
 import { AccountComponent } from './account/account.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
+// import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 import { CoordinatesComponent } from './coordinates/coordinates.component';
@@ -106,7 +106,7 @@ import { AuthGuard } from './guards/auth.guard';
     MatBadgeModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     LocationService,
