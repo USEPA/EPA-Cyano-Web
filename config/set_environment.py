@@ -123,7 +123,7 @@ class DeployEnv(ServerConfig):
         if not env_filename:
             # Finally, tries to automatically set environment if no machine id, hostname, or computer name:
             # env_filename = self.run_auto_env_selector()
-            logger.warning("Could not file .env file to set environment. Defaulting to local dev environment.")
+            logger.warning("Could not find .env file to set environment. Defaulting to local dev environment.")
             return "local_dev.env"
         else:
             logger.warning("Setting .env filename using %COMPUTERNAME% env var.")

@@ -1,2 +1,4 @@
 #!/bin/bash
-exec uwsgi --ini /etc/uwsgi/uwsgi.ini
+
+flask db-upgrade  # applies db migrations
+exec uwsgi --ini /etc/uwsgi/uwsgi.ini  # runs flask

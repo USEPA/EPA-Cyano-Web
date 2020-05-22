@@ -8,6 +8,7 @@ import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
 
 
 @Component({
@@ -31,7 +32,8 @@ export class MapPopupComponent implements OnInit {
     private user: UserService,
     private datePipe: DatePipe,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private configService: ConfigService
   ) {}
 
   ngOnInit() {
@@ -122,11 +124,28 @@ export class MapPopupComponent implements OnInit {
   }
 
   getColor(delta: boolean): string {
-    return this.locationService.getColor(this.location, delta);
+    let color = this.locationService.getColor(this.location, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   getArrow(): boolean {
     return this.locationService.getArrow(this.location);
+  }
+
+  getArrowColor(l: Location, delta: boolean) {
+    const color = this.locationService.getColor(l, delta);
+    if (color === "green") {
+      return "green";
+    }
+    if (color === "yellow") {
+      return "yellow";
+    }
+    if (color === "orange") {
+      return "orange";
+    }
+    if (color === "red") {
+      return "red";
+    }
   }
 
   formatNumber(n: number): string {

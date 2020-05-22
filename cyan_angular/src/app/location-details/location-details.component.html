@@ -16,6 +16,7 @@
     <!-- Overview-tab -->
     <mat-tab label="Overview" >
       <div class="details_tab">
+        
         <!-- map-card -->
         <mat-card>
           <mat-card-header>
@@ -25,6 +26,12 @@
           </mat-card-header>
           <mat-card-content>
             <div class="mini_map_block">
+              <div class="leaflet-container leaflet-bottom leaflet-left">
+                <span class="leaflet-control leaflet-control-attribution" (click)="toggleLegend()">Toggle Map Legend</span>
+              </div>
+              <div class="map-legend leaflet-top leaflet-left" *ngIf="showLegend">
+                <img src="assets/images/legend.png" />
+              </div>
               <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
             </div>
           </mat-card-content>
@@ -38,24 +45,47 @@
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <div class="details_cyan_left">
-              <div class="details_cyan_arrow_box">
-                <div class="details_cyan_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location?.concentrationChange)}}</div>
-                <span *ngIf="getArrow(current_location); then location_up else location_down"></span>
-                <ng-template #location_up>
-                  <span [ngClass]="['location_arrow_img', 'arrow_up', getColor(current_location, true)]"></span>
-                </ng-template>
-                <ng-template #location_down>
-                  <span [ngClass]="['location_arrow_img', 'arrow_down', getColor(current_location, true)]"></span>
-                </ng-template>
+            <div class="location_details_center">
+              <div class="left_block">
+                <div class="location_block_1">
+                  <div class="location_coord">
+                    {{current_location.latitude_deg}}&deg;{{current_location.latitude_min}}'{{current_location.latitude_sec}}"{{current_location.latitude_dir}},
+                    {{current_location.longitude_deg}}&deg;{{current_location.longitude_min}}'{{current_location.longitude_sec}}"{{current_location.longitude_dir}}
+                  </div>
+                  <div class="location_max">(Max adjacent cells: {{formatNumber(current_location.maxCellConcentration)}})</div>
+                </div>
+              <div class="location_block_1">
+                <div class="location_cell">
+                    <div class="location_cellC_meter">
+                        <div class="location_cellC_meter_center"></div>
+                        <div class="location_meter_img"></div>
+                        <div class="location_meter_value" [style.background]="getPercentage(current_location)"></div>
+                        <div class="location_cellCon" [style.color]="getColor(current_location, false)">{{formatNumber(current_location?.cellConcentration)}}</div>
+                        <div class="location_units">cells/mL</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="right_block">
+                <div class="location_block_1">
+                  <div class="location_trend">
+                    <div *ngIf="current_location.concentrationChange" class="arrow_block">
+                      <div *ngIf="getArrow(current_location); then location_up else location_down"></div>
+                      <ng-template #location_up>
+                        <div [ngClass]="['location_arrow_img', 'arrow_up', getArrowColor(current_location, true)]"></div>
+                      </ng-template>
+                      <ng-template #location_down>
+                        <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(current_location, true)]"></div>
+                      </ng-template>
+                      <div class="location_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location.concentrationChange)}}</div>
+                    </div>
+                    <div *ngIf="current_location.concentrationChange" class="location_cellDescript">cells/mL</div>
+                    <div *ngIf="current_location.concentrationChange" class="location_date_since">since {{current_location.changeDate}}</div>
+                    <div class="location_date">Date: {{current_location.dataDate}}</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="details_cyan_right">
-              <div class="details_cell_units">cells/mL</div>
-              <div class="details_date">since {{current_location?.changeDate}}</div>
-              <div class="details_counts">(Max: {{current_location.maxCellConcentration}}, Valid: {{current_location.validCellCount}})</div>
-            </div>
-
             <div class="image-carousel">
               <div *ngIf="selectedLayer">
                 <div class="details_slider">
@@ -102,6 +132,7 @@
                 <div class="details_note_body"></div>
                 <div class="details_note_add"></div>
             </div>
+
           </mat-card-content>
         </mat-card>
       </div>

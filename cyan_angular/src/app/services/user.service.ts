@@ -162,6 +162,7 @@ export class UserLocations {
   latitude: number;
   longitude: number;
   marked: boolean;
+  compare: boolean;
   notes: object[];
 }
 

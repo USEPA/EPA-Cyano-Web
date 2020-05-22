@@ -22,6 +22,7 @@ export class Location {
   validCellCount: number;
   notes: object[];
   marked: boolean;
+  compare: boolean;
 
   get hasData(): boolean {
     return !this.name.startsWith("Unknown Location");

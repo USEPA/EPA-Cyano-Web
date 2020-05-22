@@ -1,7 +1,10 @@
 bcrypt
 flask
 flask-cors
+flask-migrate
 flask-restful
+flask-sqlalchemy
+mysqlclient
 mysql-connector-python
 pyjwt
 python-dotenv

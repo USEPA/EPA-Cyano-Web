@@ -36,7 +36,7 @@ mat-card-content {
 
 .image-carousel {
     position: absolute;
-    top: 50%;
+    top: 40%;
     width: 100%;
     height: 20%;
 }
@@ -51,7 +51,7 @@ mat-card-content {
     }
     .details_overview_satellite {
         padding: 7px 0;
-    }    
+    }
     .details_cyan_left {
         position: absolute;
         top: 10%;
@@ -139,6 +139,14 @@ mat-card-content {
     }
     .cyan_chart {
         padding-bottom: 25px;
+    }
+    .map-legend {
+        width: 40%;
+        max-width: 145px;
+        margin-left: auto;
+        margin-right: auto;
+        z-index: 900;
+        top: 35px;
     }
 }
 @media screen and (max-width: 749px) and (min-width: 401px)
@@ -238,13 +246,21 @@ mat-card-content {
     .cyan_chart {
         padding-bottom: 25px;
     }
+    .map-legend {
+        width: 40%;
+        max-width: 145px;
+        margin-left: auto;
+        margin-right: auto;
+        z-index: 900;
+        top: 35px;
+    }
 }
 @media screen and (max-width: 400px)
 {
     .details_title_block_2 {
         margin: 0;
     }
-    
+
     .details_overview_product {
         padding: 2px 0;
     }
@@ -260,7 +276,7 @@ mat-card-content {
         width: 30%;
         font-size: 11px;
         text-align: right;
-        padding-right: 10px; 
+        padding-right: 10px;
     }
     .details_cyan_cellChange {
         font-size: medium;
@@ -326,6 +342,15 @@ mat-card-content {
     .cyan_chart {
         margin: 0 auto;
         padding-bottom: 10px;
+    }
+    .map-legend {
+        width: 40%;
+        max-width: 145px;
+        margin-left: auto;
+        margin-right: auto;
+        z-index: 900;
+        position: relative;
+        top: 35px;
     }
 }
 .details_block_0 {
@@ -470,8 +495,8 @@ mat-card-content {
     background-size: contain;
 }
 .yellow {
-    background: url('src/assets/images/arrow_yellow.png') no-repeat;
-    background-size: contain;
+  background: url("src/assets/images/arrow_drk_yellow.png") no-repeat;
+  background-size: contain;
 }
 .orange {
     background: url('src/assets/images/arrow_orange.png') no-repeat;
@@ -519,7 +544,7 @@ mat-card-content {
     text-align: center;
     height: 8%;
     width: 100%;
-    top: 92%;
+    top: 89%;
 }
 .details_note_title {
     background: #205493;
@@ -626,4 +651,139 @@ mat-card-content {
 } */
 .chart_title {
     padding-left: 5%;
+}
+
+.left_block {
+  float: left;
+  width: fit-content;
+  margin-top: 8%;
+}
+.right_block {
+  font-size: smaller;
+  float: left;
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8%;
+  margin-left: 15px;
+}
+.location_cellChange {
+  display: inline-block;
+  text-align: right;
+  font-size: x-large;
+  font-weight: 200;
+  float: right;
+}
+.location_meter_img {
+  width: 80px;
+  height: 80px;
+  display: inline-grid;
+  position: absolute;
+  background: conic-gradient(green, yellow, orange 50%, red 100%);
+  border-radius: 50%;
+  z-index: 4;
+}
+.location_meter_value {
+  position: absolute;
+  display: inline-grid;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  z-index: 5;
+}
+.location_block_1 {
+  display: inline-block;
+  height: 100%;
+  float: left;
+}
+.location_coord {
+  opacity: 0.8;
+  font-size: small;
+}
+.location_max {
+  display: inline-block;
+  font-size: small;
+  opacity: 0.8;
+  width: 100px;
+}
+.location_cellC_meter {
+  background: gray;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  float: right;
+  display: inline-grid;
+}
+.location_cellC_meter_center {
+  width: 72px;
+  height: 72px;
+  background-color: white;
+  position: relative;
+  top: 4px;
+  left: 4px;
+  border-radius: 50%;
+  z-index: 6;
+}
+.location_meter_img {
+  width: 80px;
+  height: 80px;
+  display: inline-grid;
+  position: absolute;
+  background: conic-gradient(green, yellow, orange 50%, red 100%);
+  border-radius: 50%;
+  z-index: 4;
+}
+.location_meter_value {
+  position: absolute;
+  display: inline-grid;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  z-index: 5;
+}
+.location_cellCon {
+  position: absolute;
+  margin-top: 25px;
+  width: 80px;
+  text-align: center;
+  z-index: 7;
+  font-size: smaller;
+  font-weight: 200;
+}
+.location_units {
+  position: absolute;
+  margin-top: 40px;
+  text-align: center;
+  width: 80px;
+  font-size: small;
+  opacity: 0.8;
+  z-index: 7;
+}
+.location_trend {
+  text-align: right;
+  display: inline-block;
+}
+.location_cellDescript {
+  font-size: small;
+  display: inline-block;
+  text-align: right;
+  opacity: 0.8;
+}
+.location_date_since {
+  font-size: x-small;
+  opacity: 0.8;
+}
+.location_date {
+  font-size: x-small;
+  opacity: 0.8;
+}
+.location_details_center {
+    display: table;
+    margin: 10% auto 0 auto;
+}
+.map-legend img {
+    object-fit: contain;
+    min-width: 100%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
 }
