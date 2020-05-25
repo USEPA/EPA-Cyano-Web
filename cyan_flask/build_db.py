@@ -14,6 +14,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class DBHandler(object):
+	"""
+	Database and table SQL commands with mysql.connector.
+	"""
 
 	def __init__(self, db_name, root_pass):
 		self.db_name = db_name

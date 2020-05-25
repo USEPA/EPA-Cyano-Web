@@ -49,7 +49,7 @@ logging.basicConfig(level=logging.DEBUG)  # sets logging level for logger (vary 
 
 def init_app():
 	with app.app_context():
-		from cyan_flask import manage  # will this work in a docker context?
+		from cyan_flask import manage  # will this work in a docker context? (nope)
 	api.init_app(app)  # initializes api from routes module
 	db.init_app(app)  # initializes db from database module
 	migrate.init_app(app, db)  # initializes db migration
