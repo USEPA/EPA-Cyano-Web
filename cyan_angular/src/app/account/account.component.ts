@@ -25,8 +25,6 @@ export class AccountComponent implements OnInit {
   registerPasswordCheck: string = null;
   hideRegisterPasswordCheck: boolean = true;
 
-  registerSub: Subscription = null;
-
   description: string =
     'This experimental web application provides provisional satellite derived measures of cyanobacteria, which may contain errors and should be considered a research tool. Users should refer to the app help menu for more details. The focus of this application is to provide cyanobacteria measure for larger lakes and reservoirs within the continental US. Data products are 7-day maximum cyanobacteria measures updated weekly.';
 
@@ -39,7 +37,6 @@ export class AccountComponent implements OnInit {
   currentUser: User = null;
   loginSub: Subscription = null;
   authSub: Subscription = null;
-  firstLoad: boolean = true;
 
   loggingOut: boolean = false;
 
@@ -58,13 +55,14 @@ export class AccountComponent implements OnInit {
     private userService: UserService,
     private authService: AuthService,
     private locationService: LocationService
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     let self = this;
     self.requestUser();
     self.userAuthListener();
-  this.activeRoute.params.subscribe((params) => {
+    this.activeRoute.params.subscribe((params) => {
       if (params['error'] != undefined) {
         self.errorMessage = params.error;  // catches authorization error message
       }
@@ -96,8 +94,7 @@ export class AccountComponent implements OnInit {
     this.authService.sendResetEmail(this.resetEmail).subscribe((response) => {
       if ('error' in response) {
         this.errorMessage = response['error'];
-      }
-      else if ('status' in response) {
+      } else if ('status' in response) {
         this.resetMessage = response['status'];
         this.allowReset = false;
       }
@@ -108,7 +105,7 @@ export class AccountComponent implements OnInit {
     if (this.authSub) {
       this.authSub.unsubscribe();
     }
-    this.authSub = this.authService.userLoginState.subscribe( (authError) => {
+    this.authSub = this.authService.userLoginState.subscribe((authError) => {
       if (authError == null) {
         return;
       }
@@ -133,94 +130,69 @@ export class AccountComponent implements OnInit {
     this.router.navigate(['/account', {error: authError.error}]);
   }
 
-  loginUser(): void {
-    this.userService.loginUser(this.username, this.password);
-    let self = this;
-    setTimeout(function() {
-      self.errorMessage = "";
-      self.requestUser();
-    }, 1200);
-  }
-
   requestUser(): void {
     let self = this;
     if (this.loginSub) {
       this.loginSub.unsubscribe();
     }
     this.loginSub = this.userService.getUser().subscribe((user: any) => {
-      if (user != null) {
-        console.log(user);
-        console.log(1);
-        if (user.hasOwnProperty('error')) {
-          console.log(2);
-          setTimeout(function() {
-            self.errorMessage = "Invalid username and/or password.";
-          }, 300);
-        } else if (user.user.username === '' || user.user.username === undefined) {
-          console.log(3);
-          if (self.firstLoad) {
-            self.firstLoad = false;
-          } else {
-            setTimeout(function() {
-              self.requestUser();
-            }, 600);
-          }
+        if (user != null && user.user.username) {
+          self.userLoggedIn = true;
+          self.currentUser = user;
         } else {
-          console.log(4);
-          this.userLoggedIn = true;
-          this.currentUser = user;
+          self.userLoggedIn = false;
+          self.currentUser = null;
         }
-      } else {
-        console.log(5);
-        setTimeout(function() {
-          self.requestUser();
-        }, 600);
       }
-    });
+    );
+  }
+
+  loginUser(): void {
+    let self = this;
+
+    this.userService.loginUser(this.username, this.password).subscribe(
+      (user: any) => {
+        // successful login
+        self.userLoggedIn = true;
+        self.currentUser = user;
+        self.errorMessage = "";
+        self.userService.setUserDetails(user);
+        self.locationService.loadUser();
+      },
+      errorResponse => {
+        // error happened, show error in page
+        self.userLoggedIn = false;
+        self.currentUser = null;
+        if (errorResponse.error) {
+          self.errorMessage = errorResponse.error.error;
+        } else {
+          self.errorMessage ="Login failed"
+        }
+      }
+    );
   }
 
   registerUser(): void {
-    if (this.validateForm()) {
-      this.userService.registerUser(this.registerUsername, this.registerEmail, this.registerPassword);
-      this.getRegisteredUser();
-    }
-  }
-
-  getRegisteredUser(): void {
     let self = this;
-    if (this.registerSub) {
-      this.registerSub.unsubscribe();
-    }
-    this.registerSub = this.userService.getResponse().subscribe(response => {
-      setTimeout(function() {
-        if (self.registerForm) {
-          self.setRegisterMessage('');
-        }
-      }, 100);
-      if (response != null) {
-        if (response.hasOwnProperty('status')) {
-          if(response.status == "failure"){
-            console.log(response.status);
-            setTimeout(function() {
-              self.setRegisterMessage('Email adress already taken.');
-            }, 300);
+    if (this.validateForm()) {
+      this.userService.registerUser(this.registerUsername, this.registerEmail, this.registerPassword).subscribe(
+        response => {
+          // user successfully registered, log the user in
+          self.registerForm = false;
+          self.username = self.registerUsername;
+          self.password = self.registerPassword;
+          self.loginUser();
+        },
+        errorResponse => {
+          // error happened, show error in page
+          if (errorResponse.error) {
+            self.setRegisterMessage(errorResponse.error.error);
           } else {
-              self.registerForm = false;
-              self.username = self.registerUsername;
-              self.password = self.registerPassword;
-              self.loginUser();
-            }
-        } else {
-          setTimeout(function() {
-            self.setRegisterMessage('User name already taken.');
-          }, 300);
+            self.setRegisterMessage("Registration failed")
+          }
         }
-      } else {
-        setTimeout(function() {
-          self.getRegisteredUser();
-        }, 600);
-      }
-    });
+      );
+    }
   }
 
   exitAccount() {
@@ -241,21 +213,16 @@ export class AccountComponent implements OnInit {
   validateForm(): Boolean {
     let self = this;
     if (this.registerUsername == '' || this.registerUsername == undefined || this.registerUsername.length < 4) {
-      setTimeout(function() {
-        self.setRegisterMessage('Username must be 4 character or more.');
-      }, 100);
+      self.setRegisterMessage('Username must be 4 character or more.');
       return false;
     }
     if (this.registerPassword != this.registerPasswordCheck) {
-      setTimeout(function() {
-        self.setRegisterMessage('Passwords do not match.');
-      }, 100);
+      self.setRegisterMessage('Passwords do not match.');
       return false;
     }
     if (this.registerPassword.length < 6 || this.registerPassword.length > 24) {
-      setTimeout(function() {
-        self.setRegisterMessage('Password must contain between 6 and 24 characters.');
-      }, 100);
+      self.setRegisterMessage('Password must contain between 6 and 24 characters.');
+      return false
     }
     return true;
   }
