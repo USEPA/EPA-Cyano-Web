@@ -33,6 +33,9 @@ def register_user(post_data):
 	user_obj = User.query.filter_by(username=user).first()  # TODO: naming refactor
 	if user_obj:
 		return {"error": "Username already exists"}, 400
+	user_obj = User.query.filter_by(email=email).first()
+	if user_obj:
+		return {"error": "Email address already taken"}, 400
 	else:
 		date = datetime.date.today().isoformat()
 		password_salted = PasswordHandler().hash_password(password)
@@ -40,7 +43,7 @@ def register_user(post_data):
 		db.session.add(new_user)
 		db.session.commit()
 		if not new_user:
-			return {"status": "failure", "username": user, "email": email}, 500
+			return {"error": "Failed to register user"}, 500
 		return {"status": "success", "username": user, "email": email}, 200
 
 def login_user(post_data):
@@ -50,13 +53,13 @@ def login_user(post_data):
 		data_type = post_data['dataType']
 	except KeyError as e:
 		logging.error(e)
-		return {"error": "Invalid key in request"}, 200
+		return {"error": "Invalid key in request"}, 400
 	user_obj = User.query.filter_by(username=user).first()
 	if not user_obj:
-		return {"error": "Invalid user credentials."}, 200
+		return {"error": "Invalid user credentials."}, 401
 	else:
 		if not PasswordHandler().test_password(user_obj.password, password):
-			return {"error": "Invalid password"}, 200
+			return {"error": "Invalid password"}, 401
 
 	last_visit_unix = time.mktime(user_obj.last_visit.timetuple())
 	notifications = get_notifications(user, last_visit_unix)
@@ -79,7 +82,7 @@ def login_user(post_data):
 		return {"error": "Invalid key in database data"}, 500
 	except Exception as e:
 		logging.warning("login_user exception: {}".format(e))
-		return {'user': user_data, 'locations': None}, 200
+		return {'error': "Failed to log user in"}, 500
 
 
 def add_location(post_data):
@@ -207,7 +210,7 @@ def get_notifications(user, last_visit):
 
 def get_users_notifications(user):
 	""" Gets existing notifications from database """
-	user_notifications = Notifications.query.filter_by(owner=user).all()
+	user_notifications = Notifications.query.filter_by(owner=user).order_by(Notifications.date).all()
 	_notifications = []
 	for notification in user_notifications:
 		notification.date = notification.date.strftime('%Y-%m-%d %H:%M:%S')
