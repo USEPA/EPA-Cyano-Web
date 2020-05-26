@@ -10,6 +10,11 @@
 		"DESCRIPTION": "GDIT development server environment."
 	},
 	{
+		"SERVER_NAME": "ceam-rhel-stg",
+		"ENV": "gdit_aws_stg.env",
+		"DESCRIPTION": "GDIT staging server environment."
+	},
+	{
 		"SERVER_NAME": "local",
 		"ENV": "local_dev.env",
 		"DESCRIPTION": "Local development environment."
