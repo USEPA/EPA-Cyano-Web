@@ -45,19 +45,17 @@ export class UserService {
   }
 
   loginUser(username: string, password: string) {
-    this.downloader.userLogin(username, password).subscribe((details: Account) => {
-      if (!('error' in details)) {
-        this.currentAccount = details;
-        this.currentAccount.locations.forEach(location => {
-          location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
-        });
-        this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
-        this.authService.setSession(details.user.auth_token);
-      }
-      else {
-        this.currentAccount['error'] = details['error'];
-      }
+    this.initializeCurrentAccount();
+    return this.downloader.userLogin(username, password);
+  }
+
+  setUserDetails(details: Account) {
+    this.currentAccount = details;
+    this.currentAccount.locations.forEach(location => {
+      location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
     });
+    this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
+    this.authService.setSession(details.user.auth_token);
   }
 
   logoutUser() {
@@ -69,31 +67,7 @@ export class UserService {
   }
 
   registerUser(username: string, email: string, password: string) {
-    let self = this;
-    this.downloader.registerUser(username, email, password).subscribe(response => {
-      if(response.hasOwnProperty("status")){
-        if(response['status'] == "success" || response['status'] == "failure"){
-          this.currentAccount.user.username = response['username'];
-          this.currentAccount.user.email = response['email'];
-          this.currentAccount.locations = [];
-          this.currentAccount.notifications = [];
-          this.response = response;
-        }
-        else{
-          this.currentAccount.user.username = response['username'];
-          this.currentAccount.user.email = response['email'];
-          this.currentAccount.locations = [];
-          this.currentAccount.notifications = [];
-        }
-      }
-      else{
-        this.response = response;
-      }
-    });
-  }
-
-  getResponse(): Observable<any> {
-    return of(this.response);
+    return this.downloader.registerUser(username, email, password);
   }
 
   getUserName(): string {
