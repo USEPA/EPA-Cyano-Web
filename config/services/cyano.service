@@ -1,0 +1,12 @@
+[Unit]
+Description=Startup service for docker-compose stack
+After=network.target
+
+[Service]
+Type=idle
+ExecStart=/var/tmp/start-app.sh
+TimeoutStartSec=0
+ExecStop=/var/tmp/stop-app.sh
+
+[Install]
+WantedBy=default.target
