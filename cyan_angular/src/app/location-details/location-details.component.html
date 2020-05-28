@@ -19,11 +19,6 @@
         
         <!-- map-card -->
         <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              Satellite: {{current_location.source}}
-            </mat-card-title>
-          </mat-card-header>
           <mat-card-content>
             <div class="mini_map_block">
               <div class="leaflet-container leaflet-bottom leaflet-left">
@@ -40,7 +35,12 @@
         <!-- details-card -->
         <mat-card>
           <mat-card-header>
-            <mat-card-title>
+            <mat-card-title style="margin-left: -15px;">
+              Satellite: {{current_location.source}}
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-header>
+            <mat-card-title style="margin-left: -15px;">
               Product: {{ current_location.sourceFrequency }}
             </mat-card-title>
           </mat-card-header>
