@@ -15,6 +15,7 @@ export class HeaderComponent implements OnInit {
   title = "Cyanobacteria Assessment Network";
   titleAbr = "CyAN";
   titleColor = "white";
+  appVersion = environment.appVersion;
   compare_locations = [];
   locationSubscription: Subscription;
   new_notifications = [];
