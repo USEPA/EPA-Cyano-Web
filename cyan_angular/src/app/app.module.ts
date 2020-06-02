@@ -56,7 +56,8 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
 import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
 import { ResetComponent } from './reset/reset.component';
 
-import { AuthInterceptor, JwtInterceptor, LoaderInterceptor } from './interceptors';
+// import { AuthInterceptor, JwtInterceptor, LoaderInterceptor } from './interceptors';
+import { AuthInterceptor, JwtInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
 
 import { LoaderComponent } from './shared/loader/loader.component';
@@ -116,7 +117,7 @@ import { LoaderService } from './services/loader.service';
   ],
   providers: [
     LoaderService,
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
+    // { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
     LocationService,
     MapService,
     AuthService,
