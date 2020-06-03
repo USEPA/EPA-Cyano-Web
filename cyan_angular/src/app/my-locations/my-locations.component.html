@@ -37,7 +37,7 @@
                 <div class="location_cellC_meter_center"></div>
                 <div class="location_meter_img"></div>
                 <div class="location_meter_value" [style.background]="getPercentage(location)"></div>
-                <div class="location_cellCon" [style.color]="getColor(location, false)">{{formatNumber(location.cellConcentration)}}</div>
+                <div class="location_cellCon" [style.color]="getColor(location, false)">{{formatNumber(location?.cellConcentration)}}</div>
                 <div class="location_units">cells/mL</div>
             </div>
           </div>
@@ -49,10 +49,10 @@
             <div class="arrow_block">
               <div *ngIf="getArrow(location); then location_up else location_down"></div>
               <ng-template #location_up>
-                <div [ngClass]="['location_arrow_img', 'arrow_up', getColor(location, true)]"></div>
+                <div [ngClass]="['location_arrow_img', 'arrow_up', getArrowColor(location, true)]"></div>
               </ng-template>
               <ng-template #location_down>
-                <div [ngClass]="['location_arrow_img', 'arrow_down', getColor(location, true)]"></div>
+                <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(location, true)]"></div>
               </ng-template>
               <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
             </div>

@@ -36,6 +36,7 @@ else
 		latitude DECIMAL(12,10) NOT NULL,
 		longitude DECIMAL(13,10) NOT NULL,
 		marked BIT NOT NULL,
+		compare BIT NOT NULL DEFAULT 0,
 		notes TEXT NOT NULL,
 		PRIMARY KEY (id, owner, type)
 	);"
@@ -65,5 +66,5 @@ fi
 
 # Creating user for connecting to mysql cyan-responsive database:
 echo "Creating DB user."
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
 mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT SELECT, INSERT, DELETE, UPDATE ON ${DB_NAME}.* TO '${DB_USER}'@'%';"

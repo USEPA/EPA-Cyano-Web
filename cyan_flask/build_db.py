@@ -4,6 +4,7 @@ Builds tables for local DB that handles user account and user location informati
 
 import os
 import sys
+import getpass
 import mysql.connector
 
 
@@ -13,6 +14,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class DBHandler(object):
+	"""
+	Database and table SQL commands with mysql.connector.
+	"""
 
 	def __init__(self, db_name, root_pass):
 		self.db_name = db_name
@@ -68,7 +72,7 @@ class DBHandler(object):
 			id INT(11) NOT NULL AUTO_INCREMENT,
 			username VARCHAR(15) CHARACTER SET utf8 NOT NULL UNIQUE,
 			email VARCHAR(50) NOT NULL UNIQUE,
-			password VARCHAR(256) NOT NULL UNIQUE,
+			password VARCHAR(256) NOT NULL,
 			created  DATE NOT NULL,
 			last_visit DATE NOT NULL,
 			PRIMARY KEY (id)
@@ -86,6 +90,7 @@ class DBHandler(object):
 			latitude DECIMAL(12,10) NOT NULL,
 			longitude DECIMAL(13,10) NOT NULL,
 			marked BIT NOT NULL,
+			compare BIT NOT NULL DEFAULT 0,
 			notes TEXT NOT NULL,
 			PRIMARY KEY (id, owner, type)
 		);
@@ -184,18 +189,16 @@ if __name__ == '__main__':
 		option = int(sys.argv[1])
 	except IndexError:
 		print("Options:\n{}".format(options))
-		option = input("\nEnter an option from above: ")
+		option = int(input("\nEnter an option from above: "))
 	try:
 		db_name = sys.argv[2]
 	except IndexError:
-		db_name = input("\nEnter database name: ")
+		db_name = os.environ.get('DB_NAME') or input("\nEnter database name: ")
 	try:
 		table_name = sys.argv[3]
 	except IndexError:
 		if option == 2 or option == 3:
 			table_name = input("\nEnter table name: ")
-		print("No table name specified, which is only needed for options 2 and 3.")
-		pass
 
 	if option == 4 or option == 6:
 		# Options that involve user creation
@@ -204,10 +207,9 @@ if __name__ == '__main__':
 			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
 		except IndexError:
 			print("No user name specified, which is only needed for option 6.")
-			pass
 
 	# MySQL root password (used for most db operations):
-	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or input("Please enter root password for database: ")
+	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or getpass.getpass("Please enter root password for database: ")
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 

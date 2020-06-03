@@ -300,3 +300,6 @@
 .help {
   display: none;
 }
+.header-version {
+  font-size: small;
+}

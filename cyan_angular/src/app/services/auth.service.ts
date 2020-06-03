@@ -8,6 +8,13 @@ import { environment } from '../../environments/environment';
 
 
 
+const headerOptions = {
+  headers: new HttpHeaders({
+    'Content-Type': 'application/json'
+  })
+};
+
+
 @Injectable()
 export class AuthService {
 
@@ -45,9 +52,19 @@ export class AuthService {
   public isAuthenticated(): boolean {
     /*
     Checks if token is valid, returns bool.
+    Optional 'token' input, otherwise uses 'auth_token' in localStorage.
     */
-    const token = localStorage.getItem('auth_token');
-    return !this.jwtHelper.isTokenExpired(token);
+    let token = localStorage.getItem('auth_token');
+    return this.validateToken(token);
+  }
+
+  validateToken(token) {
+    try {
+      return !this.jwtHelper.isTokenExpired(token);
+    }
+    catch (e) {
+      return false;
+    } 
   }
         
   public setSession(authResult) {
@@ -84,6 +101,34 @@ export class AuthService {
     if (!this.isAuthenticated()) { return; }
     let url = this.baseServerUrl + 'refresh';
     return this.http.get(url).subscribe();
+  }
+
+  sendResetEmail(resetEmail) {
+    /*
+    Makes request to send email for password reset.
+    */
+    let url = this.baseServerUrl + 'reset';
+    let body = { email: resetEmail };
+    // return this.http.post(url, body, headerOptions).subscribe();
+    return this.http.post(url, body, headerOptions);
+  }
+
+  resetPassword(newPassword) {
+    /*
+    Makes request to reset user's password.
+    */
+    if (!this.checkUserAuthentication()) { return; }
+
+    let url = this.baseServerUrl + 'reset';
+    let body = { newPassword: newPassword };
+
+    // return this.http.put(url, body, headerOptions).subscribe();
+    return this.http.put(url, body, headerOptions);
+
+  }
+
+  emailIsValid (email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
   
 }

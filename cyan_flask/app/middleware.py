@@ -4,30 +4,19 @@ import json
 import logging
 
 # Local imports:
-import auth
-
-
-# refresh_delta = 300  # refresh token if <= 5m until expiration
+from auth import JwtHandler
 
 
 
-def check_for_refresh(auth_token):
+def _check_for_refresh(auth_token):
 	"""
 	Gets new token for valid user if token
 	is near expiring.
 	"""
-	expiry_time = auth.check_time_delta(auth_token['exp'])
-	# Refreshes token if it's within refresh window:
-	# if expiry_time <= refresh_delta:
-	# 	auth_token = auth.decode_auth_token(auth.encode_auth_token(auth_token['sub']))
-	# Refreshes token each request if not expired:
-	# if expiry_time <= 0:
+	expiry_time = JwtHandler().check_time_delta(auth_token['exp'])
 	if expiry_time >= 0:
-		# auth_token = auth.decode_auth_token(auth.encode_auth_token(auth_token['sub']))
-		auth_token = auth.encode_auth_token(auth_token['sub'])
+		auth_token = JwtHandler().encode_auth_token(auth_token['sub'])
 	return auth_token
-
-
 
 def login_required(f):
 	@wraps(f)
@@ -37,10 +26,10 @@ def login_required(f):
 			return {'error': "No authorization token provied"}, 401, {'Content-type': 'application/json'}
 		try:
 			auth_token = authorization.split(' ')[1]
-			resp = auth.decode_auth_token(auth_token)
+			resp = JwtHandler().decode_auth_token(auth_token)
 			if 'error' not in resp:
 				g.user = resp['sub']
-				_token = check_for_refresh(resp)  # gets new token if almost expired
+				_token = _check_for_refresh(resp)  # gets new token if almost expired
 				g.token = _token
 			else:
 				return resp, 401, {'Content-Type': 'application/json'}

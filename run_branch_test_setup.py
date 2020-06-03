@@ -45,9 +45,11 @@ class BranchTests:
 		# Test config settings:
 		self.test_db_name = "test_cyan_web_app_db"  # local testing db name
 		self.test_db_user = "test_user"
+		self.test_flask_host = "localhost"
 		self.test_flask_port = str(5050)
 		self.test_angular_port = str(4242)
 		self.test_angular_config = "local-testing"  # environment.local-testing.ts
+		self.test_angular_host = "http://localhost:" + self.test_angular_port
 
 		self.setup_env()  # sets up env from config
 
@@ -106,10 +108,12 @@ class BranchTests:
 		current_env.update({
 			'DB_NAME': self.test_db_name,
 			'DB_USER': self.test_db_user,
-			'FLASK_PORT': self.test_flask_port
+			'FLASK_PORT': self.test_flask_port,
+			'FLASK_HOST': self.test_flask_host,
+			'HOST_DOMAIN': self.test_angular_host
 		})
 		os.environ.update(current_env)
-		subprocess.run([self.python, "app.py"], cwd=self.cyan_flask_location)
+		subprocess.run([self.python, "__init__.py"], cwd=self.cyan_flask_location / "app")
 
 	def start_angular(self):
 
@@ -117,7 +121,8 @@ class BranchTests:
 
 		os.environ.update({
 			'FLASK_PORT': self.test_flask_port,
-			'FLASK_HOST': "localhost"
+			'FLASK_HOST': self.test_flask_host,
+			'HOST_DOMAIN': self.test_angular_host
 		})
 
 		npx = shutil.which("npx")

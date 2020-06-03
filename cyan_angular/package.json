@@ -1,12 +1,12 @@
 {
   "name": "cyna-web-app",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:solo": "ng build --prod --output-path dist",
-    "build:stack": "ng build --prod --output-path dist",
+    "build:standalone": "ng build --prod --output-path dist",
+    "build:qed": "ng build --prod --baseHref=/cyanweb --outputHashing=none --outputPath=../../static_qed/epa-cyano-web",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

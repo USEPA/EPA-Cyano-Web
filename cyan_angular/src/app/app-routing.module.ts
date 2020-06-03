@@ -10,11 +10,13 @@ import { LocationCompareDetailsComponent } from './location-compare-details/loca
 import { CoordinatesComponent } from './coordinates/coordinates.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { LatestImageComponent } from './latest-image/latest-image.component';
+import { ResetComponent } from './reset/reset.component';
 
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
 	{ path: 'account', component: AccountComponent },
+	{ path: 'reset', component: ResetComponent },
 	{ path: 'mylocations', component: MyLocationsComponent, canActivate: [AuthGuard] },
 	{ path: 'comparelocations', component: LocationCompareComponent, canActivate: [AuthGuard] },
 	{ path: 'configs', component: ConfigComponent, canActivate: [AuthGuard] },
@@ -26,7 +28,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [ RouterModule.forRoot(routes) ],
+  imports: [ RouterModule.forRoot(routes)],
   exports: [ RouterModule ]
 })
 export class AppRoutingModule { }

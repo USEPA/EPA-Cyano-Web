@@ -2,7 +2,7 @@
 FROM node:alpine as builder
 
 # Build-time variables 
-ARG env=stack
+ARG env=standalone
 ARG config=nginx.conf
 
 RUN apk update && apk add --no-cache make git
