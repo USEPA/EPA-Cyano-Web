@@ -203,20 +203,18 @@ export class LocationDetailsComponent implements OnInit {
     let self = this;
     this.imageSub = this.images
       .getImageDetails(coords.latitude, coords.longitude, this.locationService.getDataType())
-      .subscribe((data: ImageDetails[]) => this.imageCollection = data);
-    let timeout = this.loadTicker * 1000;
-    setTimeout(function() {
-      self.imageSub.unsubscribe();
-      if (self.imageCollection == null) {
-        self.loadTicker = self.loadTicker + 1;
-        self.imageSub.unsubscribe();
-        self.getImages();
-      } else {
-        self.loading = false;
-        self.setImages();
-        self.loadTicker = 1;
-      }
-    }, timeout);
+      .subscribe(
+        (data: ImageDetails[]) => {
+          self.imageCollection = data;
+          self.loading = false;
+          self.setImages();
+        },
+        error => {
+          this.imageCollection = null;
+          self.loading = false;
+          console.error("error get images", error);
+        }
+      );
   }
 
   setImages() {
