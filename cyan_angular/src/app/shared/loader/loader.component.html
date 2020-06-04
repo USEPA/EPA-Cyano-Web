@@ -1,7 +1,6 @@
 <div *ngIf="isLoading | async" class="transparent-background"></div>
 <div *ngIf="isLoading | async" class="overlay">
   <mat-progress-spinner class="spinner" [color]="color" mode="indeterminate"></mat-progress-spinner>
-  <button id="exit" mat-button><h2 (click)="exitLoadWheel();">X</h2></button>
   <div *ngIf="showProgressBar">
   	<mat-progress-bar mode="determinate" [value]="progress" id="progress-bar"></mat-progress-bar>
   </div>
