@@ -15,7 +15,6 @@ div.transparent-background {
   top: 25%;
   left: 25%;
   z-index: 99999;
-  background-color: white;
 }
 .spinner {
   position: absolute;

@@ -43,7 +43,6 @@ export class LoaderComponent {
   	/*
   	Removes loading wheel from blocking.
   	*/
-  	// TODO: Is it possible to cancel requests? They've already been made (looped ajax), so probably not unless they're rate-limited
   	this.isLoading.next(false);
   	this.progressValue.next(0);
   }
