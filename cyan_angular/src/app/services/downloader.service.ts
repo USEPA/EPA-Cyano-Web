@@ -5,9 +5,10 @@ import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
 import { environment } from '../../environments/environment';
-import {LocationType} from "../models/location";
+import { LocationType } from '../models/location';
 import { AuthService } from '../services/auth.service';
-import {UserSettings} from "../models/settings";
+import { UserSettings } from '../models/settings';
+import { LoaderService } from '../services/loader.service';
 
 class UrlInfo {
   type: string;
@@ -71,9 +72,13 @@ export class DownloaderService {
   locations: Location[] = [];
 
 
+  requestsTracker: number = 0;
+
+
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private loaderService: LoaderService
   ) {}
 
   registerUser(username: string, email: string, password: string) {
@@ -182,6 +187,9 @@ export class DownloaderService {
 
   ajaxRequest(ln: Location, username: string, url: string) {
     let self = this;
+    self.loaderService.show();
+    console.log("Tracker: " + this.requestsTracker);
+    self.requestsTracker += 1;
     ajax(url).subscribe(data => {
       let d: LocationDataAll = data.response;
       let loc = self.createLocation(ln, username, d);
@@ -193,9 +201,9 @@ export class DownloaderService {
           requestData: d,
           location: loc
         };
-
-        // raise event location changed
-        self.locationSubject.next(loc);
+        self.locationSubject.next(loc);  // raise event location changed
+        self.requestsTracker -= 1;
+        self.updateProgressBar();
       }
     });
   }
@@ -346,6 +354,15 @@ export class DownloaderService {
       ln.name = ln.name;
     }
     return ln.name;
+  }
+
+  updateProgressBar(): void {
+    let progressValue = 100 * (1 - (this.requestsTracker / this.locations.length));
+    this.loaderService.progressValue.next(progressValue);
+    if (this.requestsTracker <= 0) {
+      this.loaderService.hide();
+      this.loaderService.progressValue.next(0);
+    }
   }
 
 }

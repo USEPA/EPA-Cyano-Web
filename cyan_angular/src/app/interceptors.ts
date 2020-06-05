@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/do';
-import { switchMap, filter, take } from 'rxjs/operators';
+import { switchMap, filter, take, finalize } from 'rxjs/operators';
 import { 
 	HttpRequest,
 	HttpResponse,
@@ -13,8 +13,7 @@ import {
 } from '@angular/common/http';
 
 import { AuthService } from './services/auth.service';
-
-
+import { LoaderService } from './services/loader.service';
 
 function addToken(request: HttpRequest<any>, token: string) {
 	return request.clone({
@@ -23,8 +22,6 @@ function addToken(request: HttpRequest<any>, token: string) {
 		}
 	});
 }
-
-
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -36,7 +33,8 @@ export class AuthInterceptor implements HttpInterceptor {
 	nonAuthUrls: string[] = ["cyan.epa.gov", "/cyan/app/api/user", "/cyan/app/api/user/register"];  // request urls that don't need auth (e.g., external requests)
 
 	constructor (
-		private authService: AuthService
+		private authService: AuthService,
+		private loaderService: LoaderService
 	) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -62,8 +60,6 @@ export class AuthInterceptor implements HttpInterceptor {
 		}
 	}
 }
-
-
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -99,3 +95,14 @@ export class JwtInterceptor implements HttpInterceptor {
 	}
 
 }
+
+// @Injectable()
+// export class LoaderInterceptor implements HttpInterceptor {
+//     constructor(public loaderService: LoaderService) { }
+//     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+//         this.loaderService.show();
+//         return next.handle(req).pipe(
+//             finalize(() => this.loaderService.hide())
+//         );
+//     }
+// }

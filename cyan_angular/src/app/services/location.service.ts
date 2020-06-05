@@ -9,6 +9,7 @@ import { ConcentrationRanges } from '../test-data/test-levels';
 import { UserService, UserLocations, User } from '../services/user.service';
 import { DownloaderService } from '../services/downloader.service';
 import { MapService } from '../services/map.service';
+import { LoaderService } from '../services/loader.service';
 import { UserSettings } from "../models/settings";
 
 
@@ -35,6 +36,7 @@ export class LocationService {
     private user: UserService,
     private downloader: DownloaderService,
     private mapService: MapService,
+    private loaderService: LoaderService
   ) {
     this.getData();
     this.loadUser();
@@ -118,6 +120,9 @@ export class LocationService {
     let self = this;
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
       if (locations.length != 0) {
+
+        self.loaderService.showProgressBar();  // uses progress bar while getting user's location data
+
         locations.forEach(function(location) {
 
           if (!self.locationIDCheck(location.id)) {
@@ -144,7 +149,6 @@ export class LocationService {
             l.dataDate = '';
             l.marked = location.marked == true ? true : false;
             l.compare = location.compare == true ? true: false;
-            // l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
             l.notes = location.notes;
             l.sourceFrequency = '';
             l.validCellCount = 0;
@@ -195,6 +199,7 @@ export class LocationService {
       if (loc != null) {
         this.mapService.updateMarker(loc);
         this.updateCompareLocation(loc);
+        this.downloader.updateProgressBar();
       }
     });
   }
@@ -447,6 +452,7 @@ export class LocationService {
       }
     });
   }
+
 }
 
 class Coordinate {
