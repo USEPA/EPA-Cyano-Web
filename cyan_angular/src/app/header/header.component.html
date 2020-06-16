@@ -3,9 +3,13 @@
         <div class="logo-block">
             <div class="logo-block-inner">
             <a href="https://www.epa.gov" class="header-logo-link header-logo"></a>
-                <div class="header-title-abr">{{ titleAbr }}</div>
+                <div class="header-title-abr">{{ titleAbr }}
+                  <span class="header-version">v{{ appVersion }}</span>
+                </div>
             </div>
-            <div class="header-title" [ngStyle]="{'color':titleColor}">{{ title }}</div>
+            <div class="header-title" [ngStyle]="{'color':titleColor}">{{ title }}
+              <span class="header-version">v{{ appVersion }}</span>
+            </div>
         </div>
         <div id="search-config">
             <nav class="config-links">
@@ -18,7 +22,7 @@
                 </div>
                 <div class="search config-item">
                     <img class="header-icon" src="assets/images/header_search.png"/>
-                </div>                        
+                </div>
                 <div class="help config-item">
                     <img class="header-icon" src="assets/images/header_help.png"/>
                 </div>
@@ -59,7 +63,7 @@
                 <img class="tab-icon" src="assets/images/tab_my_location_icon.png"/>
                 <span class="tab-title">My Locations</span>
             </div>
-        </button> 
+        </button>
         <button mat-button class="compare menu-item" [routerLink]="['/comparelocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
                 <img class="tab-icon" src="assets/images/tab_compare_icon.png"/>
