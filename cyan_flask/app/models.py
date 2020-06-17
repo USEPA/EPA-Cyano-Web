@@ -1,11 +1,13 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import expression
+from sqlalchemy.dialects.mysql import MEDIUMTEXT
 from flask_migrate import Migrate
 
 
 db = SQLAlchemy()
 migrate = Migrate()
+
 
 
 class User(db.Model):
@@ -46,3 +48,35 @@ class Settings(db.Model):
 	level_high = db.Column(db.Integer, nullable=False)
 	enable_alert = db.Column(db.Boolean, nullable=False)
 	alert_value = db.Column(db.Integer)
+
+class Comment(db.Model):
+	__tablename__ = 'comment'
+	id = db.Column(db.Integer, nullable=False, primary_key=True)
+	title = db.Column(db.String(128), nullable=False)
+	date = db.Column(db.DateTime, nullable=False)
+	username = db.Column(db.String(32), nullable=False)
+	device = db.Column(db.String(64), nullable=False, server_default="N/A")
+	browser = db.Column(db.String(64), nullable=False, server_default="N/A")
+	body = db.relationship('CommentBody', backref='comment', lazy=True, uselist=False)  # NOTE: one-to-one
+	replies = db.relationship('Reply', backref='comment', lazy=True)
+
+class CommentBody(db.Model):
+	__tablename__ = 'comment_body'
+	id = db.Column(db.Integer, nullable=False, primary_key=True)
+	comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
+	comment_text = db.Column(db.Text, nullable=False)
+	comment_images = db.relationship('CommentImages', backref='comment_body', lazy=True)
+
+class CommentImages(db.Model):
+	__tablename__ = 'comment_images'
+	id = db.Column(db.Integer, nullable=False, primary_key=True)
+	comment_body_id = db.Column(db.Integer, db.ForeignKey('comment_body.id'), nullable=False)
+	comment_image = db.Column(MEDIUMTEXT, nullable=False)
+
+class Reply(db.Model):
+	__tablename__ = 'reply'
+	id = db.Column(db.Integer, nullable=False, primary_key=True)
+	comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
+	date = db.Column(db.DateTime, nullable=False)
+	username = db.Column(db.String(32), nullable=False)
+	body = db.Column(db.Text, nullable=False)
