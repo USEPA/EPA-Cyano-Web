@@ -419,7 +419,9 @@ def add_user_comment(post_data):
 	
 	db.session.commit()
 
-	return {"status": "success"}, 201
+	comment_json = utils.build_comments_json([comment_obj])[0]  # creates json object from comment db object
+
+	return comment_json, 201
 
 def add_comment_reply(post_data):
 	"""
