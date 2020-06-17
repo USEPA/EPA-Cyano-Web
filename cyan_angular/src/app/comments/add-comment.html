@@ -1,0 +1,32 @@
+<div class="add-comments-section">
+
+	<button mat-button (click)="exit();" class="comments-exit">X</button>
+
+	<h4>Fill out form to submit a comment</h4>
+
+	<div class="add-comments-box">
+		<mat-form-field class="comment-input">
+			<input matInput [(ngModel)]="device" placeholder="Device">
+		</mat-form-field>
+		<mat-form-field class="comment-input">
+			<input matInput [(ngModel)]="browser" placeholder="Browser">
+		</mat-form-field>
+		<mat-form-field class="comment-input">
+			<input matInput [(ngModel)]="title" placeholder="Title" required>
+		</mat-form-field>
+
+		<mat-form-field class="comment-textarea">
+			<textarea matInput [(ngModel)]="comment_text" [placeholder]="errorMessage || 'Enter comment'" required></textarea>
+			<div *ngFor="let imageSource of imageSources">
+				<img class="uploaded-image" *ngIf="imageSources?.length > 0" src="{{imageSource}}" />
+			</div>
+		</mat-form-field>
+
+		<input #uploader type="file" accept="image/*" (change)="uploadImage($event)" hidden>
+		<mat-icon class="header-icon mat_icon" (click)="uploader.click()">image</mat-icon>
+
+	</div>
+
+	<button class="add-comment-btn" mat-raised-button color="primary" (click)="addNewComment();">Add comment</button>
+
+</div>
