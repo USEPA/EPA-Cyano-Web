@@ -19,7 +19,6 @@ export class AddComment implements OnInit {
 	/*
 	Dialog for adding a user comment.
 	*/
-	// username: string = null;
 	device: string = "";
 	browser: string = "";
 	title: string = "";
@@ -35,6 +34,7 @@ export class AddComment implements OnInit {
 
 	constructor(
     public dialogRef: MatDialogRef<AddComment>,
+    private commentAddedDialog: MatDialog,
     private datePipe: DatePipe,
     private downloader: DownloaderService,
   	private authService: AuthService,
@@ -42,21 +42,32 @@ export class AddComment implements OnInit {
   ) { }
 
   ngOnInit() {
-    
+
   }
 
-  private createNewComment(): Comment {
+  private createNewComment(commentData): Comment {
   	/*
   	Creates comment object from form fields.
   	*/
   	let newComment = new Comment();
-  	newComment.title = this.title;
-  	newComment.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
-  	// newComment.username = this.username;  // getting username from token
-  	newComment.device = this.device;
-  	newComment.browser = this.browser;
-  	newComment.body = {comment_text: this.comment_text, comment_images: this.imageSources};
-  	newComment.replies = [];
+    if (!commentData) {
+      newComment.title = this.title;
+      newComment.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+      newComment.device = this.device;
+      newComment.browser = this.browser;
+      newComment.body = {comment_text: this.comment_text, comment_images: this.imageSources};
+      newComment.replies = [];
+    }
+    else {
+      newComment.id = commentData.id;
+      newComment.title = commentData.title;
+      newComment.date = commentData.date;
+      newComment.username = commentData.username;  // getting username from token
+      newComment.device = commentData.device;
+      newComment.browser = commentData.browser;
+      newComment.body = {comment_text: commentData.body.comment_text, comment_images: commentData.body.comment_images};
+      newComment.replies = [];
+    }
   	return newComment;
   }
 
@@ -72,23 +83,34 @@ export class AddComment implements OnInit {
       this.exit();
       return;
     }
-  	
-    // TODO: More validity checking for user comments?
 
     if (this.comment_text.length < 1) {
       // Add message to user about comment needing text.
       this.errorMessage = "Enter a comment before submitting.";
       return;
     }
+    else if (this.title.length < 1) {
+      this.errorMessage = "Enter a title before submitting.";
+      return;
+    }
 
-  	let comment = this.createNewComment();
+    let comment = this.createNewComment(null);
 
   	this.downloader.addUserComment(comment).subscribe(response => {
-  		// TODOs:
-      // Check if successful, "commented added" message (shared dialog component for user messages, warnings, errors, etc.)
-  		// Also could load all comments so new comment is displayed.
-      // And exit this dialog once comment is submitted.
-      this.exit();
+
+      let newComment = this.createNewComment(response);  // creates comment object from response
+
+      this.data.comments.unshift(newComment);  // updates parent comments array
+
+      // Opens comment submitted dialog:
+      const dialogRef = this.commentAddedDialog.open(CommentAdded, {
+        // width: '25%',
+        // height: '25%',
+        // data: { }
+      });
+
+      this.exit();  // exits this dialog
+
   	});
 	}
 
@@ -115,6 +137,38 @@ export class AddComment implements OnInit {
   	reader.addEventListener('load', (e: any) => {
   		this.imageSources.push(reader.result);
   	});
+  }
+
+}
+
+
+
+@Component({
+  selector: 'comment-added',
+  template: `
+  <br><br>
+  <div class="center-wrapper">
+  <h6 class="center-item">Comment submitted.</h6>
+  <br><br>
+  <button class="center-item" mat-raised-button color="primary" (click)="exit();">OK</button>
+  </div>
+  <br>
+  `,
+  styleUrls: ['./comments.component.css']
+})
+export class CommentAdded {
+  /*
+  Dialog for viewing a user image.
+  */
+
+  constructor(
+    public dialogRef: MatDialogRef<CommentAdded>,
+    private authService: AuthService,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
+
+  exit(): void {
+    this.dialogRef.close();
   }
 
 }

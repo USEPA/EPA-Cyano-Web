@@ -66,8 +66,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { LoaderComponent } from './shared/loader/loader.component';
 import { LoaderService } from './services/loader.service';
 import { CommentsComponent } from './comments/comments.component';
-import { AddComment } from './comments/add-comment.component';
-import { ViewComment } from './comments/view-comment.component';
+import { AddComment, CommentAdded } from './comments/add-comment.component';
+import { ViewComment, ViewImage } from './comments/view-comment.component';
 
 @NgModule({
   declarations: [
@@ -94,7 +94,9 @@ import { ViewComment } from './comments/view-comment.component';
     LoaderComponent,
     CommentsComponent,
     ViewComment,
-    AddComment
+    AddComment,
+    ViewImage,
+    CommentAdded
   ],
   imports: [
     BrowserModule,
@@ -149,7 +151,9 @@ import { ViewComment } from './comments/view-comment.component';
     NotificationDetails,
     LocationCompareAlert,
     ViewComment,
-    AddComment
+    AddComment,
+    ViewImage,
+    CommentAdded
   ]
 })
 export class AppModule {

@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, Output } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { DatePipe } from '@angular/common';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AddComment } from './add-comment.component';
@@ -20,11 +21,13 @@ export class CommentsComponent implements OnInit {
 
 	comments: Comment[] = [];
 
+  downloaderSub: Subscription;
+
   constructor(
   	private downloader: DownloaderService,
   	private authService: AuthService,
   	private dialog: MatDialog,
-  	private addCommentDialog: AddComment,
+    private addComment: AddComment,
   ) { }
 
   ngOnInit() {
@@ -53,9 +56,12 @@ export class CommentsComponent implements OnInit {
   	/*
   	Gets all users' comments.
   	*/
-  	this.downloader.getAllComments().subscribe(comments => {
-  		this.comments = this.createComments(comments);
-  	});
+    if (this.downloaderSub) {
+      this.downloaderSub.unsubscribe();
+    }
+    this.downloaderSub = this.downloader.getAllComments().subscribe((comments: Comment[]) => {
+      this.comments = this.createComments(comments);
+    });
   }
 
   viewComment(comment: Comment) {
@@ -80,7 +86,9 @@ export class CommentsComponent implements OnInit {
     const dialogRef = this.dialog.open(AddComment, {
       width: '50%',
       height: '75%',
-      data: { }
+      data: {
+        comments: this.comments
+      }
     });
   }
 

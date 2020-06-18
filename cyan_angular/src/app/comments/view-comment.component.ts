@@ -27,8 +27,9 @@ export class ViewComment implements OnInit {
   errorMessage: string = "";
 
 	constructor(
-		private datePipe: DatePipe,
     public dialogRef: MatDialogRef<ViewComment>,
+		private datePipe: DatePipe,
+    private imageDialog: MatDialog,
     private downloader: DownloaderService,
   	private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -52,7 +53,24 @@ export class ViewComment implements OnInit {
     this.dialogRef.close();
   }
 
-  addReplyToComment() {
+  enlargeImage(imageSource): void {
+    /*
+    Displays larger version of selected image.
+    */
+
+    console.log("view-comment enlargeImage() called.");
+
+    if (!this.authService.checkUserAuthentication()) { return; }
+    const dialogRef = this.imageDialog.open(ViewImage, {
+      width: '80%',
+      height: '80%',
+      data: {
+        imageSource: imageSource
+      }
+    });
+  }
+
+  addReplyToComment(): void {
   	/*
   	Adds reply to a user comment.
   	*/
@@ -60,8 +78,6 @@ export class ViewComment implements OnInit {
       this.exit();
       return;
     }
-
-    // TODO: More validity checking for user replies???
 
     if (this.body.length < 1) {
       this.errorMessage = "Enter a reply before submitting.";
@@ -74,6 +90,35 @@ export class ViewComment implements OnInit {
   		this.comment.replies.push(reply);  // adds reply to frontend after api response
       this.body = "";  // clears reply textarea
   	});
+  }
+
+}
+
+
+
+@Component({
+  selector: 'view-image',
+  template: `
+  <button mat-button (click)="exit();" class="comments-exit">X</button>
+  <div class="view-image">
+    <img src={{data.imageSource}} height=100% width=100% />
+  </div>
+  `,
+  styleUrls: ['./comments.component.css']
+})
+export class ViewImage {
+  /*
+  Dialog for viewing a user image.
+  */
+
+  constructor(
+    public dialogRef: MatDialogRef<ViewImage>,
+    private authService: AuthService,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
+
+  exit(): void {
+    this.dialogRef.close();
   }
 
 }
