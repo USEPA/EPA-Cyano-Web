@@ -13,7 +13,6 @@
         </div>
         <div id="search-config">
             <nav class="config-links">
-                <!-- <div class="account config-item" [routerLink]="['/account']"> -->
                 <div class="account config-item" (click)="displayLogout()">
                     <img class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
                 </div>
@@ -23,8 +22,8 @@
                 <div class="search config-item">
                     <img class="header-icon" src="assets/images/header_search.png"/>
                 </div>
-                <div class="help config-item">
-                    <img class="header-icon" src="assets/images/header_help.png"/>
+                <div class="help config-item" [routerLink]="['/comments']">
+                    <mat-icon class="header-icon mat_icon">question_answer</mat-icon>
                 </div>
             </nav>
         </div>
@@ -34,24 +33,20 @@
         <mat-menu #linksLeft="matMenu" class="menu-link-block" panelClass="links-left-menu">
             <button mat-menu-item class="my-locations menu-link" [routerLink]="['/mylocations']">
                 <div class="menu-div">
-                    <!-- <img class="tab-icon" src="assets/images/tab_my_location_icon.png"/> -->
                     <span class="tab-title">My Locations</span>
                 </div></button>
             <button mat-menu-item class=" compare menu-link"[routerLink]="['/comparelocations']">
                 <div class="menu-div">
-                    <!-- <img class="tab-icon" src="assets/images/tab_compare_icon.png"/> -->
                     <span class="tab-title">Compare</span>
                  </div>
             </button>
             <button mat-menu-item disabled class="notifications menu-link">
                 <div class="menu-div">
-                    <!-- <img class="tab-icon" src="assets/images/tab_notifications_icon.png"/> -->
                     <span class="tab-title">Notifications</span>
                 </div>
             </button>
             <button mat-menu-item class="coordiantes menu-link">
                 <div class="menu-div">
-                    <!-- <img class="tab-icon" src="assets/images/tab_geo_coord_icon.png"/> -->
                     <span class="tab-title">Geographic Coordinates</span>
                 </div>
             </button>

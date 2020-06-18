@@ -227,6 +227,54 @@ class Reset(Resource):
 		results, status_code = web_app_api.set_new_password(args)  # update user's email in db (middleware validates user)
 		return results, status_code
 
+class Comment(Resource):
+	"""
+	Endpoints for user comments.
+	"""
+	@login_required
+	def get(self):
+		"""
+		Get all user comments.
+		"""
+		# user = JwtHandler().get_user_from_token(request)
+		headers = get_auth_headers()
+		results, status_code = web_app_api.get_comments()
+		results = simplejson.loads(simplejson.dumps(results))
+		return results, status_code, headers
+
+	@login_required
+	def post(self):
+		"""
+		Adds a user comment.
+		"""
+		args = request.get_json()
+		headers = get_auth_headers()
+		args['username'] = JwtHandler().get_user_from_token(request)  # gets username from token
+		results, status_code = web_app_api.add_user_comment(args)
+		results = simplejson.loads(simplejson.dumps(results))
+		return results, status_code, headers
+
+class Reply(Resource):
+	"""
+	Endpoints for user comment replies.
+	"""
+	@login_required
+	def get(self):
+		"""
+		"""
+		pass
+
+	@login_required
+	def post(self):
+		"""
+		Adds replay to a user's comment.
+		"""
+		args = request.get_json()
+		args['username'] = JwtHandler().get_user_from_token(request)  # gets username from token
+		headers = get_auth_headers()
+		results, status_code = web_app_api.add_comment_reply(args)
+		results = simplejson.loads(simplejson.dumps(results))
+		return results, status_code, headers
 	
 
 # Test endpoint:
@@ -255,6 +303,13 @@ api.add_resource(Refresh, api_url + 'refresh')
 
 # Reset endpoint:
 api.add_resource(Reset, api_url + 'reset')
+
+# Comment endpoint:
+api.add_resource(Comment, api_url + 'comment')
+
+# Reply endpoint:
+api.add_resource(Reply, api_url + 'reply')
+
 
 print("CyAN Flask app started.\nLive endpoints:")
 print(base_url + '/test')

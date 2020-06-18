@@ -4,10 +4,12 @@ import { Observable, of, Subscription, BehaviorSubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
-import { environment } from '../../environments/environment';
 import { LocationType } from '../models/location';
-import { AuthService } from '../services/auth.service';
 import { UserSettings } from '../models/settings';
+import { Comment, Reply } from '../models/comment';
+
+import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 
 class UrlInfo {
@@ -173,6 +175,30 @@ export class DownloaderService {
      */
     let url = this.baseServerUrl + 'settings/edit';
     return this.executeAuthorizedPostRequest(url, settings);
+  }
+
+  getAllComments() {
+    /*
+    Gets all users' comments.
+    */
+    let url = this.baseServerUrl + 'comment';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  addUserComment(comment: Comment) {
+    /*
+    Adds user comment.
+    */
+    let url = this.baseServerUrl + 'comment';
+    return this.executeAuthorizedPostRequest(url, comment);
+  }
+
+  addReplyToComment(reply: Reply) {
+    /*
+    Adds user reply to a user's comment.
+    */
+    let url = this.baseServerUrl + 'reply';
+    return this.executeAuthorizedPostRequest(url, reply);
   }
 
   executeAuthorizedPostRequest(url: string, body: any) {
