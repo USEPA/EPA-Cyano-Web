@@ -229,7 +229,8 @@ class Reset(Resource):
 
 class Comment(Resource):
 	"""
-	Endpoints for user comments.
+	GET - Retrieves all user comments.
+	POST - Adds a user's comment.
 	"""
 	@login_required
 	def get(self):

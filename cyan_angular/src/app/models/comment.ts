@@ -6,12 +6,19 @@ export class Comment {
 	device: string;
 	browser: string;
 	body: CommentBody;
+	// body: string;
 	replies: Reply[];
 }
 
 export class CommentBody {
 	comment_text: string;
-	comment_images: string[];
+	// comment_images: string[];
+	comment_images: CommentImage[];
+}
+
+export class CommentImage {
+	source: string;
+	name: string;
 }
 
 export class Reply {

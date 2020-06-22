@@ -387,20 +387,14 @@ def add_user_comment(post_data):
 	comment_obj = Comment(
 		# id=_id,
 		title=title,
-		# date=datetime.datetime.now(),
 		date=date,
 		username=username,
 		device=device,
 		browser=browser
 		# body=body
 	)
-
 	db.session.add(comment_obj)
 	db.session.flush()
-	
-	# comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
-	# comment_text = db.Column(db.Text, nullable=False)
-	# comment_images = db.relationship('CommentImages', backref='comment_body', lazy=True)
 	
 	comment_body_obj = CommentBody(
 		comment_id=comment_obj.id,
@@ -409,17 +403,22 @@ def add_user_comment(post_data):
 	db.session.add(comment_body_obj)
 	db.session.flush()
 
+	image_sources = []
 	for image in body['comment_images']:
+		
+		image_file = utils.save_image_source(username, image['source'], image['name'])
 		comment_images_obj = CommentImages(
 			comment_body_id=comment_body_obj.id,
-			comment_image=image
+			comment_image=image_file  # saving image path instead of source
 		)
 		db.session.add(comment_images_obj)
+
+		image_sources.append(image['source'])
 
 	
 	db.session.commit()
 
-	comment_json = utils.build_comments_json([comment_obj])[0]  # creates json object from comment db object
+	comment_json = utils.build_comments_json([comment_obj], image_sources)[0]  # creates json object from comment db object
 
 	return comment_json, 201
 

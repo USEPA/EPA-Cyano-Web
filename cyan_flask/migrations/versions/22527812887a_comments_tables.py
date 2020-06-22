@@ -1,16 +1,16 @@
 """comments tables
 
-Revision ID: c421782dd3e2
+Revision ID: 22527812887a
 Revises: 351647c1b5a7
-Create Date: 2020-06-15 14:26:50.598275
+Create Date: 2020-06-19 15:31:41.603654
 
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import mysql
+
 
 # revision identifiers, used by Alembic.
-revision = 'c421782dd3e2'
+revision = '22527812887a'
 down_revision = '351647c1b5a7'
 branch_labels = None
 depends_on = None
@@ -30,7 +30,7 @@ def upgrade():
     op.create_table('comment_body',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('comment_id', sa.Integer(), nullable=False),
-    sa.Column('comment_text', sa.Text(), nullable=False),
+    sa.Column('comment_text', sa.String(length=2000), nullable=False),
     sa.ForeignKeyConstraint(['comment_id'], ['comment.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -39,14 +39,14 @@ def upgrade():
     sa.Column('comment_id', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('username', sa.String(length=32), nullable=False),
-    sa.Column('body', sa.Text(), nullable=False),
+    sa.Column('body', sa.String(length=500), nullable=False),
     sa.ForeignKeyConstraint(['comment_id'], ['comment.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('comment_images',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('comment_body_id', sa.Integer(), nullable=False),
-    sa.Column('comment_image', mysql.MEDIUMTEXT(), nullable=False),
+    sa.Column('comment_image', sa.String(length=256), nullable=False),
     sa.ForeignKeyConstraint(['comment_body_id'], ['comment_body.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
