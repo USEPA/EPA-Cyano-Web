@@ -16,9 +16,9 @@
 		</mat-form-field>
 
 		<mat-form-field class="comment-textarea">
-			<textarea matInput [(ngModel)]="comment_text" [placeholder]="errorMessage || 'Enter comment'" required></textarea>
-			<div *ngFor="let imageSource of imageSources">
-				<img class="uploaded-image" *ngIf="imageSources?.length > 0" src="{{imageSource}}" />
+			<textarea matInput [(ngModel)]="comment_text" placeholder="Enter comment" required></textarea>
+			<div *ngFor="let image of comment_images">
+				<img class="uploaded-image" *ngIf="comment_images?.length > 0" src="{{image.source}}" />
 			</div>
 		</mat-form-field>
 

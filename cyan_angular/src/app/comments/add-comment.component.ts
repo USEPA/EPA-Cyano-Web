@@ -2,11 +2,10 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MatIconModule } from '@angular/material/icon';
-
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
-
-import { Comment, CommentBody, Reply } from '../models/comment';
+import { Comment, CommentBody, CommentImage, Reply } from '../models/comment';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 
 
@@ -22,15 +21,13 @@ export class AddComment implements OnInit {
 	device: string = "";
 	browser: string = "";
 	title: string = "";
-	body = {
-		comment_text: "",
-		comment_images: []
-	}
 	comment_text: string = "";  // textarea body of comment
-	comment_images: string[] = [];  // array of image sources
+  comment_images: CommentImage[] = [];
 	imageSources: any[] = [];
   imageUploadLimit: number = 2;
-  errorMessage: string = "";
+  imageSizeLimit: number = 25e6;  // 25MB
+  commentSizeLimit: number = 2000;
+  commentTitleLimit: number = 125;
 
 	constructor(
     public dialogRef: MatDialogRef<AddComment>,
@@ -38,6 +35,7 @@ export class AddComment implements OnInit {
     private datePipe: DatePipe,
     private downloader: DownloaderService,
   	private authService: AuthService,
+    private dialogComponent: DialogComponent,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) { }
 
@@ -55,7 +53,7 @@ export class AddComment implements OnInit {
       newComment.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
       newComment.device = this.device;
       newComment.browser = this.browser;
-      newComment.body = {comment_text: this.comment_text, comment_images: this.imageSources};
+      newComment.body = {comment_text: this.comment_text, comment_images: this.comment_images};
       newComment.replies = [];
     }
     else {
@@ -71,6 +69,46 @@ export class AddComment implements OnInit {
   	return newComment;
   }
 
+  private createCommentImage(imageSource, imageName): CommentImage {
+    let newCommentImage = new CommentImage();
+    newCommentImage.source = imageSource;
+    newCommentImage.name = imageName;
+    return newCommentImage;
+  }
+
+  displayDialog(message: string): void {
+    this.commentAddedDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
+  }
+
+  validateComment(): boolean {
+    if (!this.authService.checkUserAuthentication()) { 
+      this.exit();  // exits add-comment dialog
+      return false;
+    }
+
+    if (this.comment_text.length < 1) {
+      this.displayDialog("Enter a comment before submitting");
+      return false;
+    }
+    else if (this.title.length < 1) {
+      this.displayDialog("Enter a title before submitting");
+      return false;
+    }
+    else if (this.comment_text.length > this.commentSizeLimit) {
+      this.displayDialog("Comment length is too large (" + this.commentSizeLimit + " max)");
+      return false;
+    }
+    else if (this.title.length > this.commentTitleLimit) {
+      this.displayDialog("Title length is too large (" + this.commentTitleLimit + " max)");
+      return false;
+    }
+    return true;
+  }
+
   exit(): void {
     this.dialogRef.close();
   }
@@ -79,38 +117,17 @@ export class AddComment implements OnInit {
   	/*
   	Posts user comment to wall.
   	*/
-  	if (!this.authService.checkUserAuthentication()) { 
-      this.exit();
-      return;
-    }
-
-    if (this.comment_text.length < 1) {
-      // Add message to user about comment needing text.
-      this.errorMessage = "Enter a comment before submitting.";
-      return;
-    }
-    else if (this.title.length < 1) {
-      this.errorMessage = "Enter a title before submitting.";
+    if (!this.validateComment()) {
       return;
     }
 
     let comment = this.createNewComment(null);
 
   	this.downloader.addUserComment(comment).subscribe(response => {
-
       let newComment = this.createNewComment(response);  // creates comment object from response
-
       this.data.comments.unshift(newComment);  // updates parent comments array
-
-      // Opens comment submitted dialog:
-      const dialogRef = this.commentAddedDialog.open(CommentAdded, {
-        // width: '25%',
-        // height: '25%',
-        // data: { }
-      });
-
+      this.displayDialog("Comment submitted");
       this.exit();  // exits this dialog
-
   	});
 	}
 
@@ -124,51 +141,33 @@ export class AddComment implements OnInit {
       return;
     }
 
-    if (this.imageSources.length >= this.imageUploadLimit) {
-      this.errorMessage = "Limited to 2 image uploads per comment.";
+    if (this.comment_images.length >= this.imageUploadLimit) {
+      this.displayDialog("Limited to 2 image uploads per comment");
       return;
     }
 
   	let file = event.target.files[0];
   	let reader = new FileReader();
+
+    if (!file.type.includes("image/")) {
+      this.displayDialog("Must upload an image");
+      return;
+    }
   	
   	reader.readAsDataURL(file);
 
   	reader.addEventListener('load', (e: any) => {
-  		this.imageSources.push(reader.result);
+
+      // Checks size of image's base64 string:
+      if (file.size > this.imageSizeLimit) {
+        this.displayDialog("Image size is too large (" + this.imageSizeLimit/1e6 + " MB max)");
+        return;
+      }
+
+      let newCommentImage = this.createCommentImage(reader.result, file.name);
+      this.comment_images.push(newCommentImage);
+
   	});
-  }
-
-}
-
-
-
-@Component({
-  selector: 'comment-added',
-  template: `
-  <br><br>
-  <div class="center-wrapper">
-  <h6 class="center-item">Comment submitted.</h6>
-  <br><br>
-  <button class="center-item" mat-raised-button color="primary" (click)="exit();">OK</button>
-  </div>
-  <br>
-  `,
-  styleUrls: ['./comments.component.css']
-})
-export class CommentAdded {
-  /*
-  Dialog for viewing a user image.
-  */
-
-  constructor(
-    public dialogRef: MatDialogRef<CommentAdded>,
-    private authService: AuthService,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) { }
-
-  exit(): void {
-    this.dialogRef.close();
   }
 
 }
