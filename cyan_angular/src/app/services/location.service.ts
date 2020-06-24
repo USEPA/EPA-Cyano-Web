@@ -1,31 +1,29 @@
-import { Injectable, Input } from '@angular/core';
-import { Observable, of, Subscription, Subject } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
-import { marker, icon, Map } from 'leaflet';
+import { Injectable, Input } from "@angular/core";
+import { Observable, of, Subscription, Subject } from "rxjs";
+import { DomSanitizer } from "@angular/platform-browser";
+import { marker, icon, Map } from "leaflet";
 
-import { Location, LocationType } from '../models/location';
-import { ConcentrationRanges } from '../test-data/test-levels';
+import { Location, LocationType } from "../models/location";
+import { ConcentrationRanges } from "../test-data/test-levels";
 
-import { UserService, UserLocations, User } from '../services/user.service';
-import { DownloaderService } from '../services/downloader.service';
-import { MapService } from '../services/map.service';
-import { LoaderService } from '../services/loader.service';
+import { UserService, UserLocations, User } from "../services/user.service";
+import { DownloaderService } from "../services/downloader.service";
+import { MapService } from "../services/map.service";
+import { LoaderService } from "../services/loader.service";
 import { UserSettings } from "../models/settings";
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class LocationService {
-
   private data_type: LocationType = LocationType.OLCI_WEEKLY;
 
   @Input() locations: Location[] = [];
   @Input() compare_locations: Location[] = [];
 
   // Inspired by: https://angular.io/guide/component-interaction#parent-and-children-communicate-via-a-service
-  private compareLocationsSource = new Subject<Location[]>();  // observable Location[] sources
-  compare$ = this.compareLocationsSource.asObservable();  // observable Location[] streams
+  private compareLocationsSource = new Subject<Location[]>(); // observable Location[] sources
+  compare$ = this.compareLocationsSource.asObservable(); // observable Location[] streams
 
   downloaderSub: Subscription;
   locationChangedSub: Subscription;
@@ -68,10 +66,10 @@ export class LocationService {
 
     // clear locations data
     this.downloader.locationsData = {};
-    while(this.locations.length){
+    while (this.locations.length) {
       this.locations.pop();
     }
-    while(this.compare_locations.length){
+    while (this.compare_locations.length) {
       this.compare_locations.pop();
     }
   }
@@ -82,10 +80,12 @@ export class LocationService {
     this.clearUserData();
 
     // fetch data
-    this.downloader.getUserLocations(this.user.getUserName(), this.data_type).subscribe((locations: UserLocations[]) => {
-      self.user.currentAccount.locations = locations;
-      self.getUserLocations();
-    });
+    this.downloader
+      .getUserLocations(this.user.getUserName(), this.data_type)
+      .subscribe((locations: UserLocations[]) => {
+        self.user.currentAccount.locations = locations;
+        self.getUserLocations();
+      });
   }
 
   getDataType() {
@@ -99,17 +99,17 @@ export class LocationService {
     }
     this.userSub = this.user.getUserDetails().subscribe((user: User) => {
       if (user != null) {
-        if (user.username != '') {
-          setTimeout(function() {
+        if (user.username != "") {
+          setTimeout(function () {
             self.getUserLocations();
           }, 1000);
         } else {
-          setTimeout(function() {
+          setTimeout(function () {
             self.loadUser();
           }, 1000);
         }
       } else {
-        setTimeout(function() {
+        setTimeout(function () {
           self.loadUser();
         }, 1000);
       }
@@ -120,17 +120,18 @@ export class LocationService {
     let self = this;
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
       if (locations.length != 0) {
+        self.loaderService.showProgressBar(); // uses progress bar while getting user's location data
 
-        self.loaderService.showProgressBar();  // uses progress bar while getting user's location data
-
-        locations.forEach(function(location) {
-
+        locations.forEach(function (location) {
           if (!self.locationIDCheck(location.id)) {
             let l = new Location();
             l.id = location.id;
             l.name = location.name;
             l.type = location.type;
-            let coord = self.convertCoordinates(location.latitude, location.longitude);
+            let coord = self.convertCoordinates(
+              location.latitude,
+              location.longitude
+            );
             l.latitude = location.latitude;
             l.longitude = location.longitude;
             l.latitude_deg = coord.latDeg;
@@ -143,14 +144,14 @@ export class LocationService {
             l.longitude_dir = coord.lngDir;
             l.cellConcentration = 0;
             l.maxCellConcentration = 0;
-            l.source = '';
+            l.source = "";
             l.concentrationChange = 0;
-            l.changeDate = '';
-            l.dataDate = '';
+            l.changeDate = "";
+            l.dataDate = "";
             l.marked = location.marked == true ? true : false;
-            l.compare = location.compare == true ? true: false;
+            l.compare = location.compare == true ? true : false;
             l.notes = location.notes;
-            l.sourceFrequency = '';
+            l.sourceFrequency = "";
             l.validCellCount = 0;
 
             self.locations.push(l);
@@ -166,7 +167,7 @@ export class LocationService {
 
   locationIDCheck(id: number): Boolean {
     let inLocations = false;
-    this.locations.forEach(function(location) {
+    this.locations.forEach(function (location) {
       if (location.id == id) {
         inLocations = true;
       }
@@ -187,21 +188,24 @@ export class LocationService {
     if (this.downloaderSub) {
       this.downloaderSub.unsubscribe();
     }
-    this.downloaderSub = this.downloader.getData().subscribe((locations: Location[]) => {
+    this.downloaderSub = this.downloader
+      .getData()
+      .subscribe((locations: Location[]) => {
         this.locations = locations;
-      }
-    );
+      });
 
     if (this.locationChangedSub) {
       this.locationChangedSub.unsubscribe();
     }
-    this. locationChangedSub = this.downloader.locationsChanged.subscribe( (loc: Location) => {
-      if (loc != null) {
-        this.mapService.updateMarker(loc);
-        this.updateCompareLocation(loc);
-        this.downloader.updateProgressBar();
+    this.locationChangedSub = this.downloader.locationsChanged.subscribe(
+      (loc: Location) => {
+        if (loc != null) {
+          this.mapService.updateMarker(loc);
+          this.updateCompareLocation(loc);
+          this.downloader.updateProgressBar();
+        }
       }
-    });
+    );
   }
 
   getLocationData(): Observable<Location[]> {
@@ -218,7 +222,7 @@ export class LocationService {
   }
 
   getLocationByID(id: number): Location {
-    return this.locations.filter(ln => {
+    return this.locations.filter((ln) => {
       return ln.id == id;
     })[0];
   }
@@ -233,7 +237,6 @@ export class LocationService {
     dataDate: string,
     source: string
   ): Location {
-
     let l = new Location();
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
@@ -254,7 +257,7 @@ export class LocationService {
     l.concentrationChange = cellConChange;
     l.dataDate = dataDate;
     l.changeDate = dataDate;
-    l.sourceFrequency = 'Daily';
+    l.sourceFrequency = "Daily";
     l.source = source;
     l.validCellCount = 9;
     l.notes = [];
@@ -268,9 +271,13 @@ export class LocationService {
   }
 
   deleteLocation(ln: Location): void {
-    const index = this.locations.map(loc => loc.id).indexOf(ln.id);
+    const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
     if (index >= 0) {
-      this.downloader.deleteUserLocation(this.user.getUserName(), ln.id, ln.type);
+      this.downloader.deleteUserLocation(
+        this.user.getUserName(),
+        ln.id,
+        ln.type
+      );
       this.locations.splice(index, 1);
     }
     // delete from compare also
@@ -292,8 +299,10 @@ export class LocationService {
     Sends updated compare list via Observable once user's
     locations are collected.
     */
-    this.compare_locations = this.locations.filter(location => location.compare == true);
-    this.compareLocationsSource.next(this.compare_locations)
+    this.compare_locations = this.locations.filter(
+      (location) => location.compare == true
+    );
+    this.compareLocationsSource.next(this.compare_locations);
   }
 
   getCompareLocations(): Observable<Location[]> {
@@ -301,16 +310,15 @@ export class LocationService {
   }
 
   addCompareLocation(ln: Location): void {
-    if(this.compare_locations == undefined){
+    if (this.compare_locations == undefined) {
       this.compare_locations = [];
       this.compare_locations.push(ln);
-    }
-    else if(!this.compare_locations.includes(ln)){
+    } else if (!this.compare_locations.includes(ln)) {
       this.compare_locations.push(ln);
     }
-    this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
-    ln['compare'] = true;
-    this.updateLocation(ln.name, ln);  // updates location's 'compare' parameter
+    this.compareLocationsSource.next(this.compare_locations); // updates Observable/Subject for subscribed components
+    ln["compare"] = true;
+    this.updateLocation(ln.name, ln); // updates location's 'compare' parameter
   }
 
   updateCompareLocation(ln: Location) {
@@ -318,7 +326,11 @@ export class LocationService {
     Updates a location in compare location array when data for the
     location is obtained.
     */
-    let locIndex = this.compare_locations.map((item) => { return item.id; }).indexOf(ln.id);
+    let locIndex = this.compare_locations
+      .map((item) => {
+        return item.id;
+      })
+      .indexOf(ln.id);
     if (locIndex > -1) {
       this.compare_locations[locIndex] = ln;
       this.compareLocationsSource.next(this.compare_locations);
@@ -329,8 +341,8 @@ export class LocationService {
     if (this.compare_locations.includes(ln)) {
       this.compare_locations.splice(this.compare_locations.indexOf(ln), 1);
       this.compareLocationsSource.next(this.compare_locations);
-      ln['compare'] = false;
-      this.updateLocation(ln.name, ln);  // updates location's 'compare' parameter
+      ln["compare"] = false;
+      this.updateLocation(ln.name, ln); // updates location's 'compare' parameter
     }
   }
 
@@ -346,21 +358,33 @@ export class LocationService {
     coordinate.latMin = Math.trunc((lat - coordinate.latDeg) * 60) % 60;
     coordinate.lngMin = Math.trunc((lng - coordinate.lngDeg) * 60) % 60;
 
-    coordinate.latSec = Math.trunc((lat - coordinate.latDeg - coordinate.latMin / 60) * 3600);
-    coordinate.lngSec = Math.trunc((lng - coordinate.lngDeg - coordinate.lngMin / 60) * 3600);
+    coordinate.latSec = Math.trunc(
+      (lat - coordinate.latDeg - coordinate.latMin / 60) * 3600
+    );
+    coordinate.lngSec = Math.trunc(
+      (lng - coordinate.lngDeg - coordinate.lngMin / 60) * 3600
+    );
 
-    coordinate.latDir = latitude >= 0 ? 'N' : 'S';
-    coordinate.lngDir = longitude >= 0 ? 'E' : 'W';
+    coordinate.latDir = latitude >= 0 ? "N" : "S";
+    coordinate.lngDir = longitude >= 0 ? "E" : "W";
 
     return coordinate;
   }
 
   convertToDegrees(location: Location): Degree {
     let deg = new Degree();
-    deg.latitude = location.latitude_deg + location.latitude_min / 60 + location.latitude_sec / 3600;
-    deg.longitude = location.longitude_deg + location.longitude_min / 60 + location.longitude_sec / 3600;
-    deg.latitude = location.latitude_dir == 'S' ? deg.latitude * -1 : deg.latitude;
-    deg.longitude = location.longitude_dir == 'W' ? deg.longitude * -1 : deg.longitude;
+    deg.latitude =
+      location.latitude_deg +
+      location.latitude_min / 60 +
+      location.latitude_sec / 3600;
+    deg.longitude =
+      location.longitude_deg +
+      location.longitude_min / 60 +
+      location.longitude_sec / 3600;
+    deg.latitude =
+      location.latitude_dir == "S" ? deg.latitude * -1 : deg.latitude;
+    deg.longitude =
+      location.longitude_dir == "W" ? deg.longitude * -1 : deg.longitude;
     return deg;
   }
 
@@ -368,7 +392,7 @@ export class LocationService {
     let startID = 0;
     if (this.locations.length > 0) {
       let last = this.locations[0];
-      this.locations.map(location => {
+      this.locations.map((location) => {
         if (location.id > last.id) {
           last = location;
         }
@@ -387,7 +411,23 @@ export class LocationService {
     if (p > 100) {
       p = 100;
     }
-    return this._sanitizer.bypassSecurityTrustStyle('conic-gradient(transparent ' + p.toString() + '%, #A6ACAF 0)');
+    return this._sanitizer.bypassSecurityTrustStyle(
+      "conic-gradient(transparent " + p.toString() + "%, #A6ACAF 0)"
+    );
+  }
+
+  getPercentage2(l: Location): number {
+    let cells = l.cellConcentration;
+    let userSettings = this.user.getUserSettings();
+
+    let p = (cells / userSettings.level_high) * 100;
+    if (p < 1) {
+      p = 1;
+    }
+    if (p > 100) {
+      p = 100;
+    }
+    return p;
   }
 
   getColor(l: Location, delta: boolean) {
@@ -397,15 +437,21 @@ export class LocationService {
     if (delta) {
       cells = Math.abs(l.concentrationChange);
     }
-    let c = 'green';
+    let c = "green";
     if (cells <= userSettings.level_low) {
-      c = 'green';
-    } else if (cells > userSettings.level_low && cells <= userSettings.level_medium) {
-      c = 'yellow';
-    } else if (cells > userSettings.level_medium && cells <= userSettings.level_high) {
-      c = 'orange';
+      c = "green";
+    } else if (
+      cells > userSettings.level_low &&
+      cells <= userSettings.level_medium
+    ) {
+      c = "yellow";
+    } else if (
+      cells > userSettings.level_medium &&
+      cells <= userSettings.level_high
+    ) {
+      c = "orange";
     } else if (cells > userSettings.level_high) {
-      c = 'red';
+      c = "red";
     }
     return c;
   }
@@ -420,7 +466,7 @@ export class LocationService {
     let userSettings = this.user.getUserSettings();
     let cells = l.cellConcentration;
 
-    return userSettings.enable_alert && (cells >= userSettings.alert_value);
+    return userSettings.enable_alert && cells >= userSettings.alert_value;
   }
 
   formatNumber(n: number): string {
@@ -436,7 +482,7 @@ export class LocationService {
   }
 
   addMarkers(map: Map): void {
-    this.locations.forEach(location => {
+    this.locations.forEach((location) => {
       let self = this;
       if (!self.mapService.hasMarker(location.id)) {
         this.mapService.addMarker(location);
@@ -445,14 +491,13 @@ export class LocationService {
   }
 
   updateMarkers(): void {
-    this.locations.forEach(location => {
+    this.locations.forEach((location) => {
       let self = this;
       if (self.mapService.hasMarker(location.id)) {
         this.mapService.updateMarker(location);
       }
     });
   }
-
 }
 
 class Coordinate {
