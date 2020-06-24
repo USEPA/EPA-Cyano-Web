@@ -61,8 +61,8 @@ def build_comments_json(comments, images_sources=None):
 			'username': comment.username,
 			'device': comment.device,
 			'browser': comment.browser,
-			# 'body': comment.body,
-			'body': build_comment_body_json(comment.body),
+			'comment_text': comment.comment_text,
+			'comment_images': build_comment_images(comment.comment_images),
 			'replies': build_replies_json(comment.replies)
 		})
 	return comments_json
@@ -82,27 +82,24 @@ def build_replies_json(replies):
 		})
 	return replies_json
 
-def build_comment_body_json(comment_body, image_sources=[]):
+# build_comment_body_json(comment_body, image_sources=[]):
+def build_comment_images(comment_images, image_sources=[]):
 	"""
 	Creates serializable json from comment_body DB objects.
 	"""
-	if isinstance(comment_body, list):
-		comment_body = comment_body[0]
+	comment_images_json = []
 
-	comment_body_json = {
-		'comment_text': comment_body.comment_text,
-		'comment_images': []
-	}
 	if len(image_sources) < 1:
 		# Gets image from filesystem using filename from DB:
-		for image in comment_body.comment_images:
-			image_source = get_image_source(os.environ.get('FLASK_IMAGE_PATH') + image.comment_image)
-			comment_body_json['comment_images'].append(image_source)
+		for image in comment_images:
+			filename = os.environ.get('FLASK_IMAGE_PATH') + image.comment_image
+			image_source = get_image_source(filename)
+			comment_images_json.append(image_source)
 	else:
 		for image in image_sources:
 			# Uses existing image sources:
-			comment_body_json['comment_images'].append(image_sources)
-	return comment_body_json
+			comment_images_json['comment_images'].append(image_sources)
+	return comment_images_json
 
 
 def get_datetime_string(datetime_obj):
@@ -121,7 +118,7 @@ def get_image_source(image_path):
 		with open(image_path, 'r') as image_file:
 			return image_file.read()
 	except IOError as e:
-		logging.warning("utils.py get_image_source error: {}".format(e))
+		logging.warning(" utils.py get_image_source error reading filename {}:\n {}".format(image_path, e))
 		return {"error": "cannot find image"}
 
 
@@ -136,7 +133,7 @@ def save_image_source(username, image_source, image_name):
 			image_file.write(image_source)
 		return filename
 	except IOError as e:
-		logging.warning("utils.py save_image_source error: {}".format(e))
+		logging.warning( " utils.py save_image_source error saving image {}:\n {}".format(image_name, e))
 		return {"error": "error saving image"}
 
 

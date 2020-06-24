@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MatIconModule } from '@angular/material/icon';
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
-import { Comment, CommentBody, CommentImage, Reply } from '../models/comment';
+import { Comment, CommentImage, Reply } from '../models/comment';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 
 
@@ -53,7 +53,8 @@ export class AddComment implements OnInit {
       newComment.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
       newComment.device = this.device;
       newComment.browser = this.browser;
-      newComment.body = {comment_text: this.comment_text, comment_images: this.comment_images};
+      newComment.comment_text = this.comment_text;
+      newComment.comment_images = this.comment_images
       newComment.replies = [];
     }
     else {
@@ -63,7 +64,8 @@ export class AddComment implements OnInit {
       newComment.username = commentData.username;  // getting username from token
       newComment.device = commentData.device;
       newComment.browser = commentData.browser;
-      newComment.body = {comment_text: commentData.body.comment_text, comment_images: commentData.body.comment_images};
+      newComment.comment_text = commentData.comment_text;
+      newComment.comment_images = commentData.comment_images
       newComment.replies = [];
     }
   	return newComment;

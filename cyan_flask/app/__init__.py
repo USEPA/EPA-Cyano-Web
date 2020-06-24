@@ -32,6 +32,9 @@ db_port = os.environ.get('DB_PORT')
 db_user = os.environ.get('DB_USER')
 db_passwd = os.environ.get('DB_PASS')
 db_name = os.environ.get('DB_NAME')
+
+db_name = 'test_cyan_web_app_db'
+
 mysql_url = 'mysql://{}:{}@{}/{}'.format(db_user, db_passwd, db_host, db_name)
 
 # Declares Flask application:

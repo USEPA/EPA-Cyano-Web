@@ -11,7 +11,7 @@ import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 
-import { Comment, CommentBody, Reply } from '../models/comment';
+import { Comment, Reply } from '../models/comment';
 
 @Component({
   selector: 'app-comments',
@@ -47,7 +47,8 @@ export class CommentsComponent implements OnInit {
   		c.username = comment.username;
   		c.device = comment.device;
   		c.browser = comment.browser;
-  		c.body = comment.body;
+      c.comment_text = comment.comment_text;
+      c.comment_images = comment.comment_images;
   		c.replies = comment.replies || [];  // NOTE: Defaulting to blank array
   		commentObjects.push(c);
   	});

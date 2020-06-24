@@ -57,20 +57,14 @@ class Comment(db.Model):
 	username = db.Column(db.String(32), nullable=False)
 	device = db.Column(db.String(64), nullable=False, server_default="N/A")
 	browser = db.Column(db.String(64), nullable=False, server_default="N/A")
-	body = db.relationship('CommentBody', backref='comment', lazy=True, uselist=False)
-	replies = db.relationship('Reply', backref='comment', lazy=True)
-
-class CommentBody(db.Model):
-	__tablename__ = 'comment_body'
-	id = db.Column(db.Integer, nullable=False, primary_key=True)
-	comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
 	comment_text = db.Column(db.String(2000), nullable=False)
 	comment_images = db.relationship('CommentImages', backref='comment_body', lazy=True)
+	replies = db.relationship('Reply', backref='comment', lazy=True)
 
 class CommentImages(db.Model):
 	__tablename__ = 'comment_images'
 	id = db.Column(db.Integer, nullable=False, primary_key=True)
-	comment_body_id = db.Column(db.Integer, db.ForeignKey('comment_body.id'), nullable=False)
+	comment_body_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
 	comment_image = db.Column(db.String(256), nullable=False)  # path to image source
 
 class Reply(db.Model):

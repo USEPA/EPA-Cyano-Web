@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 
-import { Comment, CommentBody, Reply } from '../models/comment';
+import { Comment, Reply } from '../models/comment';
 
 
 
@@ -21,7 +21,7 @@ export class ViewComment implements OnInit {
 	*/
 
 	comment: Comment;
-  commentBody: CommentBody;
+  // commentBody: CommentBody;
 	imageSources: string[] = [];
 	body: string = ""; // reply content
   errorMessage: string = "";
@@ -37,7 +37,6 @@ export class ViewComment implements OnInit {
 
   ngOnInit() {
     this.comment = this.data.comment;
-    this.commentBody = this.data.comment.body;
   }
 
   private createReply(): Reply {

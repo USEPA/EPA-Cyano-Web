@@ -17,9 +17,9 @@
 		</p>
 		
 		<div class="comment-content">
-			<p class="comment-body">{{commentBody.comment_text}}</p>
-			<div *ngFor="let imageSource of commentBody.comment_images">
-				<img class="view-uploaded-image" *ngIf="commentBody.comment_images?.length > 0" src="{{imageSource}}" (click)="enlargeImage(imageSource)" />
+			<p class="comment-body">{{comment.comment_text}}</p>
+			<div *ngFor="let imageSource of comment.comment_images">
+				<img class="view-uploaded-image" *ngIf="comment.comment_images?.length > 0" src="{{imageSource}}" (click)="enlargeImage(imageSource)" />
 			</div>
 		</div>
 
