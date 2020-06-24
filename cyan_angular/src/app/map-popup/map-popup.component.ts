@@ -123,6 +123,10 @@ export class MapPopupComponent implements OnInit {
     return this.locationService.getPercentage(this.location);
   }
 
+  getPercentage2(l: Location) {
+    return this.locationService.getPercentage2(l);
+  }
+
   getColor(delta: boolean): string {
     let color = this.locationService.getColor(this.location, delta);  // gets color based on user's settings
     return this.configService.getColorRgbValue(color);

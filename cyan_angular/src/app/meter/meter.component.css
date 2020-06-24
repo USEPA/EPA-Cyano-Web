@@ -1,3 +1,15 @@
+.location_cellCon {
+  text-align: center;
+  font-size: smaller;
+  font-weight: 200;
+}
+
+.location_units {
+  text-align: center;
+  font-size: small;
+  opacity: 0.8;
+}
+
 .conic-gradient {
   /* margin is only for demo*/
   margin: 10px auto;

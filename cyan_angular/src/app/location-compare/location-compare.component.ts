@@ -73,6 +73,10 @@ export class LocationCompareComponent implements OnInit {
     return this.locationService.getPercentage(l);
   }
 
+  getPercentage2(l: Location) {
+    return this.locationService.getPercentage2(l);
+  }
+
   getColor(l: Location, delta: boolean) {
     let color = this.locationService.getColor(l, delta);
     

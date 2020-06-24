@@ -21,14 +21,7 @@
   <div class="location_block_0">
     <div class="location_block_1 left">
       <div class="location_cell">
-        <div class="location_cellC_meter">
-            <div class="location_cellC_meter_center"></div>
-            <div class="location_meter_img"></div>
-            <div class="location_meter_value" [style.background]="getPercentage()"></div>
-            <span *ngIf="locationData.hasData" class="location_cellCon" [style.color]="getColor(false)">
-              {{formatNumber(locationData?.cellConcentration)}}</span><br />
-            <span class="location_units">cells/mL</span>
-        </div>
+        <app-meter [meter_percentage]="getPercentage2(location)" [cellCon]="location.cellConcentration" [cellConColor]="getColor(location, false)"></app-meter>
       </div>
     </div>
     <div *ngIf="locationData.hasData" class="location_block_1 right">

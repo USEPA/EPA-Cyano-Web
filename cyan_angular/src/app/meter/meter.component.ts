@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { SafeHtml, DomSanitizer } from "@angular/platform-browser";
+import { LocationService } from "../services/location.service";
 
 @Component({
   selector: "app-meter",
@@ -8,6 +9,8 @@ import { SafeHtml, DomSanitizer } from "@angular/platform-browser";
 })
 export class MeterComponent implements OnInit {
   @Input() meter_percentage: number;
+  @Input() cellCon: number;
+  @Input() cellConColor: string;
 
   svg: SafeHtml;
 
@@ -15,10 +18,14 @@ export class MeterComponent implements OnInit {
   meterRadius = this.meterSize / 2;
   meterWidth = 6;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit() {
     this.svg = this.setMeter(this.meter_percentage);
+    console.log(this.cellCon + " | " + this.cellConColor);
   }
 
   setMeter(percentage): SafeHtml {
@@ -77,5 +84,9 @@ export class MeterComponent implements OnInit {
       </svg>`;
     }
     return this.sanitizer.bypassSecurityTrustHtml(meter);
+  }
+
+  formatNumber(n: number) {
+    return this.locationService.formatNumber(n);
   }
 }
