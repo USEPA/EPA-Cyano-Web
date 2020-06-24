@@ -4,6 +4,7 @@ Builds tables for local DB that handles user account and user location informati
 
 import os
 import sys
+import getpass
 import mysql.connector
 
 
@@ -13,10 +14,14 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class DBHandler(object):
+	"""
+	Database and table SQL commands with mysql.connector.
+	"""
 
 	def __init__(self, db_name, root_pass):
 		self.db_name = db_name
 		self.root_pass = root_pass
+		self.tables = ['user', 'location', 'notifications']
 
 	def connect_to_db(self, db_name=None):
 		conn = mysql.connector.connect(
@@ -45,19 +50,19 @@ class DBHandler(object):
 
 	def delete_table(self, table_name):
 		query = """
-		DROP TABLE {};
+		DROP TABLE IF EXISTS {};
 		""".format(table_name)
 		self.execute_query(query, self.db_name)
 
 	def create_database(self):
 		query = """
-		CREATE DATABASE {};
+		CREATE DATABASE IF NOT EXISTS {};
 		""".format(self.db_name)
 		self.execute_query(query)
 
 	def delete_database(self):
 		query = """
-		DROP DATABASE {};
+		DROP DATABASE IF EXISTS {};
 		""".format(self.db_name)
 		self.execute_query(query)
 
@@ -67,7 +72,7 @@ class DBHandler(object):
 			id INT(11) NOT NULL AUTO_INCREMENT,
 			username VARCHAR(15) CHARACTER SET utf8 NOT NULL UNIQUE,
 			email VARCHAR(50) NOT NULL UNIQUE,
-			password VARCHAR(256) NOT NULL UNIQUE,
+			password VARCHAR(256) NOT NULL,
 			created  DATE NOT NULL,
 			last_visit DATE NOT NULL,
 			PRIMARY KEY (id)
@@ -80,12 +85,14 @@ class DBHandler(object):
 		CREATE TABLE IF NOT EXISTS Location (
 			owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
 			id INTEGER NOT NULL AUTO_INCREMENT,
+			type TINYINT NOT NULL DEFAULT 1,
 			name VARCHAR(256) NOT NULL,
 			latitude DECIMAL(12,10) NOT NULL,
 			longitude DECIMAL(13,10) NOT NULL,
 			marked BIT NOT NULL,
+			compare BIT NOT NULL DEFAULT 0,
 			notes TEXT NOT NULL,
-			PRIMARY KEY (id, owner)
+			PRIMARY KEY (id, owner, type)
 		);
 		"""
 		self.execute_query(query, self.db_name)
@@ -93,19 +100,27 @@ class DBHandler(object):
 	def create_notifications_table(self):
 		query = """
 		CREATE TABLE IF NOT EXISTS Notifications (
-			-- id INTEGER NOT NULL PRIMARY KEY,
 			owner VARCHAR(20) CHARACTER SET utf8 NOT NULL,
-			-- id INTEGER NOT NULL AUTO_INCREMENT,
 			id INTEGER NOT NULL AUTO_INCREMENT,
 			date DATETIME NOT NULL,
 			subject VARCHAR(256) NOT NULL,
 			body TEXT NOT NULL,
 			is_new BIT NOT NULL,
-			-- image_id INT NOT NULL,
-			-- thumb_id INT NOT NULL,
 			PRIMARY KEY (id, owner)
-			-- FOREIGN KEY (image_id) REFERENCES image(id),
-			-- FOREIGN KEY (thumb_id) REFERENCES image(id)
+		);
+		"""
+		self.execute_query(query, self.db_name)
+
+	def create_settings_table(self):
+		query = """
+		CREATE TABLE IF NOT EXISTS Settings (
+			user_id INTEGER NOT NULL PRIMARY KEY,
+			level_low INTEGER NOT NULL,
+			level_medium INTEGER NOT NULL,
+			level_high INTEGER NOT NULL,
+			enable_alert BIT NOT NULL,
+			alert_value INTEGER,
+			FOREIGN KEY (user_id) REFERENCES User(id)
 		);
 		"""
 		self.execute_query(query, self.db_name)
@@ -117,6 +132,11 @@ class DBHandler(object):
 		query = "CREATE USER '{}'@'localhost' IDENTIFIED BY '{}';".format(user, password)
 		self.execute_query(query)
 
+	def delete_user(self, user):
+		# query = "DROP USER IF EXISTS '{}'@'localhost';".format(user)
+		query = "DROP USER '{}'@'localhost';".format(user)
+		self.execute_query(query)
+
 	def add_privilege(self, user):
 		"""
 		Adds user privilege.
@@ -124,34 +144,72 @@ class DBHandler(object):
 		query = "GRANT SELECT, INSERT, DELETE, UPDATE ON {}.* TO '{}'@'localhost';".format(self.db_name, user)
 		self.execute_query(query)
 
+	def build_table(self, table_name):
+		if table_name == 'user':
+			self.create_user_table()
+		elif table_name == 'location':
+			self.create_location_table()
+		elif table_name == 'notifications':
+			self.create_notifications_table()
+		elif table_name == 'settings':
+			self.create_settings_table()
+		else:
+			raise Exception("Table name should be 'user', 'location', 'notifications', or 'settings'")
+
+	def full_build(self, user, password):
+		print("Creating database: {}".format(self.db_name))
+		self.create_database()
+		print("Creating tables.")
+		self.create_user_table()
+		self.create_location_table()
+		self.create_notifications_table()
+		self.create_settings_table()
+		print("Creating user: {}".format(user))
+		self.create_user(user, password)
+		print("Adding privilege to user {}".format(user))
+		self.add_privilege(user)
+		return True
+
 
 
 if __name__ == '__main__':
 
 	option, db_name, table_name, user_name, user_pass, root_pass = None, None, None, None, None, None
+
+	options = """
+	1. Create a database.
+	2. Create a specific table.
+	3. Delete a specific table.
+	4. Run full database and table creation.
+	5. Deletes database and tables.
+	6. Creates a user.
+	"""
 	
 	try:
 		option = int(sys.argv[1])
 	except IndexError:
-		raise Exception("No option specified.\n1-create database\n2-create table\n3-delete table")
+		print("Options:\n{}".format(options))
+		option = int(input("\nEnter an option from above: "))
 	try:
 		db_name = sys.argv[2]
 	except IndexError:
-		raise Exception("No db name arg specified.")
+		db_name = os.environ.get('DB_NAME') or input("\nEnter database name: ")
 	try:
 		table_name = sys.argv[3]
 	except IndexError:
-		print("No table name specified, which is only needed for options 2 and 3.")
-		pass
+		if option == 2 or option == 3:
+			table_name = input("\nEnter table name: ")
 
 	if option == 4 or option == 6:
+		# Options that involve user creation
 		try:
-			user_name = os.environ.get('DB_USER') or input("Please enter a username: ")
+			user_name = os.environ.get('DB_USER') or input("Please enter a username to be created: ")
 			user_pass = os.environ.get('DB_PASS') or input("Please enter a password for {}: ".format(user_name))
-			root_pass = input("Please enter root password for database: ")
 		except IndexError:
 			print("No user name specified, which is only needed for option 6.")
-			pass
+
+	# MySQL root password (used for most db operations):
+	root_pass = os.environ.get('MYSQL_ROOT_PASSWORD') or getpass.getpass("Please enter root password for database: ")
 
 	print("Option: {},\nDB Name: {},\nTable Name: {}".format(option, db_name, table_name))
 
@@ -162,34 +220,19 @@ if __name__ == '__main__':
 		dbh.create_database()
 	elif option == 2:
 		print("Creating {} table in {}".format(table_name, db_name))
-		if table_name == 'user':
-			dbh.create_user_table()
-		elif table_name == 'location':
-			dbh.create_location_table()
-		elif table_name == 'notifications':
-			dbh.create_notifications_table()
-		else:
-			raise Exception("Table name should be 'user' or 'location'.")
+		dbh.build_table(table_name)
 	elif option == 3:
 		print("Deleting table: {}".format(table_name))
 		dbh.delete_table(table_name)
 	elif option == 4:
-		print("Running full setup.\nCreating database.")
-		dbh.create_database()
-		print("Creating tables.")
-		dbh.create_user_table()
-		dbh.create_location_table()
-		dbh.create_notifications_table()
-		print("Creating user: {}".format(user_name))
-		dbh.create_user(user_name, user_pass)
-		dbh.add_privilege(user_name)
+		print("Running full setup.")
+		dbh.full_build(user_name, user_pass)
 	elif option == 5:
 		print("Removing database and tables.")
-		dbh.delete_table('user')
-		dbh.delete_table('location')
-		dbh.delete_table('notifications')
 		dbh.delete_database()
 	elif option == 6:
 		print("Creating user: {}".format(user_name))
 		dbh.create_user(user_name, user_pass)
 		dbh.add_privilege(user_name)
+
+	print("Done.")

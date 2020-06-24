@@ -65,7 +65,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "serviceWorker": true
+              "serviceWorker": false
             },
             "django-local": {
               "fileReplacements": [
@@ -83,7 +83,15 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "serviceWorker": true
+              "serviceWorker": false
+            },
+            "local-testing": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local-testing.ts"
+                }
+              ]
             }
           }
         },
@@ -95,6 +103,9 @@
           "configurations": {
             "production": {
               "browserTarget": "cyan-web-app:build:production"
+            },
+            "local-testing": {
+              "browserTarget": "cyan-web-app:build:local-testing"
             }
           }
         },

@@ -1,11 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, Injector } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createCustomElement } from '@angular/elements';
-import { MatMenuModule } from '@angular/material/menu';
 import {
   MatSelectModule,
   MatCheckboxModule,
@@ -17,11 +16,17 @@ import {
   MatBottomSheetModule,
   MatIconModule,
   MatBadgeModule,
-  MatCardModule
+  MatCardModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatDatepickerModule,
+  MatMenuModule,
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA
 } from '@angular/material';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { Ng5SliderModule } from 'ng5-slider';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 import { AppComponent } from './app.component';
 import { MarkerMapComponent } from './marker-map/marker-map.component';
@@ -39,17 +44,30 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { LocationService } from './services/location.service';
 import { MapService } from './services/map.service';
+import { AuthService } from './services/auth.service';
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
 import { ConfigComponent } from './config/config.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details/location-details.component';
 import { AccountComponent } from './account/account.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
+// import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
 import { CoordinatesComponent } from './coordinates/coordinates.component';
 import { LatestImageComponent } from './latest-image/latest-image.component';
+import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
+import { ResetComponent } from './reset/reset.component';
+
+// import { AuthInterceptor, JwtInterceptor, LoaderInterceptor } from './interceptors';
+import { AuthInterceptor, JwtInterceptor } from './interceptors';
+import { AuthGuard } from './guards/auth.guard';
+
+import { LoaderComponent } from './shared/loader/loader.component';
+import { LoaderService } from './services/loader.service';
+import { CommentsComponent } from './comments/comments.component';
+import { AddComment, CommentAdded } from './comments/add-comment.component';
+import { ViewComment, ViewImage } from './comments/view-comment.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +88,15 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
     AccountComponent,
     LocationCompareDetailsComponent,
     CoordinatesComponent,
-    LatestImageComponent
+    LatestImageComponent,
+    BottomMenuComponent,
+    ResetComponent,
+    LoaderComponent,
+    CommentsComponent,
+    ViewComment,
+    AddComment,
+    ViewImage,
+    CommentAdded
   ],
   imports: [
     BrowserModule,
@@ -88,6 +114,7 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
     MatInputModule,
     MatNativeDateModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatDatepickerModule,
     MatTabsModule,
     MatIconModule,
@@ -95,17 +122,38 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
     MatBadgeModule,
     MatCardModule,
     MatBadgeModule,
+    MatDialogModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
-  providers: [LocationService, MapService, CyanMap, Location, DatePipe],
+  providers: [
+    LoaderService,
+    // { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
+    LocationService,
+    MapService,
+    AuthService,
+    CyanMap,
+    Location,
+    DatePipe,
+    JwtHelperService,
+    AuthGuard,
+    AddComment,
+    { provide: MatDialogRef, useValue: {} },
+    { provide: MAT_DIALOG_DATA, useValue: {} },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
   entryComponents: [
     MapPopupComponent,
     LocationDetailsNotes,
     NotificationDetails,
-    LocationCompareAlert
+    LocationCompareAlert,
+    ViewComment,
+    AddComment,
+    ViewImage,
+    CommentAdded
   ]
 })
 export class AppModule {

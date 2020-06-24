@@ -9,6 +9,7 @@ import { Location } from '../models/location';
 // import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
 import { DownloaderService } from '../services/downloader.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-notifications',
@@ -31,13 +32,16 @@ export class NotificationsComponent implements OnInit {
 
   constructor(
 		private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
 
-    this.all_notifications = this.userService.currentAccount.notifications
-    this.new_notifications = this.userService.currentAccount.notifications.filter(x => x[5] === 1);
+    // if (!this.authService.checkUserAuthentication()) { return; }
+
+    this.all_notifications = this.userService.currentAccount.notifications;
+    this.new_notifications = this.userService.currentAccount.notifications.filter(x => x[5] == true);
     this.display_notifications = this.all_notifications;
     this.new_notifications_counter = this.new_notifications.length;
 
@@ -47,7 +51,7 @@ export class NotificationsComponent implements OnInit {
 			notifications => {
         // this.new_notifications = notifications;
         this.all_notifications = notifications;
-        this.new_notifications = notifications.filter(x => x[5] === 1)
+        this.new_notifications = notifications.filter(x => x[5] == true)
         this.new_notifications_counter = this.new_notifications.length;
 			}
 		);
@@ -91,6 +95,7 @@ export class NotificationsComponent implements OnInit {
     /*
     Removes all user's notifications.
     */
+    if (!this.authService.checkUserAuthentication()) { return; }
     let user = this.userService.getUserName();
     this.userService.clearUserNotifications(user);
     this.new_notifications = [];
@@ -100,6 +105,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   openNotification(notification, notificationCount) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(NotificationDetails, {
       width: '50%',
       data: {
@@ -124,7 +130,7 @@ export class NotificationsComponent implements OnInit {
 })
 export class NotificationDetails {
 
-  current_notification_index;
+  current_notification_index: number = 0;
 
   constructor(
     public dialogRef: MatDialogRef<NotificationDetails>,
@@ -133,26 +139,27 @@ export class NotificationDetails {
   ) { }
 
   ngOnInit() {
-    // get the index of the selected notification object
+    // Gets the index of the selected notification object
     let notificationId = this.data.notificationObj[1];
-    // this.current_notification_index = this.data.allNotifications.find(item => item[1] === notificationId);
     this.current_notification_index = this.data.allNotifications.map(item => item[1]).indexOf(notificationId);
   }
 
   exit(): void {
-    // close the notification detail
+    // Closes the notification detail
     this.dialogRef.close();
   }
 
   previousNotification(): void {
-    this.current_notification_index = this.current_notification_index == 1 ? this.data.allNotifications.length : this.current_notification_index - 1;
-    this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
+    console.log("notifications previousNotification() called.");
+    this.current_notification_index = this.current_notification_index == 0 ? this.data.allNotifications.length - 1 : this.current_notification_index - 1;
+    this.data.notificationObj = this.data.allNotifications[this.current_notification_index];
     this.updateUserNotifications(this.data.notificationObj);
   }
 
   nextNotification(): void {
-    this.current_notification_index = this.current_notification_index == this.data.allNotifications.length ? 1 : this.current_notification_index + 1;
-    this.data.notificationObj = this.data.allNotifications[this.current_notification_index - 1];
+    console.log("notifications nextNotification() called.");
+    this.current_notification_index = this.current_notification_index == this.data.allNotifications.length - 1 ? 0 : this.current_notification_index + 1;
+    this.data.notificationObj = this.data.allNotifications[this.current_notification_index];
     this.updateUserNotifications(this.data.notificationObj);
   }
 

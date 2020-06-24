@@ -4,6 +4,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-location-compare',
@@ -13,16 +14,19 @@ import { LocationService } from '../services/location.service';
 export class LocationCompareComponent implements OnInit {
 
   selected_locations: Location[];
-  current_compare_locations: Location[];  // compare locations list prior to incoming locations update
 
   constructor(
     private locationService: LocationService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
    ) {}
 
   ngOnInit() {
+
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     this.getLocations();
     if (this.selected_locations === undefined) {
       this.selected_locations = [];
@@ -48,10 +52,12 @@ export class LocationCompareComponent implements OnInit {
   }
 
   removeLocation(loc: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     // Removes location from selected locations array:
     let locIndex = this.selected_locations.map((item) => { return item.id; }).indexOf(loc.id);
     if (locIndex > -1) {
-      this.selected_locations.splice(locIndex, 1);
+      // this.selected_locations.splice(locIndex, 1);
+      this.locationService.deleteCompareLocation(loc);
     }
   }
 
@@ -68,11 +74,22 @@ export class LocationCompareComponent implements OnInit {
   }
 
   getColor(l: Location, delta: boolean) {
-    return this.locationService.getColor(l, delta);
+    let color = this.locationService.getColor(l, delta);
+    
+    if (color === 'green') { color = 'rgb(0, 128, 0)'; }
+    if (color === 'yellow') { color = 'rgb(200, 200, 0)'; }
+    if (color === 'orange') { color = 'rgb(255, 165, 0)'; }
+    if (color === 'red') { color = 'rgb(255, 0, 0)'; }
+    return color;
   }
 
   getArrow(l: Location) {
     return this.locationService.getArrow(l);
+  }
+  
+  // returns a css class with arrow image background
+  getArrowColor(l: Location, delta: boolean) {
+    return this.locationService.getColor(l, delta);
   }
 
   formatNumber(n: number) {
@@ -83,6 +100,7 @@ export class LocationCompareComponent implements OnInit {
     /*
     Opens location compare details.
     */
+    if (!this.authService.checkUserAuthentication()) { return; }
     
     // Checks that > 1 location exists before routing to location-compare-details:
     if (this.selected_locations.length < 2) {

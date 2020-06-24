@@ -1,8 +1,18 @@
 [
 	{
 		"SERVER_NAME": "UberTool-Dev",
-		"ENV": "cgi_azure_docker_dev.env",
+		"ENV": "cdx_azure_dev.env",
 		"DESCRIPTION": "CGI Azure Linux server for testing."
+	},
+	{
+		"SERVER_NAME": "ceam-rhel-dev",
+		"ENV": "gdit_aws_dev.env",
+		"DESCRIPTION": "GDIT development server environment."
+	},
+	{
+		"SERVER_NAME": "ceam-rhel-stg",
+		"ENV": "gdit_aws_stg.env",
+		"DESCRIPTION": "GDIT staging server environment."
 	},
 	{
 		"SERVER_NAME": "local",

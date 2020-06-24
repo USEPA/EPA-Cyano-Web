@@ -7,6 +7,9 @@ import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
+
 
 @Component({
   selector: 'app-map-popup',
@@ -17,18 +20,25 @@ export class MapPopupComponent implements OnInit {
   marked: string = 'Mark';
   @Input() location: Location;
   @Input() locationData: Location;
+  compareSelected: boolean = false;
+  compare_locations: Location[];
 
   locationSubscription: Subscription;
+  locationCompareSub: Subscription;
 
   constructor(
     private locationService: LocationService,
     private mapService: MapService,
     private user: UserService,
     private datePipe: DatePipe,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private configService: ConfigService
   ) {}
 
   ngOnInit() {
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     let self = this;
     if (!this.location) {
       let loc = this.locationService.getStaticLocations();
@@ -39,6 +49,13 @@ export class MapPopupComponent implements OnInit {
       self.marked = self.location.marked ? 'Mark' : 'Unmark';
       self.locationService.downloadLocation(self.location);
     }
+
+    this.compareSelected = this.locationInCompareArray(self.locationService.compare_locations);
+
+    this.locationCompareSub = this.locationService.compare$.subscribe(locations => {
+      this.compareSelected = this.locationInCompareArray(locations);
+    });
+
   }
 
   ngOnDestroy() {
@@ -46,6 +63,20 @@ export class MapPopupComponent implements OnInit {
     this.locationData = null;
     if (this.locationSubscription) {
       this.locationSubscription.unsubscribe();
+    }
+    if (this.locationCompareSub) {
+      this.locationCompareSub.unsubscribe();
+    }
+  }
+
+  locationInCompareArray(compareLocations): boolean {
+    if (this.location == null) { return; }
+    let locIndex = compareLocations.map((item) => { return item.id; }).indexOf(this.location.id);
+    if (locIndex > -1) {
+      return true;
+    }
+    else {
+      return false;
     }
   }
 
@@ -93,11 +124,28 @@ export class MapPopupComponent implements OnInit {
   }
 
   getColor(delta: boolean): string {
-    return this.locationService.getColor(this.location, delta);
+    let color = this.locationService.getColor(this.location, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   getArrow(): boolean {
     return this.locationService.getArrow(this.location);
+  }
+
+  getArrowColor(l: Location, delta: boolean) {
+    const color = this.locationService.getColor(l, delta);
+    if (color === "green") {
+      return "green";
+    }
+    if (color === "yellow") {
+      return "yellow";
+    }
+    if (color === "orange") {
+      return "orange";
+    }
+    if (color === "red") {
+      return "red";
+    }
   }
 
   formatNumber(n: number): string {
@@ -105,11 +153,13 @@ export class MapPopupComponent implements OnInit {
   }
 
   updateName(e: any): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let name = e.target.value;
     this.locationService.updateLocation(name, this.location);
   }
 
   saveNoteToLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let noteTextbox = <HTMLInputElement>document.getElementById('note-input');  // NOTE: casted as HTMLInputElement to make Typescript happy
     let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
     let noteObj = {
@@ -131,8 +181,9 @@ export class MapPopupComponent implements OnInit {
   }
 
   toggleMarkedLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let m = ln.marked;
-    this.locationService.setMarked(ln, !m);
+    ln.marked = !m;
     // Change mark button label
     let label = document.getElementById('marked-label');
     label.innerHTML = this.marked;
@@ -150,15 +201,25 @@ export class MapPopupComponent implements OnInit {
   }
 
   compareLocation(ln: Location): void {
-    this.locationService.addCompareLocation(ln);
+    if (!this.authService.checkUserAuthentication()) { return; }
+    this.compareSelected = !this.compareSelected;
+    if (this.compareSelected) {
+      this.locationService.addCompareLocation(ln);
+    }
+    else{
+       this.locationService.deleteCompareLocation(ln);  // removes from compare array if it exists
+    }
   }
 
   viewLatestImage(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.router.navigate(['/latestimage', { location: JSON.stringify(ln) }]);
   }
 
   deleteLocation(ln: Location): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     this.mapService.deleteMarker(ln);
     this.locationService.deleteLocation(ln);
   }
+
 }

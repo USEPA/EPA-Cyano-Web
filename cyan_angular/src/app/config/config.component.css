@@ -73,7 +73,7 @@
     background: green;
 }
 .yellow {
-    background: yellow;
+    background: #C8C800;
 }
 .orange {
     background: orange;
@@ -93,10 +93,9 @@
 .mat-number-input {
     width: 80%;
 }
-.config-exit {
-    margin: 3px;
-    padding: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
+.config-control {
+    float: right;
+    width: 40px;
+    min-width: 40px;
+    padding: 0 10px;
 }

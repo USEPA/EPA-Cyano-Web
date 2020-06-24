@@ -1,0 +1,27 @@
+<div class="comments-block">
+
+	<button mat-button class="comments-exit" [routerLink]="['']">X</button>
+
+	<div class="comments-title">
+		<h2>User Comments ({{comments.length}})</h2>
+	</div>
+
+	<!-- User Comments Section -->
+	<div *ngIf="comments?.length > 0" class="user-comments">
+		<ul>
+			<li *ngFor="let comment of comments" class="comment-li" (click)="viewComment(comment);">
+				<div class="comment-item-left">
+					<h4>{{comment.title}}</h4>
+					{{comment.date}} <i>by {{comment.username}}</i>
+					<br>
+					{{comment.replies.length}} replies
+				</div>
+			</li>
+		</ul>
+	</div>
+
+	<br>
+
+	<button mat-raised-button color="primary" class="add-comment-btn" (click)="addNewComment();">Add comment</button>
+
+</div>

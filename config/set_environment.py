@@ -12,7 +12,7 @@ import json
 import socket
 
 logger = logging.getLogger(__name__)
-logger.warning("set_environment.py")
+logger.warning("EPA-Cyano-Web set_environment.py")
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -123,8 +123,11 @@ class DeployEnv(ServerConfig):
         if not env_filename:
             # Finally, tries to automatically set environment if no machine id, hostname, or computer name:
             # env_filename = self.run_auto_env_selector()
-            logger.warning("Could not file .env file to set environment. Defaulting to local dev environment.")
-            return "local_dev.env"
+            if not self.docker_hostname:
+                logger.warning("Could not find .env file to set environment and DOCKER_HOSTNAME not set. Defaulting to local dev environment.")
+                return "local_dev.env"
+            else:
+                return "local_docker_dev.env"
         else:
             logger.warning("Setting .env filename using %COMPUTERNAME% env var.")
             return env_filename

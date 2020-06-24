@@ -3,20 +3,23 @@ import { Observable, of, Subscription, Subject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { marker, icon, Map } from 'leaflet';
 
-import { Location } from '../models/location';
-import { UserService, UserLocations, User } from '../services/user.service';
-import { ConfigService } from '../services/config.service';
-import { DownloaderService } from '../services/downloader.service';
+import { Location, LocationType } from '../models/location';
 import { ConcentrationRanges } from '../test-data/test-levels';
+
+import { UserService, UserLocations, User } from '../services/user.service';
+import { DownloaderService } from '../services/downloader.service';
 import { MapService } from '../services/map.service';
+import { LoaderService } from '../services/loader.service';
+import { UserSettings } from "../models/settings";
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
-  userLocations: UserLocations = null;
 
-  test_levels: any;
+  private data_type: LocationType = LocationType.OLCI_WEEKLY;
+
   @Input() locations: Location[] = [];
   @Input() compare_locations: Location[] = [];
 
@@ -31,13 +34,62 @@ export class LocationService {
   constructor(
     private _sanitizer: DomSanitizer,
     private user: UserService,
-    private configService: ConfigService,
     private downloader: DownloaderService,
-    private mapService: MapService
+    private mapService: MapService,
+    private loaderService: LoaderService
   ) {
-    this.getCyanLevels();
     this.getData();
     this.loadUser();
+  }
+
+  setDataType(dataType: number) {
+    let origin_type = this.data_type;
+
+    switch (dataType) {
+      case 1:
+        this.data_type = LocationType.OLCI_WEEKLY;
+        break;
+      case 2:
+        this.data_type = LocationType.OLCI_DAILY;
+        break;
+    }
+    if (origin_type != this.data_type) {
+      // data type changed, reload locations
+      this.refreshData();
+    }
+  }
+
+  clearUserData() {
+    let self = this;
+    // clear all markers
+    this.locations.forEach((location) => {
+      self.mapService.deleteMarker(location);
+    });
+
+    // clear locations data
+    this.downloader.locationsData = {};
+    while(this.locations.length){
+      this.locations.pop();
+    }
+    while(this.compare_locations.length){
+      this.compare_locations.pop();
+    }
+  }
+
+  refreshData() {
+    let self = this;
+
+    this.clearUserData();
+
+    // fetch data
+    this.downloader.getUserLocations(this.user.getUserName(), this.data_type).subscribe((locations: UserLocations[]) => {
+      self.user.currentAccount.locations = locations;
+      self.getUserLocations();
+    });
+  }
+
+  getDataType() {
+    return this.data_type;
   }
 
   loadUser() {
@@ -66,15 +118,18 @@ export class LocationService {
 
   getUserLocations() {
     let self = this;
-    let username = this.user.getUserName();
     this.user.getUserLocations().subscribe((locations: UserLocations[]) => {
       if (locations.length != 0) {
+
+        self.loaderService.showProgressBar();  // uses progress bar while getting user's location data
+
         locations.forEach(function(location) {
 
           if (!self.locationIDCheck(location.id)) {
             let l = new Location();
             l.id = location.id;
             l.name = location.name;
+            l.type = location.type;
             let coord = self.convertCoordinates(location.latitude, location.longitude);
             l.latitude = location.latitude;
             l.longitude = location.longitude;
@@ -93,7 +148,7 @@ export class LocationService {
             l.changeDate = '';
             l.dataDate = '';
             l.marked = location.marked == true ? true : false;
-            // l.notes = location.notes == '' ? '' : JSON.parse(location.notes);
+            l.compare = location.compare == true ? true: false;
             l.notes = location.notes;
             l.sourceFrequency = '';
             l.validCellCount = 0;
@@ -102,9 +157,9 @@ export class LocationService {
             self.downloadLocation(l);
           }
         });
-
         let map = self.mapService.getMap();
         self.addMarkers(map);
+        self.updateCompareList();
       }
     });
   }
@@ -117,10 +172,6 @@ export class LocationService {
       }
     });
     return inLocations;
-  }
-
-  getCyanLevels(): void {
-    this.configService.getLevels().subscribe(levels => (this.test_levels = levels));
   }
 
   getAllLocations(): Observable<Location[]> {
@@ -147,6 +198,8 @@ export class LocationService {
     this. locationChangedSub = this.downloader.locationsChanged.subscribe( (loc: Location) => {
       if (loc != null) {
         this.mapService.updateMarker(loc);
+        this.updateCompareLocation(loc);
+        this.downloader.updateProgressBar();
       }
     });
   }
@@ -157,8 +210,6 @@ export class LocationService {
 
   // NOTE: Will not filter locations within service, set source type in my-locations
   getLocations(src: string): Observable<Location[]> {
-    src = src == 'MERIS' ? 'MERIS' : 'OLCI';
-    //TODO: add filtering for data source
     return of(this.locations);
   }
 
@@ -187,6 +238,7 @@ export class LocationService {
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
     l.name = name;
+    l.type = this.getDataType();
     l.latitude = latitude;
     l.longitude = longitude;
     l.latitude_deg = c.latDeg;
@@ -207,6 +259,7 @@ export class LocationService {
     l.validCellCount = 9;
     l.notes = [];
     l.marked = false;
+    l.compare = false;
 
     this.downloader.addUserLocation(this.user.getUserName(), l);
     this.locations.push(l);
@@ -217,7 +270,7 @@ export class LocationService {
   deleteLocation(ln: Location): void {
     const index = this.locations.map(loc => loc.id).indexOf(ln.id);
     if (index >= 0) {
-      this.downloader.deleteUserLocation(this.user.getUserName(), ln.id);
+      this.downloader.deleteUserLocation(this.user.getUserName(), ln.id, ln.type);
       this.locations.splice(index, 1);
     }
     // delete from compare also
@@ -229,9 +282,18 @@ export class LocationService {
       if (loc.id === ln.id) {
         loc.name = name;
         let username = this.user.getUserName();
-        this.downloader.editUserLocation(username, ln.id, name, ln.marked, ln.notes);
+        this.downloader.updateUserLocation(username, ln);
       }
     });
+  }
+
+  updateCompareList(): void {
+    /*
+    Sends updated compare list via Observable once user's
+    locations are collected.
+    */
+    this.compare_locations = this.locations.filter(location => location.compare == true);
+    this.compareLocationsSource.next(this.compare_locations)
   }
 
   getCompareLocations(): Observable<Location[]> {
@@ -247,15 +309,28 @@ export class LocationService {
       this.compare_locations.push(ln);
     }
     this.compareLocationsSource.next(this.compare_locations);  // updates Observable/Subject for subscribed components
+    ln['compare'] = true;
+    this.updateLocation(ln.name, ln);  // updates location's 'compare' parameter
   }
 
-  updateCompareLocation(name: string, ln: Location) {
+  updateCompareLocation(ln: Location) {
+    /*
+    Updates a location in compare location array when data for the
+    location is obtained.
+    */
+    let locIndex = this.compare_locations.map((item) => { return item.id; }).indexOf(ln.id);
+    if (locIndex > -1) {
+      this.compare_locations[locIndex] = ln;
+      this.compareLocationsSource.next(this.compare_locations);
+    }
   }
 
   deleteCompareLocation(ln: Location): void {
     if (this.compare_locations.includes(ln)) {
       this.compare_locations.splice(this.compare_locations.indexOf(ln), 1);
       this.compareLocationsSource.next(this.compare_locations);
+      ln['compare'] = false;
+      this.updateLocation(ln.name, ln);  // updates location's 'compare' parameter
     }
   }
 
@@ -306,7 +381,9 @@ export class LocationService {
 
   getPercentage(l: Location) {
     let cells = l.cellConcentration;
-    let p = (cells / this.test_levels.veryhigh[0]) * 100;
+    let userSettings = this.user.getUserSettings();
+
+    let p = (cells / userSettings.level_high) * 100;
     if (p > 100) {
       p = 100;
     }
@@ -314,21 +391,20 @@ export class LocationService {
   }
 
   getColor(l: Location, delta: boolean) {
-    let cc = new ConcentrationRanges();
+    let userSettings = this.user.getUserSettings();
+
     let cells = l.cellConcentration;
     if (delta) {
       cells = Math.abs(l.concentrationChange);
     }
     let c = 'green';
-    if (cells <= this.test_levels.low[0]) {
+    if (cells <= userSettings.level_low) {
       c = 'green';
-    } else if (cells > this.test_levels.low[0] && cells <= this.test_levels.low[1]) {
-      c = 'green';
-    } else if (cells > this.test_levels.medium[0] && cells <= this.test_levels.medium[1]) {
+    } else if (cells > userSettings.level_low && cells <= userSettings.level_medium) {
       c = 'yellow';
-    } else if (cells > this.test_levels.high[0] && cells <= this.test_levels.high[1]) {
+    } else if (cells > userSettings.level_medium && cells <= userSettings.level_high) {
       c = 'orange';
-    } else if (cells > this.test_levels.veryhigh[0]) {
+    } else if (cells > userSettings.level_high) {
       c = 'red';
     }
     return c;
@@ -340,6 +416,12 @@ export class LocationService {
     }
     return false;
   }
+  exceedAlertValue(l: Location): boolean {
+    let userSettings = this.user.getUserSettings();
+    let cells = l.cellConcentration;
+
+    return userSettings.enable_alert && (cells >= userSettings.alert_value);
+  }
 
   formatNumber(n: number): string {
     let _n = Math.abs(n);
@@ -350,7 +432,7 @@ export class LocationService {
   setMarked(l: Location, m: boolean): void {
     l.marked = m;
     let username = this.user.getUserName();
-    this.downloader.editUserLocation(username, l.id, name, l.marked, l.notes);
+    this.downloader.updateUserLocation(username, l);
   }
 
   addMarkers(map: Map): void {
@@ -361,6 +443,16 @@ export class LocationService {
       }
     });
   }
+
+  updateMarkers(): void {
+    this.locations.forEach(location => {
+      let self = this;
+      if (self.mapService.hasMarker(location.id)) {
+        this.mapService.updateMarker(location);
+      }
+    });
+  }
+
 }
 
 class Coordinate {

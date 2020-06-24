@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription, BehaviorSubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
+import { LocationType } from '../models/location';
+import { UserSettings } from '../models/settings';
+import { Comment, Reply } from '../models/comment';
+
 import { environment } from '../../environments/environment';
-import { Subscription, BehaviorSubject} from "rxjs";
+import { AuthService } from '../services/auth.service';
+import { LoaderService } from '../services/loader.service';
 
 class UrlInfo {
   type: string;
@@ -69,8 +74,13 @@ export class DownloaderService {
   locations: Location[] = [];
 
 
+  requestsTracker: number = 0;
+
+
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService,
+    private loaderService: LoaderService
   ) {}
 
   registerUser(username: string, email: string, password: string) {
@@ -81,7 +91,7 @@ export class DownloaderService {
 
   userLogin(username: string, password: string) {
     let url = this.baseServerUrl + 'user';
-    let body = { user: username, password: password };
+    let body = { user: username, password: password, dataType: LocationType.OLCI_WEEKLY };
     return this.http.post(url, body, headerOptions);
   }
 
@@ -91,13 +101,14 @@ export class DownloaderService {
       owner: username,
       id: ln.id,
       name: ln.name,
+      type: ln.type,
       latitude: ln.latitude,
       longitude: ln.longitude,
       marked: ln.marked,
-      notes: JSON.stringify(ln.notes)
+      compare: ln.compare,
+      notes: ln.notes
     };
-
-    this.executeUserLocations(url, body).subscribe();
+    this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
   updateUserLocation(username: string, ln: Location) {
@@ -105,103 +116,146 @@ export class DownloaderService {
     let body = {
       owner: username,
       id: ln.id,
+      type: ln.type,
       name: ln.name,
       marked: ln.marked,
-      notes: JSON.stringify(ln.notes)
+      compare: ln.compare,
+      notes: ln.notes
     };
-    this.executeEditUserLocation(url, body).subscribe();
+    this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
-  executeUserLocations(url: string, body: any) {
-    return this.http.post(url, body, headerOptions);
-  }
-
-  editUserLocation(username: string, id: number, name: string, marked: boolean, notes: object[]) {
-    let url = this.baseServerUrl + 'location/edit';
-    let body = {
-      owner: username,
-      id: id,
-      name: name,
-      marked: marked,
-      notes: JSON.stringify(notes)
-    };
-    this.executeEditUserLocation(url, body).subscribe();
-  }
-
-  executeEditUserLocation(url: string, body: any) {
-    return this.http.post(url, body, headerOptions);
-  }
-
-  deleteUserLocation(username: string, id: number) {
+  deleteUserLocation(username: string, id: number, type: number) {
     delete this.locationsData[id];
-    let url = this.baseServerUrl + 'location/delete/' + username + '/' + id;
+    let url = this.baseServerUrl + 'location/delete/' + id + '/' + type;
     this.executeDeleteUserLocation(url).subscribe();
   }
 
   executeDeleteUserLocation(url: string) {
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   getUserLocation(username: string, id: number) {
-    let url = this.baseServerUrl + 'location/' + username + '/' + id;
-    return this.http.get(url);
+    let url = this.baseServerUrl + 'location/' + id;
+    return this.executeAuthorizedGetRequest(url);
   }
 
+  getUserLocations(username: string, type: number) {
+    let url = this.baseServerUrl + 'locations/' + type;
+    return this.executeAuthorizedGetRequest(url);
+  }
 
   updateNotification(username: string, id: number) {
     /*
-    Updates user's notification, e.g., is_new set to false if clicked.
+     Updates user's notification, e.g., is_new set to false if clicked.
     */
-    let url = this.baseServerUrl + 'notification/edit/' + username + '/' + id;
+    let url = this.baseServerUrl + 'notification/edit/' + id;
     return this.executeUpdateNotification(url).subscribe();
   }
 
   executeUpdateNotification(url: string) {
-    return this.http.get(url);
+    return this.executeAuthorizedGetRequest(url);
   }
 
   clearUserNotifications(username: string) {
     /*
     Clears all user's notifications.
     */
-    let url = this.baseServerUrl + 'notification/delete/' + username;
+    let url = this.baseServerUrl + 'notification/delete';
     this.executeClearUserNotifications(url).subscribe();
   }
 
   executeClearUserNotifications(url: string) {
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  updateUserSettings(settings: UserSettings) {
+    /*
+     Updates user's settings for color configuration/alert threshold.
+     */
+    let url = this.baseServerUrl + 'settings/edit';
+    return this.executeAuthorizedPostRequest(url, settings);
+  }
+
+  getAllComments() {
+    /*
+    Gets all users' comments.
+    */
+    let url = this.baseServerUrl + 'comment';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  addUserComment(comment: Comment) {
+    /*
+    Adds user comment.
+    */
+    let url = this.baseServerUrl + 'comment';
+    return this.executeAuthorizedPostRequest(url, comment);
+  }
+
+  addReplyToComment(reply: Reply) {
+    /*
+    Adds user reply to a user's comment.
+    */
+    let url = this.baseServerUrl + 'reply';
+    return this.executeAuthorizedPostRequest(url, reply);
+  }
+
+  executeAuthorizedPostRequest(url: string, body: any) {
+    if (!this.authService.checkUserAuthentication()) { return; }
+    return this.http.post(url, body, headerOptions);
+  }
+
+  executeAuthorizedGetRequest(url: string) {
+    if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.get(url);
   }
 
-  ajaxRequest(id: number, username: string, name: string, marked: boolean, notes: object[], url: string) {
+  ajaxRequest(ln: Location, username: string, url: string) {
     let self = this;
+    self.loaderService.show();
+    console.log("Tracker: " + this.requestsTracker);
+    self.requestsTracker += 1;
     ajax(url).subscribe(data => {
       let d: LocationDataAll = data.response;
-      let loc = self.createLocation(id, username, name, marked, notes, d);
+      let loc = self.createLocation(ln, username, d);
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
       if (index > -1) {
         self.locations[index] = loc;
-        self.locationsData[id] = {
+        self.locationsData[ln.id] = {
           requestData: d,
           location: loc
         };
-
-        // raise event location changed
-        self.locationSubject.next(loc);
+        self.locationSubject.next(loc);  // raise event location changed
+        self.requestsTracker -= 1;
+        self.updateProgressBar();
       }
     });
   }
 
   getAjaxData(username: string, ln: Location) {
+
+    // Checks if token is valid before making requests:
+    if (!this.authService.checkUserAuthentication()) { return; }
+
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
-      this.ajaxRequest(ln.id, username, ln.name, ln.marked, ln.notes, url);
+      switch (ln.type) {
+        case LocationType.OLCI_WEEKLY:
+              url += '?type=olci&frequency=weekly';
+              break;
+        case LocationType.OLCI_DAILY:
+              url += '?type=olci&frequency=daily';
+              break;
+      }
+      this.ajaxRequest(ln, username, url);
     }
   }
 
   getLocationIndex(ln: Location) {
-    return this.locations.map(loc => loc.id).indexOf(ln.id);
+    return this.locations.findIndex(loc => loc.id == ln.id && loc.type == ln.type);
   }
 
   locationNotDeleted(ln: Location) {
@@ -216,22 +270,19 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-  createLocation(id: number, username: string, name: string, marked: boolean, notes: object[], data: LocationDataAll): Location {
+  createLocation(loc: Location, username: string, data: LocationDataAll): Location {
+
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
+    let name = loc.name;
 
     let ln = new Location();
-    ln.id = id;
-    if (name.indexOf('Update') == -1 && name != null) {
+    ln.id = loc.id;
+    if (name != null && name.indexOf('Update') == -1) {
       ln.name = name;
     } else {
       ln.name = data.metaInfo.locationName;
     }
-
-    // Check for "Unknown Location" as name, if so, then
-    // add an incremental integer to name (e.g., "Unknown Location -- 1"):
-    if (ln.name == "Unknown Location") {
-      ln.name = ln.name + " -- " + ln.id;
-    }
+    ln.type = loc.type;
 
     ln.latitude_deg = coordinates.latDeg;
     ln.latitude_min = coordinates.latMin;
@@ -268,14 +319,17 @@ export class DownloaderService {
       ln.validCellCount = 0;
     }
     // ln.notes = [];
-    ln.notes = notes;
-    if (marked != null) {
-      ln.marked = marked;
+    ln.notes = loc.notes;
+    if (loc.marked != null) {
+      ln.marked = loc.marked;
     } else {
       ln.marked = false;
     }
+    ln.compare = loc.compare;
 
-    if (this.locationNotDeleted(ln)) {
+    // update only if name changed and user did not remove location before API returns
+    if (ln.name != loc.name && this.locationNotDeleted(ln)) {
+      ln.name = this.addUniqueId(ln);
       this.updateUserLocation(username, ln);
     }
     return ln;
@@ -302,6 +356,41 @@ export class DownloaderService {
 
     return coordinate;
   }
+
+  addUniqueId(ln: Location): string {
+    /*
+    Creates a unique ID for location name.
+    */
+    let matchedLocations: Number[] = [];
+    this.locations.forEach((location) => {
+      if (location.name.includes(ln.name)) {
+        let idNum = location.name.split(" -- ")[1];
+        if (idNum != undefined && !isNaN(Number(idNum)) && !isNaN(parseInt(idNum))) {
+          matchedLocations.push(Number(idNum));
+        }
+      }
+    });
+    if (matchedLocations.length == 0) {
+      ln.name = ln.name + " -- 1";  
+    }
+    else if (matchedLocations.length > 0) {
+      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();  
+    }
+    else {
+      ln.name = ln.name;
+    }
+    return ln.name;
+  }
+
+  updateProgressBar(): void {
+    let progressValue = 100 * (1 - (this.requestsTracker / this.locations.length));
+    this.loaderService.progressValue.next(progressValue);
+    if (this.requestsTracker <= 0) {
+      this.loaderService.hide();
+      this.loaderService.progressValue.next(0);
+    }
+  }
+
 }
 
 class Coordinate {

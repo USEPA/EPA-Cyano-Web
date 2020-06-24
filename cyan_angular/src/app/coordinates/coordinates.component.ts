@@ -6,9 +6,7 @@ import { Location } from '../models/location';
 
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
-import { DownloaderService } from '../services/downloader.service';
-import { UserService } from '../services/user.service';
-import { ConfigService } from '../services/config.service';
+import { AuthService } from '../services/auth.service';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -39,20 +37,15 @@ export class CoordinatesComponent implements OnInit {
   constructor(
 		private locationService: LocationService,
 		private mapService: MapService,
-		private downloaderService: DownloaderService,
-		private user: UserService,
-		private configService: ConfigService
+		private authService: AuthService
   ) { }
 
   ngOnInit() {
-		this.getCyanRanges();
+  	if (!this.authService.checkUserAuthentication()) { return; }
   }
 
-	getCyanRanges(): void {
-		this.configService.getLevels().subscribe(levels => (this.cyan_ranges = levels));
-	}
-
 	markLocation(): void {
+		if (!this.authService.checkUserAuthentication()) { return; }
 		this.location = this.getLocationData();
 		this.locationService.setMarked(this.location, true);
 		this.mapService.updateMarker(this.location);
@@ -60,6 +53,7 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	compareLocation(): void {
+		if (!this.authService.checkUserAuthentication()) { return; }
 		this.location = this.getLocationData();
 		this.locationService.addCompareLocation(this.location);
 	}
@@ -98,40 +92,6 @@ export class CoordinatesComponent implements OnInit {
 
 		return location;
 
-	}
-
-	getMarker(n: number, c: boolean): string {
-		if (n <= this.cyan_ranges.low[1]) {
-			if (c) {
-				return 'assets/images/map_pin_green_checked.png';
-			} else {
-				return 'assets/images/map_pin_green_unchecked.png';
-			}
-		} else if (n <= this.cyan_ranges.medium[1] && n >= this.cyan_ranges.medium[0]) {
-			if (c) {
-				return 'assets/images/map_pin_yellow_checked.png';
-			} else {
-				return 'assets/images/map_pin_yellow_unchecked.png';
-			}
-		} else if (n <= this.cyan_ranges.high[1] && n >= this.cyan_ranges.high[0]) {
-			if (c) {
-				return 'assets/images/map_pin_orange_checked.png';
-			} else {
-				return 'assets/images/map_pin_orange_unchecked.png';
-			}
-		} else if (n >= this.cyan_ranges.veryhigh[0]) {
-			if (c) {
-				return 'assets/images/map_pin_red_checked.png';
-			} else {
-				return 'assets/images/map_pin_red_unchecked.png';
-			}
-		} else {
-			if (c) {
-				return 'assets/images/map_pin_green_checked.png';
-			} else {
-				return 'assets/images/map_pin_green_unchecked.png';
-			}
-		}
 	}
 
 }

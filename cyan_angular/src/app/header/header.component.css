@@ -294,3 +294,18 @@
   float: inherit;
   margin: 0 auto;
 }
+.search {
+  display: none;
+}
+.help {
+  /*display: none;*/
+}
+.header-version {
+  font-size: small;
+}
+
+.mat_icon {
+  height: 42px;
+  width: 42px;
+  color: white;
+}

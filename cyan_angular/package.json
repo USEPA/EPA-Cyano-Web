@@ -1,12 +1,12 @@
 {
   "name": "cyna-web-app",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:solo": "ng build --prod --output-path dist",
-    "build:stack": "ng build --prod --output-path dist",
+    "build:standalone": "ng build --prod --output-path dist",
+    "build:qed": "ng build --prod --baseHref=/cyanweb --outputHashing=none --outputPath=../../static_qed/epa-cyano-web",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -28,6 +28,7 @@
     "@angular/router": "8.2.9",
     "@angular/service-worker": "8.2.9",
     "@asymmetrik/ngx-leaflet": "6.0.1",
+    "@auth0/angular-jwt": "^4.0.0",
     "@types/leaflet": "1.5",
     "bootstrap": "4.3.1",
     "chart.js": "2.8.0",
@@ -42,7 +43,7 @@
     "zone.js": "0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "0.803.8",
+    "@angular-devkit/build-angular": "0.803.24",
     "@angular/cli": "8.3.8",
     "@angular/compiler-cli": "8.2.9",
     "@angular/language-service": "8.2.9",

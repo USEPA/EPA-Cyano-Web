@@ -11,6 +11,8 @@ import { LocationImagesService } from '../services/location-images.service';
 import { ImageDetails } from '../models/image-details';
 import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: 'app-location-compare-details',
@@ -98,17 +100,22 @@ export class LocationCompareDetailsComponent implements OnInit {
     center: latLng([this.lat_0, this.lng_0])
   };
 
-  constructor(private route: ActivatedRoute,
-              private router: Router,
-              private locationService: LocationService,
-              private mapService: MapService,
-              private bottomSheet: MatBottomSheet,
-              private images: LocationImagesService,
-              private downloader: DownloaderService,
-              private user: UserService) {
-  }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private locationService: LocationService,
+    private mapService: MapService,
+    private bottomSheet: MatBottomSheet,
+    private images: LocationImagesService,
+    private downloader: DownloaderService,
+    private user: UserService,
+    private authService: AuthService,
+    private configService: ConfigService
+  ) { }
 
   ngOnInit() {
+
+    if (!this.authService.checkUserAuthentication()) { return; }
 
     this.imageCollection = null;
     this.route.params.subscribe(
@@ -149,22 +156,17 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   downloadTimeSeries(l: Location) {
     let coord = this.locationService.convertToDegrees(l);
-    let username = this.user.getUserName();
-
-    this.downloader.getAjaxData(username, l);
-
+    this.locationService.downloadLocation(l);
     this.tsSub = this.downloader.getTimeSeries().subscribe((rawData: RawData[]) => {
       let data = rawData[l.id].requestData;
       let timeSeriesData = [];
       data.outputs.map(timestep => {
-        if (timestep.satelliteImageFrequency == 'Weekly') {
-          // Builds data var like [{x: '', y: ''}, {}...]
-          let datum = {
-            x: timestep.imageDate.split(' ')[0],
-            y: timestep.cellConcentration
-          };
-          timeSeriesData.push(datum);
-        }
+        // Builds data var like [{x: '', y: ''}, {}...]
+        let datum = {
+          x: timestep.imageDate.split(' ')[0],
+          y: timestep.cellConcentration
+        };
+        timeSeriesData.push(datum);
       });
 
       // Adds time series line to chart:
@@ -185,6 +187,7 @@ export class LocationCompareDetailsComponent implements OnInit {
   }
 
   onMapReady(map: Map): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
     let markerArray = [];
     let latLngArray = [];
     map.invalidateSize();  // will this fix the gray map?
@@ -220,7 +223,8 @@ export class LocationCompareDetailsComponent implements OnInit {
   }
 
   getColor(l: Location, delta: boolean) {
-    return this.locationService.getColor(l, delta);
+    let color = this.locationService.getColor(l, delta);  // gets color based on user's settings
+    return this.configService.getColorRgbValue(color);
   }
 
   formatNumber(n: number) {
@@ -229,6 +233,10 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   getPercentage(l: Location) {
     return this.locationService.getPercentage(l);
+  }
+
+  getArrowColor(l: Location, delta: boolean) {
+    return this.locationService.getColor(l, delta);
   }
 
 }

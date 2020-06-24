@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of, Subscription, Subject } from 'rxjs';
 
 import { DownloaderService } from './downloader.service';
+import { AuthService } from './auth.service';
+import {UserSettings} from "../models/settings";
 
 
 @Injectable({
@@ -12,63 +14,68 @@ export class UserService {
   currentAccount: Account = {
     user : {
       username: "",
-      email: ""
+      email: "",
+      auth_token: ""
     },
     locations : [],
-    notifications: []
+    notifications: [],
+    settings: new UserSettings()
   };
   response: any = null;
 
   private allNotificationsSource = new Subject<UserNotifications[]>();  // obserable Notifications[] sources
   allNotifications$ = this.allNotificationsSource.asObservable();  // observable Notifications[] streams
 
-  constructor(private downloader: DownloaderService) { }
+  constructor(
+    private downloader: DownloaderService,
+    private authService: AuthService
+  ) { }
+
+  initializeCurrentAccount(): void {
+    this.currentAccount = {
+      user : {
+        username: "",
+        email: "",
+        auth_token: ""
+      },
+      locations : [],
+      notifications: [],
+      settings: new UserSettings()
+    };
+  }
 
   loginUser(username: string, password: string) {
-    this.downloader.userLogin(username, password).subscribe((details: Account) => {
-      if (!('error' in details)) {
-        this.currentAccount = details;
-        this.currentAccount.locations.forEach(location => {
-          location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
-        });
-        this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
-      }
-      else {
-        this.currentAccount['error'] = details['error'];
-      }
+    this.initializeCurrentAccount();
+    return this.downloader.userLogin(username, password);
+  }
+
+  setUserDetails(details: Account) {
+    this.currentAccount = details;
+    this.currentAccount.locations.forEach(location => {
+      location.notes = Array.isArray(location.notes) ? location.notes : JSON.parse(location.notes);
     });
+    this.allNotificationsSource.next(details.notifications);  // pushes user notifications to subscriber(s)
+    this.authService.setSession(details.user.auth_token);
+  }
+
+  logoutUser() {
+    /*
+    Clears current account data, locations, notifcations, etc.
+    */
+    this.initializeCurrentAccount();  // clears currentAccount object
+    this.allNotificationsSource.next([]);  // clears notifications source
   }
 
   registerUser(username: string, email: string, password: string) {
-    let self = this;
-    this.downloader.registerUser(username, email, password).subscribe(response => {
-      if(response.hasOwnProperty("status")){
-        if(response['status'] == "success"){
-          this.currentAccount.user.username = response['username'];
-          this.currentAccount.user.email = response['email'];
-          this.currentAccount.locations = [];
-          this.currentAccount.notifications = [];
-          this.response = response;
-        }
-        else{
-          this.currentAccount.user.username = response['username'];
-          this.currentAccount.user.email = response['email'];
-          this.currentAccount.locations = [];
-          this.currentAccount.notifications = [];
-        }
-      }
-      else{
-        this.response = response;
-      }
-    });
-  }
-
-  getResponse(): Observable<any> {
-    return of(this.response);
+    return this.downloader.registerUser(username, email, password);
   }
 
   getUserName(): string {
     return this.currentAccount.user.username;
+  }
+
+  getUserSettings(): UserSettings {
+    return this.currentAccount.settings;
   }
 
   getUserDetails(): Observable<User> {
@@ -100,12 +107,15 @@ export class UserService {
     this.allNotificationsSource.next(_notifications);  // push updated notifications
   }
 
+  updateUserSettings(settings: UserSettings) {
+    return this.downloader.updateUserSettings(settings);
+  }
+
   clearUserNotifications(username: string) {
     /*
     Clears user's notifications.
     */
     this.downloader.clearUserNotifications(username);
-    // Update user's notifications array to a new/blank array?
     this.currentAccount.notifications = [];
     this.allNotificationsSource.next(this.currentAccount.notifications);
   }
@@ -115,15 +125,18 @@ export class UserService {
 export class User {
   username: string;
   email: string;
+  auth_token: string;
 }
 
 export class UserLocations {
   owner: string;
   id: number;
   name: string;
+  type: number;
   latitude: number;
   longitude: number;
   marked: boolean;
+  compare: boolean;
   notes: object[];
 }
 
@@ -139,4 +152,5 @@ export class Account {
   user: User;
   locations: UserLocations[];
   notifications: UserNotifications[];
+  settings: UserSettings;
 }
