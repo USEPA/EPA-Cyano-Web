@@ -98,7 +98,7 @@ def add_location(post_data):
 		compare = post_data.get('compare') or False
 		notes = post_data['notes'] or []
 	except KeyError:
-		return {"error": "Invalid key in request"}, 200
+		return {"error": "Invalid key in request"}, 400
 	# Checks if location already exists for user:
 	location_obj = Location.query.filter_by(id=_id, owner=user, type=data_type).first()
 	if location_obj:
@@ -135,7 +135,7 @@ def edit_location(post_data):
 		compare = post_data.get('compare') or False  # need or? trying to account for pre-existing db without "compare" column
 		notes = post_data['notes'] or []  # array of strings in json format
 	except KeyError:
-		return {"error": "Invalid key in request"}, 200
+		return {"error": "Invalid key in request"}, 400
 	updated_values = dict(name=name, marked=marked, compare=compare, notes=json.dumps(notes))
 	location_obj = Location.query.filter_by(owner=user, id=_id, type=data_type).update(updated_values)
 	db.session.commit()
@@ -397,10 +397,6 @@ def add_user_comment(post_data):
 
 	db.session.add(comment_obj)
 	db.session.flush()
-	
-	# comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
-	# comment_text = db.Column(db.Text, nullable=False)
-	# comment_images = db.relationship('CommentImages', backref='comment_body', lazy=True)
 	
 	comment_body_obj = CommentBody(
 		comment_id=comment_obj.id,
