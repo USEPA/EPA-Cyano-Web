@@ -5,8 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
-
-import { Comment, CommentBody, Reply } from '../models/comment';
+import { Comment, Reply } from '../models/comment';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 
 
@@ -16,41 +16,53 @@ import { Comment, CommentBody, Reply } from '../models/comment';
   styleUrls: ['./comments.component.css']
 })
 export class ViewComment implements OnInit {
-	/*
-	Dialog for viewing a user comment.
-	*/
+  /*
+  Dialog for viewing a user comment.
+  */
 
-	comment: Comment;
-  commentBody: CommentBody;
-	imageSources: string[] = [];
-	body: string = ""; // reply content
+  comment: Comment;
+  imageSources: string[] = [];
+  body: string = ""; // reply content
+
+  replySizeLimit: number = 500;
+
   errorMessage: string = "";
 
-	constructor(
+
+  constructor(
     public dialogRef: MatDialogRef<ViewComment>,
-		private datePipe: DatePipe,
+    private datePipe: DatePipe,
     private imageDialog: MatDialog,
+    private viewCommentDialog: MatDialog,
     private downloader: DownloaderService,
-  	private authService: AuthService,
+    private authService: AuthService,
+    private dialogComponent: DialogComponent,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit() {
     this.comment = this.data.comment;
-    this.commentBody = this.data.comment.body;
   }
 
   private createReply(): Reply {
-  	let newReply = new Reply();
-  	newReply.comment_id = this.comment.id;
-  	newReply.comment_user = this.comment.username;
-  	newReply.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
-  	newReply.body = this.body;  // reply content
-  	return newReply;
+    let newReply = new Reply();
+    newReply.comment_id = this.comment.id;
+    newReply.comment_user = this.comment.username;
+    newReply.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    newReply.body = this.body;  // reply content
+    return newReply;
   }
 
   exit(): void {
     this.dialogRef.close();
+  }
+
+  displayDialog(message: string): void {
+    this.viewCommentDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
   }
 
   enlargeImage(imageSource): void {
@@ -58,9 +70,10 @@ export class ViewComment implements OnInit {
     Displays larger version of selected image.
     */
 
-    console.log("view-comment enlargeImage() called.");
-
-    if (!this.authService.checkUserAuthentication()) { return; }
+    if (!this.authService.checkUserAuthentication()) {
+      this.exit();
+      return;
+    }
     const dialogRef = this.imageDialog.open(ViewImage, {
       width: '80%',
       height: '80%',
@@ -70,26 +83,41 @@ export class ViewComment implements OnInit {
     });
   }
 
-  addReplyToComment(): void {
-  	/*
-  	Adds reply to a user comment.
-  	*/
-  	if (!this.authService.checkUserAuthentication()) {
+  validateReply(): boolean {
+    if (!this.authService.checkUserAuthentication()) {
       this.exit();
-      return;
+      return false;
     }
 
     if (this.body.length < 1) {
-      this.errorMessage = "Enter a reply before submitting.";
+      this.displayDialog("Enter a reply before submitting.");
+      return false;
+    }
+    else if (this.body.length > this.replySizeLimit) {
+      this.displayDialog("Reply length is too large (" + this.replySizeLimit + " characters max)");
+      return false;
+    }
+
+    return true;
+  }
+
+  addReplyToComment(): void {
+    /*
+    Adds reply to a user comment.
+    */
+
+    console.log("Adding reply to comment.");
+
+    if (!this.validateReply()) {
       return;
     }
 
-  	let reply = this.createReply();
-  	this.downloader.addReplyToComment(reply).subscribe(response => {
-  		reply.username = response['username'];  // gets username from response, which is from token 
-  		this.comment.replies.push(reply);  // adds reply to frontend after api response
+    let reply = this.createReply();
+    this.downloader.addReplyToComment(reply).subscribe(response => {
+      reply.username = response['username'];  // gets username from response, which is from token
+      this.comment.replies.push(reply);  // adds reply to frontend after api response
       this.body = "";  // clears reply textarea
-  	});
+    });
   }
 
 }

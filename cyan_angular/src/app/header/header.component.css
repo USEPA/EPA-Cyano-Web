@@ -298,7 +298,10 @@
   display: none;
 }
 .help {
-  /*display: none;*/
+  display: none;
+}
+.comments {
+  margin-top: 5px;
 }
 .header-version {
   font-size: small;

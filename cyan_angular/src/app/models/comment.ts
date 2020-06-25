@@ -5,13 +5,14 @@ export class Comment {
 	username: string;
 	device: string;
 	browser: string;
-	body: CommentBody;
+	comment_text: string;
+	comment_images: CommentImage[];
 	replies: Reply[];
 }
 
-export class CommentBody {
-	comment_text: string;
-	comment_images: string[];
+export class CommentImage {
+	source: string;
+	name: string;
 }
 
 export class Reply {
