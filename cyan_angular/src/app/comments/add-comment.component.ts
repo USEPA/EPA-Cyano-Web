@@ -135,6 +135,10 @@ export class AddComment implements OnInit {
     this.dialogRef.close();
   }
 
+  removeImage(image) {
+    this.comment_images = this.comment_images.filter(item => item.name !== image.name);
+  }
+
   addNewComment(): void {
   	/*
   	Posts user comment to wall.

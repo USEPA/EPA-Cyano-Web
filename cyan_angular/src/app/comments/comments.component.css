@@ -108,6 +108,10 @@
 	float: left;
 }
 
+.uploaded-image-div {
+	float: left;
+}
+
 .view-uploaded-image {
 	max-height: 40%;
 	max-width: 40%;
