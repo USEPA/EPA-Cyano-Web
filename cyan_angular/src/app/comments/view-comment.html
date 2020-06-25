@@ -37,7 +37,7 @@
 
 	<div class="reply-controls">
 		<mat-form-field class="comment-textarea" appearance="outline">
-			<textarea matInput [(ngModel)]="body" [placeholder]="errorMessage || 'Enter reply'" required></textarea>
+			<textarea matInput [(ngModel)]="body" placeholder="Enter reply (max {{replySizeLimit}} characters)" required></textarea>
 		</mat-form-field>
 		<br>
 		<button class="add-reply-btn" mat-raised-button color="primary" (click)="addReplyToComment();">Reply</button>

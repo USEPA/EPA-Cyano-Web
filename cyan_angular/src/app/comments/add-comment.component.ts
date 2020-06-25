@@ -101,11 +101,11 @@ export class AddComment implements OnInit {
       return false;
     }
     else if (this.comment_text.length > this.commentSizeLimit) {
-      this.displayDialog("Comment length is too large (" + this.commentSizeLimit + " max)");
+      this.displayDialog("Comment length is too large (" + this.commentSizeLimit + " characters max)");
       return false;
     }
     else if (this.title.length > this.commentTitleLimit) {
-      this.displayDialog("Title length is too large (" + this.commentTitleLimit + " max)");
+      this.displayDialog("Title length is too large (" + this.commentTitleLimit + " characters max)");
       return false;
     }
     return true;
