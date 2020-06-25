@@ -408,7 +408,7 @@ def add_user_comment(post_data):
 			continue  # skips storing image filename if error
 
 		comment_images_obj = CommentImages(
-			comment_body_id=comment_obj.id,
+			comment_id=comment_obj.id,
 			comment_image=image_file  # saving image path instead of source
 		)
 		db.session.add(comment_images_obj)

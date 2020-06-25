@@ -64,11 +64,11 @@ class Comment(db.Model):
 class CommentImages(db.Model):
 	__tablename__ = 'comment_images'
 	id = db.Column(db.Integer, nullable=False, primary_key=True)
-	comment_body_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
+	comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
 	comment_image = db.Column(db.String(256), nullable=False)  # path to image source
 
 class Reply(db.Model):
-	__tablename__ = 'reply'
+	__tablename__ = 'comment_reply'
 	id = db.Column(db.Integer, nullable=False, primary_key=True)
 	comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
 	date = db.Column(db.DateTime, nullable=False)

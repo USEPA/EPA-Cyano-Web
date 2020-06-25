@@ -30,12 +30,12 @@ def upgrade():
     )
     op.create_table('comment_images',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('comment_body_id', sa.Integer(), nullable=False),
+    sa.Column('comment_id', sa.Integer(), nullable=False),
     sa.Column('comment_image', sa.String(length=256), nullable=False),
-    sa.ForeignKeyConstraint(['comment_body_id'], ['comment.id'], ),
+    sa.ForeignKeyConstraint(['comment_id'], ['comment.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('reply',
+    op.create_table('comment_reply',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('comment_id', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
