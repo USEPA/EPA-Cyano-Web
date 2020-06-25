@@ -70,7 +70,7 @@ export class ViewComment implements OnInit {
     Displays larger version of selected image.
     */
 
-    if (!this.authService.checkUserAuthentication()) { 
+    if (!this.authService.checkUserAuthentication()) {
       this.exit();
       return;
     }
@@ -83,7 +83,7 @@ export class ViewComment implements OnInit {
     });
   }
 
-  validateReply(): void {
+  validateReply(): boolean {
     if (!this.authService.checkUserAuthentication()) {
       this.exit();
       return false;
@@ -114,7 +114,7 @@ export class ViewComment implements OnInit {
 
     let reply = this.createReply();
     this.downloader.addReplyToComment(reply).subscribe(response => {
-      reply.username = response['username'];  // gets username from response, which is from token 
+      reply.username = response['username'];  // gets username from response, which is from token
       this.comment.replies.push(reply);  // adds reply to frontend after api response
       this.body = "";  // clears reply textarea
     });
