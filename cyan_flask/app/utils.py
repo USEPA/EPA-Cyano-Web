@@ -82,7 +82,6 @@ def build_replies_json(replies):
 		})
 	return replies_json
 
-# build_comment_body_json(comment_body, image_sources=[]):
 def build_comment_images(comment_images, image_sources=[]):
 	"""
 	Creates serializable json from comment_body DB objects.
@@ -92,7 +91,7 @@ def build_comment_images(comment_images, image_sources=[]):
 	if len(image_sources) < 1:
 		# Gets image from filesystem using filename from DB:
 		for image in comment_images:
-			filename = os.environ.get('FLASK_IMAGE_PATH') + image.comment_image
+			filename = _build_image_file_path(image.comment_image)
 			image_source = get_image_source(filename)
 			comment_images_json.append(image_source)
 	else:
@@ -126,9 +125,11 @@ def save_image_source(username, image_source, image_name):
 	"""
 	Saves user image to file.
 	"""
+
+	filename = _generate_image_filename(username, image_name)
+	full_filename = _build_image_file_path(filename)
+
 	try:
-		filename = _generate_image_filename(username, image_name)
-		full_filename = os.environ.get('FLASK_IMAGE_PATH') + filename
 		with open(full_filename, 'w') as image_file:
 			image_file.write(image_source)
 		return filename
@@ -146,3 +147,10 @@ def _generate_image_filename(username, image_name):
 	timestamp = str(datetime.datetime.now()).replace('-', '').replace(':', '').replace('.', '').replace(' ', '')
 	filename = "{}_{}.{}".format(username, timestamp, file_ext)
 	return filename
+
+
+def _build_image_file_path(filename):
+	"""
+	Builds absolute path of image filename.
+	"""
+	return Path(__file__).parent.parent / 'user_images' / filename
