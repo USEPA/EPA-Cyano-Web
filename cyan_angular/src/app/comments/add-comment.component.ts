@@ -111,6 +111,26 @@ export class AddComment implements OnInit {
     return true;
   }
 
+  validateImage(file: File): boolean {
+    if (!this.authService.checkUserAuthentication()) { 
+      this.exit();  // exits add-comment dialog
+      return false;
+    }
+    if (this.comment_images.length >= this.imageUploadLimit) {
+      this.displayDialog("Limited to 2 image uploads per comment");
+      return false;
+    }
+    if (!file.type.includes("image/")) {
+      this.displayDialog("Must upload an image");
+      return false;
+    }
+    if (file.type.includes("tif")) {
+      this.displayDialog("TIFF images are currently not supported");
+      return false;
+    }
+    return true;
+  }
+
   exit(): void {
     this.dialogRef.close();
   }
@@ -138,21 +158,10 @@ export class AddComment implements OnInit {
 		Uploads user image, adds image to comment and user's comment data.
 		*/
 
-		if (!this.authService.checkUserAuthentication()) { 
-      this.exit();
-      return;
-    }
+    let file = event.target.files[0];
+    let reader = new FileReader();
 
-    if (this.comment_images.length >= this.imageUploadLimit) {
-      this.displayDialog("Limited to 2 image uploads per comment");
-      return;
-    }
-
-  	let file = event.target.files[0];
-  	let reader = new FileReader();
-
-    if (!file.type.includes("image/")) {
-      this.displayDialog("Must upload an image");
+		if (!this.validateImage(file)) {
       return;
     }
   	
