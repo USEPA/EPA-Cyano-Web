@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChange } from "@angular/core";
 import { SafeHtml, DomSanitizer } from "@angular/platform-browser";
 import { LocationService } from "../services/location.service";
 import { Location } from "../models/location";
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: "app-meter",
@@ -23,7 +24,8 @@ export class MeterComponent implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private configService: ConfigService
   ) {}
 
   ngOnInit() {
@@ -32,7 +34,7 @@ export class MeterComponent implements OnInit {
     );
     this.concentration = this.setConcentration(
       this.location.cellConcentration,
-      this.locationService.getColor(this.location, false)
+      this.configService.getColorRgbValue(this.locationService.getColor(this.location, false))
     );
   }
   
@@ -46,7 +48,7 @@ export class MeterComponent implements OnInit {
     );
     this.concentration = this.setConcentration(
       this.location.cellConcentration,
-      this.locationService.getColor(this.location, false)
+      this.configService.getColorRgbValue(this.locationService.getColor(this.location, false))
     );
  }
 
