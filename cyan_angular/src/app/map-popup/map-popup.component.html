@@ -21,7 +21,7 @@
   <div class="location_block_0">
     <div class="location_block_1 left">
       <div class="location_cell">
-        <app-meter [meter_percentage]="getPercentage2(location)" [cellCon]="location.cellConcentration" [cellConColor]="getColor(location, false)"></app-meter>
+        <app-meter [location]="location"></app-meter>
       </div>
     </div>
     <div *ngIf="locationData.hasData" class="location_block_1 right">

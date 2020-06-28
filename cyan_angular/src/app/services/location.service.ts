@@ -403,6 +403,7 @@ export class LocationService {
     }
   }
 
+  // this returns a css style element
   getPercentage(l: Location) {
     let cells = l.cellConcentration;
     let userSettings = this.user.getUserSettings();
@@ -416,6 +417,7 @@ export class LocationService {
     );
   }
 
+  // this returns a percentage 0-100
   getPercentage2(l: Location): number {
     let cells = l.cellConcentration;
     let userSettings = this.user.getUserSettings();
