@@ -3,6 +3,9 @@ import datetime
 import requests
 import json
 import logging
+import os
+# from uuid import uuid4
+from pathlib import Path
 
 
 def convert_to_timestamp(unix_time):
@@ -45,7 +48,7 @@ def make_notifications_request(latest_time):
 		# TODO: Handle error.
 		return None
 
-def build_comments_json(comments):
+def build_comments_json(comments, images_sources=None):
 	"""
 	Creates serializable json from comment DB objects.
 	"""
@@ -58,8 +61,8 @@ def build_comments_json(comments):
 			'username': comment.username,
 			'device': comment.device,
 			'browser': comment.browser,
-			# 'body': comment.body,
-			'body': build_comment_body_json(comment.body),
+			'comment_text': comment.comment_text,
+			'comment_images': build_comment_images(comment.comment_images),
 			'replies': build_replies_json(comment.replies)
 		})
 	return comments_json
@@ -79,20 +82,23 @@ def build_replies_json(replies):
 		})
 	return replies_json
 
-def build_comment_body_json(comment_body):
+def build_comment_images(comment_images, image_sources=[]):
 	"""
 	Creates serializable json from comment_body DB objects.
 	"""
-	if isinstance(comment_body, list):
-		comment_body = comment_body[0]
+	comment_images_json = []
 
-	comment_body_json = {
-		'comment_text': comment_body.comment_text,
-		'comment_images': []
-	}
-	for image in comment_body.comment_images:
-		comment_body_json['comment_images'].append(image.comment_image)
-	return comment_body_json
+	if len(image_sources) < 1:
+		# Gets image from filesystem using filename from DB:
+		for image in comment_images:
+			filename = _build_image_file_path(image.comment_image)
+			image_source = get_image_source(filename)
+			comment_images_json.append(image_source)
+	else:
+		for image in image_sources:
+			# Uses existing image sources:
+			comment_images_json['comment_images'].append(image_sources)
+	return comment_images_json
 
 
 def get_datetime_string(datetime_obj):
@@ -101,3 +107,50 @@ def get_datetime_string(datetime_obj):
 	Example: DateTime(2020-06-10 10:35:00.12345) --> "2020-06-10 10:35:00"
 	"""
 	return str(datetime_obj).split('.')[0]
+
+
+def get_image_source(image_path):
+	"""
+	Gets user image from file.
+	"""
+	try:
+		with open(image_path, 'r') as image_file:
+			return image_file.read()
+	except IOError as e:
+		logging.warning(" utils.py get_image_source error reading filename {}:\n {}".format(image_path, e))
+		return {"error": "cannot find image"}
+
+
+def save_image_source(username, image_source, image_name):
+	"""
+	Saves user image to file.
+	"""
+
+	filename = _generate_image_filename(username, image_name)
+	full_filename = _build_image_file_path(filename)
+
+	try:
+		with open(full_filename, 'w') as image_file:
+			image_file.write(image_source)
+		return filename
+	except IOError as e:
+		logging.warning( " utils.py save_image_source error saving image {}:\n {}".format(image_name, e))
+		return {"error": "error saving image"}
+
+
+def _generate_image_filename(username, image_name):
+	"""
+	Creates filename for user images
+	that are saved to disk.
+	"""
+	file_ext = image_name.split(".")[-1]  # gets file extension
+	timestamp = str(datetime.datetime.now()).replace('-', '').replace(':', '').replace('.', '').replace(' ', '')
+	filename = "{}_{}.{}".format(username, timestamp, file_ext)
+	return filename
+
+
+def _build_image_file_path(filename):
+	"""
+	Builds absolute path of image filename.
+	"""
+	return Path(__file__).parent.parent / 'user_images' / filename

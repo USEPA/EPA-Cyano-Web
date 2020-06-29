@@ -22,6 +22,14 @@ db_user = os.environ.get('DB_USER')
 db_pass = os.environ.get('DB_PASS')
 db_root_passwd = os.environ.get('MYSQL_ROOT_PASSWORD')
 db_name = os.environ.get('DB_NAME')
+# os.environ.setdefault('DB_NAME', 'test_cyan_web_app_db')
+
+print("db_host value: {}".format(db_host))
+print("db_port value: {}".format(db_port))
+print("db_user value: {}".format(db_user))
+print("db_pass value: {}".format(db_pass))
+print("db_root_passwd value: {}".format(db_root_passwd))
+print("db_name value: {}".format(db_name))
 
 # MySQL URLs:
 mysql_url = 'mysql://{}:{}@{}/{}'.format(db_user, db_pass, db_host, db_name)

@@ -64,9 +64,10 @@ import { AuthInterceptor, JwtInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
 
 import { LoaderComponent } from './shared/loader/loader.component';
+import { DialogComponent } from './shared/dialog/dialog.component';
 import { LoaderService } from './services/loader.service';
 import { CommentsComponent } from './comments/comments.component';
-import { AddComment, CommentAdded } from './comments/add-comment.component';
+import { AddComment } from './comments/add-comment.component';
 import { ViewComment, ViewImage } from './comments/view-comment.component';
 import { MeterComponent } from './meter/meter.component';
 
@@ -97,8 +98,8 @@ import { MeterComponent } from './meter/meter.component';
     ViewComment,
     AddComment,
     ViewImage,
-    CommentAdded,
-    MeterComponent
+    MeterComponent,
+    DialogComponent
   ],
   imports: [
     BrowserModule,
@@ -141,6 +142,7 @@ import { MeterComponent } from './meter/meter.component';
     JwtHelperService,
     AuthGuard,
     AddComment,
+    DialogComponent,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -155,7 +157,7 @@ import { MeterComponent } from './meter/meter.component';
     ViewComment,
     AddComment,
     ViewImage,
-    CommentAdded
+    DialogComponent
   ]
 })
 export class AppModule {

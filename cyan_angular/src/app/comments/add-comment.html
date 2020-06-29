@@ -16,9 +16,10 @@
 		</mat-form-field>
 
 		<mat-form-field class="comment-textarea">
-			<textarea matInput [(ngModel)]="comment_text" [placeholder]="errorMessage || 'Enter comment'" required></textarea>
-			<div *ngFor="let imageSource of imageSources">
-				<img class="uploaded-image" *ngIf="imageSources?.length > 0" src="{{imageSource}}" />
+			<textarea matInput [(ngModel)]="comment_text" placeholder="Enter comment (max {{commentSizeLimit}} characters)" required></textarea>
+			<div class="uploaded-image-div" *ngFor="let image of comment_images">
+				<button mat-button (click)="removeImage(image)">X</button>
+				<img class="uploaded-image" *ngIf="comment_images?.length > 0" src="{{image.source}}" />
 			</div>
 		</mat-form-field>
 

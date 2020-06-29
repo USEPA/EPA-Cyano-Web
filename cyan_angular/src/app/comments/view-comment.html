@@ -17,9 +17,9 @@
 		</p>
 		
 		<div class="comment-content">
-			<p class="comment-body">{{commentBody.comment_text}}</p>
-			<div *ngFor="let imageSource of commentBody.comment_images">
-				<img class="view-uploaded-image" *ngIf="commentBody.comment_images?.length > 0" src="{{imageSource}}" (click)="enlargeImage(imageSource)" />
+			<p class="comment-body">{{comment.comment_text}}</p>
+			<div *ngFor="let imageSource of comment.comment_images">
+				<img class="view-uploaded-image" *ngIf="comment.comment_images?.length > 0" src="{{imageSource}}" (click)="enlargeImage(imageSource)" />
 			</div>
 		</div>
 
@@ -37,7 +37,7 @@
 
 	<div class="reply-controls">
 		<mat-form-field class="comment-textarea" appearance="outline">
-			<textarea matInput [(ngModel)]="body" [placeholder]="errorMessage || 'Enter reply'" required></textarea>
+			<textarea matInput [(ngModel)]="body" placeholder="Enter reply (max {{replySizeLimit}} characters)" required></textarea>
 		</mat-form-field>
 		<br>
 		<button class="add-reply-btn" mat-raised-button color="primary" (click)="addReplyToComment();">Reply</button>
