@@ -13,10 +13,11 @@ import os
 import logging
 import requests
 import simplejson
+from sqlalchemy import desc
 
 # Local imports:
 from auth import PasswordHandler, JwtHandler
-from models import User, Location, Notifications, Settings, db
+from models import User, Location, Notifications, Settings, Comment, CommentImages, Reply, db
 import utils
 
 
@@ -193,7 +194,7 @@ def get_notifications(user, last_visit):
 	else:
 		latest_time = last_visit
 
-	new_notifications = make_notifications_request(latest_time)  # gets all notifications at /cyan/cyano/notifications
+	new_notifications = utils.make_notifications_request(latest_time)  # gets all notifications at /cyan/cyano/notifications
 
 	db_values = parse_notifications_response(new_notifications, latest_time, user)
 	db_values_list = []
@@ -358,27 +359,95 @@ def set_new_password(request):
 
 	return {"status": "success"}, 200
 	
-
-def make_notifications_request(latest_time):
+def get_comments():
 	"""
-	Gets all notifications from epa cyano endpoint.
+	Gets all user comments.
 	"""
-	formatted_time = datetime.datetime.fromtimestamp(latest_time).strftime('%Y-%m-%d')
+	comments = Comment.query.order_by(desc(Comment.date)).all()  # gets all users' comments
+	if len(comments) < 1:
+		return [], 200
+	comments_json = utils.build_comments_json(comments)
+	return comments_json, 200
 
-	notification_url = 'https://cyan.epa.gov/cyan/cyano/notifications/'
-	start_date = '{}T00-00-00-000-0000'.format(formatted_time)
+def add_user_comment(post_data):
+	"""
+	Adds user comment.
+	"""
 	try:
-		notification_response = requests.get(notification_url + start_date)
-		return json.loads(notification_response.content)
-	except requests.exceptions.Timeout:
-		logging.warning("Request to {} timed out.".format(notification_url))
-		# TODO: Retry request.
-		return None
-	except requests.exceptions.RequestException as e:
-		logging.warning("Error making request to {}.".format(notification_url))
-		# TODO: Handle error.
-		return None
-	except Exception as e:
-		logging.warning("Unknown exception occurred: {}".format(e))
-		# TODO: Handle error.
-		return None
+		# _id = post_data['id']
+		title = post_data['title']
+		date = post_data['date']
+		username = post_data['username']
+		device = post_data['device'] or "N/A"
+		browser = post_data['browser'] or "N/A"
+		# body = post_data['body']
+		comment_text = post_data['comment_text']
+		comment_images = post_data['comment_images']
+	except KeyError:
+		return {"error": "Invalid key in request"}, 400
+
+	comment_obj = Comment(
+		# id=_id,
+		title=title,
+		date=date,
+		username=username,
+		device=device,
+		browser=browser,
+		comment_text=comment_text
+		# body=body
+	)
+	db.session.add(comment_obj)
+	db.session.flush()
+
+	image_sources = []
+	for image in comment_images:
+		
+		image_file = utils.save_image_source(username, image['source'], image['name'])
+
+		if 'error' in image_file:
+			continue  # skips storing image filename if error
+
+		comment_images_obj = CommentImages(
+			comment_id=comment_obj.id,
+			comment_image=image_file  # saving image path instead of source
+		)
+		db.session.add(comment_images_obj)
+
+		image_sources.append(image['source'])
+
+	
+	db.session.commit()
+
+	comment_json = utils.build_comments_json([comment_obj], image_sources)[0]  # creates json object from comment db object
+
+	return comment_json, 201
+
+def add_comment_reply(post_data):
+	"""
+	Adds reply to a user's comment.
+	"""
+	try:
+		comment_id = post_data['comment_id']
+		comment_user = post_data['comment_user']
+		date = post_data['date']
+		reply_user = post_data['username']
+		body = post_data['body']
+	except KeyError:
+		return {"error": "Invalid key in request"}, 400
+
+	# date = datetime.datetime.now()
+
+	reply_obj = Reply(
+		# id=_id  # auto increment id
+		comment_id=comment_id,
+		date=date,
+		username=reply_user,
+		body=body
+	)
+
+	db.session.add(reply_obj)
+	db.session.commit()
+
+	# return {"status": "success"}, 201
+	reply_json = utils.build_replies_json([reply_obj])[0]
+	return reply_json, 201

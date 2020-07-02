@@ -5,7 +5,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createCustomElement } from '@angular/elements';
-import { MatMenuModule } from '@angular/material/menu';
 import {
   MatSelectModule,
   MatCheckboxModule,
@@ -18,10 +17,14 @@ import {
   MatIconModule,
   MatBadgeModule,
   MatCardModule,
-  MatProgressSpinnerModule
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatDatepickerModule,
+  MatMenuModule,
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA
 } from '@angular/material';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -61,7 +64,12 @@ import { AuthInterceptor, JwtInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
 
 import { LoaderComponent } from './shared/loader/loader.component';
+import { DialogComponent } from './shared/dialog/dialog.component';
 import { LoaderService } from './services/loader.service';
+import { CommentsComponent } from './comments/comments.component';
+import { AddComment } from './comments/add-comment.component';
+import { ViewComment, ViewImage } from './comments/view-comment.component';
+import { MeterComponent } from './meter/meter.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +93,13 @@ import { LoaderService } from './services/loader.service';
     LatestImageComponent,
     BottomMenuComponent,
     ResetComponent,
-    LoaderComponent
+    LoaderComponent,
+    CommentsComponent,
+    ViewComment,
+    AddComment,
+    ViewImage,
+    MeterComponent,
+    DialogComponent
   ],
   imports: [
     BrowserModule,
@@ -111,6 +125,7 @@ import { LoaderService } from './services/loader.service';
     MatBadgeModule,
     MatCardModule,
     MatBadgeModule,
+    MatDialogModule,
     Ng5SliderModule,
     BrowserAnimationsModule,
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
@@ -126,6 +141,10 @@ import { LoaderService } from './services/loader.service';
     DatePipe,
     JwtHelperService,
     AuthGuard,
+    AddComment,
+    DialogComponent,
+    { provide: MatDialogRef, useValue: {} },
+    { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],
@@ -134,7 +153,11 @@ import { LoaderService } from './services/loader.service';
     MapPopupComponent,
     LocationDetailsNotes,
     NotificationDetails,
-    LocationCompareAlert
+    LocationCompareAlert,
+    ViewComment,
+    AddComment,
+    ViewImage,
+    DialogComponent
   ]
 })
 export class AppModule {

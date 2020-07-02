@@ -30,6 +30,8 @@ export class MyLocationsComponent implements OnInit {
   show_checked: boolean = false;
   locSub: Subscription;
 
+  meter_value;
+
   constructor(
     private router: Router,
     private locationService: LocationService,
@@ -106,8 +108,12 @@ export class MyLocationsComponent implements OnInit {
     return this.locationService.getPercentage(l);
   }
 
+  getPercentage2(l: Location) {
+    return this.locationService.getPercentage2(l);
+  }
+
   getColor(l: Location, delta: boolean) {
-    let color = this.locationService.getColor(l, delta);  // gets color based on user's settings
+    let color = this.locationService.getColor(l, delta); // gets color based on user's settings
     return this.configService.getColorRgbValue(color);
   }
 

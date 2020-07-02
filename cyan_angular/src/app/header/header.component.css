@@ -300,6 +300,15 @@
 .help {
   display: none;
 }
+.comments {
+  margin-top: 5px;
+}
 .header-version {
   font-size: small;
+}
+
+.mat_icon {
+  height: 42px;
+  width: 42px;
+  color: white;
 }

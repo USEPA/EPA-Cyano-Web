@@ -235,6 +235,10 @@ export class LocationCompareDetailsComponent implements OnInit {
     return this.locationService.getPercentage(l);
   }
 
+  getPercentage2(l: Location) {
+    return this.locationService.getPercentage2(l);
+  }
+
   getArrowColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
   }
