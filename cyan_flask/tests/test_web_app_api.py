@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(script_path, '..', '..'))  # adds EPA-Cyano-Web 
 # Local imports:
 from config.set_environment import DeployEnv
 from cyan_flask.app import web_app_api
-from cyan_flask.app.models import User, Location, Notifications, Settings, Comment, CommentBody, CommentImages, Reply
+from cyan_flask.app.models import User, Location, Notifications, Settings, Comment, CommentImages, Reply
 
 # Sets up runtime environment:
 runtime_env = DeployEnv()
@@ -1100,7 +1100,7 @@ class TestWebAppApi(unittest.TestCase):
 			.return_value.all\
 			.return_value = []
 
-		expected_result = {"status": "No comments"}, 200
+		expected_result = [], 200
 		actual_result = web_app_api.get_comments()
 
 		self.assertEqual(actual_result, expected_result)
@@ -1153,23 +1153,24 @@ class TestWebAppApi(unittest.TestCase):
 
 		self.assertEqual(actual_result, expected_result)
 
+	@patch('cyan_flask.app.web_app_api.utils.save_image_source')
 	@patch('cyan_flask.app.web_app_api.utils.build_comments_json')
 	@patch('cyan_flask.app.web_app_api.db')
-	def test_add_user_comment_2(self, db_mock, build_comments_json_mock):
+	def test_add_user_comment_2(self, db_mock, build_comments_json_mock, save_image_source_mock):
 		"""
 		add_user_comment
 		"""
 		request_obj = {
 			'id': 1,
-			'title': "test title",  # missing key
+			'title': "test title",
 			'date': datetime.datetime.now(),
 			'username': "test",
 			'device': 'N/A',
 			'browser': 'N/A',
-			'body': {
-				'comment_text': "test comment text",
-				'comment_images': ["base64encodedimagestring"]
-			}
+			'comment_text': "test comment text",
+			'comment_images': [
+				{"source": "base64encodedimagestring", "name": "testpic.jpg"}
+			]
 		}
 		comment_obj = Comment(
 			id=request_obj['id'],
@@ -1180,6 +1181,9 @@ class TestWebAppApi(unittest.TestCase):
 			browser=request_obj['browser']
 			# body=body
 		)
+
+		save_image_source_mock\
+			.return_value = request_obj['comment_images'][0]['source']
 
 		build_comments_json_mock\
 			.return_value = [request_obj]

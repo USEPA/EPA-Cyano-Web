@@ -104,6 +104,8 @@ class TestEndpoints(unittest.TestCase):
 		actual_result = endpoints.Login().get()
 		self.assertEqual(actual_result, expected_result)
 
+	
+
 	# @patch('cyan_flask.app.endpoints.web_app_api.register_user')
 	# @patch('cyan_flask.app.endpoints.request.get_json')
 	# def test_login_post(self, parse_args_mock, get_json_mock):
