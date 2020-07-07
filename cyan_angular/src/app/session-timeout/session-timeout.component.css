@@ -1,0 +1,33 @@
+
+.full-display {
+    min-width: 100vw;
+    min-height: 100vh;
+    position: fixed;
+    background:rgba(255,255,255,0.4);
+    left: 0;
+    top: 0;
+}
+
+.session-timeout {
+    border: 1px solid #777777;
+    background: white;
+    display: inline-block;
+    position: fixed;
+    opacity: 1;
+    text-align: center;
+
+    width: 50%;
+    min-width: 300px;
+    top: 15%;
+    left: 25%;
+    border-radius: 5px;
+}
+
+.session-timeout-msg {
+    padding: 30px;
+}
+
+.extend-session-button {
+    font-weight: bolder;
+    margin-bottom: 20px;
+}

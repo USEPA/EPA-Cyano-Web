@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { UserIdleService } from 'angular-user-idle';
 import { User, UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { LocationService } from '../services/location.service';
@@ -38,6 +39,10 @@ export class AccountComponent implements OnInit {
   loginSub: Subscription = null;
   authSub: Subscription = null;
 
+  userIdleTimerStartSub: Subscription = null;
+  userIdleTimeoutSub: Subscription = null;
+  userIdlePingSub: Subscription = null;
+
   loggingOut: boolean = false;
 
   errorMessage: string = "";  // error messages for login page
@@ -54,6 +59,7 @@ export class AccountComponent implements OnInit {
     private activeRoute: ActivatedRoute,
     private userService: UserService,
     private authService: AuthService,
+    private userIdle: UserIdleService,
     private locationService: LocationService
   ) {
   }
@@ -70,6 +76,46 @@ export class AccountComponent implements OnInit {
         this.loggingOut = params.loggingOut;  // shows logout button
       }
     });
+  }
+
+  trackUserIdleTimout(): void {
+    let self = this;
+    // Start watching for user inactivity.
+    this.userIdle.startWatching();
+
+    // Start watching when user idle is starting.
+    if (this.userIdleTimerStartSub) {
+      this.userIdleTimerStartSub.unsubscribe()
+    }
+    this.userIdleTimerStartSub = this.userIdle.onTimerStart().subscribe((count) => {
+        // show timeout count down
+      if (count) {
+        self.userService.currentAccount.user.sessionCountDown = self.userIdle.getConfigValue().timeout - count;
+      }
+      }
+    );
+
+    // Start watch when time is up.
+    if (this.userIdleTimeoutSub) {
+      this.userIdleTimeoutSub.unsubscribe();
+    }
+    this.userIdleTimeoutSub = this.userIdle.onTimeout().subscribe(() => {
+        self.userService.logoutUser();
+        self.performLogoutRoutine({'error': 'Session Expired'});
+      }
+    );
+
+    // Refresh token
+    if (this.userIdlePingSub) {
+      this.userIdlePingSub.unsubscribe();
+    }
+    this.userIdlePingSub = this.userIdle.ping$.subscribe(() => {
+      self.authService.refresh();
+    });
+  }
+
+  stopTrackUserIdleTimout(): void {
+    this.userIdle.stopWatching();
   }
 
   showResetView(): void {
@@ -127,6 +173,7 @@ export class AccountComponent implements OnInit {
     this.locationService.clearUserData();
     this.userService.logoutUser();
     this.locationService.loadUser();  // initiates user login loop
+    this.stopTrackUserIdleTimout();
     this.router.navigate(['/account', {error: authError.error}]);
   }
 
@@ -158,6 +205,9 @@ export class AccountComponent implements OnInit {
         self.errorMessage = "";
         self.userService.setUserDetails(user);
         self.locationService.loadUser();
+
+        // track user idle timeout, logout if expired
+        this.trackUserIdleTimout();
       },
       errorResponse => {
         // error happened, show error in page
@@ -198,6 +248,7 @@ export class AccountComponent implements OnInit {
   exitAccount() {
     if (this.userLoggedIn) {
       this.errorMessage = "";
+      this.userIdle.resetTimer();
       this.router.navigate(['']);
     } else {
       this.errorMessage = "Please login to use the CyAN web app.";

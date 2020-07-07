@@ -1,0 +1,12 @@
+<div *ngIf="userService.currentAccount.user.sessionCountDown">
+  <div class="full-display">
+    <div class="session-timeout">
+      <div class="session-timeout-msg">
+        You session will expire in {{ userService.currentAccount.user.sessionCountDown }} seconds. Do you want to extend it?
+      </div>
+      <div>
+        <button mat-raised-button color="primary" class="extend-session-button" (click)="extendSession()" autofocus>Extend Session</button>
+      </div>
+    </div>
+  </div>
+</div>
