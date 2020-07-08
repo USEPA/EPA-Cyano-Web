@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DatePipe } from '@angular/common';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AddComment } from './add-comment.component';

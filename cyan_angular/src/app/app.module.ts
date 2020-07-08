@@ -5,26 +5,24 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createCustomElement } from '@angular/elements';
-import {
-  MatSelectModule,
-  MatCheckboxModule,
-  MatButtonModule,
-  MatSliderModule,
-  MatNativeDateModule,
-  MatInputModule,
-  MatTabsModule,
-  MatBottomSheetModule,
-  MatIconModule,
-  MatBadgeModule,
-  MatCardModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatDatepickerModule,
-  MatMenuModule,
-  MatDialogModule,
-  MatDialogRef,
-  MAT_DIALOG_DATA
-} from '@angular/material';
+import {MatSelectModule } from '@angular/material/select'; 
+import {MatCheckboxModule } from '@angular/material/checkbox'; 
+import {MatButtonModule } from '@angular/material/button'; 
+import {MatSliderModule } from '@angular/material/slider'; 
+// import {MatNativeDateModule } from '@angular/material/datepicker'; 
+import {MatInputModule } from '@angular/material/input'; 
+import {MatTabsModule } from '@angular/material/tabs'; 
+import {MatBottomSheetModule } from '@angular/material/bottom-sheet'; 
+import {MatIconModule } from '@angular/material/icon'; 
+import {MatBadgeModule } from '@angular/material/badge'; 
+import {MatCardModule } from '@angular/material/card'; 
+import {MatProgressBarModule } from '@angular/material/progress-bar'; 
+import {MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
+import {MatDatepickerModule } from '@angular/material/datepicker'; 
+import {MatMenuModule } from '@angular/material/menu'; 
+import {MatDialogModule } from '@angular/material/dialog'; 
+import {MatDialogRef } from '@angular/material/dialog'; 
+import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -106,7 +104,8 @@ import { MeterComponent } from './meter/meter.component';
     CommonModule,
     HttpClientModule,
     FormsModule,
-    LeafletModule.forRoot(),
+    // LeafletModule.forRoot(),
+    LeafletModule,
     AppRoutingModule,
     ChartsModule,
     MatMenuModule,
@@ -115,7 +114,7 @@ import { MeterComponent } from './meter/meter.component';
     MatButtonModule,
     MatSliderModule,
     MatInputModule,
-    MatNativeDateModule,
+    // MatNativeDateModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatDatepickerModule,
