@@ -1,4 +1,4 @@
-import { Injectable, Input } from "@angular/core";
+import { Injectable, Input, Directive } from "@angular/core";
 import { Observable, of, Subscription, Subject } from "rxjs";
 import { DomSanitizer } from "@angular/platform-browser";
 import { marker, icon, Map } from "leaflet";
@@ -12,6 +12,7 @@ import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 import { UserSettings } from "../models/settings";
 
+@Directive()
 @Injectable({
   providedIn: "root",
 })

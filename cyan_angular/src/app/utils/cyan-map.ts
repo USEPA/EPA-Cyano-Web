@@ -1,6 +1,8 @@
 import { Map, LatLng, LayerGroup, Marker } from 'leaflet';
 import { Location } from '../models/location';
+import { Injectable } from "@angular/core";
 
+@Injectable()
 export class CyanMap {
   map: Map;
   miniMap: Map;
