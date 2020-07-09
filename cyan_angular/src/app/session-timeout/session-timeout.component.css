@@ -8,6 +8,27 @@
     top: 0;
 }
 
+@media screen and (min-width:980px) {
+    .session-timeout {
+        width: 50%;
+        left: 25%;
+    }
+}
+
+@media screen and (max-width: 979px) and (min-width: 600px) {
+    .session-timeout {
+        width: 80%;
+        left: 10%;
+    }
+}
+
+@media screen and (max-width: 599px) {
+    .session-timeout {
+        padding: 5px;
+        width: 100vw;
+    }
+}
+
 .session-timeout {
     border: 1px solid #777777;
     background: white;
@@ -16,10 +37,8 @@
     opacity: 1;
     text-align: center;
 
-    width: 50%;
     min-width: 300px;
     top: 15%;
-    left: 25%;
     border-radius: 5px;
 }
 

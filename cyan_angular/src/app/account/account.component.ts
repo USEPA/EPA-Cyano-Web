@@ -6,6 +6,7 @@ import { UserIdleService } from 'angular-user-idle';
 import { User, UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { LocationService } from '../services/location.service';
+import {environment} from "../../environments/environment";
 
 @Component({
   selector: 'app-account',
@@ -14,9 +15,9 @@ import { LocationService } from '../services/location.service';
 })
 export class AccountComponent implements OnInit {
   // TODO: Read from config file
-  devState: string = 'Alpha';
-  version: number = 0.1;
-  lastUpdate: string = '02/11/2019';
+  devState: string = 'Beta';
+  version: string = environment.appVersion;
+  lastUpdate: string = '07/10/2020';
 
   registerForm: boolean = false;
   registerUsername: string = null;
