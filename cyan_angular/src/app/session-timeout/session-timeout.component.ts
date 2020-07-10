@@ -15,7 +15,7 @@ export class SessionTimeoutComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private userService: UserService,
+    public userService: UserService,
     private userIdle: UserIdleService
   ) { }
 
