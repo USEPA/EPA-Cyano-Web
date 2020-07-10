@@ -73,8 +73,8 @@ export class MarkerMapComponent implements OnInit {
   }
 
   mapPanEvent(e: any): void {
-    
-    if (!this.authService.isAuthenticated()) { return; }  // won't auto log out, just skips refresh
+
+    if (!this.authService.checkUserAuthentication()) { return; }  // won't auto log out, just skips refresh
 
     if (this.isEnabled == true) {
       this.isEnabled = false;
