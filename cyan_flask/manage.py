@@ -1,5 +1,6 @@
 import os
 import sys
+from getpass import getpass
 import click  # comes with flask
 from flask_sqlalchemy import SQLAlchemy
 import flask_migrate
@@ -140,3 +141,12 @@ def db_downgrade(migrations_path='migrations'):
 	"""
 	print("Running flask db downgrade.")
 	as_root(flask_migrate.downgrade, directory=migrations_path)
+
+@app.cli.command('db-user')
+@click.argument('migrations_path', required=False)
+def create_db_user(migrations_path='migrations'):
+	"""
+	Creates MySQL user.
+	"""
+	print("Running flask db user.")
+	db_handler.create_user(db_user, db_pass, '%')  # TODO: Test with DB_HOST instead of '%'

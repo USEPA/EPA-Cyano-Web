@@ -12,7 +12,7 @@ import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 import { UserSettings } from "../models/settings";
 
-@Directive()
+// @Directive()
 @Injectable({
   providedIn: "root",
 })

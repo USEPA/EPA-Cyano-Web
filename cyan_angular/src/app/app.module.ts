@@ -37,6 +37,7 @@ import { NotificationsComponent, NotificationDetails } from './notifications/not
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { ChartsModule } from 'ng2-charts';
+import { UserIdleModule } from 'angular-user-idle';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -68,6 +69,7 @@ import { CommentsComponent } from './comments/comments.component';
 import { AddComment } from './comments/add-comment.component';
 import { ViewComment, ViewImage } from './comments/view-comment.component';
 import { MeterComponent } from './meter/meter.component';
+import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 
 @NgModule({
   declarations: [
@@ -97,15 +99,23 @@ import { MeterComponent } from './meter/meter.component';
     AddComment,
     ViewImage,
     MeterComponent,
-    DialogComponent
+    DialogComponent,
+    SessionTimeoutComponent
   ],
   imports: [
     BrowserModule,
     CommonModule,
     HttpClientModule,
     FormsModule,
-    // LeafletModule.forRoot(),
     LeafletModule,
+    // Optionally you can set time for `idle`, `timeout` and `ping` in seconds.
+    // Default values: `idle` is 600 (10 minutes), `timeout` is 300 (5 minutes)
+    // and `ping` is 120 (2 minutes).
+    UserIdleModule.forRoot({
+      idle: (environment.userIdleSeconds - environment.userIdleCountDownSeconds),
+      timeout: environment.userIdleCountDownSeconds,
+      ping: environment.userIdlePingSeconds
+    }),
     AppRoutingModule,
     ChartsModule,
     MatMenuModule,
