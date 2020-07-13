@@ -126,6 +126,7 @@ export class User {
   username: string;
   email: string;
   auth_token: string;
+  sessionCountDown?: number = 0;
 }
 
 export class UserLocations {

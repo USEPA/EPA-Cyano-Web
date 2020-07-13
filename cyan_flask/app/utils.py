@@ -87,16 +87,10 @@ def build_comment_images(comment_images, image_sources=[]):
 	Creates serializable json from comment_body DB objects.
 	"""
 	comment_images_json = []
-
-	# if len(image_sources) < 1:
 	for image in comment_images:
 		filename = _build_image_file_path(image.comment_image)
 		image_source = get_image_source(filename)
 		comment_images_json.append(image_source)
-	# else:
-	# 	for image in image_sources:
-	# 		# Uses existing image sources:
-	# 		comment_images_json['comment_images'].append(image_sources)
 	return comment_images_json
 
 
@@ -152,6 +146,5 @@ def _build_image_file_path(filename):
 	"""
 	Builds absolute path of image filename.
 	"""
-	# return Path(__file__).parent.parent / 'user_images' / filename
 	cyan_flask_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 	return os.path.join(cyan_flask_dir, 'user_images', filename)
