@@ -11,6 +11,7 @@ import { ConfigService } from '../services/config.service';
 })
 export class MeterComponent implements OnInit {
   @Input() location: Location;
+  @Input() cells: number;
 
   svg: SafeHtml;
   concentration: SafeHtml;
@@ -39,8 +40,7 @@ export class MeterComponent implements OnInit {
   }
   
   ngOnChanges(changes: { [property: string]: SimpleChange }){
-    let change: SimpleChange = changes['location'];
-
+    let change: SimpleChange = changes['location'] ? changes['location'] : changes['cells'];
     console.log(change);
 
     this.svg = this.setMeter(
