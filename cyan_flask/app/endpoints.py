@@ -196,7 +196,8 @@ class Refresh(Resource):
 	def get(self):
 		user = JwtHandler().get_user_from_token(request)
 		headers = get_auth_headers()
-		return {'success': True}, 200, headers
+		# return {'success': True}, 200, headers
+		return {"status": "success"}, 200, headers
 
 class Reset(Resource):
 	"""
@@ -259,11 +260,10 @@ class Reply(Resource):
 	"""
 	Endpoints for user comment replies.
 	"""
-	@login_required
 	def get(self):
 		"""
 		"""
-		pass
+		return {"status": "reply endpoint"}
 
 	@login_required
 	def post(self):
