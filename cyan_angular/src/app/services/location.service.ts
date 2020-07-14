@@ -1,16 +1,13 @@
 import { Injectable, Input } from "@angular/core";
 import { Observable, of, Subscription, Subject } from "rxjs";
 import { DomSanitizer } from "@angular/platform-browser";
-import { marker, icon, Map } from "leaflet";
 
 import { Location, LocationType } from "../models/location";
-import { ConcentrationRanges } from "../test-data/test-levels";
 
 import { UserService, UserLocations, User } from "../services/user.service";
-import { DownloaderService } from "../services/downloader.service";
+import { DownloaderService, DataPoint } from "../services/downloader.service";
 import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
-import { UserSettings } from "../models/settings";
 
 @Injectable({
   providedIn: "root",
@@ -148,8 +145,8 @@ export class LocationService {
             l.concentrationChange = 0;
             l.changeDate = "";
             l.dataDate = "";
-            l.marked = location.marked == true ? true : false;
-            l.compare = location.compare == true ? true : false;
+            l.marked = location.marked == true;
+            l.compare = location.compare == true;
             l.notes = location.notes;
             l.sourceFrequency = "";
             l.validCellCount = 0;
@@ -158,8 +155,7 @@ export class LocationService {
             self.downloadLocation(l);
           }
         });
-        let map = self.mapService.getMap();
-        self.addMarkers(map);
+        self.addMarkers();
         self.updateCompareList();
       }
     });
@@ -177,6 +173,32 @@ export class LocationService {
 
   getAllLocations(): Observable<Location[]> {
     return of(this.locations);
+  }
+
+  resetLocationsLatestData(): void {
+    this.locations.forEach((loc) => {
+      let locationDataArray = this.downloader.locationsData[loc.id].requestData.outputs;
+
+      this.setLocationDataFromOutput(loc,
+        locationDataArray.length > 0 ? locationDataArray[0] : null,
+        locationDataArray.length > 1 ? locationDataArray[1] : null);
+    });
+  }
+
+  setLocationDataFromOutput(loc: Location, current: DataPoint, previous: DataPoint): void {
+    if (current) {
+      loc.cellConcentration = Math.round(current.cellConcentration);
+      loc.maxCellConcentration = Math.round(current.maxCellConcentration);
+      loc.validCellCount = current.validCellsCount;
+      loc.dataDate = current.imageDate.split(' ')[0];
+    }
+    if (current && previous) {
+      loc.concentrationChange = Math.round(current.cellConcentration - previous.cellConcentration);
+      loc.changeDate = previous.imageDate.split(' ')[0];
+    } else {
+      loc.concentrationChange = null;
+      loc.changeDate = "N/A";
+    }
   }
 
   downloadLocation(location: Location): void {
@@ -459,11 +481,9 @@ export class LocationService {
   }
 
   getArrow(l: Location): boolean {
-    if (l.concentrationChange > 0) {
-      return true;
-    }
-    return false;
+    return l.concentrationChange > 0;
   }
+
   exceedAlertValue(l: Location): boolean {
     let userSettings = this.user.getUserSettings();
     let cells = l.cellConcentration;
@@ -473,8 +493,7 @@ export class LocationService {
 
   formatNumber(n: number): string {
     let _n = Math.abs(n);
-    let s = _n.toLocaleString();
-    return s;
+    return _n.toLocaleString();
   }
 
   setMarked(l: Location, m: boolean): void {
@@ -483,7 +502,7 @@ export class LocationService {
     this.downloader.updateUserLocation(username, l);
   }
 
-  addMarkers(map: Map): void {
+  addMarkers(): void {
     this.locations.forEach((location) => {
       let self = this;
       if (!self.mapService.hasMarker(location.id)) {

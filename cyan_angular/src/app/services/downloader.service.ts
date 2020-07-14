@@ -30,7 +30,7 @@ class MetaInfo {
   url: UrlInfo;
 }
 
-class DataPoint {
+export class DataPoint {
   imageDateLong: number;
   imageDate: string;
   satelliteImageType: string;
