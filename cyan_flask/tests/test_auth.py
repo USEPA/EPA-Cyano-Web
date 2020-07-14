@@ -52,7 +52,7 @@ class TestAuth(unittest.TestCase):
 		server_email = "test@smtp.com"
 		user_email = "test@email.com"
 		subject = "Password reset for Cyano Web"
-		test_reset_link = "http://localhost:4200/reset?token=somerandomtokenvalue"
+		test_reset_link = os.environ.get('HOST_DOMAIN') + "/reset?token=somerandomtokenvalue"
 
 		password_handler_mock\
 			.return_value = test_reset_link
@@ -75,7 +75,7 @@ class TestAuth(unittest.TestCase):
 		_create_reset_link
 		"""
 		user_email = "test@email.com"
-		test_reset_link = "http://localhost:4200/reset?token=somerandomtokenvalue"
+		test_reset_link = os.environ.get('HOST_DOMAIN') + "/reset?token=somerandomtokenvalue"
 
 		encode_auth_token_mock\
 			.return_value = "somerandomtokenvalue".encode()
@@ -94,7 +94,7 @@ class TestAuth(unittest.TestCase):
 		smtp_pass = "testpass"
 		user_email = "test@email.com"
 		subject = "Password reset for Cyano Web"
-		test_reset_link = "http://localhost:4200/reset?token=somerandomtokenvalue"
+		test_reset_link = os.environ.get('HOST_DOMAIN') + "/reset?token=somerandomtokenvalue"
 		msg = "\r\n".join([
 		  "From: {}".format(smtp_email),
 		  "To: {}".format(user_email),
@@ -116,7 +116,7 @@ class TestAuth(unittest.TestCase):
 		smtp_pass = "testpass"
 		user_email = "test@email.com"
 		subject = "Password reset for Cyano Web"
-		test_reset_link = "http://localhost:4200/reset?token=somerandomtokenvalue"
+		test_reset_link = os.environ.get('HOST_DOMAIN') + "/reset?token=somerandomtokenvalue"
 		msg = "\r\n".join([
 		  "From: {}".format(smtp_email),
 		  "To: {}".format(user_email),
