@@ -4,7 +4,6 @@ import sys
 import os
 import datetime
 import inspect
-from tabulate import tabulate
 import requests
 
 # Loads environment based on deployment location:

@@ -10,4 +10,3 @@ pyjwt
 python-dotenv
 requests
 simplejson
-tabulate
