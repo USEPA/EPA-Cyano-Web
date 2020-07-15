@@ -1,6 +1,6 @@
 {
-  "name": "cyna-web-app",
-  "version": "0.0.1",
+  "name": "cyan-web-app",
+  "version": "0.0.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

@@ -132,7 +132,7 @@ class DBHandler(object):
         """
 		Creates a user for flask backend.
 		"""
-        query = "CREATE USER IF NOT EXISTS'{}'@'{}' IDENTIFIED BY '{}';".format(
+        query = "CREATE USER IF NOT EXISTS '{}'@'{}' IDENTIFIED BY '{}';".format(
             user, host, password
         )
         self.execute_query(query)
