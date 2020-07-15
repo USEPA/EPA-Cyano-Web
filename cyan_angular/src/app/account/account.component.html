@@ -1,5 +1,5 @@
 <div class="full-display">
-  <div class="background-click" (click)="exitAccount()"></div> 
+  <div class="background-click" (click)="exitAccount()"></div>
   <div class="login-window">
     <!-- <button mat-button *ngIf="!registerForm" class="login-exit" (click)="exitAccount()">x</button> -->
     <div class="login-information-block">
@@ -79,9 +79,8 @@
         <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
         <div *ngIf="loggingOut">
           <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
-          <br>
           <!-- <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button> -->
-          <button mat-raised-button class="start-app" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
+          <button mat-raised-button color="primary" class="start-app log-out" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
         </div>
       </ng-template>
       <div class="login-notification-block" *ngIf="!registerForm">
