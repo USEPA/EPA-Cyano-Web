@@ -1,4 +1,4 @@
-import { Injectable, Input } from "@angular/core";
+import { Injectable, Input, Directive } from "@angular/core";
 import { Observable, of, Subscription, Subject } from "rxjs";
 import { DomSanitizer } from "@angular/platform-browser";
 
@@ -9,6 +9,7 @@ import { DownloaderService, DataPoint } from "../services/downloader.service";
 import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 
+// @Directive()
 @Injectable({
   providedIn: "root",
 })

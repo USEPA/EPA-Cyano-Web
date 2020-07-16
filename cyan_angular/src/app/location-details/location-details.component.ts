@@ -598,7 +598,6 @@ export class LocationDetailsNotes {
   addingNote: boolean = false;
   preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
 
-  // constructor(private bottomSheetRef: MatBottomSheetRef<LocationDetailsNotes>) {}
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
               private datePipe: DatePipe,
               private locationService: LocationService) {

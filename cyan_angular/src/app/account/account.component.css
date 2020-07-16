@@ -56,7 +56,7 @@
 }
 @media screen and (max-width: 599px)
 {
-    .login-window {       
+    .login-window {
         padding: 0;
         width: 100vw;
         min-height: 80vh;
@@ -156,6 +156,9 @@
     margin-top: 10px;
     font-weight: bolder;
     min-width: 20%;
+}
+.log-out {
+  margin-left: 10px;
 }
 .app-state-block {
     float: left;

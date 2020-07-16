@@ -16,16 +16,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'cyna-web-app'`, () => {
+  it(`should have as title 'cyan-web-app'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('cyna-web-app');
+    expect(app.title).toEqual('cyan-web-app');
   });
 
   it('should render title in a h1 tag', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to cyna-web-app!');
+    expect(compiled.querySelector('h1').textContent).toContain('Welcome to cyan-web-app!');
   });
 });

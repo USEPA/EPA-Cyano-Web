@@ -128,26 +128,27 @@ class DBHandler(object):
 		"""
         self.execute_query(query, self.db_name)
 
-    def create_user(self, user, password):
+    def create_user(self, user, password, host="localhost"):
         """
 		Creates a user for flask backend.
 		"""
-        query = "CREATE USER '{}'@'localhost' IDENTIFIED BY '{}';".format(
-            user, password
+        query = "CREATE USER IF NOT EXISTS '{}'@'{}' IDENTIFIED BY '{}';".format(
+            user, host, password
         )
         self.execute_query(query)
+        self.add_privilege(user, host)
 
     def delete_user(self, user):
         # query = "DROP USER IF EXISTS '{}'@'localhost';".format(user)
         query = "DROP USER '{}'@'localhost';".format(user)
         self.execute_query(query)
 
-    def add_privilege(self, user):
+    def add_privilege(self, user, host="localhost"):
         """
 		Adds user privilege.
 		"""
-        query = "GRANT SELECT, INSERT, DELETE, UPDATE ON {}.* TO '{}'@'localhost';".format(
-            self.db_name, user
+        query = "GRANT SELECT, INSERT, DELETE, UPDATE ON {}.* TO '{}'@'{}';".format(
+            self.db_name, user, host
         )
         self.execute_query(query)
 

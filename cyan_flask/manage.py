@@ -1,5 +1,6 @@
 import os
 import sys
+from getpass import getpass
 import click  # comes with flask
 from flask_sqlalchemy import SQLAlchemy
 import flask_migrate
@@ -12,7 +13,6 @@ sys.path.insert(1, os.path.join(sys.path[0], ".."))
 # Local imports:
 from cyan_flask.app import app, db
 from cyan_flask.build_db import DBHandler
-
 
 # Database crendentials:
 db_host = os.environ.get("DB_HOST")
@@ -39,9 +39,9 @@ db_handler = DBHandler(db_name, db_root_passwd)
 
 def as_root(db_func, **db_func_kwargs):
     """
-	Executes a function, 'db_func', as root user. Used for
-	executing flask db commands as root user (e.g., as_root(flask_migrate.migrate, message="a message")).
-	"""
+    Executes a function, 'db_func', as root user. Used for
+    executing flask db commands as root user (e.g., as_root(flask_migrate.migrate, message="a message")).
+    """
     app.config.update(SQLALCHEMY_DATABASE_URI=mysql_url_root)
     db_func(**db_func_kwargs)
     app.config.update(SQLALCHEMY_DATABASE_URI=mysql_url)
@@ -52,9 +52,9 @@ def as_root(db_func, **db_func_kwargs):
 @app.cli.command("db-create")  # showing how to group commands
 def db_create():
     """
-	Creates database and tables from database models using flask-sqlalchemy.
-	See cyan_flask/app/models.py for model schema.
-	"""
+    Creates database and tables from database models using flask-sqlalchemy.
+    See cyan_flask/app/models.py for model schema.
+    """
     print("Running manage.py db-create..")
     print("Creating database: {}.".format(db_name))
     as_root(
@@ -69,9 +69,9 @@ def db_create():
 @click.option("-d", "--directory", "migrations_path", required=False)
 def db_init(migrations_path="migrations"):
     """
-	Runs flask-migrate "flask db init"; creates migrations folder.
-	Example: flask db-init
-	"""
+    Runs flask-migrate "flask db init"; creates migrations folder.
+    Example: flask db-init
+    """
     print("Running flask db init.")
     as_root(flask_migrate.init, directory=migrations_path)
 
@@ -81,9 +81,9 @@ def db_init(migrations_path="migrations"):
 @click.argument("migrations_path", required=False)
 def db_migration(message, migrations_path="migrations"):
     """
-	Runs flask-migrate "flask db migrate -m <message>"; creates an automated revision.
-	Example: flask db-migrate "migration message/description"
-	"""
+    Runs flask-migrate "flask db migrate -m <message>"; creates an automated revision.
+    Example: flask db-migrate "migration message/description"
+    """
     print("Running flask db migrate.")
     as_root(flask_migrate.migrate, message=message, directory=migrations_path)
 
@@ -93,9 +93,9 @@ def db_migration(message, migrations_path="migrations"):
 @click.argument("migrations_path", required=False)
 def db_revision(message, migrations_path="migrations"):
     """
-	Runs flask-migrate "flask db revision -m <message>"; creates an empty revision.
-	Example: flask db-revision "made change"
-	"""
+    Runs flask-migrate "flask db revision -m <message>"; creates an empty revision.
+    Example: flask db-revision "made change"
+    """
     print("Running flask db revision.")
     as_root(flask_migrate.revision, message=message, directory=migrations_path)
 
@@ -105,10 +105,10 @@ def db_revision(message, migrations_path="migrations"):
 @click.argument("migrations_path", required=False)
 def db_stamp(revision_id, migrations_path="migrations"):
     """
-	Runs flask-migrate "flask db stamp <revision id>"; sets the revision in the
-	database without performing migrations.
-	Example: flask db-stamp 123456abcdef
-	"""
+    Runs flask-migrate "flask db stamp <revision id>"; sets the revision in the
+    database without performing migrations.
+    Example: flask db-stamp 123456abcdef
+    """
     print("Running flask db stamp.")
     as_root(flask_migrate.stamp, directory=migrations_path, revision=revision_id)
 
@@ -117,9 +117,9 @@ def db_stamp(revision_id, migrations_path="migrations"):
 @click.argument("migrations_path", required=False)
 def db_upgrade(migrations_path="migrations"):
     """
-	Runs flask-migrate "flask db upgrade"; runs upgrade() of stamped revision (i.e., applies migrations).
-	Example: flask db-upgrade
-	"""
+    Runs flask-migrate "flask db upgrade"; runs upgrade() of stamped revision (i.e., applies migrations).
+    Example: flask db-upgrade
+    """
     print("Running flask db upgrade.")
     try:
         as_root(flask_migrate.upgrade, directory=migrations_path)
@@ -141,8 +141,20 @@ def db_upgrade(migrations_path="migrations"):
 @click.argument("migrations_path", required=False)
 def db_downgrade(migrations_path="migrations"):
     """
-	Runs flask-migrate "flask db downgrade"; downgrades the database by reverting to previous revision.
-	Example: flask db-downgrade
-	"""
+    Runs flask-migrate "flask db downgrade"; downgrades the database by reverting to previous revision.
+    Example: flask db-downgrade
+    """
     print("Running flask db downgrade.")
     as_root(flask_migrate.downgrade, directory=migrations_path)
+
+
+@app.cli.command("db-user")
+@click.argument("migrations_path", required=False)
+def create_db_user(migrations_path="migrations"):
+    """
+    Creates MySQL user.
+    """
+    print("Running flask db user.")
+    db_handler.create_user(
+        db_user, db_pass, "%"
+    )  # TODO: Test with DB_HOST instead of '%'
