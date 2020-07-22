@@ -103,8 +103,29 @@ export class LocationDetailsComponent implements OnInit {
     attribution: 'Tiles &copy; Esri'
   });
 
+  esriImagery = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    detectRetina: true,
+    attribution:
+      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  });
+  streetMaps = tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    detectRetina: true,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+
+  layersControl = {
+    baseLayers: {
+      'Imagery Maps': this.esriImagery,
+      'Street Maps': this.streetMaps,
+      'Topographic Maps': this.topoMap
+    }
+  };
+
+  tileLayer: string = this.mapService.mainTileLayer;  // uses same tileLayer as main map
+  mapLayer = this.layersControl.baseLayers[this.tileLayer];
+
   options = {
-    layers: [this.topoMap],
+    layers: [this.mapLayer],
     zoomControl: false,
     zoom: 6,
     center: latLng([this.lat_0, this.lng_0])
