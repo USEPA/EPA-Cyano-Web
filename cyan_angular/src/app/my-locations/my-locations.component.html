@@ -31,15 +31,9 @@
           <div class="location_max">(Max adjacent cells: {{formatNumber(location.maxCellConcentration)}})</div>
           <mat-icon class="alert" *ngIf="exceedAlertValue(location)">error_outline</mat-icon>
         </div>
-      <div class="location_block_1">
-        <div class="location_cell">
-            <div class="location_cellC_meter">
-                <div class="location_cellC_meter_center"></div>
-                <div class="location_meter_img"></div>
-                <div class="location_meter_value" [style.background]="getPercentage(location)"></div>
-                <div class="location_cellCon" [style.color]="getColor(location, false)">{{formatNumber(location?.cellConcentration)}}</div>
-                <div class="location_units">cells/mL</div>
-            </div>
+        <div class="location_block_1">
+          <div class="location_cell">
+            <app-meter [location]="location"></app-meter>
           </div>
         </div>
       </div>

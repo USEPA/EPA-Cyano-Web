@@ -5,26 +5,24 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createCustomElement } from '@angular/elements';
-import {
-  MatSelectModule,
-  MatCheckboxModule,
-  MatButtonModule,
-  MatSliderModule,
-  MatNativeDateModule,
-  MatInputModule,
-  MatTabsModule,
-  MatBottomSheetModule,
-  MatIconModule,
-  MatBadgeModule,
-  MatCardModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatDatepickerModule,
-  MatMenuModule,
-  MatDialogModule,
-  MatDialogRef,
-  MAT_DIALOG_DATA
-} from '@angular/material';
+import {MatSelectModule } from '@angular/material/select'; 
+import {MatCheckboxModule } from '@angular/material/checkbox'; 
+import {MatButtonModule } from '@angular/material/button'; 
+import {MatSliderModule } from '@angular/material/slider'; 
+import {MatNativeDateModule } from '@angular/material';
+import {MatInputModule } from '@angular/material/input'; 
+import {MatTabsModule } from '@angular/material/tabs'; 
+import {MatBottomSheetModule } from '@angular/material/bottom-sheet'; 
+import {MatIconModule } from '@angular/material/icon'; 
+import {MatBadgeModule } from '@angular/material/badge'; 
+import {MatCardModule } from '@angular/material/card'; 
+import {MatProgressBarModule } from '@angular/material/progress-bar'; 
+import {MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
+import {MatDatepickerModule } from '@angular/material/datepicker'; 
+import {MatMenuModule } from '@angular/material/menu'; 
+import {MatDialogModule } from '@angular/material/dialog'; 
+import {MatDialogRef } from '@angular/material/dialog'; 
+import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -39,6 +37,7 @@ import { NotificationsComponent, NotificationDetails } from './notifications/not
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { ChartsModule } from 'ng2-charts';
+import { UserIdleModule } from 'angular-user-idle';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -69,6 +68,8 @@ import { LoaderService } from './services/loader.service';
 import { CommentsComponent } from './comments/comments.component';
 import { AddComment } from './comments/add-comment.component';
 import { ViewComment, ViewImage } from './comments/view-comment.component';
+import { MeterComponent } from './meter/meter.component';
+import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 
 @NgModule({
   declarations: [
@@ -97,14 +98,24 @@ import { ViewComment, ViewImage } from './comments/view-comment.component';
     ViewComment,
     AddComment,
     ViewImage,
-    DialogComponent
+    MeterComponent,
+    DialogComponent,
+    SessionTimeoutComponent
   ],
   imports: [
     BrowserModule,
     CommonModule,
     HttpClientModule,
     FormsModule,
-    LeafletModule.forRoot(),
+    LeafletModule,
+    // Optionally you can set time for `idle`, `timeout` and `ping` in seconds.
+    // Default values: `idle` is 600 (10 minutes), `timeout` is 300 (5 minutes)
+    // and `ping` is 120 (2 minutes).
+    UserIdleModule.forRoot({
+      idle: (environment.userIdleSeconds - environment.userIdleCountDownSeconds),
+      timeout: environment.userIdleCountDownSeconds,
+      ping: environment.userIdlePingSeconds
+    }),
     AppRoutingModule,
     ChartsModule,
     MatMenuModule,

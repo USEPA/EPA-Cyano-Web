@@ -1,12 +1,11 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatBottomSheet, MatBottomSheetRef } from '@angular/material';
+import { MatBottomSheet } from '@angular/material';
 import { DatePipe } from '@angular/common';
 
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
-import {MatCardModule} from '@angular/material/card';
 
-import { latLng, latLngBounds, tileLayer, marker, icon, Map, Layer, Marker, ImageOverlay, LayerGroup } from 'leaflet';
+import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, ImageOverlay } from 'leaflet';
 import { Subscription } from 'rxjs';
 
 import { MapService } from '../services/map.service';
@@ -28,7 +27,6 @@ export class LocationDetailsComponent implements OnInit {
 
   baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
 
-  currentLocationData: RawData;
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
   locationTIFFs: ImageDetails[];
@@ -171,6 +169,9 @@ export class LocationDetailsComponent implements OnInit {
 
   ngOnDestroy() {
     this.clearLayerImages();
+
+    // reset location cell/date to latest image
+    this.locationService.resetLocationsLatestData();
   }
 
   removeThumbHighlights() {
@@ -291,21 +292,11 @@ export class LocationDetailsComponent implements OnInit {
     if (selectedIndex == undefined || selectedIndex < 0) { return; }
     let locationDataArray = this.downloader.locationsData[this.current_location.id].requestData.outputs;
     let locationData = locationDataArray[selectedIndex];
-    let prevImageIndex = selectedIndex + 1;
-    if (selectedIndex >= locationDataArray.length - 1) {
-      this.current_location.concentrationChange = null;
-      this.current_location.changeDate = "N/A";
-    }
-    else {
-      this.getColor(this.current_location, true);  // updates arrow and cyano change color
-      this.current_location.concentrationChange = Math.round(locationDataArray[selectedIndex].cellConcentration - locationDataArray[selectedIndex + 1].cellConcentration);
-      this.current_location.changeDate = locationDataArray[selectedIndex + 1].imageDate.split(' ')[0];
-    }
+    let prevData = locationDataArray.length > selectedIndex ? locationDataArray[selectedIndex + 1] : null;
+
+    this.locationService.setLocationDataFromOutput(this.current_location, locationData, prevData)
+    this.getColor(this.current_location, prevData != null);  // updates arrow and cyano change color
     this.getArrow(this.current_location);  // updates arrow
-    this.current_location.cellConcentration = Math.round(locationData.cellConcentration);
-    this.current_location.maxCellConcentration = Math.round(locationData.maxCellConcentration);
-    this.current_location.validCellCount = locationData.validCellsCount;
-    this.current_location.dataDate = locationData.imageDate.split(' ')[0];
 
     if (this.selectedLayer != undefined) {
       this.getImageDate();  // updates image date
@@ -389,8 +380,8 @@ export class LocationDetailsComponent implements OnInit {
       date.setDate(date.getDate() + Number(day));
       title = title + ' ' + date.toLocaleDateString();
     } else {
-      let year1 = dateStr.substring(0, 4);
-      let day1 = dateStr.substring(4, 7);
+      // let year1 = dateStr.substring(0, 4);
+      // let day1 = dateStr.substring(4, 7);
       let year2 = dateStr.substring(7, 11);
       let day2 = dateStr.substring(11, 14);
       date = new Date(year2);
@@ -535,7 +526,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   createMarker(): Marker {
-    let m = marker(this.mapService.getLatLng(this.current_location), {
+    return marker(this.mapService.getLatLng(this.current_location), {
       icon: icon({
         iconSize: [30, 36],
         iconAnchor: [13, 41],
@@ -546,7 +537,6 @@ export class LocationDetailsComponent implements OnInit {
       riseOnHover: true,
       zIndexOffset: 10000
     });
-    return m;
   }
 
   changeMarker(): void {
@@ -608,11 +598,9 @@ export class LocationDetailsNotes {
   addingNote: boolean = false;
   preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
 
-  // constructor(private bottomSheetRef: MatBottomSheetRef<LocationDetailsNotes>) {}
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
               private datePipe: DatePipe,
-              private locationService: LocationService,
-              private user: UserService) {
+              private locationService: LocationService) {
   }
 
   ngOnInit() {

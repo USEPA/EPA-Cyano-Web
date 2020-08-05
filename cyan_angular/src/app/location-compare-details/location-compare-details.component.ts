@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatBottomSheet, MatBottomSheetRef } from '@angular/material';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { latLng, latLngBounds, tileLayer, marker, icon, Map, Layer, Marker, ImageOverlay, LayerGroup } from 'leaflet';
 import { Subscription } from 'rxjs';
 
@@ -233,6 +233,10 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   getPercentage(l: Location) {
     return this.locationService.getPercentage(l);
+  }
+
+  getPercentage2(l: Location) {
+    return this.locationService.getPercentage2(l);
   }
 
   getArrowColor(l: Location, delta: boolean) {
