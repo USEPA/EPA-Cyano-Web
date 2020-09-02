@@ -19,7 +19,9 @@ from endpoints import api
 from models import db, migrate
 
 from config.set_environment import DeployEnv
-from config.secrets.crypt import CryptManager
+# from config.secrets.crypt import CryptManager
+from cyan_flask.crypt import CryptManager
+
 
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
@@ -36,13 +38,23 @@ db_user = os.environ.get("DB_USER")
 db_pass = os.environ.get("DB_PASS")
 db_name = os.environ.get("DB_NAME")
 
-key_path = os.environ.get("KEY_PATH")
+try:
+    key_path = crypt_manager.unobscure(os.environ.get("SK"))
+except Exception:
+    logging.warning("Unable to unobscure.")
+    key_path = os.environ.get("SK")
+
+# logging.warning("KEY PATH: {}".format(key_path))
 
 mysql_url = None
-if db_pass:
-    mysql_url = "mysql://{}:{}@{}/{}".format(db_user, crypt_manager.decrypt_message(os.environ.get('KEY_PATH'), db_pass), db_host, db_name)
+if key_path and db_pass:
+    mysql_url = "mysql://{}:{}@{}/{}".format(db_user, crypt_manager.decrypt_message(key_path, db_pass), db_host, db_name)
+elif not key_path and db_pass:
+    logging.warning("No key provided for decrypting secrets.")
+    mysql_url = "mysql://{}:{}@{}/{}".format(db_user, db_pass, db_host, db_name)
 else:
-    print("No DB_PASS env var provided for cyano DB user.")
+    logging.error("\n\nNo DB_PASS env var provided for DB user.\nSet DB_PASS in the environment.\n\n")
+    raise
 
 # Declares Flask application:
 app = Flask(__name__)
