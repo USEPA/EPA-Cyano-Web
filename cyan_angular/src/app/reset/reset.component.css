@@ -165,10 +165,6 @@
     display: inline-block;
     color: red;
 }
-.last-update {
-    display: inline-block;
-    font-style: italic;
-}
 .app-description {
     font-size: smaller;
 }

@@ -17,7 +17,6 @@ export class AccountComponent implements OnInit {
   // TODO: Read from config file
   devState: string = 'Beta';
   version: string = environment.appVersion;
-  lastUpdate: string = '07/10/2020';
 
   registerForm: boolean = false;
   registerUsername: string = null;
