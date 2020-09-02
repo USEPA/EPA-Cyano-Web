@@ -84,13 +84,13 @@ export class DownloaderService {
   ) {}
 
   registerUser(username: string, email: string, password: string) {
-    let url = this.baseServerUrl + 'user/register/';
+    let url = this.baseServerUrl + 'user/register';
     let body = { user: username, email: email, password: password };
     return this.http.post(url, body, headerOptions);
   }
 
   userLogin(username: string, password: string) {
-    let url = this.baseServerUrl + 'user/';
+    let url = this.baseServerUrl + 'user';
     let body = { user: username, password: password, dataType: LocationType.OLCI_WEEKLY };
     return this.http.post(url, body, headerOptions);
   }
