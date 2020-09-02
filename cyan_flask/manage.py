@@ -17,20 +17,25 @@ sys.path.insert(1, os.path.join(sys.path[0], ".."))
 # Local imports:
 from cyan_flask.app import app, db
 from cyan_flask.build_db import DBHandler
-from config.secrets.crypt import CryptManager
+from cyan_flask.crypt import CryptManager
+
 
 crypt_manager = CryptManager()
 
+
 # DB connection settings:
 retries = 0
-max_retries = 15
+max_retries = 20
 retry_timeout_secs = 2
 
 
 def handle_password(enc_pass):
-	key_path = os.environ.get('KEY_PATH')  # relative path from EPA-Cyano-Web directory
+	try:
+		key_path = crypt_manager.unobscure(os.environ.get('SK'))  # relative path from EPA-Cyano-Web directory
+	except Exception:
+		key_path = os.environ.get("SK")
 	if not key_path:
-		raise Exception("No KEY_PATH environment variable set.")
+		raise Exception("No SK environment variable set.")
 	return crypt_manager.decrypt_message(key_path, enc_pass)
 
 def as_root(db_func, **db_func_kwargs):
@@ -44,7 +49,8 @@ def as_root(db_func, **db_func_kwargs):
 	db_user = os.environ.get("DB_USER")
 	db_pass = handle_password(os.environ.get('DB_PASS'))
 	db_name = os.environ.get("DB_NAME")
-	db_root_pass = handle_password(os.environ.get('MYSQL_ROOT_PASSWORD'))
+	# db_root_pass = handle_password(os.environ.get('MYSQL_ROOT_PASSWORD'))
+	db_root_pass = handle_password(os.environ.get('DB_ROOT_PASS'))
 
 	# MySQL URLs:
 	mysql_url = "mysql://{}:{}@{}/{}".format(db_user, db_pass, db_host, db_name)
@@ -142,7 +148,7 @@ def db_upgrade(migrations_path="migrations"):
 	"""
 	print("~~~ Running flask db upgrade.")
 
-	dec_root_pass = handle_password(os.environ.get('MYSQL_ROOT_PASSWORD'))
+	dec_root_pass = handle_password(os.environ.get('DB_ROOT_PASS'))
 	db_handler = DBHandler(os.environ.get("DB_NAME"), dec_root_pass)
 
 	try:
@@ -172,10 +178,10 @@ def db_downgrade(migrations_path="migrations"):
 
 @app.cli.command("user-create")
 @click.argument("user")
-@click.argument("newpass")
 @click.argument("host")
-@click.argument("migrations_path", required=False)
-def create_db_user(user, newpass, host, migrations_path="migrations"):
+@click.argument("root_pass")
+@click.argument("new_pass")
+def create_db_user(user, host, root_pass, new_pass):
 	"""
 	Creates MySQL user.
 	"""
@@ -183,12 +189,12 @@ def create_db_user(user, newpass, host, migrations_path="migrations"):
 	# Or is calling these cli function recursively causing the input problems?
 	print("~~~ Running flask user-create.")
 
-	dec_root_pass = handle_password(os.environ.get('MYSQL_ROOT_PASSWORD'))
+	dec_root_pass = handle_password(root_pass)
 	db_handler = DBHandler(os.environ.get("DB_NAME"), dec_root_pass)
 
 	while retry_db_command():
 		try:
-			db_handler.create_user(user, handle_password(newpass), host)  # TODO: Test with DB_HOST instead of '%'
+			db_handler.create_user(user, handle_password(new_pass), host)  # TODO: Test with DB_HOST instead of '%'
 			break
 		except Exception as e:
 			print("Exception in create_db_user: {}".format(e))
@@ -197,9 +203,9 @@ def create_db_user(user, newpass, host, migrations_path="migrations"):
 @app.cli.command("user-update")
 @click.argument("user")
 @click.argument("host")
+@click.argument("root_pass")
 @click.argument("new_pass")
-@click.argument("migrations_path", required=False)
-def update_user_password(user, host, new_pass, migrations_path="migrations"):
+def update_user_password(user, host, root_pass, new_pass):
 	"""
 	Updates user's DB password.
 	Inputs:
@@ -210,7 +216,7 @@ def update_user_password(user, host, new_pass, migrations_path="migrations"):
 	"""
 	print("\n~~~ Running flask user-update.")
 
-	dec_root_pass = handle_password(os.environ.get('MYSQL_ROOT_PASSWORD'))
+	dec_root_pass = handle_password(root_pass)
 	db_handler = DBHandler(os.environ.get("DB_NAME"), dec_root_pass)
 
 	while retry_db_command():
@@ -219,3 +225,61 @@ def update_user_password(user, host, new_pass, migrations_path="migrations"):
 			break
 		except Exception as e:
 			print("Exception in update_user_password: {}".format(e))
+
+
+@app.cli.command("create-secrets")
+@click.argument("curr_key", required=False)
+# @click.argument("secret", required=False)
+@click.argument("env_name", required=False)
+def create_secrets(curr_key, env_name):
+	"""
+	Encrypts secrets by manual encryption requiring
+	user to enter secrets to be encrypted.
+	"""
+	print("\n~~~ Running flask create-secret")
+	if not curr_key:
+		curr_key = input("Enter secret key path and filename: ")
+	while True:
+		secret = getpass("Enter secret to be encrypted: ")
+		resecret = getpass("Re-enter secret to be encrypted: ")
+		if secret != resecret:
+			print("Secrets do not match. Try to enter secret again.")
+			continue
+		enc_secret = crypt_manager.encrypt_message(curr_key, secret)
+		print("\nEncrypted secret with {} key:\n\n{}\n".format(curr_key, enc_secret.decode('utf-8')))
+		cont_enc = input("\nContinue secret encryption? (y or n): ")
+		if not cont_enc in ["y", "Y", "yes", "Yes"]:
+			break
+	print("Encryption routine complete.")
+	print("Secrets encrypted with the following key: {}".format(curr_key))
+
+
+@app.cli.command("create-key")
+@click.argument("key_path", required=False)
+def create_key(key_path):
+	"""
+	Creates secret key.
+	"""
+	if not key_path:
+		key_path = input("Enter secret key path and filename: ")
+	crypt_manager.create_key(key_path)
+	print("Key created at: {}".format(key_path))
+	print("Add this to .env file: {}".format(crypt_manager.obscure(key_path)))
+
+
+@app.cli.command("env-rotate")
+@click.argument("curr_key")
+@click.argument("env_name")
+def rotate_secrets(curr_key, env_name):
+	"""
+	1. Creates new secret key.
+	2. Loops through encrypted secrets.
+	3. Decrypts each secret.
+	4. Encrypts secret with new key.
+	5. Updates .env file with new secrets and new key.
+	"""
+	if not curr_key:
+		print("Current secret key required to rotate secrets.")
+		curr_key = input("Enter secret key path and filename: ")
+
+	new_key = crypt_manager.rotate_secrets(curr_key, env_name)

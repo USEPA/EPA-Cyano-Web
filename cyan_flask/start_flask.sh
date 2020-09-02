@@ -1,27 +1,24 @@
 #!/bin/bash
+
 python -m unittest  # runs unit tests
 
-# set env vars (TODO: Set paths with env vars?)
-enc_root_pass=$(cat /config/secrets/db.txt)  # setting new root pass as encrypted versionf from file
-enc_user_pass=$(cat /config/secrets/usr.txt)
-
+# echo "~~~~~ Current environment: ~~~~~"
+# printenv  # env is loaded for docker-compose 'env_file'
+# echo "~~~~~~~~~~~~~~~~~~~~"
 
 # 1. Changes root pass for db root@localhost
 echo "### Updating root password for db at localhost"
-flask user-update root localhost $enc_root_pass
+flask user-update root localhost $MYSQL_ROOT_PASSWORD $DB_ROOT_PASS  # sets root@localhost to pass from .env file
 
 # 2. Changes root pass for api manage.py (root@%)
 echo "### Updating root password for database at %"
-flask user-update root % $enc_root_pass
+flask user-update root % $MYSQL_ROOT_PASSWORD $DB_ROOT_PASS  # sets root@% to pass from .env file (handles cyan-api startup db migrations)
 
-# root pass should be updated now for following manage commands..
-
-export MYSQL_ROOT_PASSWORD=$enc_root_pass  # sets root db pass to encrypted version, used in manage.py
-export DB_PASS=$enc_user_pass  # sets cyano user DB_PASS env var to encrypted version, used in __init__.py
+export MYSQL_ROOT_PASSWORD=  # unsets mysql root pass
 
 # 3. Creates cyano user for API-DB interactions
 echo "### Creating user: $DB_USER, if not exist."
-flask user-create $DB_USER $DB_PASS %
+flask user-create $DB_USER % $DB_ROOT_PASS $DB_PASS  # using new root pass to create cyano db user
 
 # 4. Performs any database migrations
 echo "### Performing database migrations."
