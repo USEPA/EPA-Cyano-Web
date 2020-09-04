@@ -56,7 +56,7 @@ class Register(Resource):
 
     def post(self):
         # Adds user to user table:
-        args = self.parser.parse_args()
+        args = request.get_json()
         results, status_code = web_app_api.register_user(args)
         return results, status_code
 
@@ -236,7 +236,7 @@ class Reset(Resource):
 		"""
         parser = parser_base.copy()
         parser.add_argument("email", type=str)
-        args = parser.parse_args()
+        args = request.get_json()
         # TODO: security checks, header injections, etc.??
         results, status_code = web_app_api.reset_password(args)
         return results, status_code
@@ -249,7 +249,7 @@ class Reset(Resource):
 		"""
         parser = parser_base.copy()
         parser.add_argument("newPassword", type=str)
-        args = parser.parse_args()
+        args = request.get_json()
         args["email"] = JwtHandler().get_user_token(request)[
             "sub"
         ]  # 'sub' key should have user's email address

@@ -27,6 +27,8 @@ services:
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
       - MYSQL_ROOT_PASSWORD
+    env_file:
+      - ${CYAN_CONFIG:-./config/environments/local_docker_dev.env}
     links:
       - cyan-db
 
@@ -40,7 +42,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD
     env_file:
-      - $CYAN_CONFIG
+      - ${CYAN_CONFIG:-./config/environments/local_docker_dev.env}
       # - MYSQL_DATABASE=${DB_NAME}
       # - DB_NAME
       # NOTE: Below env vars create one-time pass displayed once in container stdout
