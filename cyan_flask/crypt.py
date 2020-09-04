@@ -137,6 +137,17 @@ class CryptManager:
 		print("\nNew environment file:\n{}\n".format(env_vars_str))
 		return env_vars_str
 
+	def get_key(self):
+		"""
+		Gets key path from environment varible.
+		"""
+		print("SK GETTING GOT: {}".format(os.environ.get("SK")))
+		try:
+		    return self.unobscure(os.environ.get("SK"))
+		except Exception:
+		    logging.warning("Unable to unobscure.")
+		    return os.environ.get("SK")
+
 	def create_key(self, fullpath):
 		"""
 		Creates secret key and saves it to/as fullpath.

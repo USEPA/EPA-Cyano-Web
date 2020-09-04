@@ -138,9 +138,9 @@ class DBHandler(object):
         self.execute_query(query)
         self.add_privilege(user, host)
 
-    def delete_user(self, user):
+    def delete_user(self, user, host="localhost"):
         # query = "DROP USER IF EXISTS '{}'@'localhost';".format(user)
-        query = "DROP USER '{}'@'localhost';".format(user)
+        query = "DROP USER '{}'@'{}';".format(user, host)
         self.execute_query(query)
 
     def add_privilege(self, user, host="localhost"):

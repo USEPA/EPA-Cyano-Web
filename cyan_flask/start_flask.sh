@@ -2,6 +2,8 @@
 
 python -m unittest  # runs unit tests
 
+python -m unittest tests/integration_tests.py  # runs integration tests (tests/integration_tests.py)
+
 # echo "~~~~~ Current environment: ~~~~~"
 # printenv  # env is loaded for docker-compose 'env_file'
 # echo "~~~~~~~~~~~~~~~~~~~~"

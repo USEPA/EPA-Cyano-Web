@@ -79,9 +79,11 @@ class TestEndpoints(unittest.TestCase):
         actual_result = endpoints.Register().get()
         self.assertEqual(actual_result, expected_result)
 
+    # @patch("cyan_flask.app.endpoints.web_app_api.register_user")
+    # @patch("cyan_flask.app.endpoints.Register.parser.parse_args")
+    # def test_register_post(self, parse_args_mock, register_user_mock):
     @patch("cyan_flask.app.endpoints.web_app_api.register_user")
-    @patch("cyan_flask.app.endpoints.Register.parser.parse_args")
-    def test_register_post(self, parse_args_mock, register_user_mock):
+    def test_register_post(self, register_user_mock):
         """
 		Tests Register endpoint POST request.
 		"""
@@ -90,10 +92,11 @@ class TestEndpoints(unittest.TestCase):
             {"status": "success", "username": "test", "email": "test@email.com"},
             200,
         )
-        parse_args_mock.return_value = test_request
-        register_user_mock.return_value = expected_result_user_created
-        actual_result_1 = endpoints.Register().post()
-        self.assertEqual(actual_result_1, expected_result_user_created)
+        with app.test_request_context(json=test_request) as client:
+            client.request.data = test_request
+            register_user_mock.return_value = expected_result_user_created
+            actual_result_1 = endpoints.Register().post()
+            self.assertEqual(actual_result_1, expected_result_user_created)
 
     def test_login_get(self):
         """

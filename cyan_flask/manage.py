@@ -30,10 +30,7 @@ retry_timeout_secs = 2
 
 
 def handle_password(enc_pass):
-	try:
-		key_path = crypt_manager.unobscure(os.environ.get('SK'))  # relative path from EPA-Cyano-Web directory
-	except Exception:
-		key_path = os.environ.get("SK")
+	key_path = crypt_manager.get_key()
 	if not key_path:
 		raise Exception("No SK environment variable set.")
 	return crypt_manager.decrypt_message(key_path, enc_pass)

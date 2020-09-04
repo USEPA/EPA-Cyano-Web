@@ -38,11 +38,7 @@ db_user = os.environ.get("DB_USER")
 db_pass = os.environ.get("DB_PASS")
 db_name = os.environ.get("DB_NAME")
 
-try:
-    key_path = crypt_manager.unobscure(os.environ.get("SK"))
-except Exception:
-    logging.warning("Unable to unobscure.")
-    key_path = os.environ.get("SK")
+key_path = crypt_manager.get_key()
 
 # logging.warning("KEY PATH: {}".format(key_path))
 

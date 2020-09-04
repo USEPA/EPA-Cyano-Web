@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker } from 'leaflet';
+import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker, tileLayer } from 'leaflet';
 import { Location } from '../models/location';
 import { CyanMap } from '../utils/cyan-map';
 import { UserService } from '../services/user.service';
@@ -15,6 +15,8 @@ export class MapService {
 
   marker_list = {};
   private data_source = 'OLCI';
+
+  public mainTileLayer: string = '';
 
   constructor(private cyanMap: CyanMap, private userService: UserService) {}
 
