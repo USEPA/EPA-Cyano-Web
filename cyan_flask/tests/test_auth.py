@@ -16,11 +16,12 @@ sys.path.insert(
 # Local imports:
 from config.set_environment import DeployEnv
 from cyan_flask.app.auth import PasswordHandler, JwtHandler
+from cyan_flask.crypt import CryptManager
 
 # Sets up runtime environment:
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
-
+crypt_manager = CryptManager()
 
 class TestAuth(unittest.TestCase):
     """
@@ -153,7 +154,7 @@ class TestAuth(unittest.TestCase):
 		_handle_config_password
 		"""
         smtp_pass = "testpass"
-        smtp_pass_obscured = "eNorSS0uKUgsLgYAD50DeA=="
+        smtp_pass_obscured = crypt_manager.encrypt_message(crypt_manager.get_key(), smtp_pass)
 
         expected_result = smtp_pass
         actual_result = PasswordHandler()._handle_config_password(smtp_pass_obscured)
