@@ -15,10 +15,14 @@ from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
 # from cryptography.hazmat.primitives import hashes
 # from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
+from cyan_flask.crypt import CryptManager
+
+crypt_manager = CryptManager()
+
 
 class PasswordHandler:
     def __init__(self):
-        self.config_obj = ConfigCrypt()
+        pass
 
     def _create_email_message(self, server_email, user_email):
         subject = "Password reset for Cyano Web"
@@ -57,7 +61,8 @@ class PasswordHandler:
             return {"error": "Unable to send email."}
 
     def _handle_config_password(self, smtp_pass):
-        return self.config_obj.unobscure(smtp_pass.encode()).decode()
+        # return self.config_obj.unobscure(smtp_pass.encode()).decode()
+        return crypt_manager.decrypt_message(crypt_manager.get_key(), smtp_pass)
 
     def hash_password(self, password):
         salt = hashlib.sha256(os.urandom(60)).hexdigest().encode("ascii")

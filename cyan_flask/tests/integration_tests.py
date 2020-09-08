@@ -28,13 +28,16 @@ from cyan_flask.app.endpoints import Register
 from cyan_flask.app.auth import JwtHandler
 from cyan_flask.app import app as app_instance
 from cyan_flask import manage
+from cyan_flask.crypt import CryptManager
 
+crypt_manager = CryptManager()
 
 
 class TestApiIntegration(unittest.TestCase):
 	"""
 	Integration tests for testing API.
 	"""
+
 	test_db_name = "test_cyan_web_app_db"  # use env var?
 	test_db_user = "test_db_user"
 	test_db_host = "localhost"
@@ -85,6 +88,9 @@ class TestApiIntegration(unittest.TestCase):
         "body": "This is a test reply."
 	}
 
+	def _get_db_pass(self):
+		return crypt_manager.decrypt_message(crypt_manager.get_key(), os.environ.get("DB_ROOT_PASS"))
+
 	def _set_env(self):
 		"""
 		Sets up runtime environment.
@@ -103,7 +109,7 @@ class TestApiIntegration(unittest.TestCase):
 		os.environ.update(current_env)  # updates environment with test values
 		app_instance.config.update(
 			TESTING=True,
-			SQLALCHEMY_DATABASE_URI="mysql://{}:{}@{}/{}".format("root", os.environ.get("MYSQL_ROOT_PASSWORD"), self.test_db_host, self.test_db_name)
+			SQLALCHEMY_DATABASE_URI="mysql://{}:{}@{}/{}".format("root", self._get_db_pass(), self.test_db_host, self.test_db_name)
 		)  # updates flask config with test values
 		print("Current environment: {}".format(os.environ))
 
@@ -111,10 +117,10 @@ class TestApiIntegration(unittest.TestCase):
 		"""
 		Creates test database and tables.
 		"""
-		if not os.environ.get("MYSQL_ROOT_PASSWORD"):
-			raise Exception("MYSQL_ROOT_PASSWORD must be set to execute integration tests.")
+		if not self._get_db_pass():
+			raise Exception("DB_ROOT_PASS must be set to execute integration tests.")
 
-		db_handler = DBHandler(self.test_db_name, os.environ.get("MYSQL_ROOT_PASSWORD"))
+		db_handler = DBHandler(self.test_db_name, self._get_db_pass())
 		attempts, max_retries = 0, 20
 
 		while attempts < max_retries:
@@ -129,7 +135,7 @@ class TestApiIntegration(unittest.TestCase):
 		with app_instance.app_context():
 			flask_migrate.upgrade()
 
-		db_handler = DBHandler(self.test_db_name, os.environ.get("MYSQL_ROOT_PASSWORD"))
+		db_handler = DBHandler(self.test_db_name, self._get_db_pass())
 		db_handler.create_user(self.test_db_user, self.test_db_pass, self.test_db_host)
 
 	def _teardown_db(self):
@@ -137,7 +143,7 @@ class TestApiIntegration(unittest.TestCase):
 		Drops test database and tables, drops test user.
 		"""
 		try:
-			db_handler = DBHandler(self.test_db_name, os.environ.get("MYSQL_ROOT_PASSWORD"))
+			db_handler = DBHandler(self.test_db_name, self._get_db_pass())
 			db_handler.delete_database()
 			db_handler.delete_user(self.test_db_user, self.test_db_host)
 		except Exception as e:

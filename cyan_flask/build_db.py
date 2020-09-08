@@ -152,6 +152,13 @@ class DBHandler(object):
         )
         self.execute_query(query)
 
+    def update_user_pass(self, user, newpass, host="localhost"):
+        """
+        Updates a user's password.
+        """
+        query = "ALTER USER '{}'@'{}' IDENTIFIED BY '{}'".format(user, host, newpass)
+        self.execute_query(query)
+
     def build_table(self, table_name):
         if table_name == "user":
             self.create_user_table()

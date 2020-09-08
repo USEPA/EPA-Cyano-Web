@@ -19,20 +19,38 @@ from endpoints import api
 from models import db, migrate
 
 from config.set_environment import DeployEnv
+# from config.secrets.crypt import CryptManager
+from cyan_flask.crypt import CryptManager
+
 
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 
+crypt_manager = CryptManager()
+
 secret_key = os.urandom(24).hex()
 os.environ.setdefault("SECRET_KEY", secret_key)
+
 
 db_host = os.environ.get("DB_HOST")
 db_port = os.environ.get("DB_PORT")
 db_user = os.environ.get("DB_USER")
-db_passwd = os.environ.get("DB_PASS")
+db_pass = os.environ.get("DB_PASS")
 db_name = os.environ.get("DB_NAME")
 
-mysql_url = "mysql://{}:{}@{}/{}".format(db_user, db_passwd, db_host, db_name)
+key_path = crypt_manager.get_key()
+
+# logging.warning("KEY PATH: {}".format(key_path))
+
+mysql_url = None
+if key_path and db_pass:
+    mysql_url = "mysql://{}:{}@{}/{}".format(db_user, crypt_manager.decrypt_message(key_path, db_pass), db_host, db_name)
+elif not key_path and db_pass:
+    logging.warning("No key provided for decrypting secrets.")
+    mysql_url = "mysql://{}:{}@{}/{}".format(db_user, db_pass, db_host, db_name)
+else:
+    logging.error("\n\nNo DB_PASS env var provided for DB user.\nSet DB_PASS in the environment.\n\n")
+    raise
 
 # Declares Flask application:
 app = Flask(__name__)

@@ -11,8 +11,8 @@ import requests
 import json
 import socket
 
-logger = logging.getLogger(__name__)
-logger.warning("EPA-Cyano-Web set_environment.py")
+# logger = logging.getLogger(__name__)
+# logger.warning("EPA-Cyano-Web set_environment.py")
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -103,33 +103,33 @@ class DeployEnv(ServerConfig):
             # Try to find matching SERVER_NAME with machine id:
             env_filename = self.set_current_config(self.machine_id)
         else:
-            logger.warning("Setting .env filename using $DOCKER_HOSTNAME.")
+            # logger.warning("Setting .env filename using $DOCKER_HOSTNAME.")
             return env_filename
 
         if not env_filename:
             # Next, try hostname ($HOSTNAME env var) if machine id doesn't match:
             env_filename = self.set_current_config(self.hostname)
         else:
-            logger.warning("Setting .env filename using socket.gethostname().")
+            # logger.warning("Setting .env filename using socket.gethostname().")
             return env_filename
 
         if not env_filename:
             # If machine id or hostname don't match, try %COMPUTERNAME% (Windows env var):
             env_filename = self.set_current_config(self.computer_name)
         else:
-            logger.warning("Setting .env filename using $HOSTNAME env var.")
+            # logger.warning("Setting .env filename using $HOSTNAME env var.")
             return env_filename
 
         if not env_filename:
             # Finally, tries to automatically set environment if no machine id, hostname, or computer name:
             # env_filename = self.run_auto_env_selector()
             if not self.docker_hostname:
-                logger.warning("Could not find .env file to set environment and DOCKER_HOSTNAME not set. Defaulting to local dev environment.")
+                # logger.warning("Could not find .env file to set environment and DOCKER_HOSTNAME not set. Defaulting to local dev environment.")
                 return "local_dev.env"
             else:
                 return "local_docker_dev.env"
         else:
-            logger.warning("Setting .env filename using %COMPUTERNAME% env var.")
+            # logger.warning("Setting .env filename using %COMPUTERNAME% env var.")
             return env_filename
 
         return None
@@ -152,14 +152,14 @@ class DeployEnv(ServerConfig):
         self.computer_name = os.environ.get('COMPUTERNAME')  # COMPUTERNAME env var for windows
         self.machine_id = socket.gethostname()  # returns string of hostname of machine where Python interpreter is currently executing (also see: socket.getfqdn())
 
-        logger.warning("DOCKER_HOSTNAME: {}".format(self.docker_hostname))
-        logger.warning("HOSTNAME: {}".format(self.hostname))
-        logger.warning("COMPUTERNAME: {}".format(self.computer_name))
-        logger.warning("MACHINE ID: {}".format(socket.gethostname()))
+        # logger.warning("DOCKER_HOSTNAME: {}".format(self.docker_hostname))
+        # logger.warning("HOSTNAME: {}".format(self.hostname))
+        # logger.warning("COMPUTERNAME: {}".format(self.computer_name))
+        # logger.warning("MACHINE ID: {}".format(socket.gethostname()))
 
         env_filename = self.determine_env()  # gets .env filename by checking machine name with server_configs.json
 
-        logger.warning("Loading env vars from: {}.".format(env_filename))
+        # logger.warning("Loading env vars from: {}.".format(env_filename))
 
         # dotenv_path = self.env_path + env_filename  # sets .env file path
         dotenv_path = os.path.join(self.env_path, env_filename)
