@@ -160,6 +160,7 @@ class DeployEnv(ServerConfig):
         env_filename = self.determine_env()  # gets .env filename by checking machine name with server_configs.json
 
         # logger.warning("Loading env vars from: {}.".format(env_filename))
+        logging.warning("Loading env vars from: {}.".format(env_filename))
 
         # dotenv_path = self.env_path + env_filename  # sets .env file path
         dotenv_path = os.path.join(self.env_path, env_filename)

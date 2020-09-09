@@ -35,7 +35,6 @@ class CryptManager:
 		"""
 		Saves file to fullpath, includes path and filename.
 		"""
-		# self._file_exists_check(fullpath)
 		print("Writing file: {}".format(fullpath))
 		with open(fullpath, "wb") as file_obj:
 			file_obj.write(file_content)
@@ -45,23 +44,18 @@ class CryptManager:
 		Opens file 'fullpath' and returns its contents.
 		"""
 		try:
-			return open(fullpath, "rb").read()
+			file_obj = open(fullpath, "rb")
+			file_content = file_obj.read()
+			file_obj.close()
+			return file_content
+
 		except FileNotFoundError:
-			# newpath = os.path.join(PROJECT_ROOT, "..", "config", "secrets", Path(fullpath).name)  # defaults to config/secrets path
 			newpath = os.path.join(self.key_location, Path(fullpath).name)
 			logging.warning("File not found at: {}. Trying default path: {}".format(fullpath, newpath))
-			return open(newpath, "rb").read()
-
-	# def _file_exists_check(self, fullpath):
-	# 	"""
-	# 	Checks if file exists as well as .orig version.
-	# 	Returns exception if file and file.orig exists so
-	# 	that a key doesn't get overwritten and lost forever.
-	# 	"""
-	# 	if Path(fullpath).is_file() and Path(fullpath + self.dup_ext).is_file():
-	# 		raise Exception("Key file already exists with name '{}' as well as '{}'.".format(fullpath, fullpath + self.dup_ext))
-	# 	else:
-	# 		return fullpath
+			file_obj = open(newpath, "rb")
+			file_content = file_obj.read()
+			file_obj.close()
+			return file_content
 
 	def _get_env_as_dict(self, env_vars):
 		"""
