@@ -70,6 +70,7 @@ import { AddComment } from './comments/add-comment.component';
 import { ViewComment, ViewImage } from './comments/view-comment.component';
 import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
+import { LocationSearchComponent } from './location-search/location-search.component';
 
 @NgModule({
   declarations: [
@@ -100,7 +101,8 @@ import { SessionTimeoutComponent } from './session-timeout/session-timeout.compo
     ViewImage,
     MeterComponent,
     DialogComponent,
-    SessionTimeoutComponent
+    SessionTimeoutComponent,
+    LocationSearchComponent
   ],
   imports: [
     BrowserModule,

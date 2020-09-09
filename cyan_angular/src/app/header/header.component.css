@@ -300,7 +300,7 @@
 .help {
   display: none;
 }
-.comments {
+.comments, .location-search {
   margin-top: 5px;
 }
 .header-version {

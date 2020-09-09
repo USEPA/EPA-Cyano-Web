@@ -1,0 +1,26 @@
+<div class="locations-block">
+	<button mat-button class="locations-exit" [routerLink]="['']">X</button>
+	<div class="locations-title">
+		<h2>Location search</h2>
+	</div>
+	<div style="padding-left:2%;">
+		<mat-form-field>
+			<input matInput [(ngModel)]="enteredLocation" placeholder="Enter location to search">
+		</mat-form-field>
+		<button mat-raised-button color="primary" (click)="searchLocation();">Search</button>
+	</div>
+	<br>
+	<div *ngIf="locationResults?.length > 0" class="user-locations">
+		<h4>Results: {{locationResults.length}}</h4>
+		<br>
+		<ul>
+			<li *ngFor="let locationResult of locationResults" class="location-li" (click)="viewLocation(locationResult);">
+				<div class="location-item-left">
+					<p><b>{{locationResult.display_name}}</b>
+					{{locationResult.lat}}, {{locationResult.lon}}</p>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<br>
+</div>
