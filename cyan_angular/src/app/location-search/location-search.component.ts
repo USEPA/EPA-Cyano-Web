@@ -43,6 +43,9 @@ export class LocationSearchComponent implements OnInit {
 		let locationResults = [];
 		for(let index in response) {
 			let responseItem = response[index];
+			if (!this.inUnitedStates(responseItem)) {
+				continue;
+			}
 			let locationResult = new LocationResult;
 			locationResult.place_id = responseItem['place_id'];
 			locationResult.licence = responseItem['licence'];
@@ -69,6 +72,19 @@ export class LocationSearchComponent implements OnInit {
 		let latLon = new LatLng(Number(location.lat), Number(location.lon));
 		map.setZoom(12);
 		map.flyTo(latLon);
+	}
+
+	inUnitedStates(locationResult: LocationResult): boolean {
+		/*
+		Checks if location is in United States.
+		NOTE: API has "country=" param, but doesn't seem to be working.
+		Test Example: https://nominatim.openstreetmap.org/search?q=deer%20lake&format=json&country=us
+		API Docs: https://nominatim.org/release-docs/develop/api/Search/
+		*/
+		if (!locationResult.display_name.includes("United States")) {
+			return false;
+		}
+		return true;
 	}
 
 }
