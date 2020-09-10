@@ -70,8 +70,9 @@ export class LocationSearchComponent implements OnInit {
 		*/
 		let map = this.mapService.getMap();
 		let latLon = new LatLng(Number(location.lat), Number(location.lon));
-		map.setZoom(12);
-		map.flyTo(latLon);
+		let latLonArray = [];
+		latLonArray.push(latLon)
+		map.flyToBounds(latLonArray);
 	}
 
 	inUnitedStates(locationResult: LocationResult): boolean {
