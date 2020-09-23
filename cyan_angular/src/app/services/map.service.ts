@@ -191,6 +191,8 @@ export class MapService {
     NOTE: Defined bounds for CONUS are approximate.
     */
 
+    console.log("Checking if within CONUS.");
+
     if (lon > 0) {
       lon = -1.0 * lon;  // assuming CONUS, flips +lon to -lon
     }
@@ -217,7 +219,7 @@ export class MapService {
     let latDeg = Math.floor(latDec);
     let latMin = 60.0 * (latDec % 1);
     let latSec = 60.0 * (latMin % 1);
-    let lonDeg = Math.floor(lonDec);
+    let lonDeg = Math.abs(Math.floor(lonDec));
     let lonMin = 60.0 * (lonDec % 1);
     let lonSec = 60.0 * (lonMin % 1);
     return [latDeg, Math.round(latMin), Math.round(latSec), lonDeg, Math.round(lonMin), Math.round(lonSec)];
