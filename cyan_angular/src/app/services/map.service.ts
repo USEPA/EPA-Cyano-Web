@@ -18,6 +18,11 @@ export class MapService {
 
   public mainTileLayer: string = '';
 
+  conusTop: number = 49.3457868; // north lat
+  conusLeft: number = -124.7844079; // west long
+  conusRight: number = -66.9513812; // east long
+  conusBottom: number =  24.7433195; // south lat
+
   constructor(private cyanMap: CyanMap, private userService: UserService) {}
 
   setMap(map: Map): void {
@@ -178,4 +183,44 @@ export class MapService {
       }
     }
   }
+
+  withinConus(lat: number, lon: number) {
+    /*
+    Checks that lat, lon is within CONUS
+    (http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States#Westernmost).
+    NOTE: Defined bounds for CONUS are approximate.
+    */
+
+    if (lon > 0) {
+      lon = -1.0 * lon;  // assuming CONUS, flips +lon to -lon
+    }
+
+    if ((this.conusBottom <= lat && lat <= this.conusTop) && (this.conusLeft <= lon && lon <= this.conusRight)) {
+        return true;
+    }
+    return false;
+  }
+
+  convertDmsToDd(latDeg: number, latMin: number, latSec: number, lonDeg: number, lonMin: number, lonSec: number) {
+    /*
+    Converts lat/lon from DMS to decimal degrees.
+    */
+    let lat = latDeg + (latMin / 60.0) + (latSec / 3600.0);
+    let lon = lonDeg + (lonMin / 60.0) + (lonSec / 3600.0);
+    return [lat, lon];
+  }
+
+  convertDdToDms(latDec: number, lonDec: number) {
+    /*
+    Converts lat/lon from decimal degrees to DMS.
+    */
+    let latDeg = Math.floor(latDec);
+    let latMin = 60.0 * (latDec % 1);
+    let latSec = 60.0 * (latMin % 1);
+    let lonDeg = Math.floor(lonDec);
+    let lonMin = 60.0 * (lonDec % 1);
+    let lonSec = 60.0 * (lonMin % 1);
+    return [latDeg, Math.round(latMin), Math.round(latSec), lonDeg, Math.round(lonMin), Math.round(lonSec)];
+  }
+
 }
