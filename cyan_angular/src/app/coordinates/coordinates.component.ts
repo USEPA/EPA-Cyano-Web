@@ -32,20 +32,34 @@ export class CoordinatesComponent implements OnInit {
 	lonMin: number;
 	lonSec: number;
 
+	latDec: number;  // decimal degrees
+	lonDec: number;  // decimal degrees
+
 	location: Location;
 
+	units: object = {dms: "Degree-Minute-Seconds", dd: "Decimal Degrees"};
+	defaultSelected: string = "dms";
+	selectedKey: string = "dms";
+
   constructor(
-		private locationService: LocationService,
-		private mapService: MapService,
-		private authService: AuthService
+	private locationService: LocationService,
+	private mapService: MapService,
+	private authService: AuthService
   ) { }
 
   ngOnInit() {
-  	if (!this.authService.checkUserAuthentication()) { return; }
+  	if (!this.authService.checkUserAuthentication()) { 
+  		return;
+  	}
   }
 
 	markLocation(): void {
-		if (!this.authService.checkUserAuthentication()) { return; }
+		if (!this.authService.checkUserAuthentication()) {
+			return;
+		}
+		if (!this.validateCoords()) {
+			return;
+		}
 		this.location = this.getLocationData();
 		this.locationService.setMarked(this.location, true);
 		this.mapService.updateMarker(this.location);
@@ -53,7 +67,12 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	compareLocation(): void {
-		if (!this.authService.checkUserAuthentication()) { return; }
+		if (!this.authService.checkUserAuthentication()) {
+			return;
+		}
+		if (!this.validateCoords()) {
+			return;
+		}
 		this.location = this.getLocationData();
 		this.locationService.addCompareLocation(this.location);
 	}
@@ -91,7 +110,42 @@ export class CoordinatesComponent implements OnInit {
 		m.fireEvent('click');
 
 		return location;
+	}
 
+	onSelect(selectedValue) {
+		console.log(selectedValue);
+		this.selectedKey = selectedValue.value;
+	}
+
+	validateCoords() {
+		/*
+		Checks whether coordinates are within CONUS.
+		*/
+		// Convert to dd if in dms.
+		let latLon = [];
+		if (this.selectedKey == "dd") {
+			let latLonDms = this.mapService.convertDdToDms(this.latDec, this.lonDec);
+			this.setDmsCoords(latLonDms);
+			latLon = [this.latDec, this.lonDec];
+		}
+		else if (this.selectedKey == "dms") {
+			latLon = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.lonDeg, this.lonMin, this.lonSec);
+		}
+
+		if (!this.mapService.withinConus(latLon[0], latLon[1])) {
+			alert("Requested coordinates not within CONUS.");
+			return false;
+		}
+		return true;
+	}
+
+	setDmsCoords(latLonDms: Array<number>) {
+		this.latDeg = latLonDms[0];
+		this.latMin = latLonDms[1];
+		this.latSec = latLonDms[2];
+		this.lonDeg = latLonDms[3];
+		this.lonMin = latLonDms[4];
+		this.lonSec = latLonDms[5];
 	}
 
 }
