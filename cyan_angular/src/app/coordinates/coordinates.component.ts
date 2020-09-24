@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map, LatLng } from 'leaflet';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 import { Location } from '../models/location';
 
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -23,6 +25,11 @@ export class CoordinatesComponent implements OnInit {
 
 	selectedLat: string = 'N';
 	selectedLon: string = 'W';
+
+	conusTop: number = 53; // north lat
+  conusLeft: number = -130; // west long
+  conusRight: number = -65; // east long
+  conusBottom: number =  24; // south lat
 
 	latDeg: number;
 	latMin: number;
@@ -44,7 +51,9 @@ export class CoordinatesComponent implements OnInit {
   constructor(
 	private locationService: LocationService,
 	private mapService: MapService,
-	private authService: AuthService
+	private authService: AuthService,
+	private dialogComponent: DialogComponent,
+	private errorDialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -77,7 +86,7 @@ export class CoordinatesComponent implements OnInit {
 		this.locationService.addCompareLocation(this.location);
 	}
 
-	getLocationData() {
+	getLocationData(): Location {
 		/*
 		requestType: 'compare' or 'mark'
 		*/
@@ -112,34 +121,64 @@ export class CoordinatesComponent implements OnInit {
 		return location;
 	}
 
-	onSelect(selectedValue) {
+	onSelect(selectedValue: any): void {
 		console.log(selectedValue);
 		this.selectedKey = selectedValue.value;
 	}
 
-	validateCoords() {
+	validateCoords(): boolean {
 		/*
 		Checks whether coordinates are within CONUS.
 		*/
-		// Convert to dd if in dms.
 		let latLon = [];
-		if (this.selectedKey == "dd") {
-			let latLonDms = this.mapService.convertDdToDms(this.latDec, this.lonDec);
+		let latLonDms = [];
+		if (this.selectedKey == "dms") {
+			latLon = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.lonDeg, this.lonMin, this.lonSec);
+		}
+		else if (this.selectedKey == "dd") {
+			latLonDms = this.mapService.convertDdToDms(this.latDec, this.lonDec);
 			this.setDmsCoords(latLonDms);
 			latLon = [this.latDec, this.lonDec];
 		}
-		else if (this.selectedKey == "dms") {
-			latLon = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.lonDeg, this.lonMin, this.lonSec);
-		}
 
-		if (!this.mapService.withinConus(latLon[0], latLon[1])) {
-			alert("Requested coordinates not within CONUS.");
+		if (!this.withinConus(latLon[0], latLon[1])) {
+			this.displayError("Coordinates are not within CONUS");
 			return false;
 		}
-		return true;
+		else {
+			return true;
+		}
+
 	}
 
-	setDmsCoords(latLonDms: Array<number>) {
+	withinConus(lat: number, lon: number): boolean {
+		if (!(this.conusBottom <= lat && lat <= this.conusTop)) {
+			return false;
+		}
+		else if (this.selectedKey == "dms" && (Math.abs(this.conusLeft) >= lon && lon >= Math.abs(this.conusRight))) {
+			return true;
+		}
+		else if (this.selectedKey == "dd" && (this.conusLeft <= lon && lon <= this.conusRight)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	displayError(message: string): void {
+		const dialogRef = this.errorDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+			console.log("result");
+    	console.log(result);
+    });
+	}
+
+	setDmsCoords(latLonDms: Array<number>): void {
 		this.latDeg = latLonDms[0];
 		this.latMin = latLonDms[1];
 		this.latSec = latLonDms[2];

@@ -18,11 +18,6 @@ export class MapService {
 
   public mainTileLayer: string = '';
 
-  conusTop: number = 49.3457868; // north lat
-  conusLeft: number = -124.7844079; // west long
-  conusRight: number = -66.9513812; // east long
-  conusBottom: number =  24.7433195; // south lat
-
   constructor(private cyanMap: CyanMap, private userService: UserService) {}
 
   setMap(map: Map): void {
@@ -182,25 +177,6 @@ export class MapService {
         return 'assets/images/map_pin_green_unchecked.png';
       }
     }
-  }
-
-  withinConus(lat: number, lon: number) {
-    /*
-    Checks that lat, lon is within CONUS
-    (http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States#Westernmost).
-    NOTE: Defined bounds for CONUS are approximate.
-    */
-
-    console.log("Checking if within CONUS.");
-
-    if (lon > 0) {
-      lon = -1.0 * lon;  // assuming CONUS, flips +lon to -lon
-    }
-
-    if ((this.conusBottom <= lat && lat <= this.conusTop) && (this.conusLeft <= lon && lon <= this.conusRight)) {
-        return true;
-    }
-    return false;
   }
 
   convertDmsToDd(latDeg: number, latMin: number, latSec: number, lonDeg: number, lonMin: number, lonSec: number) {
