@@ -122,7 +122,6 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	onSelect(selectedValue: any): void {
-		console.log(selectedValue);
 		this.selectedKey = selectedValue.value;
 	}
 
@@ -171,10 +170,6 @@ export class CoordinatesComponent implements OnInit {
       data: {
         dialogMessage: message
       }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-			console.log("result");
-    	console.log(result);
     });
 	}
 
