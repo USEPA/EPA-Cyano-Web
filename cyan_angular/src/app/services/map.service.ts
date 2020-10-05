@@ -192,10 +192,10 @@ export class MapService {
     /*
     Converts lat/lon from decimal degrees to DMS.
     */
-    let latDeg = Math.floor(latDec);
+    let latDeg = parseInt(latDec.toString(), 10);
     let latMin = 60.0 * (latDec % 1);
     let latSec = 60.0 * (latMin % 1);
-    let lonDeg = Math.abs(Math.floor(lonDec));
+    let lonDeg = parseInt(lonDec.toString(), 10);
     let lonMin = 60.0 * (lonDec % 1);
     let lonSec = 60.0 * (lonMin % 1);
     return [latDeg, Math.round(latMin), Math.round(latSec), lonDeg, Math.round(lonMin), Math.round(lonSec)];
