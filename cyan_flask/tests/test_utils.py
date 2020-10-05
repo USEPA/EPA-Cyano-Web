@@ -55,7 +55,7 @@ class TestAuth(unittest.TestCase):
 		"""
         unix_time = 1446772133000  # example timestamp from notifications endpoint
 
-        expected_result = "2015-11-05 20:08:53"
+        expected_result = "2015-11-06 01:08:53"
         actual_result = utils.convert_to_timestamp(unix_time)
 
         self.assertEqual(actual_result, expected_result)
@@ -65,7 +65,7 @@ class TestAuth(unittest.TestCase):
 		convert_to_unix
 		"""
         unix_time = 1446772133
-        timestamp = "2015-11-05 20:08:53"
+        timestamp = "2015-11-06 01:08:53"
 
         expected_result = unix_time
         actual_result = utils.convert_to_unix(timestamp)

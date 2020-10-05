@@ -4,9 +4,8 @@ import requests
 import json
 import logging
 import os
-
-# from uuid import uuid4
 from pathlib import Path
+import calendar
 
 
 def convert_to_timestamp(unix_time):
@@ -14,7 +13,7 @@ def convert_to_timestamp(unix_time):
 	Converts notifications endpoint's timestamps.
 	"""
     trimmed_time = int(str(unix_time)[:-3])  # NOTE: trimming off 3 trailing 0s
-    return datetime.datetime.fromtimestamp(trimmed_time).strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.datetime.utcfromtimestamp(trimmed_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def convert_to_unix(timestamp):
@@ -22,8 +21,7 @@ def convert_to_unix(timestamp):
 	Converts notification timestamp to unix time.
 	"""
     dt = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-    unix_time = dt.timetuple()
-    unix_time = int(time.mktime(unix_time))
+    unix_time = calendar.timegm(dt.utctimetuple())
     return unix_time
 
 
