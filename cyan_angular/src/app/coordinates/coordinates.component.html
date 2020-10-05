@@ -1,26 +1,46 @@
 <div class="location_block_0">
-  <div class="location_exit_block">
-    <button mat-button class="location_exit" [routerLink]="['']">x</button>
-  </div>
-  <div class="location_top_bar">
-    <h2> Enter the latitude and longitude below to find a new location </h2>
-    <br>
-    <br>
-    <h1>Latitude:</h1>
-    <input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
-    <input type="number" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
-    <input type="number" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
-    <h2>N</h2>
-    <br>
-    <br>
-    <h1> Longitude: </h1>
-    <input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
-    <input type="number" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
-    <input type="number" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
-    <h2>W</h2>
-    <br>
-    <br>
-    <button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
-    <button type="button" class="popup-unmark-btn popup-btn" (click)="markLocation()"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
-  </div>
+	<div class="location_exit_block">
+		<button mat-button class="location_exit" [routerLink]="['']">x</button>
+	</div>
+	<div class="location_top_bar">
+		<h2> Enter the latitude and longitude below to find a new location </h2>
+		<br>
+		<br>
+		<div *ngIf="selectedKey == 'dms'">
+			<h1>Latitude:</h1>
+			<input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
+			<input type="number" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
+			<input type="number" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
+			<h2>N</h2>
+			<br>
+			<br>
+			<h1> Longitude: </h1>
+			<input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
+			<input type="number" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
+			<input type="number" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
+			<h2>W</h2>
+		</div>
+		<div *ngIf="selectedKey == 'dd'">
+			<h1>Latitude:</h1>
+			<input type="number" placeholder="Decimal" [(ngModel)]="latDec" style="width:50%;">
+			<br>
+			<br>
+			<h1> Longitude: </h1>
+			<input type="number" placeholder="Decimal" [(ngModel)]="lonDec" style="width:50%;">
+		</div>
+		<br>
+		<br>
+		<mat-form-field style="width:50%;">
+			<mat-label>Units</mat-label>
+			<mat-select [value]="defaultSelected" (selectionChange)="onSelect($event);">
+				<mat-option *ngFor="let unit of units | keyvalue" [value]="unit.key">
+					{{unit.value}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field>
+		<br>
+		<br>
+		<button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
+		<button type="button" class="popup-unmark-btn popup-btn" (click)="markLocation()"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
+	</div>
 </div>
