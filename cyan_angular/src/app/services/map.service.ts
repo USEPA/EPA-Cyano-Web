@@ -195,6 +195,9 @@ export class MapService {
     let latDeg = parseInt(latDec.toString(), 10);
     let latMin = 60.0 * (latDec % 1);
     let latSec = 60.0 * (latMin % 1);
+    if (lonDec < 0) {
+      lonDec = Math.abs(lonDec);
+    }
     let lonDeg = parseInt(lonDec.toString(), 10);
     let lonMin = 60.0 * (lonDec % 1);
     let lonSec = 60.0 * (lonMin % 1);
