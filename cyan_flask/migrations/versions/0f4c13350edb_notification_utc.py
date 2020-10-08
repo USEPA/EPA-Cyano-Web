@@ -42,6 +42,8 @@ def upgrade():
     	notification.date = utc_timestamp
     	db.session.commit()
 
+    db.session.close()
+
 
 def downgrade():
     notifications = Notifications.query.all()
@@ -65,3 +67,5 @@ def downgrade():
     	# 5. Updates notification date in DB
     	notification.date = edt_timestamp
     	db.session.commit()
+
+    db.session.close()
