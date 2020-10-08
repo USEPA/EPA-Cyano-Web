@@ -47,7 +47,7 @@ def register_user(post_data):
     if user_obj:
         return {"error": "Email address already taken"}, 400
     else:
-        date = datetime.date.today().isoformat()
+        date = datetime.datetime.utcnow()
         password_salted = PasswordHandler().hash_password(password)
         new_user = User(
             username=user,
@@ -83,7 +83,7 @@ def login_user(post_data):
 
     settings = get_user_settings(user_obj.id)
 
-    user_obj.last_visit = datetime.date.today().isoformat()  # updates 'last_visit'
+    user_obj.last_visit = datetime.datetime.utcnow()  # updates 'last_visit'
     db.session.commit()
 
     try:
