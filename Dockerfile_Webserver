@@ -1,4 +1,3 @@
-# The builder from node image
 FROM node:alpine as builder
 
 # Build-time variables 

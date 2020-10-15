@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker } from 'leaflet';
+import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker, tileLayer } from 'leaflet';
 import { Location } from '../models/location';
 import { CyanMap } from '../utils/cyan-map';
 import { UserService } from '../services/user.service';
@@ -15,6 +15,8 @@ export class MapService {
 
   marker_list = {};
   private data_source = 'OLCI';
+
+  public mainTileLayer: string = '';
 
   constructor(private cyanMap: CyanMap, private userService: UserService) {}
 
@@ -176,4 +178,30 @@ export class MapService {
       }
     }
   }
+
+  convertDmsToDd(latDeg: number, latMin: number, latSec: number, lonDeg: number, lonMin: number, lonSec: number) {
+    /*
+    Converts lat/lon from DMS to decimal degrees.
+    */
+    let lat = latDeg + (latMin / 60.0) + (latSec / 3600.0);
+    let lon = lonDeg + (lonMin / 60.0) + (lonSec / 3600.0);
+    return [lat, lon];
+  }
+
+  convertDdToDms(latDec: number, lonDec: number) {
+    /*
+    Converts lat/lon from decimal degrees to DMS.
+    */
+    let latDeg = parseInt(latDec.toString(), 10);
+    let latMin = 60.0 * (latDec % 1);
+    let latSec = 60.0 * (latMin % 1);
+    if (lonDec < 0) {
+      lonDec = Math.abs(lonDec);
+    }
+    let lonDeg = parseInt(lonDec.toString(), 10);
+    let lonMin = 60.0 * (lonDec % 1);
+    let lonSec = 60.0 * (lonMin % 1);
+    return [latDeg, Math.round(latMin), Math.round(latSec), lonDeg, Math.round(lonMin), Math.round(lonSec)];
+  }
+
 }

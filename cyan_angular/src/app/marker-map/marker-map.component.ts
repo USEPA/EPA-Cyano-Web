@@ -70,6 +70,19 @@ export class MarkerMapComponent implements OnInit {
     if (username == '' && !path.includes('reset')) {
       this.router.navigate(['/account']);
     }
+    this.tileLayerEvents();  // updates main map's tile layer for minimap to access
+  }
+
+  tileLayerEvents() {
+    this.esriImagery.on('load', event => {
+      this.mapService.mainTileLayer = "Imagery Maps";  
+    });
+    this.streetMaps.on('load', event => {
+      this.mapService.mainTileLayer = "Street Maps";
+    });
+    this.topoMap.on('load', event => {
+      this.mapService.mainTileLayer = "Topographic Maps";
+    });
   }
 
   mapPanEvent(e: any): void {

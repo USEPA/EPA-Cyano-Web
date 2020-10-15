@@ -138,9 +138,9 @@ class DBHandler(object):
         self.execute_query(query)
         self.add_privilege(user, host)
 
-    def delete_user(self, user):
+    def delete_user(self, user, host="localhost"):
         # query = "DROP USER IF EXISTS '{}'@'localhost';".format(user)
-        query = "DROP USER '{}'@'localhost';".format(user)
+        query = "DROP USER '{}'@'{}';".format(user, host)
         self.execute_query(query)
 
     def add_privilege(self, user, host="localhost"):
@@ -150,6 +150,13 @@ class DBHandler(object):
         query = "GRANT SELECT, INSERT, DELETE, UPDATE ON {}.* TO '{}'@'{}';".format(
             self.db_name, user, host
         )
+        self.execute_query(query)
+
+    def update_user_pass(self, user, newpass, host="localhost"):
+        """
+        Updates a user's password.
+        """
+        query = "ALTER USER '{}'@'{}' IDENTIFIED BY '{}'".format(user, host, newpass)
         self.execute_query(query)
 
     def build_table(self, table_name):

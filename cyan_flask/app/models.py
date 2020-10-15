@@ -15,8 +15,8 @@ class User(db.Model):
     username = db.Column(db.String(35), nullable=False, unique=True)
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
-    created = db.Column(db.Date, nullable=False)
-    last_visit = db.Column(db.Date, nullable=False)
+    created = db.Column(db.DateTime, nullable=False)
+    last_visit = db.Column(db.DateTime, nullable=False)
 
 
 class Location(db.Model):

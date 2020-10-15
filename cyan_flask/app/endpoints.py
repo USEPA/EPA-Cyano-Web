@@ -56,7 +56,7 @@ class Register(Resource):
 
     def post(self):
         # Adds user to user table:
-        args = self.parser.parse_args()
+        args = request.get_json()
         results, status_code = web_app_api.register_user(args)
         return results, status_code
 
@@ -236,7 +236,7 @@ class Reset(Resource):
 		"""
         parser = parser_base.copy()
         parser.add_argument("email", type=str)
-        args = parser.parse_args()
+        args = request.get_json()
         # TODO: security checks, header injections, etc.??
         results, status_code = web_app_api.reset_password(args)
         return results, status_code
@@ -249,7 +249,7 @@ class Reset(Resource):
 		"""
         parser = parser_base.copy()
         parser.add_argument("newPassword", type=str)
-        args = parser.parse_args()
+        args = request.get_json()
         args["email"] = JwtHandler().get_user_token(request)[
             "sub"
         ]  # 'sub' key should have user's email address
@@ -349,18 +349,18 @@ api.add_resource(Comment, api_url + "comment")
 # Reply endpoint:
 api.add_resource(Reply, api_url + "reply")
 
-
-print("CyAN Flask app started.\nLive endpoints:")
-print(base_url + "/test")
-print(base_url + api_url + "user")
-print(base_url + api_url + "user/register")
-print(base_url + api_url + "location/add")
-print(base_url + api_url + "location/edit")
-print(base_url + api_url + "location/delete/<string:_id>")
-print(base_url + api_url + "location/<string:_id>/<string:type>")
-print(base_url + api_url + "locations/<string:type>")
-print(base_url + api_url + "notification/edit/<string:_id>")
-print(base_url + api_url + "notification/delete")
-print(base_url + api_url + "settings/edit")
-print(base_url + api_url + "refresh")
-print(base_url + api_url + "reset")
+print("CyAN Flask app started.")
+# print("CyAN Flask app started.\nLive endpoints:")
+# print(base_url + "/test")
+# print(base_url + api_url + "user")
+# print(base_url + api_url + "user/register")
+# print(base_url + api_url + "location/add")
+# print(base_url + api_url + "location/edit")
+# print(base_url + api_url + "location/delete/<string:_id>")
+# print(base_url + api_url + "location/<string:_id>/<string:type>")
+# print(base_url + api_url + "locations/<string:type>")
+# print(base_url + api_url + "notification/edit/<string:_id>")
+# print(base_url + api_url + "notification/delete")
+# print(base_url + api_url + "settings/edit")
+# print(base_url + api_url + "refresh")
+# print(base_url + api_url + "reset")
