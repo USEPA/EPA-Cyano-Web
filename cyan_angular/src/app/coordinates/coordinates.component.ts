@@ -46,7 +46,7 @@ export class CoordinatesComponent implements OnInit {
 
 	units: object = {dms: "Degree-Minute-Seconds", dd: "Decimal Degrees"};
 	defaultSelected: string = "dms";
-	selectedKey: string = "dms";
+	selectedKey: string = "dms";  // dms or dd
 
   constructor(
 	private locationService: LocationService,
@@ -99,7 +99,6 @@ export class CoordinatesComponent implements OnInit {
 		let cellChange = 0;
 		let dataDate = '01/01/2018';
 		let source = 'OLCI';
-
 		let location: Location = new Location();
 		location.latitude_deg = this.latDeg;
 		location.latitude_min = this.latMin;
@@ -110,7 +109,13 @@ export class CoordinatesComponent implements OnInit {
 		location.longitude_sec = this.lonSec;
 		location.longitude_dir = this.selectedLon;
 
-		let latLon = this.mapService.getLatLng(location);
+		let latLon = null;
+		if (this.selectedKey == "dms") {
+			latLon = this.mapService.getLatLng(location);
+		}
+		else {
+			latLon = new LatLng(this.latDec, this.lonDec);
+		}
 
 		location = this.locationService.createLocation(name, latLon.lat, latLon.lng, cellCon, maxCellCon, cellChange, dataDate, source);
 
