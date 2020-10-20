@@ -6,5 +6,5 @@ export const environment = {
   userIdleCountDownSeconds: 120,
   userIdlePingSeconds: 300,
   baseServerUrl: '/cyan/app/api/',
-  tomcatApiUrl: '/cyan/cyano'
+  tomcatApiUrl: '/cyan/cyano/'
 };
