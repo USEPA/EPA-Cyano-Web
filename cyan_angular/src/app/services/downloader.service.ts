@@ -62,8 +62,8 @@ const headerOptions = {
   providedIn: 'root'
 })
 export class DownloaderService {
-  private baseUrl: string = 'https://cyan.epa.gov/';
-  private dataUrl: string = 'cyan/cyano/location/data/'; //  complete url is baseUrl + dataUrl + LAT + "/" + LNG + "/all"
+
+  private baseUrl: string = environment.tomcatApiUrl + "location/data/";
 
   private baseServerUrl: string = environment.baseServerUrl;  // see src/environments for this value
 
@@ -241,7 +241,7 @@ export class DownloaderService {
 
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
-      let url = this.baseUrl + this.dataUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
+      let url = this.baseUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
       switch (ln.type) {
         case LocationType.OLCI_WEEKLY:
               url += '?type=olci&frequency=weekly';

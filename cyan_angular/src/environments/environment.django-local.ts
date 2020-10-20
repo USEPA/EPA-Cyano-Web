@@ -5,5 +5,6 @@ export const environment = {
   userIdleSeconds: 3600,
   userIdleCountDownSeconds: 120,
   userIdlePingSeconds: 300,
-  baseServerUrl: 'http://localhost:5001/cyan/app/api/'
+  baseServerUrl: 'http://localhost:5001/cyan/app/api/',
+  tomcatApiUrl: 'https://cyan.epa.gov/cyan/cyano/'
 };

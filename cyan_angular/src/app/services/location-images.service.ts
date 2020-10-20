@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {LocationType} from "../models/location";
+import { environment } from '../../environments/environment';
 
 const headerOptions = {
   headers: new HttpHeaders({})
@@ -11,9 +12,9 @@ const headerOptions = {
 })
 export class LocationImagesService {
 
-  private baseUrl: string = "https://cyan.epa.gov/";
-  private imageUrl: string = "cyan/cyano/location/images/";
-	private allImagesUrl: string = "cyan/cyano/location/allImages/";
+  private baseUrl: string = environment.tomcatApiUrl;
+  private imageUrl: string = "location/images/";
+	private allImagesUrl: string = "location/allImages/";
 
   constructor(private http: HttpClient) { }
 

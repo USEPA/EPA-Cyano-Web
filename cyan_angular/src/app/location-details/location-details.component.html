@@ -107,7 +107,7 @@
                     <div class="details_thumbs_block">
                       <div class="details_thumb_parent" *ngFor="let thumb of locationThumbs">
                         <div class="details_thumb" #thumbDiv (click)="toggleImage(thumbDiv, thumb)">
-                          <img src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
+                          <img src="{{ baseURL }}{{ thumb.name }}">
                           <div class="details_thumb_title">{{ getImageTitle(thumb) }}</div>
                         </div>
                       </div>
@@ -156,7 +156,7 @@
         <div class="imagery_gallery">
           <div *ngFor="let thumb of filteredPNGs">
             <div class="image_thumb" (click)="downloadImage($event, thumb)">
-              <img class="png_image" title="Download image for {{ getImageDate2(thumb) }}" src="https://cyan.epa.gov/cyan/cyano/location/images/{{ thumb.name }}">
+              <img class="png_image" title="Download image for {{ getImageDate2(thumb) }}" src="{{ baseURL }}{{ thumb.name }}">
             </div>
           </div>
         </div>
