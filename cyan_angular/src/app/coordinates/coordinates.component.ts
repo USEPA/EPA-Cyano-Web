@@ -140,8 +140,6 @@ export class CoordinatesComponent implements OnInit {
 			latLon = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.lonDeg, this.lonMin, this.lonSec);
 		}
 		else if (this.selectedKey == "dd") {
-			latLonDms = this.mapService.convertDdToDms(this.latDec, this.lonDec);
-			this.setDmsCoords(latLonDms);
 			latLon = [this.latDec, this.lonDec];
 		}
 
@@ -176,15 +174,6 @@ export class CoordinatesComponent implements OnInit {
         dialogMessage: message
       }
     });
-	}
-
-	setDmsCoords(latLonDms: Array<number>): void {
-		this.latDeg = latLonDms[0];
-		this.latMin = latLonDms[1];
-		this.latSec = latLonDms[2];
-		this.lonDeg = latLonDms[3];
-		this.lonMin = latLonDms[4];
-		this.lonSec = latLonDms[5];
 	}
 
 }

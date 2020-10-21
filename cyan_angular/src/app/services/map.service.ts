@@ -188,20 +188,4 @@ export class MapService {
     return [lat, lon];
   }
 
-  convertDdToDms(latDec: number, lonDec: number) {
-    /*
-    Converts lat/lon from decimal degrees to DMS.
-    */
-    let latDeg = parseInt(latDec.toString(), 10);
-    let latMin = Math.ceil(60.0 * (latDec % 1));
-    let latSec = 60.0 * (latMin % 1);
-    if (lonDec < 0) {
-      lonDec = Math.abs(lonDec);
-    }
-    let lonDeg = parseInt(lonDec.toString(), 10);
-    let lonMin = Math.ceil(60.0 * (lonDec % 1));
-    let lonSec = 60.0 * (lonMin % 1);
-    return [latDeg, latMin, latSec, lonDeg, lonMin, lonSec];
-  }
-
 }
