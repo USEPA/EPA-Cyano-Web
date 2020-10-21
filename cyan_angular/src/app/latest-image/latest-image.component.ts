@@ -8,6 +8,7 @@ import { LocationImagesService } from '../services/location-images.service';
 import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
 
+import { environment } from '../../environments/environment';
 import { Location } from '../models/location';
 import { ImageDetails } from '../models/image-details';
 
@@ -18,7 +19,7 @@ import { ImageDetails } from '../models/image-details';
 })
 export class LatestImageComponent implements OnInit {
 
-	baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
+	baseURL: string = environment.tomcatApiUrl + "location/images/";
 
 	location: Location;
 

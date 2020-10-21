@@ -5,8 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:standalone": "ng build --prod --output-path dist",
+    "build:standalone": "ng build --prod --output-path=dist",
     "build:qed": "ng build --prod --baseHref=/cyanweb --outputHashing=none --outputPath=../../static_qed/epa-cyano-web",
+    "build:docker": "ng build --configuration=docker --output-path=dist",
+    "build:qed-docker": "ng build --configuration=docker --baseHref=/cyanweb --outputHashing=none --outputPath=../../static_qed/epa-cyano-web",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

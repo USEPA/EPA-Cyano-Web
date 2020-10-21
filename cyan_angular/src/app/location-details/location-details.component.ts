@@ -17,6 +17,8 @@ import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
+import { environment } from '../../environments/environment';
+
 
 @Component({
   selector: 'app-location-details',
@@ -25,7 +27,7 @@ import { ConfigService } from '../services/config.service';
 })
 export class LocationDetailsComponent implements OnInit {
 
-  baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
+  baseURL: string = environment.tomcatApiUrl + "location/images/";
 
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
@@ -454,7 +456,7 @@ export class LocationDetailsComponent implements OnInit {
   downloadImage(event: any, image: ImageDetails): void {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = 'https://cyan.epa.gov/cyan/cyano/location/images/' + tifName;
+    let imageURL = this.baseURL + tifName;
     window.open(imageURL, '_blank');
   }
 

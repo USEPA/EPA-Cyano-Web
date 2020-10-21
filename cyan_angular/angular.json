@@ -111,6 +111,20 @@
                   "with": "src/environments/environment.local-testing.ts"
                 }
               ]
+            },
+            "docker": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
+                }
+              ]
             }
           }
         },
