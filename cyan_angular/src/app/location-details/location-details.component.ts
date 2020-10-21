@@ -456,7 +456,7 @@ export class LocationDetailsComponent implements OnInit {
   downloadImage(event: any, image: ImageDetails): void {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = environment.tomcatApiUrl + tifName;
+    let imageURL = this.baseURL + tifName;
     window.open(imageURL, '_blank');
   }
 
