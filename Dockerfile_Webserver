@@ -1,8 +1,7 @@
 FROM node:alpine as builder
 
-# Build-time variables 
 ARG env=standalone
-ARG config=nginx.conf
+
 
 RUN apk update && apk add --no-cache make git
 
@@ -20,6 +19,9 @@ RUN cd /app && npm run build:$env
 
 # Builds a small nginx image with static website
 FROM nginx:alpine
+
+ARG config=nginx.conf
+
 RUN rm -rf /usr/share/nginx/html/*
 RUN rm /etc/nginx/conf.d/default.conf
 COPY ./cyan_nginx/$config /etc/nginx/conf.d

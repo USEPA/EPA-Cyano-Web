@@ -7,3 +7,6 @@ __pycache__/
 
 # Pycharm settings
 .idea
+
+# Docker settings
+.env
