@@ -17,6 +17,9 @@ import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
+
+import { EnvService } from '../services/env.service';
+
 import { environment } from '../../environments/environment';
 
 
@@ -143,10 +146,15 @@ export class LocationDetailsComponent implements OnInit {
     private downloader: DownloaderService,
     private user: UserService,
     private authService: AuthService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private envService: EnvService
   ) { }
 
   ngOnInit() {
+
+    console.log("Env Service called in location-details");
+
+    console.log(this.envService.config);
 
     if (!this.authService.checkUserAuthentication()) { return; }
 
