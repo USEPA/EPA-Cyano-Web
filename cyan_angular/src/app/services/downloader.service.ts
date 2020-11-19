@@ -11,6 +11,7 @@ import { Comment, Reply } from '../models/comment';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
+import { EnvService } from '../services/env.service';
 
 class UrlInfo {
   type: string;
@@ -63,10 +64,6 @@ const headerOptions = {
 })
 export class DownloaderService {
 
-  private baseUrl: string = environment.tomcatApiUrl + "location/data/";
-
-  private baseServerUrl: string = environment.baseServerUrl;  // see src/environments for this value
-
   private locationSubject =  new BehaviorSubject<Location>(null);
   locationsChanged = this.locationSubject.asObservable();
 
@@ -80,23 +77,24 @@ export class DownloaderService {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private loaderService: LoaderService
-  ) {}
+    private loaderService: LoaderService,
+    private envService: EnvService
+  ) { }
 
   registerUser(username: string, email: string, password: string) {
-    let url = this.baseServerUrl + 'user/register';
+    let url = this.envService.config.baseServerUrl + 'user/register';
     let body = { user: username, email: email, password: password };
     return this.http.post(url, body, headerOptions);
   }
 
   userLogin(username: string, password: string) {
-    let url = this.baseServerUrl + 'user';
+    let url = this.envService.config.baseServerUrl + 'user';
     let body = { user: username, password: password, dataType: LocationType.OLCI_WEEKLY };
     return this.http.post(url, body, headerOptions);
   }
 
   addUserLocation(username: string, ln: Location) {
-    let url = this.baseServerUrl + 'location/add';
+    let url = this.envService.config.baseServerUrl + 'location/add';
     let body = {
       owner: username,
       id: ln.id,
@@ -112,7 +110,7 @@ export class DownloaderService {
   }
 
   updateUserLocation(username: string, ln: Location) {
-    let url = this.baseServerUrl + 'location/edit';
+    let url = this.envService.config.baseServerUrl + 'location/edit';
     let body = {
       owner: username,
       id: ln.id,
@@ -127,7 +125,7 @@ export class DownloaderService {
 
   deleteUserLocation(username: string, id: number, type: number) {
     delete this.locationsData[id];
-    let url = this.baseServerUrl + 'location/delete/' + id + '/' + type;
+    let url = this.envService.config.baseServerUrl + 'location/delete/' + id + '/' + type;
     this.executeDeleteUserLocation(url).subscribe();
   }
 
@@ -136,12 +134,12 @@ export class DownloaderService {
   }
 
   getUserLocation(username: string, id: number) {
-    let url = this.baseServerUrl + 'location/' + id;
+    let url = this.envService.config.baseServerUrl + 'location/' + id;
     return this.executeAuthorizedGetRequest(url);
   }
 
   getUserLocations(username: string, type: number) {
-    let url = this.baseServerUrl + 'locations/' + type;
+    let url = this.envService.config.baseServerUrl + 'locations/' + type;
     return this.executeAuthorizedGetRequest(url);
   }
 
@@ -149,7 +147,7 @@ export class DownloaderService {
     /*
      Updates user's notification, e.g., is_new set to false if clicked.
     */
-    let url = this.baseServerUrl + 'notification/edit/' + id;
+    let url = this.envService.config.baseServerUrl + 'notification/edit/' + id;
     return this.executeUpdateNotification(url).subscribe();
   }
 
@@ -161,7 +159,7 @@ export class DownloaderService {
     /*
     Clears all user's notifications.
     */
-    let url = this.baseServerUrl + 'notification/delete';
+    let url = this.envService.config.baseServerUrl + 'notification/delete';
     this.executeClearUserNotifications(url).subscribe();
   }
 
@@ -173,7 +171,7 @@ export class DownloaderService {
     /*
      Updates user's settings for color configuration/alert threshold.
      */
-    let url = this.baseServerUrl + 'settings/edit';
+    let url = this.envService.config.baseServerUrl + 'settings/edit';
     return this.executeAuthorizedPostRequest(url, settings);
   }
 
@@ -181,7 +179,7 @@ export class DownloaderService {
     /*
     Gets all users' comments.
     */
-    let url = this.baseServerUrl + 'comment';
+    let url = this.envService.config.baseServerUrl + 'comment';
     return this.executeAuthorizedGetRequest(url);
   }
 
@@ -189,7 +187,7 @@ export class DownloaderService {
     /*
     Adds user comment.
     */
-    let url = this.baseServerUrl + 'comment';
+    let url = this.envService.config.baseServerUrl + 'comment';
     return this.executeAuthorizedPostRequest(url, comment);
   }
 
@@ -197,7 +195,7 @@ export class DownloaderService {
     /*
     Adds user reply to a user's comment.
     */
-    let url = this.baseServerUrl + 'reply';
+    let url = this.envService.config.baseServerUrl + 'reply';
     return this.executeAuthorizedPostRequest(url, reply);
   }
 
@@ -235,13 +233,11 @@ export class DownloaderService {
   }
 
   getAjaxData(username: string, ln: Location) {
-
     // Checks if token is valid before making requests:
     if (!this.authService.checkUserAuthentication()) { return; }
-
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
-      let url = this.baseUrl + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
+      let url = this.envService.config.tomcatApiUrl + "location/data/" + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
       switch (ln.type) {
         case LocationType.OLCI_WEEKLY:
               url += '?type=olci&frequency=weekly';

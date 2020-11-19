@@ -7,53 +7,31 @@ import { shareReplay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class EnvService {
-  // config: Config;
 
   config: any;
+  retries: number = 0;  // retry counter
+  allowedRetries: number = 1;
 
   constructor(private http: HttpClient) {}
 
   loadConfig() {
+    console.log("Loading runtime configuration.");
+    this.setConfig("./assets/env.json");
+  }
+
+  setConfig(configFile) {
+    if (this.retries > this.allowedRetries) { return; }
     return this.http
-      .get('./assets/configs/runtime-env.json')
+      .get(configFile)
       .toPromise()
       .then(config => {
         this.config = config;
+      })
+      .catch(err => {
+        console.log("Runtime envivornment not found. Loading default envivornment instead.");
+        this.retries += 1;
+        this.setConfig("./assets/default-env.json");
       });
   }
+
 }
-
-
-// export enum Environment {
-//   Prod = 'prod',
-//   Staging = 'staging',
-//   Test = 'test',
-//   Dev = 'dev',
-//   Local = 'local',
-// }
-
-// interface Configuration {
-//   apiUrl: string;
-//   stage: Environment;
-// }
-
-// @Injectable({ providedIn: 'root' })
-// export class EnvService {
-//   // private readonly apiUrl = 'http://localhost:4200';
-//   private readonly configUrl = 'assets/config/runtime-env.json';  // TODO: Would this work with QED deploy?
-//   private configuration$: Observable<Configuration>;
-
-//   constructor(private http: HttpClient) {}
-
-//   public load(): Observable<Configuration> {
-
-//     console.log("Loading runtime environment.");
-
-//     if (!this.configuration$) {
-//       this.configuration$ = this.http
-//         .get<Configuration>(`${this.configUrl}`)
-//         .pipe(shareReplay(1));  // caches reponse at runtime to reduce http requests (remove for dynamic env updates)
-//     }
-//     return this.configuration$;
-//   }
-// }

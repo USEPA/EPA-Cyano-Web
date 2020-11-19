@@ -5,7 +5,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { environment } from '../../environments/environment';
-
+import { EnvService } from '../services/env.service';
 
 
 const headerOptions = {
@@ -22,9 +22,7 @@ export class AuthService {
     userLoggedIn: false,
     error: ""
   }
-
-  private baseServerUrl: string = environment.baseServerUrl;  // see src/environments for this value
-
+  
   private authSubject =  new Subject<AuthError>();
   userLoginState = this.authSubject.asObservable();
 
@@ -32,7 +30,8 @@ export class AuthService {
 
   constructor(
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private envService: EnvService
   ) { }
 
   public checkUserAuthentication(): boolean {
@@ -99,7 +98,7 @@ export class AuthService {
     Refreshes token for authenticated user.
     */
     if (!this.isAuthenticated()) { return; }
-    let url = this.baseServerUrl + 'refresh';
+    let url = this.envService.config.baseServerUrl + 'refresh';
     return this.http.get(url).subscribe();
   }
 
@@ -107,9 +106,8 @@ export class AuthService {
     /*
     Makes request to send email for password reset.
     */
-    let url = this.baseServerUrl + 'reset';
+    let url = this.envService.config.baseServerUrl + 'reset';
     let body = { email: resetEmail };
-    // return this.http.post(url, body, headerOptions).subscribe();
     return this.http.post(url, body, headerOptions);
   }
 
@@ -118,13 +116,9 @@ export class AuthService {
     Makes request to reset user's password.
     */
     if (!this.checkUserAuthentication()) { return; }
-
-    let url = this.baseServerUrl + 'reset';
+    let url = this.envService.config.baseServerUrl + 'reset';
     let body = { newPassword: newPassword };
-
-    // return this.http.put(url, body, headerOptions).subscribe();
     return this.http.put(url, body, headerOptions);
-
   }
 
   emailIsValid (email) {

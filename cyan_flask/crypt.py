@@ -51,7 +51,7 @@ class CryptManager:
 
 		except FileNotFoundError:
 			newpath = os.path.join(self.key_location, Path(fullpath).name)
-			logging.warning("File not found at: {}. Trying default path: {}".format(fullpath, newpath))
+			# logging.warning("File not found at: {}. Trying default path: {}".format(fullpath, newpath))
 			file_obj = open(newpath, "rb")
 			file_content = file_obj.read()
 			file_obj.close()
@@ -135,7 +135,7 @@ class CryptManager:
 		"""
 		Gets key path from environment varible.
 		"""
-		print("SK GETTING GOT: {}".format(os.environ.get("SK")))
+		# print("SK GETTING GOT: {}".format(os.environ.get("SK")))
 		try:
 		    return self.unobscure(os.environ.get("SK"))
 		except Exception:
@@ -263,6 +263,12 @@ class CryptManager:
 
 		print("\nUpdated secret file '{}' secret values: {}".format(env_file, updated_secrets))
 
+	def compare_passwords(self):
+		message1 = getpass.getpass("Enter secret to encrypt: ")
+		message2 = getpass.getpass("Re-enter secret to encrypt: ")
+		if message1 != message2:
+			return None
+		return message1
 
 
 
@@ -280,7 +286,10 @@ if __name__ == '__main__':
 		try:
 			message = sys.argv[3]  # message to encrypt
 		except IndexError:
-			message = getpass.getpass("Enter secret to encrypt: ")
+			# message = getpass.getpass("Enter secret to encrypt: ")
+			message = cm.compare_passwords()
+			if not message:
+				raise "Secrets do not match."
 		try:
 			save_file = sys.argv[4]  # file to save encrypted message
 		except IndexError:

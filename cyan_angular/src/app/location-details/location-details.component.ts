@@ -19,7 +19,6 @@ import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 
 import { EnvService } from '../services/env.service';
-
 import { environment } from '../../environments/environment';
 
 
@@ -29,8 +28,6 @@ import { environment } from '../../environments/environment';
   styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsComponent implements OnInit {
-
-  baseURL: string = environment.tomcatApiUrl + "location/images/";
 
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
@@ -151,10 +148,6 @@ export class LocationDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
-    console.log("Env Service called in location-details");
-
-    console.log(this.envService.config);
 
     if (!this.authService.checkUserAuthentication()) { return; }
 
@@ -297,7 +290,7 @@ export class LocationDetailsComponent implements OnInit {
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
-    let imageURL = this.baseURL + pngImage.name;
+    let imageURL = this.envService.config.tomcatApiUrl + pngImage.name;
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -361,7 +354,7 @@ export class LocationDetailsComponent implements OnInit {
       }
     })[0];
     this.selectedLayerIndex = this.locationPNGs.indexOf(pngImage);
-    let imageURL = this.baseURL + pngImage.name;
+    let imageURL = this.envService.config.tomcatApiUrl + pngImage.name;
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -464,7 +457,7 @@ export class LocationDetailsComponent implements OnInit {
   downloadImage(event: any, image: ImageDetails): void {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = this.baseURL + tifName;
+    let imageURL = this.envService.config.tomcatApiUrl + tifName;
     window.open(imageURL, '_blank');
   }
 

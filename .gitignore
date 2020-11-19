@@ -4,6 +4,7 @@ cyan_angular/dist/
 
 # Python settings
 __pycache__/
-
-# Pycharm settings
 .idea
+
+# Angular settings
+env.json
