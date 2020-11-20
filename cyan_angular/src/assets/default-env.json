@@ -1,4 +1,4 @@
 {
-	"baseServerUrl": "http://localhost:5001/cyan/app/api/",
+	"baseServerUrl": "/cyan/app/api/",
   	"tomcatApiUrl": "https://cyan.epa.gov/cyan/cyano/"
 }
