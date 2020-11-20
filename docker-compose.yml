@@ -8,12 +8,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_Webserver
-      args:
-        env: ${CYAN_BUILD_SCRIPT:-standalone}  # cyan_angular/package.json
-        config: ${NGINX_CONFIG:-nginx.conf}
     ports:
       - "80:80"
-      # - "443:443"
     links:
       - cyan-api:uwsgi_flask
 
