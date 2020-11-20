@@ -12,6 +12,8 @@ services:
       - "80:80"
     links:
       - cyan-api:uwsgi_flask
+    volumes:
+      - ./cyan_angular/src/assets/env.json:/usr/share/nginx/html/assets/env.json
 
   cyan-api:
     build:
