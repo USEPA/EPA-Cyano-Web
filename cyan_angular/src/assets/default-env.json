@@ -1,0 +1,4 @@
+{
+  "baseServerUrl": "/cyan/app/api/",
+  "tomcatApiUrl": "https://cyan.epa.gov/cyan/cyano/"
+}

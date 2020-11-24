@@ -17,6 +17,8 @@ import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
+
+import { EnvService } from '../services/env.service';
 import { environment } from '../../environments/environment';
 
 
@@ -26,8 +28,6 @@ import { environment } from '../../environments/environment';
   styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsComponent implements OnInit {
-
-  baseURL: string = environment.tomcatApiUrl + "location/images/";
 
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
@@ -143,7 +143,8 @@ export class LocationDetailsComponent implements OnInit {
     private downloader: DownloaderService,
     private user: UserService,
     private authService: AuthService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private envService: EnvService
   ) { }
 
   ngOnInit() {
@@ -276,6 +277,10 @@ export class LocationDetailsComponent implements OnInit {
     }
   }
 
+  getImageUrl(imageName: string) {
+    return this.envService.config.tomcatApiUrl + "location/images/" + imageName;
+  }
+
   cycleImages() {
     let thumbs = this.removeThumbHighlights();
     let map = this.mapService.getMinimap();
@@ -289,7 +294,7 @@ export class LocationDetailsComponent implements OnInit {
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
-    let imageURL = this.baseURL + pngImage.name;
+    let imageURL = this.getImageUrl(pngImage.name);
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -353,7 +358,7 @@ export class LocationDetailsComponent implements OnInit {
       }
     })[0];
     this.selectedLayerIndex = this.locationPNGs.indexOf(pngImage);
-    let imageURL = this.baseURL + pngImage.name;
+    let imageURL = this.getImageUrl(pngImage.name);
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -456,7 +461,7 @@ export class LocationDetailsComponent implements OnInit {
   downloadImage(event: any, image: ImageDetails): void {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = this.baseURL + tifName;
+    let imageURL = this.getImageUrl(tifName);
     window.open(imageURL, '_blank');
   }
 
