@@ -277,6 +277,10 @@ export class LocationDetailsComponent implements OnInit {
     }
   }
 
+  getImageUrl(imageName: string) {
+    return this.envService.config.tomcatApiUrl + "location/images/" + imageName;
+  }
+
   cycleImages() {
     let thumbs = this.removeThumbHighlights();
     let map = this.mapService.getMinimap();
@@ -290,7 +294,7 @@ export class LocationDetailsComponent implements OnInit {
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
-    let imageURL = this.envService.config.tomcatApiUrl + pngImage.name;
+    let imageURL = this.getImageUrl(pngImage.name);
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -354,7 +358,7 @@ export class LocationDetailsComponent implements OnInit {
       }
     })[0];
     this.selectedLayerIndex = this.locationPNGs.indexOf(pngImage);
-    let imageURL = this.envService.config.tomcatApiUrl + pngImage.name;
+    let imageURL = this.getImageUrl(pngImage.name);
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -457,7 +461,7 @@ export class LocationDetailsComponent implements OnInit {
   downloadImage(event: any, image: ImageDetails): void {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = this.envService.config.tomcatApiUrl + tifName;
+    let imageURL = this.getImageUrl(tifName);
     window.open(imageURL, '_blank');
   }
 
