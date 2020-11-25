@@ -11,12 +11,12 @@
       <button mat-button (click)="exit();" class="details_exit">x</button>
     </div>
   </div>
-  <mat-tab-group mat-stretch-tabs class="details_tab_group">
+  <mat-tab-group mat-stretch-tabs class="details_tab_group" #tabGroup>
 
     <!-- Overview-tab -->
     <mat-tab label="Overview" >
       <div class="details_tab">
-        
+
         <!-- map-card -->
         <mat-card>
           <mat-card-header>
