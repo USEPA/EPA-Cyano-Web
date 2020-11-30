@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Inject } from '@angular/core';
+import {Component, OnInit, Input, Inject, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatBottomSheet } from '@angular/material';
 import { DatePipe } from '@angular/common';
@@ -17,9 +17,7 @@ import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
-
 import { EnvService } from '../services/env.service';
-import { environment } from '../../environments/environment';
 
 
 @Component({
@@ -28,6 +26,8 @@ import { environment } from '../../environments/environment';
   styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsComponent implements OnInit {
+
+  @ViewChild('tabGroup') tabGroup;
 
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
@@ -56,7 +56,6 @@ export class LocationDetailsComponent implements OnInit {
   startDate: Date = new Date();
   endDate: Date = new Date();
 
-  loadTicker = 1;
   opacityValue = 0.7;
   showLegend = false;
 
@@ -282,6 +281,12 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   cycleImages() {
+    if (this.tabGroup.selectedIndex != 0) {
+      // switched away from Overview tab, disable slide show
+      this.slidershow = false;
+      return
+    }
+
     let thumbs = this.removeThumbHighlights();
     let map = this.mapService.getMinimap();
     let layerOptions = {
