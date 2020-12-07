@@ -108,7 +108,7 @@ export class MapService {
     });
     let marker = this.marker_list[ln.id];
     if (marker) {
-      marker.setTooltipContent(ln.name);
+      marker.setTooltipContent(ln.name + '<br>' + ln.dataDate);
       marker.setIcon(_icon);
     }
   }
