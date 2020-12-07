@@ -4,9 +4,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
-import { DownloaderService } from './downloader.service';
+import { EnvService } from './env.service';
 
-describe('DownloaderService', () => {
+describe('EnvService', () => {
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
@@ -22,7 +22,7 @@ describe('DownloaderService', () => {
 	});
 
 	it('should be created', () => {
-		const service: DownloaderService = TestBed.get(DownloaderService);
+		const service: EnvService = TestBed.get(EnvService);
 		expect(service).toBeTruthy();
 	});
 

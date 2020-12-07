@@ -1,14 +1,29 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from "@angular/router/testing";
+import { HttpClientModule } from '@angular/common/http';
 
+import { AuthService } from '../services/auth.service';
+import { LoaderService } from '../services/loader.service';
+import { CyanMap } from '../utils/cyan-map';
 import { ResetComponent } from './reset.component';
 
 describe('ResetComponent', () => {
+
   let component: ResetComponent;
   let fixture: ComponentFixture<ResetComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ResetComponent ]
+      imports: [
+        HttpClientModule,
+        RouterTestingModule
+      ],
+      declarations: [ ResetComponent ],
+      providers: [
+        AuthService,
+        LoaderService,
+        CyanMap
+      ]
     })
     .compileComponents();
   }));
@@ -22,4 +37,5 @@ describe('ResetComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
 });

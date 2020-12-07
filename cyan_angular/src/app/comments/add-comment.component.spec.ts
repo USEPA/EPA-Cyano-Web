@@ -2,53 +2,63 @@ import { Component } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
-import { MatDialogModule } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { of } from 'rxjs';
 
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
-import { CyanMap } from '../utils/cyan-map';
 import { AddComment } from './add-comment.component';
-import { CommentsComponent } from './comments.component';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 import { Comment, Reply } from '../models/comment';
 
-describe('CommentsComponent', () => {
+describe('AddComment', () => {
 
-  let component: CommentsComponent;
-  let fixture: ComponentFixture<CommentsComponent>;
-  let downloaderService: DownloaderService;
+  let component: AddComment;
+  let fixture: ComponentFixture<AddComment>;
+
+  const mockDialogRef = {
+    close: jasmine.createSpy('close')
+  };
+
+  const mockDialogComponent = {
+
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
-        HttpClientModule,
-        MatDialogModule
+        MatDialogModule,
+        HttpClientModule
       ],
       declarations: [
-        CommentsComponent
+        AddComment
       ],
       providers: [
-        AuthService,
-        LoaderService,
         {
-          provide: AddComment,
-          useClass: MockAddComment
+          provide: MatDialogRef,
+          useValue: mockDialogRef
         },
         {
-          provide: DownloaderService,
-          useClass: MockDownloaderService
-        }
+          provide: DialogComponent,
+          useValue: mockDialogComponent
+        },
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {}
+        },
+        DatePipe,
+        AuthService,
+        LoaderService
       ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CommentsComponent);
+    fixture = TestBed.createComponent(AddComment);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -58,18 +68,3 @@ describe('CommentsComponent', () => {
   });
 
 });
-
-// Mock objects:
-@Component({
-  selector: 'add-comment',
-  template: ''
-})
-export class MockAddComment {
-
-}
-
-export class MockDownloaderService {
-  getAllComments() {
-    return of([{test: "test"}]);
-  }
-}

@@ -1,5 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterTestingModule } from '@angular/router/testing';
 
+import { AuthService } from '../services/auth.service';
+import { LoaderService } from '../services/loader.service';
+import { CyanMap } from '../utils/cyan-map';
 import { ConfigComponent } from './config.component';
 
 describe('ConfigComponent', () => {
@@ -8,7 +13,18 @@ describe('ConfigComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfigComponent ]
+      imports: [
+        RouterTestingModule,
+        HttpClientModule
+      ],
+      declarations: [
+        ConfigComponent
+      ],
+      providers: [
+        AuthService,
+        LoaderService,
+        CyanMap
+      ]
     })
     .compileComponents();
   }));
@@ -22,4 +38,5 @@ describe('ConfigComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
 });
