@@ -1,21 +1,26 @@
 FROM node:12.19.1-alpine as builder
 
-# Build-time variables
+# Build-time variables:
 ARG env=standalone
 
-RUN apk update && apk add --no-cache make git
+# Env vars for angular tests:
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+	CHROME_PATH=/usr/lib/chromium/
 
-# Moves files into directory name "app"
-WORKDIR /app
-COPY cyan_angular/package.json cyan_angular/package-lock.json  /app/
-RUN npm install @angular/cli -g
-RUN cd /app \
-	&& npm install \
-	&& npm audit fix
 COPY cyan_angular/ /app
+COPY cyan_angular/src/karma.docker.conf.js /app/src/karma.conf.js
 
-# Builds with $env variable
-RUN cd /app && npm run build:$env
+WORKDIR /app
+
+RUN apk update && \
+	apk add chromium
+
+RUN rm -rf node_modules/ && \
+	rm -rf dist/ && \
+	npm install && \
+	npm audit fix && \
+	npm run build:$env && \
+	npx ng test --sourceMap=false --browsers=Chrome_without_sandbox --watch=false
 
 # Builds a small nginx image with static website
 FROM nginx:alpine
