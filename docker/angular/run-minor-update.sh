@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Save original package.json minor update:
-cp package.json package.json.orig.minor
-
 # Updates NPM packages (but not major versions):
 npm update
 
@@ -18,4 +15,6 @@ npm audit fix
 # Performs linting for Angular code:
 # npx ng lint
 
-npx ng serve --host 0.0.0.0
+npm run build:${env:-standalone}
+
+cp package.json /docker/angular/package.json.minor

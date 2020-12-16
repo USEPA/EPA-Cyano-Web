@@ -1,13 +1,19 @@
 version: '3.1'
 
+volumes:
+  cyan_angular:
+
 services:
 
   node-builder:
     build:
       context: ../
       dockerfile: ./docker/angular/Dockerfile
-    image: builder
-    container_name: builder
+    image: node-builder
+    container_name: node-builder
+    volumes:
+      - ./angular:/docker/angular
+      - cyan_angular:/app/dist
 
   cyan-webserver:
     restart: always
@@ -22,6 +28,7 @@ services:
       - cyan-api:uwsgi_flask
     volumes:
       - ../cyan_angular/src/assets/env.json:/usr/share/nginx/html/assets/env.json
+      - cyan_angular:/usr/share/nginx/html
 
   cyan-api:
     build:

@@ -1,21 +1,3 @@
-# FROM node:lts-alpine as builder
-
-# # Build-time variables
-# ARG env=standalone
-
-# # RUN apk update && apk add --no-cache make git
-
-# # Moves files into directory name "app"
-# WORKDIR /app
-# COPY cyan_angular/package.json cyan_angular/package-lock.json  /app/
-# # RUN npm install @angular/cli -g
-# RUN cd /app \
-# 	&& npm install \
-# 	&& npm audit fix
-# COPY cyan_angular/ /app
-
-# # Builds with $env variable
-# RUN cd /app && npm run build:$env
 
 # # Builds a small nginx image with static website
 FROM nginx:alpine
@@ -29,6 +11,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY ./cyan_nginx/$config /etc/nginx/conf.d
 
 # Uses "builder" image from docker/angular/Dockerfile
-COPY --from=builder /app/dist /usr/share/nginx/html
+# COPY --from=node-builder /app/dist /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]

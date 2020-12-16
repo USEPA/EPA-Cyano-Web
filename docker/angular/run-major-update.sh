@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Save original package.json before major update:
-cp package.json package.json.orig.major
-
 # Updates package.json to latest versions (including major):
 npx ncu -u --packageFile /app/package.json
 
@@ -18,4 +15,6 @@ npm audit fix
 # Performs linting for Angular code:
 # npx ng lint
 
-npx ng serve --host 0.0.0.0
+npm run build:${env:-standalone}
+
+cp package.json /docker/angular/package.json.major
