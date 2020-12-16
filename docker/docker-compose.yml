@@ -1,0 +1,70 @@
+version: '3.1'
+
+volumes:
+  cyan_angular:
+
+services:
+
+  node-builder:
+    build:
+      context: ../
+      dockerfile: ./docker/angular/Dockerfile
+    image: node-builder
+    container_name: node-builder
+    volumes:
+      - ./angular:/docker/angular
+      - cyan_angular:/app/dist
+
+  cyan-webserver:
+    restart: always
+    build:
+      context: ../
+      dockerfile: ./docker/nginx/Dockerfile
+    image: cyan-webserver
+    container_name: cyan-webserver
+    ports:
+      - "80:80"
+    links:
+      - cyan-api:uwsgi_flask
+    volumes:
+      - ../cyan_angular/src/assets/env.json:/usr/share/nginx/html/assets/env.json
+      - cyan_angular:/usr/share/nginx/html
+
+  cyan-api:
+    build:
+      context: ../
+      dockerfile: ./docker/flask/Dockerfile
+    image: cyan-api
+    container_name: cyan-api
+    expose:
+      - "5001"
+    depends_on:
+      - cyan-db
+    volumes:
+      - ../config/:/config
+    environment:
+      - DOCKER_HOSTNAME=${HOSTNAME}
+      - MYSQL_ROOT_PASSWORD
+    env_file:
+      - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
+    links:
+      - cyan-db
+
+  cyan-db:
+    build:
+      context: ../
+      dockerfile: ./docker/mysql/Dockerfile
+    image: cyan-db
+    container_name: cyan-db
+    volumes:
+      - ${SQL_DUMP:-../cyan_mysql/no_dump.txt}:/tmp/dump.sql  # use optional dump file to build container DB
+      - /var/www/app_data/cyano:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD
+    env_file:
+      - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
+      # - MYSQL_DATABASE=${DB_NAME}
+      # - DB_NAME
+      # NOTE: Below env vars create one-time pass displayed once in container stdout
+      # - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      # - MYSQL_ONETIME_PASSWORD

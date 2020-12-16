@@ -1,6 +1,6 @@
 import {Component, OnInit, Input, Inject, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { DatePipe } from '@angular/common';
 
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
