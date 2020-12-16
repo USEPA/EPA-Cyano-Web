@@ -13,3 +13,4 @@ env.json
 
 # Docker settings
 .env
+docker/angular/package.json*
