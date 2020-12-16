@@ -3,6 +3,9 @@ FROM node:lts-alpine
 # Build-time variables
 ARG env=standalone
 
+# Bypasses analytics prompt for Angular CLI install
+ENV NG_CLI_ANALYTICS=false
+
 # Moves files into directory name "app"
 WORKDIR /app
 
