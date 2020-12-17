@@ -9,7 +9,7 @@ import {MatSelectModule } from '@angular/material/select';
 import {MatCheckboxModule } from '@angular/material/checkbox'; 
 import {MatButtonModule } from '@angular/material/button'; 
 import {MatSliderModule } from '@angular/material/slider'; 
-import {MatNativeDateModule } from '@angular/material';
+import {MatNativeDateModule } from '@angular/material/core';
 import {MatInputModule } from '@angular/material/input'; 
 import {MatTabsModule } from '@angular/material/tabs'; 
 import {MatBottomSheetModule } from '@angular/material/bottom-sheet'; 
