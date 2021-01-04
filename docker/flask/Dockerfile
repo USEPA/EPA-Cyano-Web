@@ -12,7 +12,7 @@ RUN apk add python3-dev libffi-dev build-base linux-headers pcre-dev mariadb-dev
 RUN pip install uwsgi
 
 # Overwrite the uWSGI config
-COPY cyan_flask/uwsgi.ini /etc/uwsgi/
+COPY docker/flask/uwsgi.ini /etc/uwsgi/
 
 COPY cyan_flask/ /cyan_flask
 
@@ -27,6 +27,6 @@ RUN pip install --requirement /cyan_flask/requirements.txt
 
 RUN mkdir /config && \
 	chmod -R 755 /config && \
-	chmod 755 /cyan_flask/start_flask.sh
+	chmod 755 /docker/flask/start_flask.sh
 
-CMD ["sh", "/cyan_flask/start_flask.sh"]
+CMD ["sh", "/docker/flask/start_flask.sh"]
