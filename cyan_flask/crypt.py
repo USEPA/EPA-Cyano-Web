@@ -20,17 +20,6 @@ class CryptManager:
 		self.env_location = os.path.join(os.path.dirname(PROJECT_ROOT), "config", "environments")
 		self.key_location = os.path.join(os.path.dirname(PROJECT_ROOT), "config", "secrets")
 
-	def _convert_to_bytes(self, message):
-		"""
-		Type checks message. Tries to convert
-		to bytes type.
-		"""
-		if isinstance(message, str):
-			return message.encode()
-		elif not isinstance(message, bytes):
-			raise TypeError("Message must be a string of byte type.")
-		return message
-
 	def _save_file(self, file_content, fullpath):
 		"""
 		Saves file to fullpath, includes path and filename.
@@ -117,6 +106,17 @@ class CryptManager:
 			secrets_dict[key] = val
 		return secrets_dict
 
+	def convert_to_bytes(self, message):
+		"""
+		Type checks message. Tries to convert
+		to bytes type.
+		"""
+		if isinstance(message, str):
+			return message.encode()
+		elif not isinstance(message, bytes):
+			raise TypeError("Message must be a string of byte type.")
+		return message
+
 	def update_env_file(self, env_file, updated_env_dict):
 		"""
 		Updates current .env file with updated/rotated
@@ -156,7 +156,7 @@ class CryptManager:
 		Encrypts a message using a key file.
 		Returns encrypted messaged value.
 		"""
-		message = self._convert_to_bytes(message)
+		message = self.convert_to_bytes(message)
 		key = self._open_file(key_file)  # gets key from file
 		f = Fernet(key)
 		encrypted_message = f.encrypt(message)
@@ -168,7 +168,7 @@ class CryptManager:
 		"""
 		Decrypts an encrypted message.
 		"""
-		message = self._convert_to_bytes(message)
+		message = self.convert_to_bytes(message)
 		key = self._open_file(key_file)
 		f = Fernet(key)
 		try:
@@ -191,7 +191,7 @@ class CryptManager:
 		must still be kept secret).
 		Returns byte string.
 		"""
-		data = self._convert_to_bytes(data)
+		data = self.convert_to_bytes(data)
 		return b64e(zlib.compress(data, 9)).decode('utf-8')
 
 	def unobscure(self, obscured):
@@ -199,7 +199,7 @@ class CryptManager:
 		Unobscures a byte string.
 		Returns byte string.
 		"""
-		obscured = self._convert_to_bytes(obscured)
+		obscured = self.convert_to_bytes(obscured)
 		return zlib.decompress(b64d(obscured)).decode('utf-8')
 
 	def rotate(self, orig_key_file, new_key_file, env_file):
