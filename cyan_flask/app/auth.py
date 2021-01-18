@@ -104,7 +104,8 @@ class JwtHandler:
                 "iat": datetime.datetime.utcnow(),
                 "sub": user,
             }
-            return jwt.encode(payload, os.environ.get("SECRET_KEY"), algorithm="HS256")
+            enc_token = jwt.encode(payload, os.environ.get("SECRET_KEY"), algorithm="HS256")
+            return crypt_manager.convert_to_bytes(enc_token)
         except Exception as e:
             return e
 

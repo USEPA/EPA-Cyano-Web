@@ -108,7 +108,7 @@ export class MapService {
     });
     let marker = this.marker_list[ln.id];
     if (marker) {
-      marker.setTooltipContent(ln.name);
+      marker.setTooltipContent(ln.name + '<br>' + ln.dataDate);
       marker.setIcon(_icon);
     }
   }
@@ -186,22 +186,6 @@ export class MapService {
     let lat = latDeg + (latMin / 60.0) + (latSec / 3600.0);
     let lon = lonDeg + (lonMin / 60.0) + (lonSec / 3600.0);
     return [lat, lon];
-  }
-
-  convertDdToDms(latDec: number, lonDec: number) {
-    /*
-    Converts lat/lon from decimal degrees to DMS.
-    */
-    let latDeg = parseInt(latDec.toString(), 10);
-    let latMin = 60.0 * (latDec % 1);
-    let latSec = 60.0 * (latMin % 1);
-    if (lonDec < 0) {
-      lonDec = Math.abs(lonDec);
-    }
-    let lonDeg = parseInt(lonDec.toString(), 10);
-    let lonMin = 60.0 * (lonDec % 1);
-    let lonSec = 60.0 * (lonMin % 1);
-    return [latDeg, Math.round(latMin), Math.round(latSec), lonDeg, Math.round(lonMin), Math.round(lonSec)];
   }
 
 }

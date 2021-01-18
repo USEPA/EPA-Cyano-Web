@@ -7,3 +7,11 @@ __pycache__/
 
 # Pycharm settings
 .idea
+
+# Angular settings
+env.json
+
+# Docker settings
+.env
+docker/angular/package.json*
+docker/flask/requirements.*

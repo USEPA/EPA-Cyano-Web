@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# export FLASK_APP=/cyan_flask/app
+
+cd /cyan_flask  # switch to cyan_flask directory
+
 python -m unittest  # runs unit tests
 
 python -m unittest tests/integration_tests.py  # runs integration tests (tests/integration_tests.py)

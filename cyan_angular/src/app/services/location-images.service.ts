@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {LocationType} from "../models/location";
+import { environment } from '../../environments/environment';
+import { EnvService } from '../services/env.service';
 
 const headerOptions = {
   headers: new HttpHeaders({})
@@ -11,20 +13,22 @@ const headerOptions = {
 })
 export class LocationImagesService {
 
-  private baseUrl: string = "https://cyan.epa.gov/";
-  private imageUrl: string = "cyan/cyano/location/images/";
-	private allImagesUrl: string = "cyan/cyano/location/allImages/";
+  private imageUrl: string = "location/images/";
+	private allImagesUrl: string = "location/allImages/";
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private envService: EnvService
+  ) { }
 
   getImageDetails(latitude: number, longitude: number, locationType: LocationType) {
-    let url = this.baseUrl + this.imageUrl + latitude.toString() + "/" + longitude.toString() + "/";
+    let url = this.envService.config.tomcatApiUrl + this.imageUrl + latitude.toString() + "/" + longitude.toString() + "/";
     url = this.addImagesParameter(url, locationType);
     return this.http.get(url);
   }
 
   getAllImages(latitude: number, longitude: number, locationType: LocationType) {
-		let url = this.baseUrl + this.allImagesUrl + latitude.toString() + "/" + longitude.toString() + "/";
+		let url = this.envService.config.tomcatApiUrl + this.allImagesUrl + latitude.toString() + "/" + longitude.toString() + "/";
     url = this.addImagesParameter(url, locationType);
 		return this.http.get(url);
   }

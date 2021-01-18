@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, Injector } from '@angular/core';
+import { NgModule, Injector, APP_INITIALIZER } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import {MatSelectModule } from '@angular/material/select';
 import {MatCheckboxModule } from '@angular/material/checkbox'; 
 import {MatButtonModule } from '@angular/material/button'; 
 import {MatSliderModule } from '@angular/material/slider'; 
-import {MatNativeDateModule } from '@angular/material';
+import {MatNativeDateModule } from '@angular/material/core';
 import {MatInputModule } from '@angular/material/input'; 
 import {MatTabsModule } from '@angular/material/tabs'; 
 import {MatBottomSheetModule } from '@angular/material/bottom-sheet'; 
@@ -44,6 +44,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { LocationService } from './services/location.service';
 import { MapService } from './services/map.service';
 import { AuthService } from './services/auth.service';
+import { EnvService } from './services/env.service';
+
+
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
@@ -158,6 +161,12 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { 
+        provide: APP_INITIALIZER, 
+        useFactory: (envService: EnvService) => () => envService.loadConfig(),
+        deps: [EnvService],
+        multi: true
+    }
   ],
   bootstrap: [AppComponent],
   entryComponents: [

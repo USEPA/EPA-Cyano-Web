@@ -4,6 +4,5 @@ export const environment = {
   testing: false,
   userIdleSeconds: 3600,
   userIdleCountDownSeconds: 120,
-  userIdlePingSeconds: 300,
-  baseServerUrl: '/cyan/app/api/'
+  userIdlePingSeconds: 300
 };

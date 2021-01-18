@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, Inject } from '@angular/core';
+import {Component, OnInit, Input, Inject, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { DatePipe } from '@angular/common';
 
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
@@ -17,6 +17,8 @@ import { DownloaderService, RawData } from '../services/downloader.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
+import { EnvService } from '../services/env.service';
+
 
 @Component({
   selector: 'app-location-details',
@@ -25,7 +27,7 @@ import { ConfigService } from '../services/config.service';
 })
 export class LocationDetailsComponent implements OnInit {
 
-  baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
+  @ViewChild('tabGroup') tabGroup;
 
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
@@ -54,7 +56,6 @@ export class LocationDetailsComponent implements OnInit {
   startDate: Date = new Date();
   endDate: Date = new Date();
 
-  loadTicker = 1;
   opacityValue = 0.7;
   showLegend = false;
 
@@ -141,7 +142,8 @@ export class LocationDetailsComponent implements OnInit {
     private downloader: DownloaderService,
     private user: UserService,
     private authService: AuthService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private envService: EnvService
   ) { }
 
   ngOnInit() {
@@ -274,7 +276,17 @@ export class LocationDetailsComponent implements OnInit {
     }
   }
 
+  getImageUrl(imageName: string) {
+    return this.envService.config.tomcatApiUrl + "location/images/" + imageName;
+  }
+
   cycleImages() {
+    if (this.tabGroup.selectedIndex != 0) {
+      // switched away from Overview tab, disable slide show
+      this.slidershow = false;
+      return
+    }
+
     let thumbs = this.removeThumbHighlights();
     let map = this.mapService.getMinimap();
     let layerOptions = {
@@ -287,7 +299,7 @@ export class LocationDetailsComponent implements OnInit {
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
     this.selectedLayer = pngImage;
     this.updateDetails(this.selectedLayerIndex);
-    let imageURL = this.baseURL + pngImage.name;
+    let imageURL = this.getImageUrl(pngImage.name);
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -351,7 +363,7 @@ export class LocationDetailsComponent implements OnInit {
       }
     })[0];
     this.selectedLayerIndex = this.locationPNGs.indexOf(pngImage);
-    let imageURL = this.baseURL + pngImage.name;
+    let imageURL = this.getImageUrl(pngImage.name);
     let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
     let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
     let imageBounds = latLngBounds(bottomRight, topLeft);
@@ -454,7 +466,7 @@ export class LocationDetailsComponent implements OnInit {
   downloadImage(event: any, image: ImageDetails): void {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = 'https://cyan.epa.gov/cyan/cyano/location/images/' + tifName;
+    let imageURL = this.getImageUrl(tifName);
     window.open(imageURL, '_blank');
   }
 

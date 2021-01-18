@@ -7,7 +7,9 @@ import { LocationService } from '../services/location.service';
 import { LocationImagesService } from '../services/location-images.service';
 import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
+import { EnvService } from '../services/env.service';
 
+import { environment } from '../../environments/environment';
 import { Location } from '../models/location';
 import { ImageDetails } from '../models/image-details';
 
@@ -18,7 +20,7 @@ import { ImageDetails } from '../models/image-details';
 })
 export class LatestImageComponent implements OnInit {
 
-	baseURL: string = 'https://cyan.epa.gov/cyan/cyano/location/images/';
+	imageEndpoint: string = "location/images/";
 
 	location: Location;
 
@@ -70,7 +72,8 @@ export class LatestImageComponent implements OnInit {
 		private locationService: LocationService,
 		private images: LocationImagesService,
 		private mapService: MapService,
-		private authService: AuthService
+		private authService: AuthService,
+		private envService: EnvService
 	) { }
 
 	ngOnInit() {
@@ -167,7 +170,7 @@ export class LatestImageComponent implements OnInit {
 			}
 		})[0];
 		this.selectedLayerIndex = this.locationPNGs.indexOf(pngImage);
-		let imageURL = this.baseURL + pngImage.name;
+		let imageURL = this.envService.config.tomcatApiUrl + this.imageEndpoint + pngImage.name;
 		let topLeft = latLng(pngImage.coordinates['topRightX'], pngImage.coordinates['topRightY']);
 		let bottomRight = latLng(pngImage.coordinates['bottomLeftX'], pngImage.coordinates['bottomLeftY']);
 		let imageBounds = latLngBounds(bottomRight, topLeft);

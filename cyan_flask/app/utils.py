@@ -31,8 +31,11 @@ def make_notifications_request(latest_time):
 	"""
     formatted_time = datetime.datetime.fromtimestamp(latest_time).strftime("%Y-%m-%d")
 
-    notification_url = "https://cyan.epa.gov/cyan/cyano/notifications/"
+    notification_url = os.environ.get("TOMCAT_API", "https://cyan.epa.gov") + "/cyan/cyano/notifications/"
     start_date = "{}T00-00-00-000-0000".format(formatted_time)
+
+    logging.info("Notifications request: {}".format(notification_url + start_date))
+
     try:
         notification_response = requests.get(notification_url + start_date)
         return json.loads(notification_response.content)
@@ -41,7 +44,7 @@ def make_notifications_request(latest_time):
         # TODO: Retry request.
         return None
     except requests.exceptions.RequestException as e:
-        logging.warning("Error making request to {}.".format(notification_url))
+        logging.warning("Error making request to {}.\n{}".format(notification_url, e))
         # TODO: Handle error.
         return None
     except Exception as e:
