@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatMenuModule } from '@angular/material';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
@@ -11,6 +12,11 @@ import { HeaderComponent } from './header.component';
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
+  let setTitleSpy;
+  let userServiceSpy;
+  let locationServiceSpy;
+  const testNotifications = {};
+
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -37,6 +43,21 @@ describe('HeaderComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should test setTitle()', () => {
+    component.setTitle();
+
+    expect(component.title).toMatch('Cyanobacteria Assessment Network');
+  });
+
+  it('should test displayLogout()', () => {
+    spyOn(component, 'setTitle');
+    let routerSpy = spyOn<any>(component['router'], 'navigate');
+
+    component.displayLogout();
+
+    expect(routerSpy).toHaveBeenCalledWith(['/account', {loggingOut: true}]);
   });
 
 });

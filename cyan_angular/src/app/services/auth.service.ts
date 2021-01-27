@@ -127,7 +127,7 @@ export class AuthService {
 
 
 
-class AuthError {
+export class AuthError {
   userLoggedIn: boolean;
   error: string;
 }

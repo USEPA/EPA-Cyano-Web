@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
-import { MatMenuModule } from '@angular/material';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
@@ -41,6 +41,15 @@ describe('BottomMenuComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should test dataTypeClick() - type is set', () => {
+    const testType: number = 1;
+    spyOn<any>(component['locationService'], 'setDataType');
+
+    component.dataTypeClick(testType);
+
+    expect(component.data_type).toEqual(testType);
   });
 
 });

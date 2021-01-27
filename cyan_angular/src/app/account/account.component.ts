@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { UserIdleService } from 'angular-user-idle';
-import { User, UserService } from '../services/user.service';
+import { User, Account, UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { LocationService } from '../services/location.service';
 import {environment} from "../../environments/environment";
@@ -35,7 +35,7 @@ export class AccountComponent implements OnInit {
   username: string = null;
   password: string = null;
 
-  currentUser: User = null;
+  currentUser: Account = null;
   loginSub: Subscription = null;
   authSub: Subscription = null;
 
@@ -196,7 +196,6 @@ export class AccountComponent implements OnInit {
 
   loginUser(): void {
     let self = this;
-
     this.userService.loginUser(this.username, this.password).subscribe(
       (user: any) => {
         // successful login
