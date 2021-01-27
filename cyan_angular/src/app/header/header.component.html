@@ -1,5 +1,6 @@
 <div id="header-div">
     <div class="header-block">
+
         <div class="logo-block">
             <div class="logo-block-inner">
             <a href="https://www.epa.gov" class="header-logo-link header-logo"></a>
@@ -11,7 +12,33 @@
               <span class="header-version">v{{ appVersion }}</span>
             </div>
         </div>
+
         <div id="search-config">
+            <div class="menu-block-icon">
+                <button mat-button [matMenuTriggerFor]="linksRight" class="menu-block-button">&#9776;</button>
+                <mat-menu #linksRight="matMenu" class="menu-link-block" panelClass="links-right-menu">
+                    <button mat-menu-item class="account menu-link" [routerLink]="['/account']">
+                        <div class="menu-div">
+                            <span class="tab-title">Account</span>
+                        </div>
+                    </button>
+                    <button mat-menu-item class="configs menu-link"[routerLink]="['/configs']">
+                        <div class="menu-div">
+                            <span class="tab-title">Config</span>
+                         </div>
+                    </button>
+                    <button mat-menu-item disabled class="comments menu-link">
+                        <div class="menu-div">
+                            <span class="tab-title">comments</span>
+                        </div>
+                    </button>
+                    <button mat-menu-item class="search menu-link">
+                        <div class="menu-div">
+                            <span class="tab-title">search</span>
+                        </div>
+                    </button>
+                </mat-menu>
+            </div>
             <nav class="config-links">
                 <div class="account config-item" (click)="displayLogout()">
                     <img class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
@@ -19,9 +46,6 @@
                 <div class="settings config-item" [routerLink]="['/configs']">
                     <img class="header-icon" src="assets/images/header_settings.png"/>
                 </div>
-<!--                 <div class="search config-item">
-                    <img class="header-icon" src="assets/images/header_search.png"/>
-                </div> -->
                 <div class="comments config-item" [routerLink]="['/comments']">
                     <mat-icon class="header-icon mat_icon">question_answer</mat-icon>
                 </div>
@@ -30,6 +54,7 @@
                 </div>
             </nav>
         </div>
+
     </div>
     <div class="menu-block-icon">
         <button mat-button [matMenuTriggerFor]="linksLeft" class="menu-block-button">&#9776;</button>

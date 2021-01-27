@@ -63,7 +63,10 @@
     display: inline-block;
   }
   #search-config-button {
-    display: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-top: 4px;
   }
   .menu-div {
     margin: 0 auto;
@@ -112,7 +115,10 @@
     display: none;
   }
   #search-config-button {
-    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-top: 4px;
   }
   .menu-block {
     display: none;
@@ -149,9 +155,7 @@
   color: transparent;
   position: relative;
   font: 0/0 a;
-  /* height: 100%; */
   text-shadow: none;
-  /* width: 25%; */
   float: left;
   z-index: 100;
 }
@@ -211,10 +215,7 @@
   margin-top: 4px;
 }
 #search-config-button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 3px;
+  display: none;
 }
 .settings-block-button {
   color: white;
@@ -239,7 +240,6 @@
   display: block;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-weight: 500;
-  /* margin: -5px 0 0 0; */
 }
 .menu-item:hover {
   cursor: pointer;
