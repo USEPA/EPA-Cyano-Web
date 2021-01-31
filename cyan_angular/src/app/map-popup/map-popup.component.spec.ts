@@ -44,4 +44,13 @@ describe('MapPopupComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  fit('should test ngOnInit()', () => {
+    spyOn<any>(component['authService'], 'checkUserAuthentication')
+      .and.returnValue(false);
+
+    let result = component.ngOnInit();
+
+    expect(result).toBeUndefined();
+  });
+
 });
