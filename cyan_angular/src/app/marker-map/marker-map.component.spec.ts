@@ -2,6 +2,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterTestingModule } from "@angular/router/testing";
 import { of, Observable } from 'rxjs';
+import { Map } from 'leaflet';
+import * as L from 'leaflet';
 
 import { MockLocation } from '../../testing/mocks/location';
 import { LocationService } from '../services/location.service';
@@ -15,6 +17,7 @@ describe('MarkerMapComponent', () => {
 
   let component: MarkerMapComponent;
   let fixture: ComponentFixture<MarkerMapComponent>;
+  let testLocation: MockLocation = new MockLocation();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -50,6 +53,103 @@ describe('MarkerMapComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should test ngOnInit - navigate to /account', () => {
+    const testPath = '/';
+    const testUser = '';
+    spyOn(component, 'getLocations');
+    spyOn<any>(component['user'], 'getUserName')
+      .and.returnValue(testUser);
+    spyOn<any>(component['ngLocation'], 'path')
+      .and.returnValue(testPath);
+    let routerSpy = spyOn<any>(component['router'], 'navigate');
+    spyOn(component, 'tileLayerEvents');
+
+    component.ngOnInit();
+
+    expect(routerSpy).toHaveBeenCalledWith(['/account']);
+  });
+
+  it('should test tileLayerEvents', () => {
+    let tileSpy = spyOn<any>(component['esriImagery'], 'on')
+      .and.returnValue(null);
+    
+    component.tileLayerEvents();
+
+    expect(tileSpy).toHaveBeenCalled();
+  });
+
+  it('should test mapPanEvent - unauthenticated', () => {
+    const testEvent = null;
+    spyOn<any>(component['authService'], 'checkUserAuthentication')
+      .and.returnValue(false);
+
+    let result = component.mapPanEvent(testEvent);
+
+    expect(result).toBeUndefined();
+  });
+
+  it('should test mapPanEvent - refresh from panning', () => {
+    const testEvent = null;
+    spyOn<any>(component['authService'], 'checkUserAuthentication')
+      .and.returnValue(true);
+    let authSpy = spyOn<any>(component['authService'], 'refresh');
+
+    let result = component.mapPanEvent(testEvent);
+
+    expect(authSpy).toHaveBeenCalled();
+  });
+
+  it('should test getLocations', () => {
+    let locSpy = spyOn<any>(component['locationService'], 'getLocations')
+      .and.returnValue(of(null));
+
+    component.getLocations();
+
+    expect(locSpy).toHaveBeenCalled();
+  });
+
+  it('should test onMapReady', () => {
+    let mapDomObj = document.createElement('div');
+    mapDomObj.classList.add('map');
+    const testMap = L.map(mapDomObj, {center: [34, -81], zoom: 12});
+    let mapSpy = spyOn<any>(component['mapService'], 'setMap');
+
+    component.onMapReady(testMap);
+
+    expect(mapSpy).toHaveBeenCalled();
+  });
+
+  it('should test addMarkerOnClick - unauthenticated', () => {
+    const testEvent = null;
+    spyOn<any>(component['authService'], 'checkUserAuthentication')
+      .and.returnValue(false);
+
+    let result = component.mapPanEvent(testEvent);
+
+    expect(result).toBeUndefined();
+  });
+
+  it('should test addMarkerOnClick - map service addMarker called', () => {
+    const testEvent = {
+      latlng: {
+        lat: 34,
+        lng: -81
+      }
+    };
+    let testMarkerEvent = new MockMarker();
+    let testMap = new MockMap();
+    spyOn<any>(component['authService'], 'checkUserAuthentication')
+      .and.returnValue(true);
+    spyOn<any>(component['mapService'], 'getMap')
+      .and.returnValue(testMap);  
+    let mapSpy = spyOn<any>(component['mapService'], 'addMarker')
+      .and.returnValue(new MockMarker());
+
+    component.addMarkerOnClick(testEvent);
+
+    expect(mapSpy).toHaveBeenCalled();
+  });
+
 });
 
 class MockUserService {
@@ -64,5 +164,20 @@ class MockLocationService {
   }
   getLocations(): Observable<MockLocation[]> {
     return of([new MockLocation]);
+  }
+  createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source) {
+    return new MockLocation();
+  }
+}
+
+class MockMap {
+  setView(latLon, zoom) {
+    return;
+  }
+}
+
+class MockMarker {
+  fireEvent(event) {
+    return;
   }
 }

@@ -8,6 +8,8 @@ import { EnvService } from './env.service';
 
 describe('EnvService', () => {
 
+	let service: EnvService;
+
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			imports: [
@@ -19,11 +21,19 @@ describe('EnvService', () => {
 				CyanMap
 			]
 		});
+		service = TestBed.get(EnvService);
 	});
 
 	it('should be created', () => {
-		const service: EnvService = TestBed.get(EnvService);
 		expect(service).toBeTruthy();
+	});
+
+	it('should test setConfig - allowedRetries exceeded', () => {
+		service.retries = service.allowedRetries + 1;
+
+		let result = service.setConfig('');
+
+		expect(result).toBeUndefined();
 	});
 
 });

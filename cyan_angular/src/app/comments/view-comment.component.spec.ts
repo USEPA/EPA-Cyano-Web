@@ -39,8 +39,8 @@ describe('ViewComment', () => {
 
   testReply.comment_id = testComment.id;
   testReply.comment_user = testComment.username;
-  testReply.username = "reply-username"
-  testReply.body = "test reply body"
+  testReply.username = "reply-username";
+  testReply.body = "test reply body";
 
   const mockViewImage = {
     data: null

@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from "@angular/router/testing";
 import { HttpClientModule } from '@angular/common/http';
 
+import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
@@ -11,6 +12,14 @@ describe('SessionTimeoutComponent', () => {
 
   let component: SessionTimeoutComponent;
   let fixture: ComponentFixture<SessionTimeoutComponent>;
+
+  let mockUserService = {
+    currentAccount: {
+      user: {
+        sessionCountDown: 10
+      }
+    }
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -22,7 +31,11 @@ describe('SessionTimeoutComponent', () => {
       providers: [
         AuthService,
         LoaderService,
-        CyanMap
+        CyanMap,
+        {
+          providers: UserService,
+          useValue: mockUserService
+        }
       ]
     })
     .compileComponents();
@@ -36,6 +49,14 @@ describe('SessionTimeoutComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should test extendSession()', () => {
+    let userSpy = spyOn<any>(component['userIdle'], 'resetTimer');
+
+    component.extendSession();
+
+    expect(userSpy).toHaveBeenCalled();
   });
 
 });

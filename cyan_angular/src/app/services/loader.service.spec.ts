@@ -4,11 +4,53 @@ import { LoaderService } from './loader.service';
 
 describe('LoaderService', () => {
 
-  beforeEach(() => TestBed.configureTestingModule({providers: [LoaderService]}));
+	let service: LoaderService;
+
+  beforeEach(() => {
+  	TestBed.configureTestingModule({
+  		providers: [LoaderService]
+  	})
+  	service = TestBed.get(LoaderService);
+  });
 
   it('should be created', () => {
-    const service: LoaderService = TestBed.get(LoaderService);
+    
     expect(service).toBeTruthy();
+  });
+
+  it('should test show()', () => {
+  	let loadSpy = spyOn(service.isLoading, 'next');
+
+  	service.show();
+
+  	expect(loadSpy).toHaveBeenCalled();
+  });
+
+  it('should test hide()', () => {
+  	let loadSpy = spyOn(service.isLoading, 'next');
+  	let userSpy = spyOn(service.isUserLocations, 'next');
+
+  	service.hide();
+
+  	expect(loadSpy).toHaveBeenCalled();
+  	expect(userSpy).toHaveBeenCalled();
+  });
+
+  it('should test showProgressBar()', () => {
+  	let userSpy = spyOn(service.isUserLocations, 'next');
+
+  	service.showProgressBar();
+
+  	expect(userSpy).toHaveBeenCalled();
+  });
+
+  it('should test updateProgressValue()', () => {
+  	const testVal: number = 0;
+  	let progSpy = spyOn(service.progressValue, 'next');
+
+  	service.updateProgressValue(testVal);
+
+  	expect(progSpy).toHaveBeenCalled();
   });
 
 });
