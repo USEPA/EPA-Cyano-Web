@@ -43,6 +43,7 @@ describe('LocationCompareComponent', () => {
   }));
 
   beforeEach(() => {
+    LocationCompareComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(LocationCompareComponent);
     component = fixture.componentInstance;
     component.selected_locations = [new MockLocation()];
@@ -77,6 +78,7 @@ describe('LocationCompareComponent', () => {
   it('should test removeLocation() - successful', () => {
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
+    component.selected_locations = [testLocation];
     let locSpy = spyOn<any>(component['locationService'], 'deleteCompareLocation');
 
     component.removeLocation(testLocation);
@@ -127,8 +129,6 @@ describe('LocationCompareComponent', () => {
     let i = 0;
 
     testColors.forEach(testColor => {
-      console.log("Testing '" + testColor + "' color for cell concentrations");
-
       locSpy.and.returnValue(testColor);
 
       let result = component.getColor(testLocation, testDelta);

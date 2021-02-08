@@ -36,9 +36,17 @@ describe('HeaderComponent', () => {
   }));
 
   beforeEach(() => {
+
+    HeaderComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
+    HeaderComponent.prototype.ngOnDestroy = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    userServiceSpy = spyOn<any>(component['userService'], 'allNotifications$')
+      .and.returnValue(of(null));
+    locationServiceSpy = spyOn<any>(component['locationService'], 'compare$')
+      .and.returnValue(of(null));
   });
 
   it('should create', () => {

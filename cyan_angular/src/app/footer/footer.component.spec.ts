@@ -18,6 +18,7 @@ describe('FooterComponent', () => {
   }));
 
   beforeEach(() => {
+    FooterComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(FooterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

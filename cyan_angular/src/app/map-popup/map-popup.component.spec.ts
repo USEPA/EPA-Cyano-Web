@@ -40,6 +40,7 @@ describe('MapPopupComponent', () => {
   }));
 
   beforeEach(() => {
+    MapPopupComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(MapPopupComponent);
     component = fixture.componentInstance;
     component.locationData = testLocation;
@@ -147,8 +148,6 @@ describe('MapPopupComponent', () => {
     let i = 0;
 
     testColors.forEach(testColor => {
-      console.log("Testing '" + testColor + "' color for cell concentrations");
-
       locSpy.and.returnValue(testColor);
 
       let result = component.getColor(testDelta);

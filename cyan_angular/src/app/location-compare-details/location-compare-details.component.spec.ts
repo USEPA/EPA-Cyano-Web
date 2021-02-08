@@ -52,9 +52,11 @@ describe('LocationCompareDetailsComponent', () => {
   }));
 
   beforeEach(() => {
+    LocationCompareDetailsComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(LocationCompareDetailsComponent);
     component = fixture.componentInstance;
     component.locations = [testLocation];
+    component.current_location = testLocation;
     component.dataDownloaded = false;
     fixture.detectChanges();
   });
@@ -139,9 +141,6 @@ describe('LocationCompareDetailsComponent', () => {
     component.onMapReady(testMap);
 
     expect(mapSpy).toHaveBeenCalled();
-    // setTimeout(() => {
-    //   expect(mapSpy).toHaveBeenCalledWith(latLonArray);  
-    // }, component.mapReadyTimeout + 100);  // +10ms
   });
 
   it('should test createMarker', () => {
@@ -186,8 +185,6 @@ describe('LocationCompareDetailsComponent', () => {
     let i = 0;
 
     testColors.forEach(testColor => {
-      console.log("Testing '" + testColor + "' color for cell concentrations");
-
       locSpy.and.returnValue(testColor);
 
       let result = component.getColor(testLocation, testDelta);

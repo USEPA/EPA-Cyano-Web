@@ -10,7 +10,6 @@ import { LocationSearchComponent } from './location-search.component';
 import { MockLocation } from '../../testing/mocks/location';
 import { Location } from '../models/location';
 
-let locationSearchResults = require('../../testing/mocks/location-search-results.json');
 
 
 describe('LocationSearchComponent', () => {
@@ -18,6 +17,7 @@ describe('LocationSearchComponent', () => {
   let component: LocationSearchComponent;
   let fixture: ComponentFixture<LocationSearchComponent>;
   let testLocation: Location = new MockLocation();
+  let locationSearchResults;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -35,9 +35,12 @@ describe('LocationSearchComponent', () => {
   }));
 
   beforeEach(() => {
+    LocationSearchComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(LocationSearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    locationSearchResults = require('../../testing/mocks/location-search-results.json');
   });
 
   it('should create', () => {
@@ -81,6 +84,7 @@ describe('LocationSearchComponent', () => {
 
   it('should test inUnitedStates - within US', () => {
     const testLocationResult = locationSearchResults[0];
+    testLocationResult.display_name = component.withinUSKeyword;
 
     let result = component.inUnitedStates(testLocationResult);
 

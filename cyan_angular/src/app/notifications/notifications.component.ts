@@ -62,7 +62,6 @@ export class NotificationsComponent implements OnInit {
   }
 
   toggleChecked(event) {
-    console.log("toggleChecked hit.");
     if (event.checked == true) {
       // Only shows new notifications:
       this.display_notifications = this.new_notifications;
@@ -150,14 +149,12 @@ export class NotificationDetails {
   }
 
   previousNotification(): void {
-    console.log("notifications previousNotification() called.");
     this.current_notification_index = this.current_notification_index == 0 ? this.data.allNotifications.length - 1 : this.current_notification_index - 1;
     this.data.notificationObj = this.data.allNotifications[this.current_notification_index];
     this.updateUserNotifications(this.data.notificationObj);
   }
 
   nextNotification(): void {
-    console.log("notifications nextNotification() called.");
     this.current_notification_index = this.current_notification_index == this.data.allNotifications.length - 1 ? 0 : this.current_notification_index + 1;
     this.data.notificationObj = this.data.allNotifications[this.current_notification_index];
     this.updateUserNotifications(this.data.notificationObj);

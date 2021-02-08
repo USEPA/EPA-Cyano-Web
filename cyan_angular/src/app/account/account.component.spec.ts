@@ -27,6 +27,7 @@ describe('AccountComponent', () => {
 				CyanMap
 			]
 		}).compileComponents();
+		AccountComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
 		fixture = TestBed.createComponent(AccountComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
@@ -225,11 +226,8 @@ describe('AccountComponent', () => {
 	// 	spyOn<any>(component['authService'], 'userLoginState')
 	// 		.and.returnValue(of(testAuthError));
 	// 	spyOn(component, 'performLogoutRoutine');
-
 	// 	component.userAuthListener();
-
 	// 	// TODO: Finish this one
-
 	// });
 
 	it('should test sendResetEmail() - invalid email from authService', () => {

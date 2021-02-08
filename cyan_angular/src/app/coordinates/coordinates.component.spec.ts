@@ -25,9 +25,6 @@ describe('CoordinatesComponent', () => {
     setview: null
   };
 
-  // const testLatLng = new LatLng();
-  // testLatLng.
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -49,6 +46,7 @@ describe('CoordinatesComponent', () => {
   }));
 
   beforeEach(() => {
+    CoordinatesComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(CoordinatesComponent);
     component = fixture.componentInstance;
 

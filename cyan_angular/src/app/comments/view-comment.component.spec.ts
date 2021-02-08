@@ -98,8 +98,10 @@ describe('ViewComment', () => {
   }));
 
   beforeEach(() => {
+    ViewComment.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(ViewComment);
     component = fixture.componentInstance;
+    component.comment = testComment;
     fixture.detectChanges();
   });
 

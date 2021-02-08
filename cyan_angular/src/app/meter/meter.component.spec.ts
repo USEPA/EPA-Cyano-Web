@@ -19,6 +19,8 @@ describe('MeterComponent', () => {
   let fixture: ComponentFixture<MeterComponent>;
   let testLocation: MockLocation = new MockLocation();
   let mockSimpleChange: SimpleChange = new SimpleChange(undefined, testLocation, true);
+  let meterSpy;
+  let conSpy;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -37,10 +39,16 @@ describe('MeterComponent', () => {
   }));
 
   beforeEach(() => {
+    // MeterComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(MeterComponent);
     component = fixture.componentInstance;
     component.location = new MockLocation();
     fixture.detectChanges();
+
+    meterSpy = spyOn(component, 'setMeter');
+    conSpy = spyOn(component, 'setConcentration');
+
+    component.location = testLocation;
   });
 
   it('should create', () => {
@@ -48,17 +56,15 @@ describe('MeterComponent', () => {
   });
 
   it('should test ngOnInit', () => {
-    spyOn(component, 'setMeter');
-    let conSpy = spyOn(component, 'setConcentration');
 
     component.ngOnInit();
 
-    expect(conSpy).toHaveBeenCalled();
+    expect(meterSpy).toHaveBeenCalled();
   });
 
   it('should test ngOnChanges', () => {
-    spyOn(component, 'setMeter');
-    let conSpy = spyOn(component, 'setConcentration');
+    // spyOn(component, 'setMeter');
+    // let conSpy = spyOn(component, 'setConcentration');
 
     component.ngOnChanges({['location']: mockSimpleChange});
 
@@ -67,6 +73,7 @@ describe('MeterComponent', () => {
 
   it('should test setMeter - a <= 1', () => {
     const testPercent = 0;
+    meterSpy.and.callThrough();
 
     let result = component.setMeter(testPercent);
 
@@ -75,6 +82,7 @@ describe('MeterComponent', () => {
 
   it('should test setMeter - a > 1', () => {
     const testPercent = 10;
+    meterSpy.and.callThrough();
 
     let result = component.setMeter(testPercent);
 
@@ -94,7 +102,8 @@ describe('MeterComponent', () => {
   it('should test setConcentration()', () => {
     const testConcentration = 10;
     const testColor = 'green';
-    let expectedResult = `<div style="color: ${testColor};">${testConcentration}</div>`
+    let expectedResult = `<div style="color: ${testColor};">${testConcentration}</div>`;
+    conSpy.and.callThrough();
     
     let result = component.setConcentration(testConcentration, testColor);
 

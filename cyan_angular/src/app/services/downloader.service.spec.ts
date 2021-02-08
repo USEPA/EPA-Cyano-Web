@@ -369,14 +369,19 @@ describe('DownloaderService', () => {
 		expect(result).toMatch(expectedResult);
 	});
 
-	// it('should test updateProgressBar', () => {
-	// 	let loadSpy = spyOn<any>(service['loaderService'], 'hide');
-	// 	spyOn<any>(service['loaderService'], 'progressValue')
-	// 		.and.returnValue(new Subject<any>());
+	it('should test updateProgressBar', () => {
+		let loadSpy = spyOn<any>(service['loaderService'], 'hide');
+		spyOn<any>(service, 'loaderService')
+			.and.returnValue(new MockSubject());
 
-	// 	service.updateProgressBar();
+		service.updateProgressBar();
 
-	// 	expect(loadSpy).toHaveBeenCalled();
-	// });
+		expect(loadSpy).toHaveBeenCalled();
+	});
 
 });
+
+
+class MockSubject {
+	progressValue = new Subject<number>();
+}

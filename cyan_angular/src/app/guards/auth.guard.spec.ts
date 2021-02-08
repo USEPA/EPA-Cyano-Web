@@ -9,14 +9,11 @@ describe('AuthGuard', () => {
   let service: AuthGuard;
   let authServiceSpy;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ AuthGuard ]
     })
     .compileComponents();
-  }));
-
-  beforeEach(() => {
   });
 
   it('should create', () => {

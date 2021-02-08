@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
+import * as L from 'leaflet';
 
 import { LocationType } from '../models/location';
 import { MockLocation } from '../../testing/mocks/location';
@@ -8,11 +9,14 @@ import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
 import { UserService } from './user.service';
+import { MapService } from './map.service';
 import { LocationService } from './location.service';
 
 describe('LocationService', () => {
 
 	let service: LocationService;
+	let mapService: MapService;
+	let testMap;
 	let testLocation: MockLocation = new MockLocation();
 	let testLocationType = LocationType;
 	let testUser = {
@@ -59,6 +63,11 @@ describe('LocationService', () => {
 			]
 		});
 		service = TestBed.get(LocationService);
+		mapService = TestBed.get(MapService);
+		let mapDomObj = document.createElement('div');
+	    mapDomObj.classList.add('map');
+	    testMap = L.map(mapDomObj, {center: [34, -81], zoom: 12});
+	    mapService.setMap(testMap);
 	});
 
 	it('should be created', () => {
@@ -214,7 +223,6 @@ describe('LocationService', () => {
 		
 		let result = service.getLocationByID(testLocation.id);
 		
-		console.log(result)
 		expect(result.id).toEqual(testLocation.id);
 	});
 
@@ -373,7 +381,7 @@ describe('LocationService', () => {
   	expect(spy).toHaveBeenCalled();
   });
 
-  // fit('should test addMarkers()', () => {
+  // it('should test addMarkers()', () => {
   // 	spyOn<any>(service['mapService'], 'hasMarker')
   // 		.and.returnValue(false);
   // 	let spy = spyOn<any>(service['mapService'], 'addMarker')
@@ -383,7 +391,7 @@ describe('LocationService', () => {
   // 	expect(spy).toHaveBeenCalled();
   // });
 
-  // fit('should test updateMarkers()', () => {
+  // it('should test updateMarkers()', () => {
   // 	spyOn<any>(service['mapService'], 'hasMarker')
   // 		.and.returnValue(false);
   // 	let spy = spyOn<any>(service['mapService'], 'updateMarker')

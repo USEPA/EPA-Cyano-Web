@@ -34,6 +34,7 @@ describe('DialogComponent', () => {
   }));
 
   beforeEach(() => {
+    DialogComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(DialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

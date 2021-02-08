@@ -12,8 +12,6 @@ COPY cyan_angular/ /app
 
 COPY docker/ /docker
 
-COPY cyan_angular/src/karma.docker.conf.js /app/src/karma.conf.js
-
 WORKDIR /app
 
 RUN apk update && \

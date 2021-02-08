@@ -42,6 +42,7 @@ describe('SessionTimeoutComponent', () => {
   }));
 
   beforeEach(() => {
+    SessionTimeoutComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(SessionTimeoutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

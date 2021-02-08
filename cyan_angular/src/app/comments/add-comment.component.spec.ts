@@ -67,6 +67,7 @@ describe('AddComment', () => {
   }));
 
   beforeEach(() => {
+    AddComment.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(AddComment);
     component = fixture.componentInstance;
     fixture.detectChanges();

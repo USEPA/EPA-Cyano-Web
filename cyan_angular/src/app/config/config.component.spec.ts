@@ -53,13 +53,11 @@ describe('ConfigComponent', () => {
   }));
 
   beforeEach(() => {
+    service = TestBed.get(UserService)
+    service.currentAccount = testAccount;
     fixture = TestBed.createComponent(ConfigComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
-    service = TestBed.get(UserService)
-    service.currentAccount = testAccount;
-
   });
 
   it('should create', () => {

@@ -32,7 +32,7 @@ describe('BottomMenuComponent', () => {
   }));
 
   beforeEach(() => {
-
+    BottomMenuComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(BottomMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -23,6 +23,7 @@ describe('LoaderComponent', () => {
   }));
 
   beforeEach(() => {
+    LoaderComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(LoaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
