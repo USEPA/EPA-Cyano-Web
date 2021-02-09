@@ -1,5 +1,4 @@
 import { Injectable, Inject, Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -29,7 +28,6 @@ export class AuthService {
   private jwtHelper = new JwtHelperService();
 
   constructor(
-    private router: Router,
     private http: HttpClient,
     private envService: EnvService
   ) { }
@@ -129,7 +127,7 @@ export class AuthService {
 
 
 
-class AuthError {
+export class AuthError {
   userLoggedIn: boolean;
   error: string;
 }

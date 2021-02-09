@@ -8,6 +8,7 @@ import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, ImageOverlay } from 'leaflet';
 import { Subscription } from 'rxjs';
 
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MapService } from '../services/map.service';
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -147,6 +148,8 @@ export class LocationDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
+    console.log("LOCATION DETAILS GETTING INITED")
 
     if (!this.authService.checkUserAuthentication()) { return; }
 

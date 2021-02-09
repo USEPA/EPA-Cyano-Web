@@ -105,9 +105,6 @@ export class ViewComment implements OnInit {
     /*
     Adds reply to a user comment.
     */
-
-    console.log("Adding reply to comment.");
-
     if (!this.validateReply()) {
       return;
     }

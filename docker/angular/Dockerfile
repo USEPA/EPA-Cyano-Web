@@ -3,22 +3,20 @@ FROM node:lts-alpine
 # Build-time variables
 ARG env=standalone
 
-# Bypasses analytics prompt for Angular CLI install
-ENV NG_CLI_ANALYTICS=false
+# Env vars for angular unit tests and bypassing angular CLI install prompt:
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+	CHROME_PATH=/usr/lib/chromium/ \
+	NG_CLI_ANALYTICS=false
 
-# Moves files into directory name "app"
-WORKDIR /app
-
-# COPY cyan_angular/package.json cyan_angular/package-lock.json  /app/
 COPY cyan_angular/ /app
+
 COPY docker/ /docker
 
+WORKDIR /app
 
-RUN cd /app \
-	&& npm install \
-	&& npm audit fix
-
-# COPY cyan_angular/ /app
-
-# Builds with $env variable
-RUN cd /app && npm run build:$env
+RUN apk update && \
+	apk add chromium && \
+	npm install && \
+	npm audit fix && \
+	npm run build:$env && \
+	npx ng test --sourceMap=false --browsers=Chrome_without_sandbox --watch=false
