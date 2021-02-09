@@ -99,11 +99,7 @@ describe('ConfigComponent', () => {
 
     component.validateInputValue(testChangeContext);
 
-    console.log("# " + component.user_inputs.level_low )
-
     expect(component.user_inputs.level_low).toEqual(component.user_inputs.level_medium - sliderStep);
-
-
   });
 
   it('should test validateInputValue() - adjusts alert level if greater than alert max', () => {

@@ -12,6 +12,10 @@ import { UserService } from './user.service';
 import { MapService } from './map.service';
 import { LocationService } from './location.service';
 
+let rawDataJson = require('../../testing/mocks/raw-data-response.json');
+
+
+
 describe('LocationService', () => {
 
 	let service: LocationService;
@@ -159,11 +163,13 @@ describe('LocationService', () => {
 	});
 
 	it('should test resetLocationsLatestData()', () => {
-		service.locations = [];
+		service.locations = [testLocation];
+		let spy = spyOn(service, 'setLocationDataFromOutput');
+		service['downloader']['locationsData'] = rawDataJson;
 
 		service.resetLocationsLatestData();
 
-		expect(service.locations.length).toEqual(0);
+		expect(spy).toHaveBeenCalled();
 	});
 
 	it('should test setLocationDataFromOutput()', () => {
@@ -431,4 +437,8 @@ class MockUserService {
 	getUserLocations() {
 		return of([new MockLocation()]);
 	}
+}
+
+class MockDownloader {
+  locationsData = rawDataJson;
 }

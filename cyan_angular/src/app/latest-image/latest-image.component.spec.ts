@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { ImageOverlay, latLngBounds, latLng, Marker, marker } from 'leaflet';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { MockLocation } from '../../testing/mocks/location';
 import { ActivatedRouteStub } from '../../testing/activated-route-stub';
@@ -25,7 +26,8 @@ describe('LatestImageComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientModule
+        HttpClientModule,
+        LeafletModule
       ],
       declarations: [
         LatestImageComponent
@@ -147,9 +149,9 @@ describe('LatestImageComponent', () => {
     expect(component.layer.options.opacity).toEqual(testEvent.value);
   });
 
-  it('should test onMapReady()', () => {
-    // TODO
-  });
+  // it('should test onMapReady()', () => {
+  //   // TODO
+  // });
 
   it('should test createMarker()', () => {
     const testLatLng = latLng(34, -81);

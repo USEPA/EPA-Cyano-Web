@@ -17,7 +17,10 @@ describe('AccountComponent', () => {
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
-			imports: [RouterTestingModule, HttpClientModule,],
+			imports: [
+				RouterTestingModule,
+				HttpClientModule
+			],
 			declarations: [
 				AccountComponent
 			],
@@ -282,9 +285,9 @@ describe('AccountComponent', () => {
 		expect(component.allowReset).toBe(expectedAllowReset);
 	});
 
-	it('should test trackUserIdleTimout() - TODO', () => {
-		// Test counter on DOM.
-		// Test user logout when time is up.
-	});
+	// it('should test trackUserIdleTimout() - TODO', () => {
+	// 	// Test counter on DOM.
+	// 	// Test user logout when time is up.
+	// });
 
 });

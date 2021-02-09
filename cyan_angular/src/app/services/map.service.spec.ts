@@ -87,9 +87,9 @@ describe('MapService', () => {
 		expect(result).toBe(false);
 	});
 
-	it('should test addMarker()', () => {
+	// it('should test addMarker()', () => {
 
-	});
+	// });
 
 	it('should test updateMarker()', () => {
 		service.updateMarker(testLocation);
@@ -97,9 +97,9 @@ describe('MapService', () => {
 		expect(service).toBeDefined();
 	});
 
-	it('should test deleteMarker()', () => {
-		// service.deleteMarker(testLocation);
-	});
+	// it('should test deleteMarker()', () => {
+	// 	// service.deleteMarker(testLocation);
+	// });
 
 	it('should test getSource()', () => {
 		const expectedResult = 'OLCI';

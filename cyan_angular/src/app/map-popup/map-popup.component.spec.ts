@@ -261,6 +261,7 @@ describe('MapPopupComponent', () => {
   });
 
   it('should test compareLocation - addCompareLocation called', () => {
+    component.compareSelected = false;
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
     let locSpy = spyOn<any>(component['locationService'], 'addCompareLocation');
@@ -280,6 +281,19 @@ describe('MapPopupComponent', () => {
 
     expect(locSpy).toHaveBeenCalled();
   });
+
+
+  // compareLocation(ln: Location): void {
+  //   if (!this.authService.checkUserAuthentication()) {
+  //     return;
+  //   }
+  //   this.compareSelected = !this.compareSelected;
+  //   if (this.compareSelected) {
+  //     this.locationService.addCompareLocation(ln);
+  //   } else {
+  //     this.locationService.deleteCompareLocation(ln); // removes from compare array if it exists
+  //   }
+  // }
 
   it('should test viewLatestImage - unauthenticated', () => {
     spyOn<any>(component['authService'], 'checkUserAuthentication')

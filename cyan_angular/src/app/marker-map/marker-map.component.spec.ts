@@ -4,6 +4,7 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { of, Observable } from 'rxjs';
 import { Map } from 'leaflet';
 import * as L from 'leaflet';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { MockLocation } from '../../testing/mocks/location';
 import { LocationService } from '../services/location.service';
@@ -26,7 +27,8 @@ describe('MarkerMapComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule,
-        RouterTestingModule
+        RouterTestingModule,
+        LeafletModule
       ],
       declarations: [ MarkerMapComponent ],
       providers: [

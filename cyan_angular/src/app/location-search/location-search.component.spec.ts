@@ -64,7 +64,6 @@ describe('LocationSearchComponent', () => {
 
     let result = component.createLocationResults(locationSearchResults);
 
-    console.log(result[0]);
     expect(result[0].place_id).toEqual(locationSearchResults[0].place_id);
   });
 

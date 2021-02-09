@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
 import { ImageOverlay, latLng, latLngBounds, LatLng } from 'leaflet';
 import { DatePipe } from '@angular/common';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { ImageDetails } from '../models/image-details';
 import { Location } from '../models/location';
@@ -74,6 +75,10 @@ describe('LocationDetailsComponent', () => {
       ]
     })
     .compileComponents();
+
+    let mapDomObj = document.createElement('div');
+    mapDomObj.classList.add('map');
+
   }));
 
   beforeEach(() => {
@@ -85,7 +90,6 @@ describe('LocationDetailsComponent', () => {
     component.locations = [testLocation];
     component.dataDownloaded = true;
     fixture.detectChanges();
-    // tsSubSpy = spyOn<any>(component['tsSub'], 'unsubscribe');
   });
 
   it('should create', () => {
@@ -362,9 +366,6 @@ describe('LocationDetailsComponent', () => {
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
     spyOn(component, 'updateDetails');
-
-    console.log(component.selectedLayer)
-
     testImageDetails.name = null;
 
     let result = component.toggleImage(testThumb, testImageDetails);
@@ -385,8 +386,6 @@ describe('LocationDetailsComponent', () => {
     const expectedResult = 'L 1/16/2021';
 
     let result = component.getImageTitle(testImage);
-
-    console.log(result);
 
     expect(result.length).toEqual(expectedResult.length);
   });
