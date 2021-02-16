@@ -22,7 +22,9 @@ import {MatDatepickerModule } from '@angular/material/datepicker';
 import {MatMenuModule } from '@angular/material/menu'; 
 import {MatDialogModule } from '@angular/material/dialog'; 
 import {MatDialogRef } from '@angular/material/dialog'; 
+import {MatToolbarModule} from '@angular/material/toolbar'; 
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {MatSidenavModule} from '@angular/material/sidenav';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -140,8 +142,10 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     MatCardModule,
     MatBadgeModule,
     MatDialogModule,
+    MatToolbarModule,
+    MatSidenavModule,
     Ng5SliderModule,
-    BrowserAnimationsModule,
+    BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [

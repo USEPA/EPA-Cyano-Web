@@ -3,7 +3,7 @@
 
         <div class="logo-block">
             <div class="logo-block-inner">
-            <a href="https://www.epa.gov" class="header-logo-link header-logo"></a>
+                <a href="https://www.epa.gov" class="header-logo-link header-logo"></a>
                 <div class="header-title-abr">{{ titleAbr }}
                   <span class="header-version">v{{ appVersion }}</span>
                 </div>
@@ -12,34 +12,37 @@
               <span class="header-version">v{{ appVersion }}</span>
             </div>
         </div>
+    </div>
 
-        <div id="search-config">
+    <div id="search-config">
             <div class="menu-block-icon">
-                <button mat-button [matMenuTriggerFor]="linksRight" class="menu-block-button">&#9776;</button>
+                <button mat-button [matMenuTriggerFor]="linksRight" class="menu-right-block-button">
+                    <mat-icon class="header-icon mat_icon">more_vert</mat-icon>
+                </button>
                 <mat-menu #linksRight="matMenu" class="menu-link-block" panelClass="links-right-menu">
-                    <button mat-menu-item class="account menu-link" [routerLink]="['/account']">
+                    <button mat-menu-item class="account menu-link" (click)="displayLogout()">
                         <div class="menu-div">
                             <span class="tab-title">Account</span>
                         </div>
                     </button>
-                    <button mat-menu-item class="configs menu-link"[routerLink]="['/configs']">
+                    <button mat-menu-item class="configs menu-link" [routerLink]="['/configs']">
                         <div class="menu-div">
                             <span class="tab-title">Config</span>
                          </div>
                     </button>
-                    <button mat-menu-item disabled class="comments menu-link">
+                    <button mat-menu-item class="comments menu-link" [routerLink]="['/comments']">
                         <div class="menu-div">
-                            <span class="tab-title">comments</span>
+                            <span class="tab-title">Comments</span>
                         </div>
                     </button>
-                    <button mat-menu-item class="search menu-link">
+                    <button mat-menu-item class="location-search menu-link" [routerLink]="['/search']">
                         <div class="menu-div">
-                            <span class="tab-title">search</span>
+                            <span class="tab-title">Search</span>
                         </div>
                     </button>
                 </mat-menu>
             </div>
-            <nav class="config-links">
+            <nav class="config-links menu-block">
                 <div class="account config-item" (click)="displayLogout()">
                     <img class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
                 </div>
@@ -54,8 +57,7 @@
                 </div>
             </nav>
         </div>
-
-    </div>
+    
     <div class="menu-block-icon">
         <button mat-button [matMenuTriggerFor]="linksLeft" class="menu-block-button">&#9776;</button>
         <mat-menu #linksLeft="matMenu" class="menu-link-block" panelClass="links-left-menu">
@@ -63,17 +65,17 @@
                 <div class="menu-div">
                     <span class="tab-title">My Locations</span>
                 </div></button>
-            <button mat-menu-item class=" compare menu-link"[routerLink]="['/comparelocations']">
+            <button mat-menu-item class=" compare menu-link" [routerLink]="['/comparelocations']">
                 <div class="menu-div">
                     <span class="tab-title">Compare</span>
                  </div>
             </button>
-            <button mat-menu-item disabled class="notifications menu-link">
+            <button mat-menu-item class="notifications menu-link" [routerLink]="['/notifications']">
                 <div class="menu-div">
                     <span class="tab-title">Notifications</span>
                 </div>
             </button>
-            <button mat-menu-item class="coordiantes menu-link">
+            <button mat-menu-item class="coordiantes menu-link" [routerLink]="['/coordinates']">
                 <div class="menu-div">
                     <span class="tab-title">Geographic Coordinates</span>
                 </div>

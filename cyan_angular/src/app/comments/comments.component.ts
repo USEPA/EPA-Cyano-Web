@@ -75,8 +75,8 @@ export class CommentsComponent implements OnInit {
   	*/
   	if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(ViewComment, {
-      width: '50%',
-      height: '75%',
+      panelClass: 'view-comment-dialog',
+      maxWidth: '100%',
       data: {
         comment: comment
       }
@@ -89,8 +89,8 @@ export class CommentsComponent implements OnInit {
   	*/
   	if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(AddComment, {
-      width: '50%',
-      height: '75%',
+      panelClass: 'add-comment-dialog',
+      maxWidth: '100%',
       data: {
         comments: this.comments
       }

@@ -619,6 +619,10 @@ export class LocationDetailsComponent implements OnInit {
 
   }
 
+  openCyanoDetails() {
+    console.log("openCyanoDetails() called.");
+  }
+
 }
 
 

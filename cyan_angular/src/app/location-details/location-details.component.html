@@ -8,22 +8,23 @@
         <div class="details_location_counter">{{current_location_index}} of {{locations.length}}</div>
       </div>
       <button mat-button (click)="nextLocation();" class="details_next_location">&#8250;</button>
-      <button mat-button (click)="exit();" class="details_exit">x</button>
+      <button mat-button (click)="exit();" class="details_exit">X</button>
     </div>
   </div>
   <mat-tab-group mat-stretch-tabs class="details_tab_group" #tabGroup>
 
     <!-- Overview-tab -->
     <mat-tab label="Overview" >
+
       <div class="details_tab">
 
         <!-- map-card -->
         <mat-card>
-          <mat-card-header>
-            <mat-card-title>
+          <div class="product-header">
+            <div class="product-title">
               Satellite: {{current_location.source}}
-            </mat-card-title>
-          </mat-card-header>
+            </div>
+          </div>
           <mat-card-content>
             <div class="mini_map_block">
               <div class="leaflet-container leaflet-bottom leaflet-left">
@@ -39,11 +40,11 @@
 
         <!-- details-card -->
         <mat-card>
-          <mat-card-header>
-            <mat-card-title>
+          <div class="product-header">
+            <div class="product-title">
               Product: {{ current_location.sourceFrequency }}
-            </mat-card-title>
-          </mat-card-header>
+            </div>
+          </div>
           <mat-card-content>
             <div class="location_details_center">
               <div class="left_block">
@@ -123,8 +124,6 @@
                   <img class="tab-icon" src="assets/images/details_notes.png"/>
                   <span class="tab-title">Notes ({{current_location.notes ? current_location.notes.length : '0'}})</span>
                 </div>
-                <div class="details_note_body"></div>
-                <div class="details_note_add"></div>
             </div>
 
           </mat-card-content>

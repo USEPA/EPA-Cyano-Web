@@ -1,7 +1,23 @@
-.locations-block {
-	width: 30vw;
-	height: 100%;
-	background: white;
+@media screen and (min-width: 980px) {
+	.locations-block {
+		width: 30vw;
+		height: 100%;
+		background: white;
+	}
+}
+@media screen and (max-width: 979px) and (min-width: 401px) {
+	.locations-block {
+		width: 100vw;
+		height: 100%;
+		background: white;
+	}
+}
+@media screen and (max-width: 400px) {
+	.locations-block {
+		width: 100vw;
+		height: 100%;
+		background: white;
+	}
 }
 
 .locations-title {
