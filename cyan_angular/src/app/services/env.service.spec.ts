@@ -4,9 +4,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
-import { UserService } from './user.service';
+import { EnvService } from './env.service';
 
-describe('UserService', () => {
+describe('EnvService', () => {
+
+	let service: EnvService;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
@@ -19,11 +21,19 @@ describe('UserService', () => {
 				CyanMap
 			]
 		});
+		service = TestBed.get(EnvService);
 	});
 
 	it('should be created', () => {
-		const service: UserService = TestBed.get(UserService);
 		expect(service).toBeTruthy();
+	});
+
+	it('should test setConfig - allowedRetries exceeded', () => {
+		service.retries = service.allowedRetries + 1;
+
+		let result = service.setConfig('');
+
+		expect(result).toBeUndefined();
 	});
 
 });

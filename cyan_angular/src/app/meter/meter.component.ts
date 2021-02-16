@@ -41,8 +41,6 @@ export class MeterComponent implements OnInit {
   
   ngOnChanges(changes: { [property: string]: SimpleChange }){
     let change: SimpleChange = changes['location'] ? changes['location'] : changes['cells'];
-    console.log(change);
-
     this.svg = this.setMeter(
       this.locationService.getPercentage2(this.location)
     );

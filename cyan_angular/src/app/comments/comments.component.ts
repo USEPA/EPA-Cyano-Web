@@ -38,7 +38,6 @@ export class CommentsComponent implements OnInit {
 
   private createComments(comments): Comment[] {
   	let commentObjects: Comment[] = [];
-  	console.log("comments component createComments() called.");
   	comments.forEach(comment => {
   		let c = new Comment();
   		c.id = comment.id;

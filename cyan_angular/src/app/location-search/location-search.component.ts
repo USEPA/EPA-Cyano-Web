@@ -21,6 +21,7 @@ export class LocationSearchComponent implements OnInit {
 	locationResults: LocationResult[] = [];  // list of location results
 	zoomLevel: number = 12;  // zoom level when selecting location
 	showLocationSearch: boolean = true;
+	withinUSKeyword: string = "United States";  // string to determine if result is within conus US
 
 	constructor(
 		private downloader: DownloaderService,
@@ -85,7 +86,7 @@ export class LocationSearchComponent implements OnInit {
 		Test Example: https://nominatim.openstreetmap.org/search?q=deer%20lake&format=json&country=us
 		API Docs: https://nominatim.org/release-docs/develop/api/Search/
 		*/
-		if (!locationResult.display_name.includes("United States")) {
+		if (!locationResult.display_name.includes(this.withinUSKeyword)) {
 			return false;
 		}
 		return true;

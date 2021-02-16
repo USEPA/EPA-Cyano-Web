@@ -1,0 +1,344 @@
+{
+  "1": {
+    "requestData": {
+      "metaInfo": {
+        "locationName": "Kreamer Island",
+        "locationLat": 26.774303,
+        "locationLng": -80.77698,
+        "description": "location with image file name as L20203552020361.L3m_7D_CYAN_CI_cyano_CYAN_CONUS_300m_7_5_web.png",
+        "status": "Finished",
+        "requestTimestampLong": 1611669763888,
+        "requestTimestamp": "01-26-2021 09:02:43:888 EST",
+        "queryDateLong": 1611669763888,
+        "queryDate": "01-26-2021 09:02:43:888 EST",
+        "url": {
+          "type": "application/json",
+          "href": "https://cyan.epa.gov/cyan/cyano/location/data/26.774303/-80.77698"
+        }
+      },
+      "outputs": [
+        {
+          "imageDateLong": 1608958800000,
+          "imageDate": "12-26-2020 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 55975.758,
+          "maxCellConcentration": 55975.758,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 4
+        },
+        {
+          "imageDateLong": 1603512000000,
+          "imageDate": "10-24-2020 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 46131.758,
+          "maxCellConcentration": 87096.36,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 5
+        },
+        {
+          "imageDateLong": 1597464000000,
+          "imageDate": "08-15-2020 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 118032.06,
+          "maxCellConcentration": 216770.4,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1596254400000,
+          "imageDate": "08-01-2020 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 67920.37,
+          "maxCellConcentration": 67920.37,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 4
+        },
+        {
+          "imageDateLong": 1595649600000,
+          "imageDate": "07-25-2020 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 62517.27,
+          "maxCellConcentration": 80167.805,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 3
+        },
+        {
+          "imageDateLong": 1588996800000,
+          "imageDate": "05-09-2020 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 44874.54,
+          "maxCellConcentration": 84722.74,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1582952400000,
+          "imageDate": "02-29-2020 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 15275.66,
+          "maxCellConcentration": 15275.66,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 3
+        },
+        {
+          "imageDateLong": 1581138000000,
+          "imageDate": "02-08-2020 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 124738.35,
+          "maxCellConcentration": 131825.67,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1578718800000,
+          "imageDate": "01-11-2020 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 8317.638,
+          "maxCellConcentration": 11271.975,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 3
+        },
+        {
+          "imageDateLong": 1578114000000,
+          "imageDate": "01-04-2020 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 17060.824,
+          "maxCellConcentration": 73790.42,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1576904400000,
+          "imageDate": "12-21-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 143218.78,
+          "maxCellConcentration": 143218.78,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1576299600000,
+          "imageDate": "12-14-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 346736.84,
+          "maxCellConcentration": 387257.62,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1575694800000,
+          "imageDate": "12-07-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 169044.1,
+          "maxCellConcentration": 277971.34,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1575090000000,
+          "imageDate": "11-30-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 23768.402,
+          "maxCellConcentration": 73790.42,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1567828800000,
+          "imageDate": "09-07-2019 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 356451.16,
+          "maxCellConcentration": 420726.66,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1567224000000,
+          "imageDate": "08-31-2019 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 1380384.2,
+          "maxCellConcentration": 1629296,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1565409600000,
+          "imageDate": "08-10-2019 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 128233.06,
+          "maxCellConcentration": 285759.06,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1562385600000,
+          "imageDate": "07-06-2019 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 11587.773,
+          "maxCellConcentration": 15275.66,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 2
+        },
+        {
+          "imageDateLong": 1561780800000,
+          "imageDate": "06-29-2019 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 164437.17,
+          "maxCellConcentration": 248885.73,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 3
+        },
+        {
+          "imageDateLong": 1561176000000,
+          "imageDate": "06-22-2019 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 270395.84,
+          "maxCellConcentration": 301995.2,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1550293200000,
+          "imageDate": "02-16-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 7447.3193,
+          "maxCellConcentration": 9036.495,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 2
+        },
+        {
+          "imageDateLong": 1549688400000,
+          "imageDate": "02-09-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 151356.12,
+          "maxCellConcentration": 164437.17,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1549083600000,
+          "imageDate": "02-02-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 114815.37,
+          "maxCellConcentration": 147231.25,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1548478800000,
+          "imageDate": "01-26-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 6668.0674,
+          "maxCellConcentration": 21877.615,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 4
+        },
+        {
+          "imageDateLong": 1547874000000,
+          "imageDate": "01-19-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 28840.316,
+          "maxCellConcentration": 32210.688,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        },
+        {
+          "imageDateLong": 1546664400000,
+          "imageDate": "01-05-2019 00:00:00:0 EST",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 11587.773,
+          "maxCellConcentration": 35974.934,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 5
+        },
+        {
+          "imageDateLong": 1530331200000,
+          "imageDate": "06-30-2018 00:00:00:0 EDT",
+          "satelliteImageType": "OLCI",
+          "satelliteImageFrequency": "Weekly",
+          "cellConcentration": 1458814.2,
+          "maxCellConcentration": 1923091.8,
+          "latitude": 26.774075,
+          "longitude": -80.77802,
+          "validCellsCount": 6
+        }
+      ]
+    },
+    "location": {
+      "id": 1,
+      "name": "Kreamer Island -- 1",
+      "type": 1,
+      "latitude_deg": 26,
+      "latitude_min": 46,
+      "latitude_sec": 27,
+      "latitude_dir": "N",
+      "longitude_deg": 80,
+      "longitude_min": 46,
+      "longitude_sec": 37,
+      "longitude_dir": "W",
+      "cellConcentration": 55976,
+      "maxCellConcentration": 55976,
+      "dataDate": "12-26-2020",
+      "source": "OLCI",
+      "sourceFrequency": "Weekly",
+      "validCellCount": 4,
+      "concentrationChange": 9844,
+      "changeDate": "10-24-2020",
+      "notes": [],
+      "marked": false,
+      "compare": true
+    }
+  }
+}
