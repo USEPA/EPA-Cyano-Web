@@ -20,6 +20,7 @@ export class LocationSearchComponent implements OnInit {
 	enteredLocation: string = "";  // user-entered location
 	locationResults: LocationResult[] = [];  // list of location results
 	zoomLevel: number = 12;  // zoom level when selecting location
+	showLocationSearch: boolean = true;
 	withinUSKeyword: string = "United States";  // string to determine if result is within conus US
 
 	constructor(
@@ -28,6 +29,7 @@ export class LocationSearchComponent implements OnInit {
 	) { }
 
 	ngOnInit(): void {
+		this.showLocationSearch = true;
 	}
 
 	searchLocation() {
@@ -74,6 +76,7 @@ export class LocationSearchComponent implements OnInit {
 		let latLonArray = [];
 		latLonArray.push(latLon)
 		map.flyToBounds(latLonArray);
+		this.handleComponentDisplay();
 	}
 
 	inUnitedStates(locationResult: LocationResult): boolean {
@@ -87,6 +90,19 @@ export class LocationSearchComponent implements OnInit {
 			return false;
 		}
 		return true;
+	}
+
+	handleComponentDisplay(): void {
+		/*
+		Removes location-search component when "viewLocation"
+		is selected for small screens.
+		*/
+		if (window.innerWidth <= 500) {
+			this.showLocationSearch = false;
+		}
+		else {
+			this.showLocationSearch = true;
+		}
 	}
 
 }

@@ -1,8 +1,6 @@
-<div class="location_block_0">
-	<div class="location_exit_block">
-		<button mat-button class="location_exit" [routerLink]="['']">x</button>
-	</div>
+<div *ngIf="showCoords" id="coordinates-view" class="location_block_0">
 	<div class="location_top_bar">
+		<button mat-button class="location_exit" [routerLink]="['']">X</button>
 		<h2> Enter the latitude and longitude below to find a new location </h2>
 		<br>
 		<br>

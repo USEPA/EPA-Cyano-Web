@@ -175,6 +175,10 @@ export class LocationCompareDetailsComponent implements OnInit {
     }, timeout);
   }
 
+  exit() {
+    
+  }
+
   downloadTimeSeries(l: Location) {
     let coord = this.locationService.convertToDegrees(l);
     this.locationService.downloadLocation(l);

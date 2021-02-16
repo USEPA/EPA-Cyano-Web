@@ -32,7 +32,7 @@
         width: 510px;
     }
 }
-@media screen and (max-width: 979px) and (min-width: 401px)
+@media screen and (max-width: 979px) and (min-width: 501px)
 {
     .location_block_0 {
         width: 50%;
@@ -66,7 +66,7 @@
         width: 100%;
     }
 }
-@media screen and (max-width: 400px)
+@media screen and (max-width: 500px)
 {
     .location_block_0 {
         width: 100vw;
@@ -94,6 +94,12 @@
     }
     .location_top_bar {
         width: 100%;
+    }
+    span.compare_icon {
+        display: none;
+    }
+    span#marked-icon {
+        display: none;
     }
 }
 h1{
@@ -140,6 +146,9 @@ h2{
     display: table;
     height: 50px;
 }
+.location_top_bar h2 {
+  padding: 2px;
+}
 .location_sort {
     display: flex;
     flex-direction: column;
@@ -174,7 +183,9 @@ h2{
     margin: 0 0 0 10px;
 }
 .location_exit {
-    margin-right: 10px;
+    margin: 4px 10px 0 0;
+    font-size: x-large;
+    float: right;
 }
 .location_exit:hover {
     cursor: pointer;

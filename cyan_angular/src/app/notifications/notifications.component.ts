@@ -106,7 +106,8 @@ export class NotificationsComponent implements OnInit {
   openNotification(notification, notificationCount) {
     if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(NotificationDetails, {
-      width: '50%',
+      panelClass: 'open-notification-dialog',
+      maxWidth: '100%',
       data: {
         notificationObj: notification,
         notificationCount: notificationCount,
