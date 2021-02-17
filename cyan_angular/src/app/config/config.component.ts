@@ -125,6 +125,10 @@ export class ConfigComponent implements OnInit {
     this.settingChange = true;
   }
 
+  settingChanged() {
+    this.settingChange = true;
+  }
+
   saveConfig() {
     // save settings
     let self = this;

@@ -81,7 +81,7 @@
   </div>
   <div class="cyan-level alert">
     <div class="cyan-icon veryhigh">
-      <input type="checkbox" [(ngModel)]="user_settings.enable_alert">
+      <input type="checkbox" [(ngModel)]="user_settings.enable_alert" (ngModelChange)="settingChanged()">
     </div>
     <div class="cyan-inputs">
       <div class="alert-inputs">
