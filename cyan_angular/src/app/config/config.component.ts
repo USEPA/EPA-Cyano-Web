@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Options, ChangeContext } from 'ng5-slider';
 
+// import { DialogComponent } from '../shared/dialog/dialog.component';
 import { UserService } from '../services/user.service';
 import { LocationService } from '../services/location.service';
 import {UserSettings} from "../models/settings";
@@ -49,11 +50,15 @@ export class ConfigComponent implements OnInit {
     showSelectionBarEnd: true
   };
 
+  settingChange: boolean = false;
+  isSaved: boolean = false;
+
   constructor(
     private userService: UserService,
     private locationService: LocationService,
-    private router: Router) {
-  }
+    private router: Router,
+    private saveDialog: MatDialog
+  ) { }
 
   ngOnInit() {
     this.getRanges();
@@ -81,6 +86,8 @@ export class ConfigComponent implements OnInit {
 
     // sync user input values to update slider
     this.user_settings = Object.assign({}, this.user_inputs);
+
+    this.settingChange = true;
   }
 
   validateValue(c: ChangeContext, slider: any): void {
@@ -114,6 +121,12 @@ export class ConfigComponent implements OnInit {
 
     // sync to update the input fields
     this.user_inputs = Object.assign({}, this.user_settings);
+
+    this.settingChange = true;
+  }
+
+  settingChanged() {
+    this.settingChange = true;
   }
 
   saveConfig() {
@@ -124,6 +137,7 @@ export class ConfigComponent implements OnInit {
         self.userService.currentAccount.settings = Object.assign({}, self.user_settings);
         // refresh marker colors
         this.locationService.updateMarkers();
+        this.isSaved = true;
         self.exitConfig();
       },
       error: error => {
@@ -133,6 +147,76 @@ export class ConfigComponent implements OnInit {
   }
 
   exitConfig() {
+    if (this.isSaved === false && this.settingChange === true) {
+      // Asks if user wants to save before closing:
+      this.displayMessage('Save before closing?')
+    }
     this.router.navigate(['']);
   }
+
+  displayMessage(message: string): void {
+    const dialogRef = this.saveDialog.open(SaveDialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
+    const sub = dialogRef.componentInstance.saveEmitter.subscribe((save) => {
+      if (save === true) {
+        this.saveConfig();
+      }
+      else {
+        this.router.navigate(['']);
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      sub.unsubscribe();
+    });
+  }
+
+}
+
+@Component({
+  template: `
+  <br>
+  <div class="center-wrapper">
+    <h6 class="center-item">{{dialogMessage}}</h6>
+    <br><br>
+    <button class="center-item" mat-raised-button color="primary" (click)=exit(true)>Yes</button>
+    <button class="center-item" mat-raised-button color="primary" (click)=exit(false)>No</button>
+  </div>
+  <br>
+  `,
+  styles: [`
+  .center-wrapper {
+    text-align: center;
+  }
+  .center-item {
+    display: inline-block;
+    margin: 0 8px 0 8px;
+  }
+  `]
+})
+export class SaveDialogComponent {
+  /*
+  Dialog for saving config if exited without
+  saving.
+  */
+
+  dialogMessage: string = "";
+  saveEmitter: EventEmitter<boolean> = new EventEmitter();
+
+  constructor(
+    public dialogRef: MatDialogRef<SaveDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
+
+  ngOnInit() {
+    this.dialogMessage = this.data.dialogMessage;
+  }
+
+  exit(save: boolean): void {
+    this.saveEmitter.emit(save);
+    this.dialogRef.close();
+  }
+
 }

@@ -52,7 +52,7 @@ import { EnvService } from './services/env.service';
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
-import { ConfigComponent } from './config/config.component';
+import { ConfigComponent, SaveDialogComponent } from './config/config.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details/location-details.component';
 import { AccountComponent } from './account/account.component';
 // import { ServiceWorkerModule } from '@angular/service-worker';
@@ -91,6 +91,7 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     NotificationDetails,
     MapPopupComponent,
     ConfigComponent,
+    SaveDialogComponent,
     LocationDetailsComponent,
     LocationDetailsNotes,
     AccountComponent,
