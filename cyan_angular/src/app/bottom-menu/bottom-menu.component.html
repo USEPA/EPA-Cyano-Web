@@ -1,4 +1,5 @@
 <div id="bottom-menu-bar">
+  
   <div class="bottom-menu-title-block">
     <button mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type</button>
     <mat-menu #dataType="matMenu" class="bottom-menu-link-block">
@@ -10,4 +11,10 @@
   <div class="bottom-menu-title-block">
     <button mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">Reload Data</button>
   </div>
+
+  <!-- Upload CSV / batch feature -->
+  <div class="bottom-menu-title-block">
+    <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
+  </div>
+
 </div>

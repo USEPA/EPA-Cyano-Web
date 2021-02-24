@@ -28,9 +28,12 @@ from models import (
     db,
 )
 import utils
+from celery_tasks import CeleryHandler
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+celery_handler = CeleryHandler()
 
 
 def register_user(post_data):
@@ -519,3 +522,19 @@ def add_comment_reply(post_data):
     # return {"status": "success"}, 201
     reply_json = utils.build_replies_json([reply_obj])[0]
     return reply_json, 201
+
+
+def get_batch_status(username):
+    """
+    Gets job ID from DB and returns the
+    job's status from celery worker.
+    """
+    
+
+
+def start_batch_job(request_obj):
+    """
+    Starts a user's batch request/job.
+    """
+    job_id = celery_handler.start_task(request_obj)
+    return {"status": "success", "job_id": job_id}, 201

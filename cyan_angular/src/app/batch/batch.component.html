@@ -1,0 +1,8 @@
+<button mat-button (click)="exit();" class="comments-exit">X</button>
+<div class="">
+	<p>Upload CSV for batch processing</p>
+	<!--<input type="text" placeholder="Upload CSV for batch processing" />-->
+	<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
+	<button mat-raised-button color="primary" (click)="uploader.click()">Upload</button>
+	<p id="csv-filename"></p>
+</div>

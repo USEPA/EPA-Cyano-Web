@@ -76,6 +76,7 @@ import { ViewComment, ViewImage } from './comments/view-comment.component';
 import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
+import { BatchComponent } from './batch/batch.component';
 
 @NgModule({
   declarations: [
@@ -108,7 +109,8 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     MeterComponent,
     DialogComponent,
     SessionTimeoutComponent,
-    LocationSearchComponent
+    LocationSearchComponent,
+    BatchComponent
   ],
   imports: [
     BrowserModule,
