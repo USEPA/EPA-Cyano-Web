@@ -73,8 +73,14 @@ export class LocationDetailsComponent implements OnInit {
     maintainAspectRatio: false,
     scales: {
       xAxes: [{
-        type: "time",
-        time: {parser: "MM-DD-YYYY"}
+        type: 'time',
+        time: {
+          unit: 'month',  // default: MMM YYYY
+          parser: "MM-DD-YYYY",
+          displayFormats: {
+            month: 'MM-YYYY'
+          }
+        }
       }]
     }
   };
@@ -148,8 +154,6 @@ export class LocationDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
-    console.log("LOCATION DETAILS GETTING INITED")
 
     if (!this.authService.checkUserAuthentication()) { return; }
 
