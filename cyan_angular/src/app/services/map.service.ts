@@ -76,10 +76,11 @@ export class MapService {
         iconSize: [30, 36],
         iconAnchor: [13, 41],
         iconUrl: this.getMarker(ln),
-        shadowUrl: 'leaflet/marker-shadow.png'
+        shadowUrl: 'leaflet/marker-shadow.png',
       }),
       riseOnHover: true,
-      zIndexOffset: 10000
+      zIndexOffset: 10000,
+      alt: "Map marker for " + ln.name
     });
     let self = this;
     m.on('click', function(e) {

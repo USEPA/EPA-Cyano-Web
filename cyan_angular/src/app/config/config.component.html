@@ -1,14 +1,14 @@
 <div class="config-background">
-  <div class="config-background-click" [routerLink]="['']"></div>
+  <div class="config-background-click" [routerLink]="['']" aria-label="config background"></div>
 <div class="config-block">
   <div class="top-block">
     <div class="app-version"></div>
     <div class="config-title">
       <span>Modify Marker Color Configuration</span>
-      <button mat-button class="config-control">
+      <button mat-button class="config-control" aria-label="Close">
         <mat-icon aria-label="Close" (click)="exitConfig()">close</mat-icon>
       </button>
-      <button mat-button class="config-control">
+      <button mat-button class="config-control" aria-label="Save">
         <mat-icon aria-label="Save" (click)="saveConfig()">save</mat-icon>
       </button>
     </div>
@@ -81,7 +81,7 @@
   </div>
   <div class="cyan-level alert">
     <div class="cyan-icon veryhigh">
-      <input type="checkbox" [(ngModel)]="user_settings.enable_alert" (ngModelChange)="settingChanged()">
+      <input aria-label="enable alert" type="checkbox" [(ngModel)]="user_settings.enable_alert" (ngModelChange)="settingChanged()">
     </div>
     <div class="cyan-inputs">
       <div class="alert-inputs">

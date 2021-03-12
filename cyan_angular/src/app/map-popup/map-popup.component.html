@@ -1,6 +1,6 @@
 <div class="popup-div">
   <mat-form-field>
-    <input matInput type="text" value="{{ locationData?.name }}" class="popup-name" (blur)="updateName($event)">
+    <input aria-label="Map marker popup" matInput type="text" value="{{ locationData?.name }}" class="popup-name" (blur)="updateName($event)">
   </mat-form-field>
   <div class="popup-location">
     {{locationData?.latitude_deg}}&deg;{{locationData?.latitude_min}}'{{locationData?.latitude_sec}}"{{locationData?.latitude_dir}},

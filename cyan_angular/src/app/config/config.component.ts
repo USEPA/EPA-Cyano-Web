@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Options, ChangeContext } from 'ng5-slider';
 
-// import { DialogComponent } from '../shared/dialog/dialog.component';
 import { UserService } from '../services/user.service';
 import { LocationService } from '../services/location.service';
 import {UserSettings} from "../models/settings";
@@ -28,6 +27,7 @@ export class ConfigComponent implements OnInit {
     floor: 0,
     ceil: this.LEVEL_MAX,
     step: this.SLIDER_STEP,
+    ariaLabel: "Marker color settings slider",
   };
 
   slider_options_end: Options = {
@@ -37,7 +37,8 @@ export class ConfigComponent implements OnInit {
     floor: 10000,
     ceil: this.LEVEL_MAX,
     step: this.SLIDER_STEP,
-    showSelectionBarEnd: true
+    showSelectionBarEnd: true,
+    ariaLabel: "Max marker color setting slider",
   };
 
   slider_options_alert: Options = {
@@ -47,7 +48,8 @@ export class ConfigComponent implements OnInit {
     floor: 0,
     ceil: this.ALERT_MAX,
     step: this.SLIDER_STEP,
-    showSelectionBarEnd: true
+    showSelectionBarEnd: true,
+    ariaLabel: "Alert level slider"
   };
 
   settingChange: boolean = false;
@@ -62,6 +64,10 @@ export class ConfigComponent implements OnInit {
 
   ngOnInit() {
     this.getRanges();
+  }
+
+  ngAfterViewInit() {
+    this.ngSliders508Patch();
   }
 
   getRanges(): void {
@@ -170,6 +176,20 @@ export class ConfigComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       sub.unsubscribe();
+    });
+  }
+
+  ngSliders508Patch() {
+    /*
+    ng5-slider "hack" that adds aria-label to slider <span>s for the max
+    bound. NOTE: Setting ariaLabel in slider_options objects above
+    are setting aria labels for min bound slider, but not the max, which is
+    what this function is intended to do.`
+    */
+    const selectorString: string = 'span.ng5-slider-span.ng5-slider-pointer-max[role="slider"]';
+    let levelSliders = document.querySelectorAll(selectorString);
+    levelSliders.forEach(slider => {
+      slider.setAttribute('aria-label', "testing");
     });
   }
 
