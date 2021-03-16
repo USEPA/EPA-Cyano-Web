@@ -10,7 +10,7 @@
     <ng-template #has_locations>
       <div class="location_sort">
         <mat-form-field>
-          <mat-select (selectionChange)="sortLocations();" [(ngModel)]="selected_value">
+          <mat-select aria-label="Sort locations" (selectionChange)="sortLocations();" [(ngModel)]="selected_value">
             <mat-option *ngFor="let sort of sort_selection" [value]="sort.value">{{sort.viewValue}}</mat-option>
           </mat-select>
         </mat-form-field>

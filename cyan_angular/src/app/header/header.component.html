@@ -57,7 +57,7 @@
                 </div>
             </nav>
         </div>
-    
+
     <div class="menu-block-icon">
         <button mat-button [matMenuTriggerFor]="linksLeft" class="menu-block-button">&#9776;</button>
         <mat-menu #linksLeft="matMenu" class="menu-link-block" panelClass="links-left-menu">
@@ -85,25 +85,25 @@
     <nav class="menu-block">
         <button mat-button class="my-locations menu-item" [routerLink]="['/mylocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_my_location_icon.png"/>
+                <img class="tab-icon" alt="" src="assets/images/tab_my_location_icon.png"/>
                 <span class="tab-title">My Locations</span>
             </div>
         </button>
         <button mat-button class="compare menu-item" [routerLink]="['/comparelocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_compare_icon.png"/>
+                <img class="tab-icon" alt="" src="assets/images/tab_compare_icon.png"/>
                 <span matBadge="{{compare_locations.length || ''}}" class="tab-title" matBadgeDescription="Number of locations to compare">Compare</span>
             </div>
         </button>
         <button mat-button class="notifications menu-item" [routerLink]="['/notifications']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_notifications_icon.png"/>
+                <img class="tab-icon" alt="" src="assets/images/tab_notifications_icon.png"/>
                 <span matBadge="{{new_notifications.length || ''}}" class="tab-title" matBadgeDescription="Number of new notifications">Notifications</span>
             </div>
         </button>
         <button mat-button class="coordinates menu-item" [routerLink]="['/coordinates']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_geo_coord_icon.png"/>
+                <img class="tab-icon" alt="" src="assets/images/tab_geo_coord_icon.png"/>
                 <span class="tab-title">Geographic Coordinates</span>
             </div>
         </button>
