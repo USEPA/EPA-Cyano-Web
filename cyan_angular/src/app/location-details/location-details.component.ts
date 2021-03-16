@@ -573,6 +573,7 @@ export class LocationDetailsComponent implements OnInit {
         iconUrl: this.mapService.getMarker(this.current_location),
         shadowUrl: 'leaflet/marker-shadow.png'
       }),
+      alt: "Map marker for " + this.current_location.name,
       title: this.current_location.name,
       riseOnHover: true,
       zIndexOffset: 10000

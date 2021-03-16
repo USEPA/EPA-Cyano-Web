@@ -34,7 +34,8 @@
                     <ng-template #location_down>
                       <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(location, true)]"></div>
                     </ng-template>
-                    <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
+                    <!-- <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div> -->
+                    <div class="location_cellChange">{{formatNumber(location.concentrationChange)}}</div>
                   </div>
                   <div class="location_cellDescript">cells/mL</div>
                   <div class="location_date_since">since {{location.changeDate}}</div>
@@ -53,7 +54,7 @@
         <div class="chart_source_selection"></div>
       </div>
       <div class="chart_graph" *ngIf="dataDownloaded">
-        <canvas baseChart class="cyan_chart" width="1" height="1"
+        <canvas aria-label="Location compare bloom chart" baseChart class="cyan_chart" width="1" height="1"
           [datasets]="chartData"
           [labels]="chartDataLabels"
           [options]="chartOptions"

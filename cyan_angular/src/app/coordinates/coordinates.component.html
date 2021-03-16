@@ -6,16 +6,16 @@
 		<br>
 		<div *ngIf="selectedKey == 'dms'">
 			<h1>Latitude:</h1>
-			<input type="number" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
-			<input type="number" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
-			<input type="number" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
+			<input type="number" aria-label="Latitude degree" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
+			<input type="number" aria-label="Latitude minute" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
+			<input type="number" aria-label="Latitude second" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
 			<h2>N</h2>
 			<br>
 			<br>
 			<h1> Longitude: </h1>
-			<input type="number" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
-			<input type="number" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
-			<input type="number" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
+			<input type="number" aria-label="Longitude degree" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
+			<input type="number" aria-label="Longitude minute" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
+			<input type="number" aria-label="Longitude second" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
 			<h2>W</h2>
 		</div>
 		<div *ngIf="selectedKey == 'dd'">

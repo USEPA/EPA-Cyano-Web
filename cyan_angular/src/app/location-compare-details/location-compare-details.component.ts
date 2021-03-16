@@ -243,6 +243,7 @@ export class LocationCompareDetailsComponent implements OnInit {
         shadowUrl: 'leaflet/marker-shadow.png'
       }),
       title: loc.name,
+      alt: "Map marker for " + loc.name,
       riseOnHover: true,
       zIndexOffset: 10000
     });

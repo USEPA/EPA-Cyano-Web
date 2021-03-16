@@ -37,21 +37,21 @@
     background: #0071bc;
 }
 .popup-compare-btn {
-    background: gray;
+    background: #767676;
     color: white;
 }
 .popup-compare-btn:hover {
     background: darkgray;
 }
 .popup-latest-image-btn {
-    background: gray;
+    background: #767676;
     color: white;  
 }
 .popup-latest-image-btn:hover {
     background: darkgray;
 }
 .popup-remove-btn {
-    background: gray;
+    background: #767676;
     color: white;  
 }
 .popup-remove-btn:hover {

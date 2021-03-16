@@ -21,10 +21,11 @@
 
 .location_units {
   font-size: small;
-  opacity: 0.8;
+  /*opacity: 0.8;*/
   text-align: center;
   margin-top: 35px;
   z-index: 1000;
+  color: #212529;
 }
 
 .conic-gradient {

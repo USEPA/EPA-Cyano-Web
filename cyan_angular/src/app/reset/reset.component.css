@@ -112,7 +112,7 @@
 }
 .login-message {
     font-size: smaller;
-    color: red;
+    color: #ef0000;
 }
 .login-button {
     margin-left: 25px;
@@ -150,7 +150,7 @@
 }
 .register-message {
     font-size: smaller;
-    color: red;
+    color: #ef0000;
 }
 .start-app {
     margin-top: 10px;
@@ -163,7 +163,7 @@
 }
 .dev-state {
     display: inline-block;
-    color: red;
+    color: #ef0000;
 }
 .app-description {
     font-size: smaller;
