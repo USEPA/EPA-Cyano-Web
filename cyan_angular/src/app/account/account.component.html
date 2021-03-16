@@ -1,11 +1,10 @@
 <div class="full-display">
   <div class="background-click" (click)="exitAccount()"></div>
   <div class="login-window">
-    <!-- <button mat-button *ngIf="!registerForm" class="login-exit" (click)="exitAccount()">x</button> -->
     <div class="login-information-block">
       <div class="information-text"></div>
     </div>
-    <div class="login-block">
+    <div id="account-form" class="login-block">
       <div *ngIf="!userLoggedIn; else userDetailsBlock">
         <div *ngIf="loginForm">
           <div (keyup.enter)="loginUser();">

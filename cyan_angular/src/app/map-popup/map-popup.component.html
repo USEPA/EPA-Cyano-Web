@@ -33,7 +33,8 @@
         <ng-template #location_down>
           <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(location, true)]"></div>
         </ng-template>
-        <span class="location_cellChange" [style.color]="getColor(true)">{{formatNumber(locationData?.concentrationChange)}}</span><br />
+        <!-- <span class="location_cellChange" [style.color]="getColor(true)">{{formatNumber(locationData?.concentrationChange)}}</span><br /> -->
+        <span class="location_cellChange">{{formatNumber(locationData?.concentrationChange)}}</span><br />
         <span class="location_cellDescript">cells/mL<br />since {{locationData?.changeDate}}</span><br />
       </span>
     </div>

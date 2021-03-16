@@ -61,3 +61,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     overflow: hidden !important;
     overflow-y: hidden !important;
 }
+
+/* Mat badge styling (ANDI color contrast) */
+.mat-badge-content {
+    background-color: #ef0000;
+}
+
+/*.leaflet-styling-close-button {
+    color: #767676;
+    background-color: black;
+}*/
+
+/* Move to map-popup component? */
+.customClass a.leaflet-popup-close-button {
+    color: #616161;
+    font-size: medium;
+}

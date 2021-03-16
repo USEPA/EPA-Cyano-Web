@@ -44,10 +44,10 @@
             </div>
             <nav class="config-links menu-block">
                 <div class="account config-item" (click)="displayLogout()" aria-label="Account">
-                    <img class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
+                    <img aria-label="User account" class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
                 </div>
                 <div class="settings config-item" [routerLink]="['/configs']" aria-label="Settings">
-                    <img class="header-icon" src="assets/images/header_settings.png"/>
+                    <img aria-label="User settings" class="header-icon" src="assets/images/header_settings.png"/>
                 </div>
                 <div class="comments config-item" [routerLink]="['/comments']" aria-label="Comments">
                     <mat-icon class="header-icon mat_icon">question_answer</mat-icon>
@@ -92,13 +92,13 @@
         <button mat-button class="compare menu-item" [routerLink]="['/comparelocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
                 <img class="tab-icon" src="assets/images/tab_compare_icon.png"/>
-                <span matBadge="{{compare_locations.length || ''}}" matBadgeColor="warn" class="tab-title">Compare</span>
+                <span matBadge="{{compare_locations.length || ''}}" class="tab-title" matBadgeDescription="Number of locations to compare">Compare</span>
             </div>
         </button>
         <button mat-button class="notifications menu-item" [routerLink]="['/notifications']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
                 <img class="tab-icon" src="assets/images/tab_notifications_icon.png"/>
-                <span matBadge="{{new_notifications.length || ''}}" matBadgeColor="warn" class="tab-title">Notifications</span>
+                <span matBadge="{{new_notifications.length || ''}}" class="tab-title" matBadgeDescription="Number of new notifications">Notifications</span>
             </div>
         </button>
         <button mat-button class="coordinates menu-item" [routerLink]="['/coordinates']" routerLinkActive="selected-menu-item">

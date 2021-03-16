@@ -189,7 +189,7 @@ export class ConfigComponent implements OnInit {
     const selectorString: string = 'span.ng5-slider-span.ng5-slider-pointer-max[role="slider"]';
     let levelSliders = document.querySelectorAll(selectorString);
     levelSliders.forEach(slider => {
-      slider.setAttribute('aria-label', "testing");
+      slider.setAttribute('aria-label', "slider max range");
     });
   }
 

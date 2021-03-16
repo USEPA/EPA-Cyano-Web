@@ -19,6 +19,9 @@
     float: right;
     color: white;
 }
+.config-block .mat-form-field-label {
+    color: #ef0000;
+}
 .top-block {
     border-bottom: 1px solid #205493;
     padding: 10px;
@@ -98,4 +101,8 @@
     width: 40px;
     min-width: 40px;
     padding: 0 10px;
+}
+
+.config-placeholder {
+    color: white;
 }

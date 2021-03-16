@@ -86,7 +86,9 @@ export class MapService {
     m.on('click', function(e) {
       let p = self.createPopup(ln);
       map.setView(m.getLatLng(), 12);
-      m.bindPopup(p).openPopup();
+      m.bindPopup(p, {
+        className: 'customClass'
+      }).openPopup();
       m.unbindPopup();
     });
     m.bindTooltip(ln.name);
