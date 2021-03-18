@@ -299,8 +299,10 @@ export class LocationDetailsComponent implements OnInit {
     let layerOptions = {
       opacity: this.opacityValue
     };
+
     this.selectedLayerIndex = this.selectedLayerIndex == 0 ? this.locationPNGs.length - 1 : this.selectedLayerIndex - 1;
-    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) {
+
+    if (isNaN(this.selectedLayerIndex) || this.selectedLayerIndex < 0) {
       return;
     }
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
