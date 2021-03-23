@@ -19,7 +19,7 @@ export class BatchComponent {
   uploadedFile: File;  // user input file
   acceptedType: string = 'csv';  // accepted file type for upload
   status: string = '';  // job status
-  pollStatusDelay: number = 2000;  // milliseconds
+  pollStatusDelay: number = 5000;  // milliseconds
   intervalProcess: ReturnType<typeof setInterval>;  // keeps track of status polling
   batchStatus: BatchStatus = new BatchStatus();
   currentInputFilename: string = '';
