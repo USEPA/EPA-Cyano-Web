@@ -4,8 +4,6 @@ from sqlalchemy.sql import expression
 from sqlalchemy.dialects.mysql import MEDIUMTEXT, LONGTEXT
 from flask_migrate import Migrate
 
-# from extensions import db
-
 
 db = SQLAlchemy()
 migrate = Migrate()

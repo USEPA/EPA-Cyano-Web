@@ -20,6 +20,10 @@ from cyan_flask.build_db import DBHandler
 from cyan_flask.crypt import CryptManager
 
 
+# db_handler = DBHandler()
+
+
+
 crypt_manager = CryptManager()
 
 
@@ -35,19 +39,24 @@ def handle_password(enc_pass):
 		raise Exception("No SK environment variable set.")
 	return crypt_manager.decrypt_message(key_path, enc_pass)
 
+
+dec_root_pass = handle_password(os.getenv('DB_ROOT_PASS'))
+db_handler = DBHandler(os.getenv("DB_NAME"), dec_root_pass)
+
+
 def as_root(db_func, **db_func_kwargs):
 	"""
 	Executes a function, 'db_func', as root user. Used for
 	executing flask db commands as root user (e.g., as_root(flask_migrate.migrate, message="a message")).
 	"""
 	# Database crendentials:
-	db_host = os.environ.get("DB_HOST")
-	db_port = os.environ.get("DB_PORT")
-	db_user = os.environ.get("DB_USER")
-	db_pass = handle_password(os.environ.get('DB_PASS'))
-	db_name = os.environ.get("DB_NAME")
-	# db_root_pass = handle_password(os.environ.get('MYSQL_ROOT_PASSWORD'))
-	db_root_pass = handle_password(os.environ.get('DB_ROOT_PASS'))
+	db_host = os.getenv("DB_HOST")
+	db_port = os.getenv("DB_PORT")
+	db_user = os.getenv("DB_USER")
+	db_pass = handle_password(os.getenv('DB_PASS'))
+	db_name = os.getenv("DB_NAME")
+	# db_root_pass = handle_password(os.getenv('MYSQL_ROOT_PASSWORD'))
+	db_root_pass = handle_password(os.getenv('DB_ROOT_PASS'))
 
 	# MySQL URLs:
 	mysql_url = "mysql://{}:{}@{}/{}".format(db_user, db_pass, db_host, db_name)
@@ -79,7 +88,7 @@ def db_create():
 	See cyan_flask/app/models.py for model schema.
 	"""
 	print("~~~ Running manage.py db-create..")
-	print("Creating database: {}.".format(db_name))
+	# print("Creating database: {}.".format(db_name))
 	as_root(
 		db_handler.create_database
 	)  # creates database using DB_NAME, doesn't create tables.
@@ -145,9 +154,6 @@ def db_upgrade(migrations_path="migrations"):
 	"""
 	print("~~~ Running flask db upgrade.")
 
-	dec_root_pass = handle_password(os.environ.get('DB_ROOT_PASS'))
-	db_handler = DBHandler(os.environ.get("DB_NAME"), dec_root_pass)
-
 	try:
 		as_root(flask_migrate.upgrade, directory=migrations_path)
 	except exc.OperationalError as e:
@@ -186,9 +192,6 @@ def create_db_user(user, host, root_pass, new_pass):
 	# Or is calling these cli function recursively causing the input problems?
 	print("~~~ Running flask user-create.")
 
-	dec_root_pass = handle_password(root_pass)
-	db_handler = DBHandler(os.environ.get("DB_NAME"), dec_root_pass)
-
 	while retry_db_command():
 		try:
 			db_handler.create_user(user, handle_password(new_pass), host)  # TODO: Test with DB_HOST instead of '%'
@@ -212,9 +215,6 @@ def update_user_password(user, host, root_pass, new_pass):
 		+ migrations_path - path for flask-migrate migrations folder
 	"""
 	print("\n~~~ Running flask user-update.")
-
-	dec_root_pass = handle_password(root_pass)
-	db_handler = DBHandler(os.environ.get("DB_NAME"), dec_root_pass)
 
 	while retry_db_command():
 		try:

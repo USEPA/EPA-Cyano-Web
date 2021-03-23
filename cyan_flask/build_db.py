@@ -44,6 +44,7 @@ class DBHandler(object):
             print("query: {}".format(query))
         conn.commit()
         conn.close()
+        return c
 
     def delete_table(self, table_name):
         query = """
