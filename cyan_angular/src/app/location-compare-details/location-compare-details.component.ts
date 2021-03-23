@@ -62,8 +62,14 @@ export class LocationCompareDetailsComponent implements OnInit {
     maintainAspectRatio: false,
     scales: {
       xAxes: [{
-        type: "time",
-        time: {parser: "MM-DD-YYYY"}
+        type: 'time',
+        time: {
+          unit: 'month',  // default: MMM YYYY
+          parser: "MM-DD-YYYY",
+          displayFormats: {
+            month: 'MM-YYYY'
+          }
+        }
       }]
     }
   };
@@ -237,6 +243,7 @@ export class LocationCompareDetailsComponent implements OnInit {
         shadowUrl: 'leaflet/marker-shadow.png'
       }),
       title: loc.name,
+      alt: "Map marker for " + loc.name,
       riseOnHover: true,
       zIndexOffset: 10000
     });

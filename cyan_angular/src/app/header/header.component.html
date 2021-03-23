@@ -3,7 +3,7 @@
 
         <div class="logo-block">
             <div class="logo-block-inner">
-                <a href="https://www.epa.gov" class="header-logo-link header-logo"></a>
+                <a href="https://www.epa.gov" class="header-logo-link header-logo" aria-label="EPA homepage link"></a>
                 <div class="header-title-abr">{{ titleAbr }}
                   <span class="header-version">v{{ appVersion }}</span>
                 </div>
@@ -16,48 +16,48 @@
 
     <div id="search-config">
             <div class="menu-block-icon">
-                <button mat-button [matMenuTriggerFor]="linksRight" class="menu-right-block-button">
+                <button aria-label="User options" mat-button [matMenuTriggerFor]="linksRight" class="menu-right-block-button">
                     <mat-icon class="header-icon mat_icon">more_vert</mat-icon>
                 </button>
                 <mat-menu #linksRight="matMenu" class="menu-link-block" panelClass="links-right-menu">
                     <button mat-menu-item class="account menu-link" (click)="displayLogout()">
-                        <div class="menu-div">
+                        <div class="menu-div" aria-label="Account">
                             <span class="tab-title">Account</span>
                         </div>
                     </button>
                     <button mat-menu-item class="configs menu-link" [routerLink]="['/configs']">
-                        <div class="menu-div">
+                        <div class="menu-div" aria-label="Settings">
                             <span class="tab-title">Config</span>
                          </div>
                     </button>
                     <button mat-menu-item class="comments menu-link" [routerLink]="['/comments']">
-                        <div class="menu-div">
+                        <div class="menu-div" aria-label="Comments">
                             <span class="tab-title">Comments</span>
                         </div>
                     </button>
                     <button mat-menu-item class="location-search menu-link" [routerLink]="['/search']">
-                        <div class="menu-div">
+                        <div class="menu-div" aria-label="Location Search">
                             <span class="tab-title">Search</span>
                         </div>
                     </button>
                 </mat-menu>
             </div>
             <nav class="config-links menu-block">
-                <div class="account config-item" (click)="displayLogout()">
-                    <img class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
+                <div class="account config-item" (click)="displayLogout()" aria-label="Account">
+                    <img aria-label="User account" class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
                 </div>
-                <div class="settings config-item" [routerLink]="['/configs']">
-                    <img class="header-icon" src="assets/images/header_settings.png"/>
+                <div class="settings config-item" [routerLink]="['/configs']" aria-label="Settings">
+                    <img aria-label="User settings" class="header-icon" src="assets/images/header_settings.png"/>
                 </div>
-                <div class="comments config-item" [routerLink]="['/comments']">
+                <div class="comments config-item" [routerLink]="['/comments']" aria-label="Comments">
                     <mat-icon class="header-icon mat_icon">question_answer</mat-icon>
                 </div>
-                <div class="location-search config-item" [routerLink]="['/search']">
+                <div class="location-search config-item" [routerLink]="['/search']" aria-label="Location Search">
                     <mat-icon class="header-icon mat_icon">search</mat-icon>
                 </div>
             </nav>
         </div>
-    
+
     <div class="menu-block-icon">
         <button mat-button [matMenuTriggerFor]="linksLeft" class="menu-block-button">&#9776;</button>
         <mat-menu #linksLeft="matMenu" class="menu-link-block" panelClass="links-left-menu">
@@ -85,25 +85,25 @@
     <nav class="menu-block">
         <button mat-button class="my-locations menu-item" [routerLink]="['/mylocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_my_location_icon.png"/>
+                <img class="tab-icon" alt="" src="assets/images/tab_my_location_icon.png"/>
                 <span class="tab-title">My Locations</span>
             </div>
         </button>
         <button mat-button class="compare menu-item" [routerLink]="['/comparelocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_compare_icon.png"/>
-                <span matBadge="{{compare_locations.length || ''}}" matBadgeColor="warn" class="tab-title">Compare</span>
+                <img class="tab-icon" alt="" src="assets/images/tab_compare_icon.png"/>
+                <span matBadge="{{compare_locations.length || ''}}" class="tab-title" matBadgeDescription="Number of locations to compare">Compare</span>
             </div>
         </button>
         <button mat-button class="notifications menu-item" [routerLink]="['/notifications']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_notifications_icon.png"/>
-                <span matBadge="{{new_notifications.length || ''}}" matBadgeColor="warn" class="tab-title">Notifications</span>
+                <img class="tab-icon" alt="" src="assets/images/tab_notifications_icon.png"/>
+                <span matBadge="{{new_notifications.length || ''}}" class="tab-title" matBadgeDescription="Number of new notifications">Notifications</span>
             </div>
         </button>
         <button mat-button class="coordinates menu-item" [routerLink]="['/coordinates']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" src="assets/images/tab_geo_coord_icon.png"/>
+                <img class="tab-icon" alt="" src="assets/images/tab_geo_coord_icon.png"/>
                 <span class="tab-title">Geographic Coordinates</span>
             </div>
         </button>

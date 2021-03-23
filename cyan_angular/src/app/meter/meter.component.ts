@@ -115,7 +115,8 @@ export class MeterComponent implements OnInit {
 
   setConcentration(concentration, color): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(
-      `<div style="color: ${color};">${concentration}</div>`
+      // `<div style="color: ${color};">${concentration}</div>`
+      `<div>${this.formatNumber(concentration)}</div>`
     );
   }
 
