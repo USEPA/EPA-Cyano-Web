@@ -13,8 +13,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class DBHandler(object):
     """
-	Database and table SQL commands with mysql.connector.
-	"""
+    Database and table SQL commands with mysql.connector.
+    """
 
     def __init__(self, db_name, root_pass):
         self.db_name = db_name
@@ -131,8 +131,8 @@ class DBHandler(object):
 
     def create_user(self, user, password, host="localhost"):
         """
-		Creates a user for flask backend.
-		"""
+        Creates a user for flask backend.
+        """
         query = "CREATE USER IF NOT EXISTS '{}'@'{}' IDENTIFIED BY '{}';".format(
             user, host, password
         )
@@ -146,8 +146,8 @@ class DBHandler(object):
 
     def add_privilege(self, user, host="localhost"):
         """
-		Adds user privilege.
-		"""
+        Adds user privilege.
+        """
         query = "GRANT SELECT, INSERT, DELETE, UPDATE ON {}.* TO '{}'@'{}';".format(
             self.db_name, user, host
         )

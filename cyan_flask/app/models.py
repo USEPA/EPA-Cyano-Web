@@ -91,23 +91,19 @@ class Reply(db.Model):
 class Job(db.Model):
     __tablename__ = "job"
     id = db.Column(db.Integer, nullable=False, primary_key=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     job_id = db.Column(db.String(256), nullable=False)  # batch job ID
     job_status = db.Column(db.String(32), nullable=False)  # batch job status
     input_file = db.Column(db.String(128), nullable=False)  # user input filename
     output_file = db.Column(db.String(128), nullable=False)  # user output filename
     num_locations = db.Column(db.Integer, nullable=False)  # of locations in job
-    received_datetime = db.Column(db.DateTime, nullable=False)  # init time job was received
+    received_datetime = db.Column(
+        db.DateTime, nullable=False
+    )  # init time job was received
     started_datetime = db.Column(db.DateTime, nullable=True)  # time job is started
     finished_datetime = db.Column(db.DateTime, nullable=True)  # time job is complete
     queue_time = db.Column(db.Integer, nullable=True)  # time spent waiting in queue
     exec_time = db.Column(db.Integer, nullable=True)  # execution time
 
 
-job_response = {
-    "status": None,
-    "job_id": None,
-    "job_status": None
-}
+job_response = {"status": None, "job_id": None, "job_status": None}

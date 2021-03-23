@@ -32,9 +32,9 @@ def get_auth_headers():
 
 class StatusTest(Resource):
     """
-	Flask test endpoint.
-	URL: /test
-	"""
+    Flask test endpoint.
+    URL: /test
+    """
 
     def get(self):
         return {"status": "cyan flask up and running."}
@@ -42,9 +42,9 @@ class StatusTest(Resource):
 
 class Register(Resource):
     """
-	Endpoint for user registration.
-	URL: /app/api/user/register
-	"""
+    Endpoint for user registration.
+    URL: /app/api/user/register
+    """
 
     parser = parser_base.copy()
     parser.add_argument("user", type=str)
@@ -63,9 +63,9 @@ class Register(Resource):
 
 class Login(Resource):
     """
-	Endpoint for logging user in.
-	URL: /app/api/user
-	"""
+    Endpoint for logging user in.
+    URL: /app/api/user
+    """
 
     parser = parser_base.copy()
     parser.add_argument("user", type=str)
@@ -87,9 +87,9 @@ class Login(Resource):
 
 class AddLocation(Resource):
     """
-	Endpoint for adding user location.
-	URL: /app/api/location/add
-	"""
+    Endpoint for adding user location.
+    URL: /app/api/location/add
+    """
 
     def get(self):
         return {"status": "location endpoint"}
@@ -106,9 +106,9 @@ class AddLocation(Resource):
 
 class EditLocation(Resource):
     """
-	Endpoint for editing user location.
-	URL: /app/api/location/edit
-	"""
+    Endpoint for editing user location.
+    URL: /app/api/location/edit
+    """
 
     def get(self):
         return {"status": "edit location endpoint"}
@@ -124,9 +124,9 @@ class EditLocation(Resource):
 
 class DeleteLocation(Resource):
     """
-	Endpoint for deleting user location.
-	URL: /app/api/location/delete/<string:_id>
-	"""
+    Endpoint for deleting user location.
+    URL: /app/api/location/delete/<string:_id>
+    """
 
     @login_required
     def get(self, _id="", type=""):
@@ -138,8 +138,8 @@ class DeleteLocation(Resource):
 
 class GetUserLocations(Resource):
     """
-	Endpoint for get all user locations.
-	"""
+    Endpoint for get all user locations.
+    """
 
     @login_required
     def get(self, type=""):
@@ -152,8 +152,8 @@ class GetUserLocations(Resource):
 
 class GetLocation(Resource):
     """
-	Endoint for getting a user location by user and location id.
-	"""
+    Endoint for getting a user location by user and location id.
+    """
 
     @login_required
     def get(self, _id="", type=""):
@@ -166,8 +166,8 @@ class GetLocation(Resource):
 
 class EditNotification(Resource):
     """
-	Endpoint for setting is_new false after read.
-	"""
+    Endpoint for setting is_new false after read.
+    """
 
     @login_required
     def get(self, _id=""):
@@ -179,8 +179,8 @@ class EditNotification(Resource):
 
 class DeleteNotification(Resource):
     """
-	Endpoint for "Clear" notifications.
-	"""
+    Endpoint for "Clear" notifications.
+    """
 
     @login_required
     def get(self):
@@ -192,9 +192,9 @@ class DeleteNotification(Resource):
 
 class EditSettings(Resource):
     """
-	Endpoint for editing user settings.
-	URL: /app/api/settings/edit
-	"""
+    Endpoint for editing user settings.
+    URL: /app/api/settings/edit
+    """
 
     def get(self):
         return {"status": "edit settings endpoint"}
@@ -210,11 +210,11 @@ class EditSettings(Resource):
 
 class Refresh(Resource):
     """
-	Endpoint for getting new token.
-	Example usage: map panning uses this to get a
-	new token, middleware.py ensures user is valid
-	before providing a new token.
-	"""
+    Endpoint for getting new token.
+    Example usage: map panning uses this to get a
+    new token, middleware.py ensures user is valid
+    before providing a new token.
+    """
 
     @login_required
     def get(self):
@@ -226,14 +226,14 @@ class Refresh(Resource):
 
 class Reset(Resource):
     """
-	Reset password endpoint. Sends reset link to user's
-	email with token in URL.
-	"""
+    Reset password endpoint. Sends reset link to user's
+    email with token in URL.
+    """
 
     def post(self):
         """
-		Reset password request.
-		"""
+        Reset password request.
+        """
         parser = parser_base.copy()
         parser.add_argument("email", type=str)
         args = request.get_json()
@@ -244,9 +244,9 @@ class Reset(Resource):
     @login_required
     def put(self):
         """
-		Reset password form handler (after user has verified email).
-		Updates user's password.
-		"""
+        Reset password form handler (after user has verified email).
+        Updates user's password.
+        """
         parser = parser_base.copy()
         parser.add_argument("newPassword", type=str)
         args = request.get_json()
@@ -261,15 +261,15 @@ class Reset(Resource):
 
 class Comment(Resource):
     """
-	GET - Retrieves all user comments.
-	POST - Adds a user's comment.
-	"""
+    GET - Retrieves all user comments.
+    POST - Adds a user's comment.
+    """
 
     @login_required
     def get(self):
         """
-		Get all user comments.
-		"""
+        Get all user comments.
+        """
         # user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
         results, status_code = web_app_api.get_comments()
@@ -279,8 +279,8 @@ class Comment(Resource):
     @login_required
     def post(self):
         """
-		Adds a user comment.
-		"""
+        Adds a user comment.
+        """
         args = request.get_json()
         headers = get_auth_headers()
         args["username"] = JwtHandler().get_user_from_token(
@@ -293,19 +293,18 @@ class Comment(Resource):
 
 class Reply(Resource):
     """
-	Endpoints for user comment replies.
-	"""
+    Endpoints for user comment replies.
+    """
 
     def get(self):
-        """
-		"""
+        """"""
         return {"status": "reply endpoint"}
 
     @login_required
     def post(self):
         """
-		Adds replay to a user's comment.
-		"""
+        Adds replay to a user's comment.
+        """
         args = request.get_json()
         args["username"] = JwtHandler().get_user_from_token(
             request
@@ -317,8 +316,7 @@ class Reply(Resource):
 
 
 class BatchStatus(Resource):
-    """
-    """
+    """"""
 
     @login_required
     def post(self):

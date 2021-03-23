@@ -27,9 +27,9 @@ runtime_env.load_deployment_environment()
 
 class TestAuth(unittest.TestCase):
     """
-	Unit test class for web_app_api.py module, which is the Flask app
-	that defines the API endpoints.
-	"""
+    Unit test class for web_app_api.py module, which is the Flask app
+    that defines the API endpoints.
+    """
 
     print(
         "cyan_flask utils.py unittests conducted at " + str(datetime.datetime.today())
@@ -37,22 +37,22 @@ class TestAuth(unittest.TestCase):
 
     def setUp(self):
         """
-		Setup routine called before each unit tests.
-		:return:
-		"""
+        Setup routine called before each unit tests.
+        :return:
+        """
         pass
 
     def tearDown(self):
         """
-		teardown called after each test
-		:return:
-		"""
+        teardown called after each test
+        :return:
+        """
         pass
 
     def test_convert_to_timestamp(self):
         """
-		convert_to_timestamp
-		"""
+        convert_to_timestamp
+        """
         unix_time = 1446772133000  # example timestamp from notifications endpoint
 
         expected_result = "2015-11-06 01:08:53"
@@ -62,8 +62,8 @@ class TestAuth(unittest.TestCase):
 
     def test_convert_to_unix(self):
         """
-		convert_to_unix
-		"""
+        convert_to_unix
+        """
         unix_time = 1446772133
         timestamp = "2015-11-06 01:08:53"
 
@@ -75,8 +75,8 @@ class TestAuth(unittest.TestCase):
     # @patch('cyan_flask.app.utils.requests.get')
     def test_make_notifications_request(self):
         """
-		make_notifications_request
-		"""
+        make_notifications_request
+        """
         latest_time = time.time()
         notifications_response = """
 		[
@@ -106,8 +106,8 @@ class TestAuth(unittest.TestCase):
         self, build_replies_json_mock, build_comment_images_mock
     ):
         """
-		build_comments_json
-		"""
+        build_comments_json
+        """
         comment_json = {
             "id": None,
             "title": "test title",
@@ -141,8 +141,8 @@ class TestAuth(unittest.TestCase):
 
     def test_build_replies_json(self):
         """
-		build_replies_json
-		"""
+        build_replies_json
+        """
         reply = Reply(
             id=1,
             comment_id=1,
@@ -167,8 +167,8 @@ class TestAuth(unittest.TestCase):
 
     def test_get_datetime_string(self):
         """
-		get_datetime_string
-		"""
+        get_datetime_string
+        """
         datetime_obj = datetime.datetime.now()
         datetime_str = str(datetime_obj)
 
@@ -179,8 +179,8 @@ class TestAuth(unittest.TestCase):
 
     def test_get_image_source_1(self):
         """
-		get_image_source
-		"""
+        get_image_source
+        """
         image_path = "/file/not/found.jpg"
         expected_result = {"error": "cannot find image"}
         actual_result = utils.get_image_source(image_path)
@@ -188,8 +188,8 @@ class TestAuth(unittest.TestCase):
 
     def test_get_image_source_2(self):
         """
-		get_image_source
-		"""
+        get_image_source
+        """
         image_path = Path(__file__).parent / "mock_data" / "test_image_source_new.jpg"
         actual_result = utils.get_image_source(image_path)
         self.assertIsInstance(actual_result, str)
@@ -200,8 +200,8 @@ class TestAuth(unittest.TestCase):
         self, _generate_image_filename_mock, _build_image_file_path_mock
     ):
         """
-		save_image_source
-		"""
+        save_image_source
+        """
         username = "test"
         image_source = "imagebase64source"
         image_name = "test_image_source_new.jpg"
@@ -220,8 +220,8 @@ class TestAuth(unittest.TestCase):
         self, _generate_image_filename_mock, _build_image_file_path_mock
     ):
         """
-		save_image_source
-		"""
+        save_image_source
+        """
         username = "test"
         image_source = "imagebase64source"
         image_name = "test_image_source_new.jpg"

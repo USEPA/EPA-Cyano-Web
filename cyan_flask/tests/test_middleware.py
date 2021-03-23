@@ -31,9 +31,9 @@ app.testing = True
 
 class TestAuth(unittest.TestCase):
     """
-	Unit test class for web_app_api.py module, which is the Flask app
-	that defines the API endpoints.
-	"""
+    Unit test class for web_app_api.py module, which is the Flask app
+    that defines the API endpoints.
+    """
 
     print(
         "cyan_flask middleware.py unittests conducted at "
@@ -42,16 +42,16 @@ class TestAuth(unittest.TestCase):
 
     def setUp(self):
         """
-		Setup routine called before each unit tests.
-		:return:
-		"""
+        Setup routine called before each unit tests.
+        :return:
+        """
         pass
 
     def tearDown(self):
         """
-		teardown called after each test
-		:return:
-		"""
+        teardown called after each test
+        :return:
+        """
         pass
 
     def create_test_token(self, user):
@@ -61,8 +61,8 @@ class TestAuth(unittest.TestCase):
 
     def test__check_for_refresh(self):
         """
-		Test _check_for_refresh.
-		"""
+        Test _check_for_refresh.
+        """
         user = "test"
         token, token_obj = self.create_test_token(user)
         expected_result = token.encode()  # str -> bytes
