@@ -4,6 +4,8 @@ from sqlalchemy.sql import expression
 from sqlalchemy.dialects.mysql import MEDIUMTEXT, LONGTEXT
 from flask_migrate import Migrate
 
+# from extensions import db
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -17,8 +19,6 @@ class User(db.Model):
     password = db.Column(db.String(256), nullable=False)
     created = db.Column(db.DateTime, nullable=False)
     last_visit = db.Column(db.DateTime, nullable=False)
-    # job = db.Column(db.String(256), nullable=False)  # batch job ID
-    # job_status = db.Column(db.String(32), nullable=False)  # batch job status
 
 
 class Location(db.Model):
@@ -89,29 +89,27 @@ class Reply(db.Model):
     username = db.Column(db.String(32), nullable=False)
     body = db.Column(db.String(500), nullable=False)
 
+
 class Job(db.Model):
     __tablename__ = "job"
     id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=False
+    )
     job_id = db.Column(db.String(256), nullable=False)  # batch job ID
     job_status = db.Column(db.String(32), nullable=False)  # batch job status
-    # job_request = 
-    # job_locations = db.relationship("JobLocation", backref="job", lazy=True)
-
-# class JobLocation(db.Model):
-#     __tablename__ = "job_location"
-#     id = db.Column(db.Integer, nullable=False, primary_key=True)
-#     type = db.Column(
-#         db.SmallInteger,
-#         nullable=False,
-#         server_default=expression.true(),
-#         primary_key=True,
-#     )
-#     latitude = db.Column(db.Numeric(12, 10), nullable=False)
-#     longitude = db.Column(db.Numeric(13, 10), nullable=False)
-
-# class JobRequest(db.Model):
-#     __tablename__ = "job_request"
-#     id = db.Column(db.Integer, nullable=False, primary_key=True)
-#     # locations =   # list of locations requested by user (map to location table?)
+    input_file = db.Column(db.String(128), nullable=False)  # user input filename
+    output_file = db.Column(db.String(128), nullable=False)  # user output filename
+    num_locations = db.Column(db.Integer, nullable=False)  # of locations in job
+    received_datetime = db.Column(db.DateTime, nullable=False)  # init time job was received
+    started_datetime = db.Column(db.DateTime, nullable=True)  # time job is started
+    finished_datetime = db.Column(db.DateTime, nullable=True)  # time job is complete
+    queue_time = db.Column(db.Integer, nullable=True)  # time spent waiting in queue
+    exec_time = db.Column(db.Integer, nullable=True)  # execution time
 
 
+job_response = {
+    "status": None,
+    "job_id": None,
+    "job_status": None
+}
