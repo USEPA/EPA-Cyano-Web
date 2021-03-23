@@ -7,6 +7,41 @@ import os
 from pathlib import Path
 import calendar
 
+# Local imports:
+from cyan_flask.crypt import CryptManager
+crypt_manager = CryptManager()
+
+
+
+def set_db_url():
+    """
+    Sets DB URL with crypt manager.
+    """
+    key_path = crypt_manager.get_key()
+    if key_path and os.getenv("DB_PASS"):
+        return "mysql://{}:{}@{}/{}".format(
+            os.getenv("DB_USER"),
+            crypt_manager.decrypt_message(key_path, os.getenv("DB_PASS")),
+            os.getenv("DB_HOST"),
+            os.getenv("DB_NAME")
+        )
+    elif not key_path and os.getenv("DB_PASS"):
+        logging.warning(
+            "No key provided for decrypting secrets. \
+            Setting MySQL URL without assuming no encryption."
+        )
+        return "mysql://{}:{}@{}/{}".format(
+            os.getenv("DB_USER"),
+            os.getenv("DB_PASS"),
+            os.getenv("DB_HOST"),
+            os.getenv("DB_NAME")
+        )
+    else:
+        error = "\nNo DB_PASS env var provided for DB user.\
+                \nSet DB_PASS in the environment.\n"
+        logging.error(error)
+        raise Exception(error)
+
 
 def convert_to_timestamp(unix_time):
     """
@@ -30,27 +65,10 @@ def make_notifications_request(latest_time):
 	Gets all notifications from epa cyano endpoint.
 	"""
     formatted_time = datetime.datetime.fromtimestamp(latest_time).strftime("%Y-%m-%d")
-
-    notification_url = os.environ.get("TOMCAT_API", "https://cyan.epa.gov") + "/cyan/cyano/notifications/"
+    url = os.environ.get("TOMCAT_API", "https://cyan.epa.gov") + "/cyan/cyano/notifications/"
     start_date = "{}T00-00-00-000-0000".format(formatted_time)
-
-    logging.info("Notifications request: {}".format(notification_url + start_date))
-
-    try:
-        notification_response = requests.get(notification_url + start_date)
-        return json.loads(notification_response.content)
-    except requests.exceptions.Timeout:
-        logging.warning("Request to {} timed out.".format(notification_url))
-        # TODO: Retry request.
-        return None
-    except requests.exceptions.RequestException as e:
-        logging.warning("Error making request to {}.\n{}".format(notification_url, e))
-        # TODO: Handle error.
-        return None
-    except Exception as e:
-        logging.warning("Unknown exception occurred: {}".format(e))
-        # TODO: Handle error.
-        return None
+    response = _make_request(url + start_date)
+    return response
 
 
 def build_comments_json(comments, images_sources=None):
@@ -173,3 +191,24 @@ def _build_image_file_path(filename):
 	"""
     cyan_flask_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(cyan_flask_dir, "user_images", filename)
+
+
+def _make_request(url, data=None):
+    try:
+        if data:
+            response = requests.post(url, data=data)
+        else:
+            response = requests.get(url)
+        return json.loads(response.content)
+    except requests.exceptions.Timeout:
+        logging.warning("Request to {} timed out.".format(url))
+        # TODO: Retry request.
+        return None
+    except requests.exceptions.RequestException as e:
+        logging.warning("Error making request to {}.\n{}".format(url, e))
+        # TODO: Handle error.
+        return None
+    except Exception as e:
+        logging.warning("Unknown exception occurred: {}".format(e))
+        # TODO: Handle error.
+        return None
