@@ -2,20 +2,29 @@
 Celery instance and worker functions for
 processing CSV data requests.
 """
-
 import os
 import sys
 import logging
 import time
+import requests
+import json
 from celery import Celery
+# import mysql.connector
+import datetime
+from sqlalchemy import and_
+import uuid
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-sys.path.insert(1, PROJECT_ROOT)
-sys.path.insert(1, os.path.join(PROJECT_ROOT, "..", ".."))
-
-# local imports:
-from models import Job, User, Location
+# Local imports:
+from csv_handler import CSVHandler
+from auth import PasswordHandler
+from models import (
+	User,
+	Job,
+	db
+)
 from config.set_environment import DeployEnv
+from cyan_flask.build_db import DBHandler
+from cyan_flask.crypt import CryptManager
 
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
@@ -23,106 +32,153 @@ runtime_env.load_deployment_environment()
 redis_hostname = os.environ.get('REDIS_HOSTNAME', 'localhost')
 redis_port = os.environ.get('REDIS_PORT', 6379)
 
-logging.warning("REDIS_HOSTNAME: {}".format(redis_hostname))
-logging.warning("REDIS_PORT: {}".format(redis_port))
+logging.info("REDIS_HOSTNAME: {}".format(redis_hostname))
+logging.info("REDIS_PORT: {}".format(redis_port))
 
-celery_instance = Celery('tasks',
-				broker='redis://{}:{}/0'.format(redis_hostname, redis_port),	
-				backend='redis://{}:{}/0'.format(redis_hostname, redis_port))
+celery_instance = Celery(
+	'tasks',
+	broker='redis://{}:{}/0'.format(redis_hostname, redis_port),
+	backend='redis://{}:{}/0'.format(redis_hostname, redis_port)
+)
 
 celery_instance.conf.update(
+	CELERY_BROKER_URL='redis://{}:{}/0'.format(redis_hostname, redis_port),
+	CELERY_RESULT_BACKEND='redis://{}:{}/0'.format(redis_hostname, redis_port),
 	CELERY_ACCEPT_CONTENT=['json'],
 	CELERY_TASK_SERIALIZER='json',
 	CELERY_RESULT_SERIALIZER='json',
-    CELERY_IGNORE_RESULT=False,  # LOOK INTO THESE SETTINGS
-    CELERY_TRACK_STARTED=True,  # LOOK INTO THESE SETTINGS
-    CELERYD_MAX_MEMORY_PER_CHILD=50000000,  # LOOK INTO THESE SETTINGS
+	CELERY_IGNORE_RESULT=False,
+	CELERY_TRACK_STARTED=True,
+	CELERYD_MAX_MEMORY_PER_CHILD=50000000
 )
+
+crypt_manager = CryptManager()
+csv_handler = CSVHandler()
+email_handler = PasswordHandler()
+
 
 
 @celery_instance.task(bind=True)
 def run_batch_job(self, request_obj):
 	"""
 	Celery task that initiates processing of user batch request.
-
-	NOTE 1: As data is returned, the user's location table can get populated
-	with the results. There then needs to be a way to map the locations from that
-	table to the job ID for sending results from job request back to user as a CSV.
+	
+	TODO: More exception handling
 	"""
+	celery_handler = CeleryHandler()
+	username = request_obj["username"]
+	locations = request_obj["locations"]
+	filename = request_obj["filename"]
+	job_id = request_obj["job_id"]
 
-	# 1. Create initial locations in location table (should it be separate table? 
-	# will it collide with batch/background vs ui location requests? should the location
-	# table be checked if location exists there before calling NCC?)
+	user_job = celery_handler.get_job_from_db(username, job_id)
 
-	# 2. Start calling cyano backend (currently on NCC) for data.
+	logging.info("User job: {}".format(user_job))
 
-	# 3. Store cyano results by updating locations in location table.
+	received_datetime = user_job.received_datetime
+	started_datetime = datetime.datetime.utcnow()
 
-	# 4. When results are all complete, send email to user that job is complete (note that if
-	# frontend is up on user-end, a polling request could keep updating user of job status)
+	user_job.started_datetime = started_datetime  # sets job start time in db
+	user_job.job_status = "STARTED"  # sets job status in db
+	db.session.commit()
 
-	# 5. 
+	# Makes requests for location data:
+	location_responses = []
+	for location in locations:
+		time.sleep(0.1)  # little delay b/w calls
+		response = celery_handler.make_cyano_request(location)
+		location_responses.append(response)
 
-	logging.warning("Celery request ID: {}".format(self.request.id))
-	logging.warning("Request Object: {}".format(request_obj))
-	status = check_job_status(self.request.id.__str__())
-	logging.warning("Job status: {}".format(status))
-	time.sleep(10)
-	status = check_job_status(self.request.id.__str__())
-	logging.warning("Job status: {}".format(status))
-	return status
+	# Creates CSV object from location responses (list of rows):
+	csv_data = csv_handler.create_csv(username, filename, location_responses)
+	# logging.info("CSV created for {}: {}".format(username, filename))
+	
+	# Send email to user about job being complete, includes link (w/ token like reset endpoint):
+	# token needs link to .csv file
+	email_handler.send_batch_job_complete_email(request_obj)
 
-# def add_location(post_data):
-#     try:
-#         user = post_data["owner"]
-#         _id = post_data["id"]
-#         data_type = post_data["type"]
-#         name = post_data["name"]
-#         latitude = post_data["latitude"]
-#         longitude = post_data["longitude"]
-#         marked = post_data["marked"]
-#         compare = post_data.get("compare") or False
-#         notes = post_data["notes"] or []
-#     except KeyError:
-#         return {"error": "Invalid key in request"}, 400
-#     # Checks if location already exists for user:
-#     location_obj = Location.query.filter_by(id=_id, owner=user, type=data_type).first()
-#     if location_obj:
-#         return {"error": "Record with same key exists"}, 409
-#     # Inserts new location into database:
-#     location_obj = Location(
-#         owner=user,
-#         id=_id,
-#         type=data_type,
-#         name=name,
-#         latitude=latitude,
-#         longitude=longitude,
-#         marked=marked,
-#         notes=json.dumps(notes),
-#         compare=compare,
-#     )
-#     db.session.add(location_obj)
-#     db.session.commit()
-#     return {"status": "success"}, 201
+	# Removes CSV from disk after it has been sent as email attachment:
+	csv_handler.remove_csv_file(filename)
+
+	# Updates user job in db:
+	user_job.job_status = "SUCCESS"  # updates job status in db
+	user_job.finished_datetime = datetime.datetime.utcnow()  # sets job complete datetime
+	db.session.commit()
+	user_job.queue_time = celery_handler.calculate_queue_time(user_job)  # sets job's queue time (s)
+	user_job.exec_time = celery_handler.calculate_exec_time(user_job)  # sets job's execution time (s)
+	db.session.commit()
+
+	logging.info("Task complete.")
+
+	return csv_data
+
 
 
 class CeleryHandler:
 
 	def __init__(self):
-		self.states = ["FAILURE", "REVOKED", "PENDING", "RECEIVED", "STARTED", "SUCCESS"]
-		self.request_obj = {
-			"locations": []
-		}
+		self.states = ["FAILURE", "REVOKED", "RETRY", "PENDING", "RECEIVED", "STARTED", "SUCCESS"]
+		self.pending_states = ["RETRY", "PENDING", "RECEIVED", "STARTED"]
+		self.fail_states = ["FAILURE", "REVOKED"]
+		self.locations_limit = 1e4  # limit on num locations in job
 
 	def start_task(self, request_obj):
 		"""
 		Starts celery task and saves job/task ID to job table.
 		"""
-		# task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), queue="qed", taskset_id=jobId)
-		job_obj = run_batch_job.apply_async(args=[request_obj], queue="celery")
-		return job_obj.id
+		logging.info("Starting task, request: {}".format(request_obj))
 
-	def check_job_status(self, job_id):
+		username = request_obj['username']
+		locations = request_obj['locations']
+		filename = request_obj['filename']
+
+		job_id = str(uuid.uuid4())
+
+		request_obj['job_id'] = job_id
+
+		user = User.query.filter_by(username=username).first()  # gets user from db
+
+		# Creates initial job entry:
+		job_obj = Job(
+			user_id=user.id,
+			job_id=job_id,
+			job_status="RECEIVED",
+			input_file=filename,
+			output_file=csv_handler.generate_output_filename(filename),
+			num_locations=len(locations),
+			received_datetime=datetime.datetime.utcnow()
+		)
+		db.session.add(job_obj)
+		db.session.commit()
+
+		# Runs job on celery worker:
+		celery_job = run_batch_job.apply_async(args=[request_obj], queue="celery", task_id=job_id)
+
+		return celery_job.id
+
+	def get_active_user_job(self, username):
+		"""
+		Gets current/active user job from job table.
+		"""
+		user = User.query.filter_by(username=username).first()  # gets user from db
+		active_user_job = Job.query.filter_by(user_id=user.id) \
+							.filter((Job.job_status == "PENDING") \
+								| (Job.job_status == "RECEIVED") \
+								| (Job.job_status == "RETRY") \
+								| (Job.job_status == "STARTED")) \
+							.first()
+		return active_user_job
+
+	def get_job_from_db(self, username, job_id):
+		"""
+		Checks celery job status in DB instead of
+		from AsyncResult (see check_celery_job_status())
+		"""
+		user = User.query.filter_by(username=username).first()  # gets user from db
+		user_job = Job.query.filter_by(user_id=user.id, job_id=job_id).first()
+		return user_job
+
+	def check_celery_job_status(self, job_id):
 		"""
 		Checks the status of a celery job and returns 
 		its status.
@@ -130,23 +186,60 @@ class CeleryHandler:
 		REVOKED, STARTED, SUCCESS 
 		"""
 		job = celery_instance.AsyncResult(job_id)
-		state = job.status
-
 		logging.warning("JOB: {}".format(job))
-		logging.warning("JOB STATE: {}".format(state))
-		
-		if state == "SUCCESS":
-			message = "Job {} is complete.".format(job_id)
-		elif state == "FAILURE":
-			message = "Job {} has failed.".format(job_id)
-		elif state == "REVOKED":
-			message = "Job {} has been canceled or an error has occurred.".format(job_id)
-		elif state in ["PENDING", "RECEIVED"]:
-			message = "Job {} is in queue.".format(job_id)
-		elif state == "STARTED":
-			message = "Job {} is in progress.".format(job_id)
-		else:
-			# NOTE: Not going to set retry for tasks.
-			message = "Error processing job {}".format(job_id)
+		logging.warning("JOB Type: {}".format(type(job)))
+		return job.status
 
-		return message
+	def update_db_job_status(self, username):
+		"""
+		Updates job status in job table using
+		actual state from celery.
+		"""
+		user_job = self.get_active_user_job(username)
+		job_state = self.check_celery_job_status(user_job.job_id)  # gets current celery state
+
+		if not user_job:
+			return {"error": "job not found"}
+
+		user_job.job_status = job_state  # updates job state in db table
+		db.session.commit()
+
+		return {"status": "success"}
+
+	def make_cyano_request(self, request_data):
+		"""
+		Gets cyano data for location using
+		/cyan/cyano/location/data/{lat}/{lon}/all?type=olci&frequency={weekly,daily}
+		"""
+		lat = request_data['lat']
+		lon = request_data['lon']
+		data_type = request_data['type']
+
+		url = os.environ.get("TOMCAT_API") \
+			+ "/cyan/cyano/location/data/" \
+			+ "{}/{}/all?type=olci&frequency={}".format(lat, lon, data_type)
+
+		try:
+			response = requests.get(url)
+			return json.loads(response.content)
+		except Exception as e:
+			logging.warning("Unknown exception occurred: {}".format(e))
+			return None
+
+	def calculate_queue_time(self, user_job):
+		"""
+		Calculates time user's job spent in celery queue.
+		Units: seconds
+		"""
+		return (
+			user_job.started_datetime - user_job.received_datetime
+		).total_seconds()
+
+	def calculate_exec_time(self, user_job):
+		"""
+		Calculates time user's job took to execute.
+		Units: seconds
+		"""
+		return (
+			user_job.finished_datetime - user_job.received_datetime
+		).total_seconds()
