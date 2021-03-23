@@ -63,7 +63,6 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
 import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
 import { ResetComponent } from './reset/reset.component';
 
-// import { AuthInterceptor, JwtInterceptor, LoaderInterceptor } from './interceptors';
 import { AuthInterceptor, JwtInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
 

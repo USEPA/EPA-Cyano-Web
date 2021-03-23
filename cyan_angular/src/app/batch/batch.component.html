@@ -1,8 +1,14 @@
 <button mat-button (click)="exit();" class="comments-exit">X</button>
 <div class="">
 	<p>Upload CSV for batch processing</p>
-	<!--<input type="text" placeholder="Upload CSV for batch processing" />-->
 	<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
 	<button mat-raised-button color="primary" (click)="uploader.click()">Upload</button>
-	<p id="csv-filename"></p>
+	<br><br>
+	<p>{{status}}</p>
+	<br>
+	<div *ngIf="currentInputFilename">
+		<p><b>Input Filename:</b> {{currentInputFilename}}</p>
+		<p><b>Job ID:</b> {{batchStatus.job_id}}</p>
+		<p><b>Job Status:</b> {{batchStatus.job_status}}</p>
+	</div>
 </div>
