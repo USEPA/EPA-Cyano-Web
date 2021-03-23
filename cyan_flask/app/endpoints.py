@@ -316,26 +316,32 @@ class Reply(Resource):
         return results, status_code, headers
 
 
-class Batch(Resource):
+class BatchStatus(Resource):
     """
-    Batch processing of CSV-uploaded location data requests
-    that are processed with a background celery worker.
     """
 
     @login_required
-    def get(self):
+    def post(self):
         """
         Gets status of a given job ID.
         Could use username or other info from validated token
         to check job status in User DB table.
         """
-        user = JwtHandler().get_user_from_token(
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
             request
         )  # gets username from token
         headers = get_auth_headers()
-        results, status_code = web_app_api.get_batch_status(user)
+        results, status_code = web_app_api.get_batch_status(args)
         results = simplejson.loads(simplejson.dumps(results))
         return results, status_code, headers
+
+
+class Batch(Resource):
+    """
+    Batch processing of CSV-uploaded location data requests
+    that are processed with a background celery worker.
+    """
 
     @login_required
     def post(self):
@@ -386,8 +392,9 @@ api.add_resource(Comment, api_url + "comment")
 # Reply endpoint:
 api.add_resource(Reply, api_url + "reply")
 
-# Batch endpoint:
+# Batch endpoints:
 api.add_resource(Batch, api_url + "batch")
+api.add_resource(BatchStatus, api_url + "batch/status")
 
 print("CyAN Flask app started.")
 # print("CyAN Flask app started.\nLive endpoints:")
