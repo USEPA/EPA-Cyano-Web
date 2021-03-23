@@ -52,7 +52,7 @@ services:
       dockerfile: ./docker/flask/Dockerfile
     image: cyan-api
     container_name: cyan-celery
-    command: celery -A cyan_flask.app.celery_tasks worker -l info -c 1
+    command: celery -A celery_worker.celery worker --loglevel=INFO -c 1
     depends_on:
       - cyan-db
       - redis
@@ -87,8 +87,8 @@ services:
   redis:
     image: redis:latest
     hostname: redis
-    command: redis-server /usr/local/etc/redis/redis.conf
-    volumes:
-      - ./redis.config:/usr/local/etc/redis/redis.conf
+    # command: redis-server /usr/local/etc/redis/redis.conf
+    # volumes:
+    #   - ./redis.config:/usr/local/etc/redis/redis.conf
     expose:
       - "6379"
