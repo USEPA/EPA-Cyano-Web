@@ -566,7 +566,11 @@ def start_batch_job(request_obj):
 
     # Checks number of locations requested:
     if len(locations) > celery_handler.locations_limit:
-        response_obj["status"] = "Failed - number of locations exceeds limit ({})".format(celery_handler.locations_limit)
+        response_obj[
+            "status"
+        ] = "Failed - number of locations exceeds limit ({})".format(
+            celery_handler.locations_limit
+        )
         response_obj["job_status"] = ""
         response_obj["job_id"] = ""
         return response_obj, 200

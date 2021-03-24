@@ -342,18 +342,14 @@ class Batch(Resource):
     """
 
     @login_required
-    def get(self, job_id=''):
+    def get(self, job_id=""):
         """
         Gets batch job from db for user.
         """
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
         if not job_id:
-            results, status_code = web_app_api.get_all_batch_jobs(
-                {
-                    "username": user
-                }
-            )
+            results, status_code = web_app_api.get_all_batch_jobs({"username": user})
         else:
             results, status_code = web_app_api.get_batch_job(user, job_id)
         results = simplejson.loads(simplejson.dumps(results))
@@ -390,7 +386,6 @@ class BatchJobCancel(Resource):
         results, status_code = web_app_api.cancel_batch_job(args)
         results = simplejson.loads(simplejson.dumps(results))
         return results, status_code, headers
-
 
 
 # Test endpoint:

@@ -109,11 +109,7 @@ class Job(db.Model):
 
     @staticmethod
     def job_response():
-        return {
-            "status": None,
-            "job_id": None,
-            "job_status": None
-        }
+        return {"status": None, "job_id": None, "job_status": None}
 
     @staticmethod
     def job_response_obj():
@@ -124,15 +120,12 @@ class Job(db.Model):
             "numLocations": None,
             "receivedDatetime": None,
             "startedDatetime": None,
-            "finishedDatetime": None
+            "finishedDatetime": None,
         }
 
     @staticmethod
     def user_jobs_response():
-        return {
-            "status": None,
-            "jobs": []
-        }
+        return {"status": None, "jobs": []}
 
     @classmethod
     def create_jobs_json(cls, user_jobs):
@@ -146,8 +139,12 @@ class Job(db.Model):
             job_obj["jobStatus"] = job.job_status
             job_obj["inputFile"] = job.input_file
             job_obj["numLocations"] = job.num_locations
-            job_obj["receivedDatetime"] = utils.get_datetime_string(job.received_datetime)
+            job_obj["receivedDatetime"] = utils.get_datetime_string(
+                job.received_datetime
+            )
             job_obj["startedDatetime"] = utils.get_datetime_string(job.started_datetime)
-            job_obj["finishedDatetime"] = utils.get_datetime_string(job.finished_datetime)
+            job_obj["finishedDatetime"] = utils.get_datetime_string(
+                job.finished_datetime
+            )
             jobs_json.append(job_obj)
         return jobs_json
