@@ -27,7 +27,6 @@ from models import (
     CommentImages,
     Reply,
     Job,
-    job_response,
     db,
 )
 import utils
@@ -554,6 +553,7 @@ def start_batch_job(request_obj):
     """
     username = request_obj["username"]
     filename = request_obj["filename"]
+    locations = request_obj["locations"]
 
     user = User.query.filter_by(username=username).first()  # gets user email from db
     user_job = celery_handler.get_active_user_job(
@@ -562,7 +562,14 @@ def start_batch_job(request_obj):
 
     request_obj["user_email"] = user.email
 
-    response_obj = dict(job_response)
+    response_obj = dict(Job.job_response())
+
+    # Checks number of locations requested:
+    if len(locations) > celery_handler.locations_limit:
+        response_obj["status"] = "Failed - number of locations exceeds limit ({})".format(celery_handler.locations_limit)
+        response_obj["job_status"] = ""
+        response_obj["job_id"] = ""
+        return response_obj, 200
 
     # Checks if user already has a job in progress:
     if user_job and user_job.job_status in celery_handler.pending_states:
@@ -592,3 +599,53 @@ def start_batch_job(request_obj):
     response_obj["job_status"] = job_status
     response_obj["job_id"] = job_id
     return response_obj, 202
+
+
+def cancel_batch_job(request_obj):
+    """
+    Cancels a user's batch job.
+    """
+    job_id = request_obj["job_id"]
+    username = request_obj["username"]
+
+    user = User.query.filter_by(username=username).first()  # gets user email from db
+    user_job = celery_handler.get_active_user_job(
+        username
+    )  # gets any active job user may have
+
+    celery_handler.cancel_job(username, job_id)
+
+    return response_obj, 200
+
+
+def get_all_batch_jobs(request_obj):
+    """
+    Gets all batch jobs from a user.
+    """
+    username = request_obj["username"]
+
+    user_jobs = celery_handler.get_all_jobs(username)
+
+    response_obj = dict(Job.user_jobs_response())
+    response_obj["status"] = "success"
+    response_obj["jobs"] = Job.create_jobs_json(user_jobs)
+
+    return response_obj, 200
+
+
+def get_batch_job(request_obj):
+    """
+    Gets a specific batch job.
+    """
+    job_id = request_obj["job_id"]
+    username = request_obj["username"]
+
+    user_jobs = celery_handler.get_job_from_db(username, job_id)
+
+    # TODO: This endpoint is in progress.
+
+    response_obj = dict(Job.user_jobs_response())
+    response_obj["status"] = "success"
+    response_obj["jobs"] = Job.create_jobs_json([user_jobs])
+
+    return response_obj, 200

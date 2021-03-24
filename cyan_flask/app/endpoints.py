@@ -315,7 +315,7 @@ class Reply(Resource):
         return results, status_code, headers
 
 
-class BatchStatus(Resource):
+class BatchJobStatus(Resource):
     """"""
 
     @login_required
@@ -342,6 +342,24 @@ class Batch(Resource):
     """
 
     @login_required
+    def get(self, job_id=''):
+        """
+        Gets batch job from db for user.
+        """
+        user = JwtHandler().get_user_from_token(request)
+        headers = get_auth_headers()
+        if not job_id:
+            results, status_code = web_app_api.get_all_batch_jobs(
+                {
+                    "username": user
+                }
+            )
+        else:
+            results, status_code = web_app_api.get_batch_job(user, job_id)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+    @login_required
     def post(self):
         """
         Starts a user's batch request/job.
@@ -355,6 +373,24 @@ class Batch(Resource):
         results, status_code = web_app_api.start_batch_job(args)
         results = simplejson.loads(simplejson.dumps(results))
         return results, status_code, headers
+
+
+class BatchJobCancel(Resource):
+    """
+    Endpoint for canceling a user's batch job.
+    """
+
+    @login_required
+    def post(self):
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        results, status_code = web_app_api.cancel_batch_job(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
 
 
 # Test endpoint:
@@ -392,7 +428,8 @@ api.add_resource(Reply, api_url + "reply")
 
 # Batch endpoints:
 api.add_resource(Batch, api_url + "batch")
-api.add_resource(BatchStatus, api_url + "batch/status")
+api.add_resource(BatchJobStatus, api_url + "batch/status")
+api.add_resource(BatchJobCancel, api_url + "batch/cancel")
 
 print("CyAN Flask app started.")
 # print("CyAN Flask app started.\nLive endpoints:")
