@@ -192,6 +192,13 @@ class CeleryHandler:
         user_job = Job.query.filter_by(user_id=user.id, job_id=job_id).first()
         return user_job
 
+    def get_all_jobs(self, username):
+        """
+        Gets all user's jobs from db.
+        """
+        user = User.query.filter_by(username=username).first()
+        return Job.query.filter_by(user_id=user.id).all()
+
     def check_celery_job_status(self, job_id):
         """
         Checks the status of a celery job and returns
@@ -220,6 +227,14 @@ class CeleryHandler:
         user_job.job_status = job_state  # updates job state in db table
         db.session.commit()
 
+        return {"status": "success"}
+
+    def revoke_job(self, job_id):
+        """
+        Revokes/cancels a celery task.
+        """
+        result = celery_instance.AsyncResult(job_id).revoke()
+        logging.warning("Task '{}' revoked: {}".format(job_id, result))
         return {"status": "success"}
 
     def make_cyano_request(self, request_data):
