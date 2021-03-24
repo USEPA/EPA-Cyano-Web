@@ -43,10 +43,10 @@ export class BottomMenuComponent implements OnInit {
     if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(BatchComponent, {
       // panelClass: 'view-comment-dialog',
-      maxWidth: '100%',
-      // data: {
-      //   comment: comment
-      // }
+      // TODO: Use class to account for various device sizes
+      width: '60%',
+      maxWidth: '75%',
+      maxHeight: '75%'
     });
   }
 

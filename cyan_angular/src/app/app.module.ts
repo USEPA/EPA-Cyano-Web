@@ -22,7 +22,8 @@ import {MatDatepickerModule } from '@angular/material/datepicker';
 import {MatMenuModule } from '@angular/material/menu'; 
 import {MatDialogModule } from '@angular/material/dialog'; 
 import {MatDialogRef } from '@angular/material/dialog'; 
-import {MatToolbarModule} from '@angular/material/toolbar'; 
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { MatTableModule } from '@angular/material/table';
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { Ng5SliderModule } from 'ng5-slider';
@@ -145,6 +146,7 @@ import { BatchComponent } from './batch/batch.component';
     MatBadgeModule,
     MatDialogModule,
     MatToolbarModule,
+    MatTableModule,
     MatSidenavModule,
     Ng5SliderModule,
     BrowserAnimationsModule

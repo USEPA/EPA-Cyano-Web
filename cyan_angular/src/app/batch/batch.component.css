@@ -1,0 +1,24 @@
+
+
+/*.mat-tab-group {
+	max-height: 80%;
+}*/
+
+.jobs_tab_group {
+	height: 50%;
+	width: 100%;
+}
+
+.table-responsive {
+	overflow-y: scroll;
+	max-height: 60%;
+}
+
+.mat-table {
+	/*max-height: 80%;*/
+}
+
+.exit-button {
+	float: right;
+	font-size: x-large;
+}

@@ -1,10 +1,17 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
+import { DataSource } from '@angular/cdk/table';
 
 import { AuthService } from '../services/auth.service';
 import { DownloaderService } from '../services/downloader.service';
-
-import { BatchJob, BatchLocation, BatchStatus } from '../models/batch';
+import { 
+  BatchJob,
+  BatchLocation,
+  BatchStatus,
+  JobsTableParams,
+  columnNames
+} from '../models/batch';
 
 
 @Component({
@@ -19,12 +26,15 @@ export class BatchComponent {
   uploadedFile: File;  // user input file
   acceptedType: string = 'csv';  // accepted file type for upload
   status: string = '';  // job status
-  pollStatusDelay: number = 5000;  // milliseconds
+  pollStatusDelay: number = 2000;  // milliseconds
   intervalProcess: ReturnType<typeof setInterval>;  // keeps track of status polling
-  batchStatus: BatchStatus = new BatchStatus();
+  currentJobStatus: BatchStatus;
   currentInputFilename: string = '';
   finishedStates: string[] = ['FAILURE', 'REVOKED', 'SUCCESS'];
   inProgressStates: string[] = ['RETRY', 'PENDING', 'RECEIVED', 'STARTED'];
+  dataSource;  // data structure for user jobs table
+  displayedColumns: string[] = [];
+  columnNames: any[] = columnNames;
 
   constructor(
     public dialogRef: MatDialogRef<BatchComponent>,
@@ -34,6 +44,8 @@ export class BatchComponent {
   ) { }
 
   ngOnInit(): void {
+    this.currentJobStatus = new BatchStatus();
+    this.displayedColumns = this.columnNames.map(x => x.id);
   }
 
   ngOnDestroy(): void {
@@ -54,17 +66,19 @@ export class BatchComponent {
     */
     console.log("Starting job status polling.")
     this.intervalProcess = setInterval(() => {
-      this.downloaderService.getBatchStatus(batchStatus).subscribe(response => {
+      this.downloaderService.checkBatchJobStatus(batchStatus).subscribe(response => {
         console.log("Batch status response.");
+        console.log(response['job_id'])
+        console.log(response['job_status'])
         if (response['status'].length > 0) {
           this.status = response['status'];
         }
-        if (this.finishedStates.includes(this.batchStatus.job_status)) {
+        if (this.finishedStates.includes(this.currentJobStatus.job_status)) {
           console.log("Stopping job status polling.")
           clearInterval(this.intervalProcess);
         }
-        this.batchStatus.job_id = response['job_id'];
-        this.batchStatus.job_status = response['job_status'];
+        this.currentJobStatus.job_id = response['job_id'];
+        this.currentJobStatus.job_status = response['job_status'];
       });
     }, this.pollStatusDelay);
   }
@@ -79,6 +93,8 @@ export class BatchComponent {
       return {"error": "Error uploading file."};
     }
 
+    // TODO: Filename length check.
+
     let fileExtension = uploadedFile.name.split(".").splice(-1)[0];
 
     if (fileExtension != this.acceptedType) {
@@ -92,6 +108,7 @@ export class BatchComponent {
     /*
     TODO
     */
+    // TODO 1: Check that the headers are correct.
     return fileContent;
   }
 
@@ -114,12 +131,22 @@ export class BatchComponent {
     return batchLocations;
   }
 
+  clearInputFields(): void {
+    this.currentJobStatus.job_id = '';
+    this.currentJobStatus.job_status = '';
+    this.currentInputFilename = '';
+  }
+
   uploadFile(event): void {
     /*
     Uploads CSV file of locations for data processing.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
+
+    this.clearInputFields();
+
     let file = this.validateUploadedFile(event);
+    
     if ("error" in file) {
       this.status = file.error;
       this.uploadedFile = null;
@@ -130,27 +157,53 @@ export class BatchComponent {
     }
 
     let reader = new FileReader();
+
     reader.onload = (e) => {
       let csvContent: string = this.validateFileContent(reader.result);
+      
       let locationObjects: BatchLocation[] = this.createBatchLocations(csvContent);
+
       let batchJob: BatchJob = new BatchJob();
       batchJob.filename = this.uploadedFile.name;  // TODO: Validate/sanitize filename
       batchJob.locations = locationObjects;
+      batchJob.status = new BatchStatus();
 
       this.currentInputFilename = this.uploadedFile.name;
 
       // Kicks off batch/celery process via API:
       this.downloaderService.startBatchJob(batchJob).subscribe(response => {
-        console.log(response);
         this.status = response['status'];
-        this.batchStatus.job_id = response['job_id'];
-        this.batchStatus.job_status = response['job_status'];
+        batchJob.status.job_id = response['job_id'];
+        batchJob.status.job_status = response['job_status'];
         console.log("Initiating polling of job status.");
-        this.pollJobStatus(this.batchStatus);
+        this.pollJobStatus(batchJob.status);
       });
 
     }
     reader.readAsText(this.uploadedFile);
+  }
+
+  tabChange(event): void {
+    /*
+    Handles batch job tab change event.
+    */
+    console.log(event);
+    if (event.index == 1) {
+      // Loads all of user's jobs
+      this.downloaderService.getBatchJobs().subscribe(response => {
+        if (response['status'] == false) {
+          console.log("Error getting batch jobs");
+          alert("Error getting batch jobs");
+        }
+        this.createTable(response);
+      });
+    }
+  }
+
+  createTable(jobsResponse) {
+    console.log("Creating job table.");
+    let tableArray: JobsTableParams[] = jobsResponse['jobs'];
+    this.dataSource = new MatTableDataSource(tableArray);
   }
 
 }
