@@ -5,8 +5,8 @@ export class BatchJob {
 }
 
 export class BatchLocation {
-	lat: number;
-  lon: number;
+	latitude: number;
+  longitude: number;
   type: string;	
 }
 

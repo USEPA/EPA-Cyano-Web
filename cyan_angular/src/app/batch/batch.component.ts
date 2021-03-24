@@ -67,13 +67,14 @@ export class BatchComponent {
     console.log("Starting job status polling.")
     this.intervalProcess = setInterval(() => {
       this.downloaderService.checkBatchJobStatus(batchStatus).subscribe(response => {
-        console.log("Batch status response.");
-        console.log(response['job_id'])
-        console.log(response['job_status'])
         if (response['status'].length > 0) {
           this.status = response['status'];
         }
-        if (this.finishedStates.includes(this.currentJobStatus.job_status)) {
+        if (response['status'].includes("Failed")) {
+          console.log("Stopping job status polling.")
+          clearInterval(this.intervalProcess);
+        }
+        else if (this.finishedStates.includes(this.currentJobStatus.job_status)) {
           console.log("Stopping job status polling.")
           clearInterval(this.intervalProcess);
         }
@@ -123,8 +124,8 @@ export class BatchComponent {
     rows.slice(1, -1).forEach(row => {
       let rowArray = row.split(',');
       let batchLocation: BatchLocation = new BatchLocation();
-      batchLocation.lat = parseFloat(rowArray[0]);
-      batchLocation.lon = parseFloat(rowArray[1]);
+      batchLocation.latitude = parseFloat(rowArray[0]);
+      batchLocation.longitude = parseFloat(rowArray[1]);
       batchLocation.type = this.cleanString(rowArray[2]);  // weekly/daily
       batchLocations.push(batchLocation);
     });
@@ -173,9 +174,11 @@ export class BatchComponent {
       // Kicks off batch/celery process via API:
       this.downloaderService.startBatchJob(batchJob).subscribe(response => {
         this.status = response['status'];
+        if (this.status.includes("Failed")) {
+          return;  // halts job if there was an issue
+        }
         batchJob.status.job_id = response['job_id'];
         batchJob.status.job_status = response['job_status'];
-        console.log("Initiating polling of job status.");
         this.pollJobStatus(batchJob.status);
       });
 

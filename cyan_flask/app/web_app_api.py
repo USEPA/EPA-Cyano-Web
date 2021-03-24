@@ -530,8 +530,11 @@ def get_batch_status(response_obj):
     Gets job ID from DB and returns the
     job's status from celery worker.
     """
-    job_id = response_obj["job_id"]
-    username = response_obj["username"]
+    try:
+        job_id = response_obj["job_id"]
+        username = response_obj["username"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
 
     user_job = celery_handler.get_job_from_db(username, job_id)
 
@@ -551,9 +554,12 @@ def start_batch_job(request_obj):
     """
     Starts a user's batch request/job.
     """
-    username = request_obj["username"]
-    filename = request_obj["filename"]
-    locations = request_obj["locations"]
+    try:
+        username = request_obj["username"]
+        filename = request_obj["filename"]
+        locations = request_obj["locations"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
 
     user = User.query.filter_by(username=username).first()  # gets user email from db
     user_job = celery_handler.get_active_user_job(
@@ -582,9 +588,15 @@ def start_batch_job(request_obj):
         response_obj["job_id"] = user_job.job_id
         return response_obj, 200
 
-    # Starts a new job:
-    job_id = celery_handler.start_task(request_obj)
-    job_status = celery_handler.check_celery_job_status(job_id)
+    try:
+        job_id = celery_handler.start_task(request_obj)  # starts a new job
+        job_status = celery_handler.check_celery_job_status(job_id)
+    except Exception as e:
+        logging.error("start_batch_job exception: {}".format(e))
+        response_obj["status"] = "Failed - error starting job"
+        response_obj["job_status"] = job_status
+        response_obj["job_id"] = job_id
+        return response_obj, 500
 
     # Checks for job starting errors:
     if job_status in celery_handler.fail_states:
@@ -609,15 +621,24 @@ def cancel_batch_job(request_obj):
     """
     Cancels a user's batch job.
     """
-    job_id = request_obj["job_id"]
-    username = request_obj["username"]
+    try:
+        job_id = request_obj["job_id"]
+        username = request_obj["username"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
 
     user = User.query.filter_by(username=username).first()  # gets user email from db
     user_job = celery_handler.get_active_user_job(
         username
     )  # gets any active job user may have
 
-    celery_handler.cancel_job(username, job_id)
+    # TODO: This endpoint is in progress.
+
+    canceled_job = celery_handler.cancel_job(username, job_id)
+
+    response_obj = dict(Job.user_jobs_response())
+    response_obj["status"] = "success"
+    response_obj["jobs"] = [canceled_job]
 
     return response_obj, 200
 

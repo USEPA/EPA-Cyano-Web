@@ -62,12 +62,20 @@ def run_batch_job(self, request_obj):
     TODO: More exception handling
     """
     celery_handler = CeleryHandler()
+
     username = request_obj["username"]
     locations = request_obj["locations"]
     filename = request_obj["filename"]
     job_id = request_obj["job_id"]
 
     user_job = celery_handler.get_job_from_db(username, job_id)
+
+    if not user_job:
+        logging.error(
+            "No user job found for username '{}', job id '{}'".format(username, job_id)
+        )
+        # TODO: How to handle this in a way that user can be notified?
+        return
 
     logging.info("User job: {}".format(user_job))
 
@@ -78,20 +86,34 @@ def run_batch_job(self, request_obj):
     user_job.job_status = "STARTED"  # sets job status in db
     db.session.commit()
 
-    # Makes requests for location data:
-    location_responses = []
-    for location in locations:
-        time.sleep(0.1)  # little delay b/w calls
-        response = celery_handler.make_cyano_request(location)
-        location_responses.append(response)
+    try:
+        # Makes requests for location data:
+        location_responses = []
+        for location in locations:
+            time.sleep(0.1)  # little delay b/w calls
+            response = celery_handler.make_cyano_request(location)
+            location_responses.append(response)
+    except Exception as e:
+        logging.error("run_batch_job error getting location data: {}".format(e))
+        celery_handler.handle_failed_job(user_job)
+        return
 
-    # Creates CSV object from location responses (list of rows):
-    csv_data = csv_handler.create_csv(username, filename, location_responses)
-    # logging.info("CSV created for {}: {}".format(username, filename))
+    try:
+        # Creates CSV object from location responses (list of rows):
+        csv_data = csv_handler.create_csv(username, filename, location_responses)
+        # logging.info("CSV created for {}: {}".format(username, filename))
+    except Exception as e:
+        logging.error("run_batch_job error creating CSV results file: {}".format(e))
+        celery_handler.handle_failed_job(user_job)
+        return
 
-    # Send email to user about job being complete, includes link (w/ token like reset endpoint):
-    # token needs link to .csv file
-    email_handler.send_batch_job_complete_email(request_obj)
+    try:
+        # Sends email to user about job being complete:
+        email_handler.send_batch_job_complete_email(request_obj)
+    except Exception as e:
+        logging.error("run_batch_job error sending email of CSV results: {}".format(e))
+        celery_handler.handle_failed_job(user_job)
+        return
 
     # Removes CSV from disk after it has been sent as email attachment:
     csv_handler.remove_csv_file(filename)
@@ -129,6 +151,7 @@ class CeleryHandler:
         self.pending_states = ["RETRY", "PENDING", "RECEIVED", "STARTED"]
         self.fail_states = ["FAILURE", "REVOKED"]
         self.locations_limit = 1e4  # limit on num locations in job
+        self.cyano_request_timeout = 30  # seconds
 
     def start_task(self, request_obj):
         """
@@ -140,7 +163,7 @@ class CeleryHandler:
         locations = request_obj["locations"]
         filename = request_obj["filename"]
 
-        job_id = str(uuid.uuid4())
+        job_id = str(uuid.uuid4())  # creates job ID for celery task
 
         request_obj["job_id"] = job_id
 
@@ -207,8 +230,6 @@ class CeleryHandler:
         REVOKED, STARTED, SUCCESS
         """
         job = celery_instance.AsyncResult(job_id)
-        logging.warning("JOB: {}".format(job))
-        logging.warning("JOB Type: {}".format(type(job)))
         return job.status
 
     def update_db_job_status(self, username):
@@ -242,8 +263,8 @@ class CeleryHandler:
         Gets cyano data for location using
         /cyan/cyano/location/data/{lat}/{lon}/all?type=olci&frequency={weekly,daily}
         """
-        lat = request_data["lat"]
-        lon = request_data["lon"]
+        lat = request_data["latitude"]
+        lon = request_data["longitude"]
         data_type = request_data["type"]
 
         url = (
@@ -254,10 +275,10 @@ class CeleryHandler:
 
         try:
             response = requests.get(url)
-            return json.loads(response.content)
-        except Exception as e:
-            logging.warning("Unknown exception occurred: {}".format(e))
-            return None
+            return json.loads(response.content, timeout=self.cyano_request_timeout)
+        except requests.exceptions.RequestException as e:
+            logging.error("make_cyano_request exception occurred: {}".format(e))
+            raise e
 
     def calculate_queue_time(self, user_job):
         """
@@ -272,3 +293,13 @@ class CeleryHandler:
         Units: seconds
         """
         return (user_job.finished_datetime - user_job.received_datetime).total_seconds()
+
+    def handle_failed_job(self, user_job):
+        """
+        Updates user's failed job in DB.
+        """
+        user_job.job_status = "FAILURE"
+        user_job.finished_datetime = (
+            datetime.datetime.utcnow()
+        )  # sets job complete datetime
+        db.session.commit()

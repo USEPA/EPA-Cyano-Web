@@ -11,11 +11,9 @@ class CSVHandler:
                 "locationName",
                 "locationLat",
                 "locationLng",
-                # "description",
                 "status",
                 "requestTimestamp",
                 "queryDate",
-                # "url"
             ],
             "outputs": [
                 "imageDate",

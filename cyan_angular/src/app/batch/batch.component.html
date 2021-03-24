@@ -5,7 +5,7 @@
     <!-- Run tab -->
     <mat-tab label="Run">
 		<div class="">
-			<br><p>Upload CSV for batch processing</p><br>
+			<br><p>Upload CSV for batch processing (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download template input file</a>)</p><br>
 			<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
 			<button mat-raised-button color="primary" (click)="uploader.click()">Upload</button>
 			<br><br>
