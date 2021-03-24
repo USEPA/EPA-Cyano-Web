@@ -208,13 +208,29 @@ export class DownloaderService {
     return this.executeAuthorizedPostRequest(url, batchRequest);
   }
 
-  getBatchStatus(batchStatusRequest: BatchStatus) {
+  checkBatchJobStatus(batchStatusRequest: BatchStatus) {
     /*
     Gets status of user's batch job.
     */
     let url = this.envService.config.baseServerUrl + 'batch/status';
     return this.executeAuthorizedPostRequest(url, batchStatusRequest);
-    // return this.executeAuthorizedGetRequest(url);
+  }
+
+  cancelBatchJob(batchStatusRequest: BatchStatus) {
+    /*
+    Cancels user's batch job.
+    */
+    let url = this.envService.config.baseServerUrl + 'batch/cancel';
+    return this.executeAuthorizedPostRequest(url, batchStatusRequest);
+  }
+
+  getBatchJobs(batchJob: string = "") {
+    /*
+    Returns batch job(s).
+    */
+    // let url = this.envService.config.baseServerUrl + 'batch/' + batchJob;
+    let url = this.envService.config.baseServerUrl + 'batch';
+    return this.executeAuthorizedGetRequest(url);
   }
 
   executeAuthorizedPostRequest(url: string, body: any) {
