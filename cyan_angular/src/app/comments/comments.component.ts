@@ -38,7 +38,6 @@ export class CommentsComponent implements OnInit {
 
   private createComments(comments): Comment[] {
   	let commentObjects: Comment[] = [];
-  	console.log("comments component createComments() called.");
   	comments.forEach(comment => {
   		let c = new Comment();
   		c.id = comment.id;
@@ -75,8 +74,8 @@ export class CommentsComponent implements OnInit {
   	*/
   	if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(ViewComment, {
-      width: '50%',
-      height: '75%',
+      panelClass: 'view-comment-dialog',
+      maxWidth: '100%',
       data: {
         comment: comment
       }
@@ -89,8 +88,8 @@ export class CommentsComponent implements OnInit {
   	*/
   	if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.dialog.open(AddComment, {
-      width: '50%',
-      height: '75%',
+      panelClass: 'add-comment-dialog',
+      maxWidth: '100%',
       data: {
         comments: this.comments
       }

@@ -42,3 +42,5 @@ coverage.xml
 
 # pycharm stuff
 .idea
+
+.vscode/

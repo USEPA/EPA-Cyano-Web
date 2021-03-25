@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { UserIdleService } from 'angular-user-idle';
-import { User, UserService } from '../services/user.service';
+import { User, Account, UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { LocationService } from '../services/location.service';
 import {environment} from "../../environments/environment";
@@ -11,7 +11,8 @@ import {environment} from "../../environments/environment";
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
-  styleUrls: ['./account.component.css']
+  styleUrls: ['./account.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AccountComponent implements OnInit {
   // TODO: Read from config file
@@ -35,7 +36,7 @@ export class AccountComponent implements OnInit {
   username: string = null;
   password: string = null;
 
-  currentUser: User = null;
+  currentUser: Account = null;
   loginSub: Subscription = null;
   authSub: Subscription = null;
 
@@ -196,7 +197,6 @@ export class AccountComponent implements OnInit {
 
   loginUser(): void {
     let self = this;
-
     this.userService.loginUser(this.username, this.password).subscribe(
       (user: any) => {
         // successful login

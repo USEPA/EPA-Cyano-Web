@@ -366,6 +366,8 @@
 }
 .location_exit {
     margin-right: 10px;
+    float: right;
+    color: black;
 }
 .location_exit:hover {
     cursor: pointer;
@@ -562,7 +564,7 @@
 }
 .details_exit {
     float: right;
-    color: white;
+    color: black;
     position: absolute;
     right: 0;
     font-size: large;

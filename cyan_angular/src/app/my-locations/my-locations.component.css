@@ -145,6 +145,7 @@
 }
 .location_exit {
   margin-right: 10px;
+  font-size: x-large;
 }
 .location_exit:hover {
   cursor: pointer;
@@ -324,5 +325,5 @@
   margin: 25px 10px;
 }
 .alert {
-  color: red;
+  color: #ef0000;
 }

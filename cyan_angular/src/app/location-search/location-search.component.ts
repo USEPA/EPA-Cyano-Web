@@ -20,6 +20,8 @@ export class LocationSearchComponent implements OnInit {
 	enteredLocation: string = "";  // user-entered location
 	locationResults: LocationResult[] = [];  // list of location results
 	zoomLevel: number = 12;  // zoom level when selecting location
+	showLocationSearch: boolean = true;
+	withinUSKeyword: string = "United States";  // string to determine if result is within conus US
 
 	constructor(
 		private downloader: DownloaderService,
@@ -27,6 +29,7 @@ export class LocationSearchComponent implements OnInit {
 	) { }
 
 	ngOnInit(): void {
+		this.showLocationSearch = true;
 	}
 
 	searchLocation() {
@@ -73,6 +76,7 @@ export class LocationSearchComponent implements OnInit {
 		let latLonArray = [];
 		latLonArray.push(latLon)
 		map.flyToBounds(latLonArray);
+		this.handleComponentDisplay();
 	}
 
 	inUnitedStates(locationResult: LocationResult): boolean {
@@ -82,10 +86,23 @@ export class LocationSearchComponent implements OnInit {
 		Test Example: https://nominatim.openstreetmap.org/search?q=deer%20lake&format=json&country=us
 		API Docs: https://nominatim.org/release-docs/develop/api/Search/
 		*/
-		if (!locationResult.display_name.includes("United States")) {
+		if (!locationResult.display_name.includes(this.withinUSKeyword)) {
 			return false;
 		}
 		return true;
+	}
+
+	handleComponentDisplay(): void {
+		/*
+		Removes location-search component when "viewLocation"
+		is selected for small screens.
+		*/
+		if (window.innerWidth <= 500) {
+			this.showLocationSearch = false;
+		}
+		else {
+			this.showLocationSearch = true;
+		}
 	}
 
 }

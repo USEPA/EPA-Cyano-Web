@@ -8,6 +8,7 @@ import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, ImageOverlay } from 'leaflet';
 import { Subscription } from 'rxjs';
 
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MapService } from '../services/map.service';
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -72,8 +73,14 @@ export class LocationDetailsComponent implements OnInit {
     maintainAspectRatio: false,
     scales: {
       xAxes: [{
-        type: "time",
-        time: {parser: "MM-DD-YYYY"}
+        type: 'time',
+        time: {
+          unit: 'month',  // default: MMM YYYY
+          parser: "MM-DD-YYYY",
+          displayFormats: {
+            month: 'MM-YYYY'
+          }
+        }
       }]
     }
   };
@@ -292,8 +299,10 @@ export class LocationDetailsComponent implements OnInit {
     let layerOptions = {
       opacity: this.opacityValue
     };
+
     this.selectedLayerIndex = this.selectedLayerIndex == 0 ? this.locationPNGs.length - 1 : this.selectedLayerIndex - 1;
-    if (this.selectedLayerIndex == undefined || this.selectedLayerIndex < 0) {
+
+    if (isNaN(this.selectedLayerIndex) || this.selectedLayerIndex < 0) {
       return;
     }
     let pngImage = this.locationPNGs[this.selectedLayerIndex];
@@ -566,6 +575,7 @@ export class LocationDetailsComponent implements OnInit {
         iconUrl: this.mapService.getMarker(this.current_location),
         shadowUrl: 'leaflet/marker-shadow.png'
       }),
+      alt: "Map marker for " + this.current_location.name,
       title: this.current_location.name,
       riseOnHover: true,
       zIndexOffset: 10000
@@ -617,6 +627,10 @@ export class LocationDetailsComponent implements OnInit {
       }
     });
 
+  }
+
+  openCyanoDetails() {
+    console.log("openCyanoDetails() called.");
   }
 
 }

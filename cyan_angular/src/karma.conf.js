@@ -13,6 +13,9 @@ module.exports = function (config) {
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
+      jasmine: {
+        random: false  // run unit tests in order
+      },
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     coverageIstanbulReporter: {
@@ -23,9 +26,15 @@ module.exports = function (config) {
     reporters: ['progress', 'kjhtml'],
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_ERROR,
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['Chrome_without_sandbox'],
+    customLaunchers: {
+      Chrome_without_sandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'] // with sandbox it fails under Docker
+      }
+    },
     singleRun: false
   });
 };

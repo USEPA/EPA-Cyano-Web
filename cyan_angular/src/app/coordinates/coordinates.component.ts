@@ -27,9 +27,9 @@ export class CoordinatesComponent implements OnInit {
 	selectedLon: string = 'W';
 
 	conusTop: number = 53; // north lat
-  conusLeft: number = -130; // west long
-  conusRight: number = -65; // east long
-  conusBottom: number =  24; // south lat
+	conusLeft: number = -130; // west long
+	conusRight: number = -65; // east long
+	conusBottom: number =  24; // south lat
 
 	latDeg: number;
 	latMin: number;
@@ -48,6 +48,8 @@ export class CoordinatesComponent implements OnInit {
 	defaultSelected: string = "dms";
 	selectedKey: string = "dms";  // dms or dd
 
+	showCoords: boolean = true;  // bool for displaying coordinates component
+
   constructor(
 	private locationService: LocationService,
 	private mapService: MapService,
@@ -60,6 +62,7 @@ export class CoordinatesComponent implements OnInit {
   	if (!this.authService.checkUserAuthentication()) { 
   		return;
   	}
+  	this.showCoords = true;
   }
 
 	markLocation(): void {
@@ -73,6 +76,7 @@ export class CoordinatesComponent implements OnInit {
 		this.locationService.setMarked(this.location, true);
 		this.mapService.updateMarker(this.location);
 		this.locationService.updateLocation(this.location.name, this.location);
+		this.handleComponentDisplay();
 	}
 
 	compareLocation(): void {
@@ -84,6 +88,7 @@ export class CoordinatesComponent implements OnInit {
 		}
 		this.location = this.getLocationData();
 		this.locationService.addCompareLocation(this.location);
+		this.handleComponentDisplay();
 	}
 
 	getLocationData(): Location {
@@ -170,10 +175,23 @@ export class CoordinatesComponent implements OnInit {
 
 	displayError(message: string): void {
 		const dialogRef = this.errorDialog.open(DialogComponent, {
-      data: {
-        dialogMessage: message
-      }
-    });
+	      data: {
+	        dialogMessage: message
+	      }
+	    });
+	}
+
+	handleComponentDisplay(): void {
+		/*
+		Removes coordinate component when "compare" or "mark"
+		is selected for small screens.
+		*/
+		if (window.innerWidth <= 500) {
+			this.showCoords = false;
+		}
+		else {
+			this.showCoords = true;
+		}
 	}
 
 }

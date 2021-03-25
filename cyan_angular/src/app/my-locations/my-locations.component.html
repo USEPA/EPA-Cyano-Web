@@ -1,6 +1,6 @@
 <div class="location_block_0">
   <div class="location_exit_block">
-    <button mat-button class="location_exit" [routerLink]="['']">x</button>
+    <button mat-button class="location_exit" [routerLink]="['']">X</button>
   </div>
   <div class="location_top_bar">
     <span *ngIf="hasLocations(); then has_locations else no_locations"></span>
@@ -10,7 +10,7 @@
     <ng-template #has_locations>
       <div class="location_sort">
         <mat-form-field>
-          <mat-select (selectionChange)="sortLocations();" [(ngModel)]="selected_value">
+          <mat-select aria-label="Sort locations" (selectionChange)="sortLocations();" [(ngModel)]="selected_value">
             <mat-option *ngFor="let sort of sort_selection" [value]="sort.value">{{sort.viewValue}}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -48,7 +48,8 @@
               <ng-template #location_down>
                 <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(location, true)]"></div>
               </ng-template>
-              <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div>
+              <!-- <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div> -->
+              <div class="location_cellChange">{{formatNumber(location.concentrationChange)}}</div>
             </div>
             <div class="location_cellDescript">cells/mL</div>
             <div class="location_date_since">since {{location.changeDate}}</div>

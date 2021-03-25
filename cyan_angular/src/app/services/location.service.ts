@@ -533,7 +533,7 @@ class Coordinate {
   lngDir: string;
 }
 
-class Degree {
+export class Degree {
   latitude: number;
   longitude: number;
 }

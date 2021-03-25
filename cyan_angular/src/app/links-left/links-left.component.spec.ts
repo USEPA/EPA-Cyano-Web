@@ -14,6 +14,7 @@ describe('LinksLeftComponent', () => {
   }));
 
   beforeEach(() => {
+    LinksLeftComponent.prototype.ngOnInit = () => {};  // skips ngOnInit
     fixture = TestBed.createComponent(LinksLeftComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

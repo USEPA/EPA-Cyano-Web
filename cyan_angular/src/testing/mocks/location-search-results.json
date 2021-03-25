@@ -1,0 +1,110 @@
+[
+  {
+    "place_id": 87151324,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 10774980,
+    "boundingbox": [
+      "28.6658769",
+      "28.6875378",
+      "-80.9014357",
+      "-80.891543"
+    ],
+    "lat": "28.6765467",
+    "lon": "-80.8964008",
+    "display_name": "Fawn Lake Boulevard, Brevard County, Florida, 32754, United States",
+    "class": "highway",
+    "type": "residential",
+    "importance": 0.4
+  },
+  {
+    "place_id": 215966770,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 604003877,
+    "boundingbox": [
+      "28.2543209",
+      "28.2547573",
+      "-80.7019957",
+      "-80.7013851"
+    ],
+    "lat": "28.254512249999998",
+    "lon": "-80.70169288120985",
+    "display_name": "Fawn Park, Viera, Brevard County, Florida, United States",
+    "class": "leisure",
+    "type": "park",
+    "importance": 0.35000000000000003
+  },
+  {
+    "place_id": 88922591,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 10775897,
+    "boundingbox": [
+      "28.2412522",
+      "28.2440216",
+      "-80.7089634",
+      "-80.7068498"
+    ],
+    "lat": "28.2427598",
+    "lon": "-80.7075525",
+    "display_name": "Fawn Ridge Drive, Viera, Brevard County, Florida, 32940, United States",
+    "class": "highway",
+    "type": "residential",
+    "importance": 0.3
+  },
+  {
+    "place_id": 88409324,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 10767925,
+    "boundingbox": [
+      "27.8827462",
+      "27.8827852",
+      "-80.6633323",
+      "-80.6570412"
+    ],
+    "lat": "27.8827471",
+    "lon": "-80.6590611",
+    "display_name": "Fawn Trail Street, Brevard County, Florida, United States",
+    "class": "highway",
+    "type": "residential",
+    "importance": 0.3
+  },
+  {
+    "place_id": 87885389,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 10771958,
+    "boundingbox": [
+      "28.5149562",
+      "28.5172467",
+      "-80.8632993",
+      "-80.8605193"
+    ],
+    "lat": "28.5160597",
+    "lon": "-80.8622441",
+    "display_name": "Fawn Trail, Brevard County, Florida, 32780, United States",
+    "class": "highway",
+    "type": "residential",
+    "importance": 0.3
+  },
+  {
+    "place_id": 112275219,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 105598932,
+    "boundingbox": [
+      "28.1462355",
+      "28.1469381",
+      "-80.7108953",
+      "-80.7106807"
+    ],
+    "lat": "28.1467158",
+    "lon": "-80.7107451",
+    "display_name": "Spotted Fawn Way, Brevard County, Florida, 32934, United States",
+    "class": "highway",
+    "type": "residential",
+    "importance": 0.3
+  }
+]
