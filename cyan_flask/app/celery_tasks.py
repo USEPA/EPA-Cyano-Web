@@ -254,9 +254,13 @@ class CeleryHandler:
         """
         Revokes/cancels a celery task.
         """
-        result = celery_instance.AsyncResult(job_id).revoke()
-        logging.warning("Task '{}' revoked: {}".format(job_id, result))
-        return {"status": "success"}
+        try:
+            result = celery_instance.AsyncResult(job_id).revoke()
+            logging.warning("Task '{}' revoked: {}".format(job_id, result))
+            return {"status": "Job canceled"}
+        except Exception as e:
+            logging.error("revoke_job error: {}".format(e))
+            return {"status": "Failed to cancel job"}
 
     def make_cyano_request(self, request_data):
         """
@@ -274,8 +278,8 @@ class CeleryHandler:
         )
 
         try:
-            response = requests.get(url)
-            return json.loads(response.content, timeout=self.cyano_request_timeout)
+            response = requests.get(url, timeout=self.cyano_request_timeout)
+            return json.loads(response.content)
         except requests.exceptions.RequestException as e:
             logging.error("make_cyano_request exception occurred: {}".format(e))
             raise e

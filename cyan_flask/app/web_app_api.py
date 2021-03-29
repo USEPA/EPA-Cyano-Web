@@ -627,18 +627,31 @@ def cancel_batch_job(request_obj):
     except KeyError:
         return {"error": "Invalid key in request"}, 400
 
-    user = User.query.filter_by(username=username).first()  # gets user email from db
-    user_job = celery_handler.get_active_user_job(
-        username
-    )  # gets any active job user may have
+    # user = User.query.filter_by(username=username).first()  # gets user email from db
+    # user_job = celery_handler.get_active_user_job(
+    #     username
+    # )  # gets any active job user may have
 
-    # TODO: This endpoint is in progress.
+    user_job = celery_handler.get_job_from_db(username, job_id)
 
-    canceled_job = celery_handler.cancel_job(username, job_id)
+    if not user_job:
+        # No job to cancel, user doesn't have this job, skip revoking.
+        # TODO: Complete
+        pass
+
+    cancel_response = celery_handler.revoke_job(job_id)
+
+    # TODO: Check if revoke worked then update DB.
+
+    # Updates job status in DB.
+    user_job.job_status = "REVOKED"
+    db.session.commit()
+
+    # TODO: Send jobId back and status for updating table.
 
     response_obj = dict(Job.user_jobs_response())
-    response_obj["status"] = "success"
-    response_obj["jobs"] = [canceled_job]
+    response_obj["status"] = cancel_response["status"]
+    response_obj["job_status"] = "REVOKED"
 
     return response_obj, 200
 
@@ -651,9 +664,13 @@ def get_all_batch_jobs(request_obj):
 
     user_jobs = celery_handler.get_all_jobs(username)
 
+    jobs = list(reversed(
+        Job.create_jobs_json(user_jobs)
+    ))  # sorts in desc (latest job first)
+
     response_obj = dict(Job.user_jobs_response())
     response_obj["status"] = "success"
-    response_obj["jobs"] = Job.create_jobs_json(user_jobs)
+    response_obj["jobs"] = jobs
 
     return response_obj, 200
 

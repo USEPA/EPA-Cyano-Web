@@ -114,6 +114,7 @@ class Job(db.Model):
     @staticmethod
     def job_response_obj():
         return {
+            "jobNum": None,
             "jobId": None,
             "jobStatus": None,
             "inputFile": None,
@@ -130,11 +131,13 @@ class Job(db.Model):
     @classmethod
     def create_jobs_json(cls, user_jobs):
         """
-        Creates json object of user jobs.
+        Creates json object of user jobs for frontend table.
         """
         jobs_json = []
+        _id = 1
         for job in user_jobs:
             job_obj = dict(cls.job_response_obj())
+            job_obj["jobNum"] = _id
             job_obj["jobId"] = job.job_id
             job_obj["jobStatus"] = job.job_status
             job_obj["inputFile"] = job.input_file
@@ -147,4 +150,5 @@ class Job(db.Model):
                 job.finished_datetime
             )
             jobs_json.append(job_obj)
+            _id += 1
         return jobs_json
