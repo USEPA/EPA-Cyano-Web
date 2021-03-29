@@ -43,6 +43,7 @@ export class BatchComponent {
   columnNames: any[] = columnNames;
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('uploader') uploader;  // input file uploader
 
   constructor(
     public dialogRef: MatDialogRef<BatchComponent>,
@@ -68,6 +69,10 @@ export class BatchComponent {
   exit(): void {
     this.dialogRef.close();
     this.ngOnDestroy();
+  }
+
+  clearFile(): void {
+    this.uploader.nativeElement.value = '';
   }
 
   stopJobPolling(): void {
@@ -206,6 +211,7 @@ export class BatchComponent {
       let csvContent = this.validateFileContent(reader.result);
 
       if ('error' in csvContent) {
+        // this.status = csvContent.error;
         this.displayMessageDialog(csvContent.error);
         this.uploadedFile = null;
         return;
@@ -225,6 +231,8 @@ export class BatchComponent {
 
     }
     reader.readAsText(this.uploadedFile);
+
+    this.clearFile();  // enable uploading same filename on (change) multiple times
   }
 
   tabChange(event): void {
