@@ -46,7 +46,7 @@ export class BottomMenuComponent implements OnInit {
       // TODO: Use class to account for various device sizes
       width: '60%',
       maxWidth: '75%',
-      maxHeight: '75%'
+      height: '75%'
     });
   }
 

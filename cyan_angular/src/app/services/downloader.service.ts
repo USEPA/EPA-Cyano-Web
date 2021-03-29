@@ -228,7 +228,6 @@ export class DownloaderService {
     /*
     Returns batch job(s).
     */
-    // let url = this.envService.config.baseServerUrl + 'batch/' + batchJob;
     let url = this.envService.config.baseServerUrl + 'batch';
     return this.executeAuthorizedGetRequest(url);
   }
