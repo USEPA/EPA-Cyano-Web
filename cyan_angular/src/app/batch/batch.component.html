@@ -2,8 +2,8 @@
 
 <mat-tab-group (selectedTabChange)="tabChange($event)" mat-stretch-tabs class="jobs_tab_group" #tabGroup>
 
-    <!-- Run tab -->
-    <mat-tab label="Run">
+		<!-- Run tab -->
+		<mat-tab label="Run">
 		<div class="">
 			<br><p>Upload CSV for batch processing (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download template input file</a>)</p><br>
 			<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
@@ -14,26 +14,32 @@
 				<p><b>Input Filename:</b> {{currentInputFilename}}</p>
 				<p><b>Job ID:</b> {{currentJobStatus.job_id}}</p>
 				<p><b>Job Status:</b> {{currentJobStatus.job_status}}</p>
+				<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Job</button>
 			</div>
 		</div>
 	</mat-tab>
-
-	<!-- Info tab -->
-	<!-- <mat-tab label="Info">
-		<p>Get info on a job</p>
-	</mat-tab> -->
 
 	<!-- Jobs/History tab -->
 	<mat-tab label="Jobs">
 		<br><p>List of all user jobs</p><br>
 		<div class="table-responsive">
 			<mat-table #table [dataSource]="dataSource" matSort>
-			  <ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">
-			    <mat-header-cell *matHeaderCellDef mat-sort-header> {{column.value}}</mat-header-cell>
-			    <mat-cell *matCellDef="let element"> {{element[column.id]}}</mat-cell>
-			  </ng-container>
-			  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-			  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+				<ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">
+					<mat-header-cell *matHeaderCellDef mat-sort-header>{{column.value}}</mat-header-cell>
+					<mat-cell *matCellDef="let element">
+						<!-- Displays "X" next to job to cancel if in an active state -->
+						<mat-icon
+							class="cancel-icon"
+							*ngIf="column.id == 'jobStatus' && inProgressStates.includes(element[column.id])"
+							(click)="cancelJob(element)"
+						>
+							clear
+						</mat-icon>
+						{{element[column.id]}}
+					</mat-cell>
+				</ng-container>
+				<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+				<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 			</mat-table>
 		</div>
 	</mat-tab>

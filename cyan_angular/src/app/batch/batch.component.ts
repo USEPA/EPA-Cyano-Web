@@ -1,17 +1,21 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { DataSource } from '@angular/cdk/table';
+import { MatSort } from '@angular/material/sort';
 
 import { AuthService } from '../services/auth.service';
 import { DownloaderService } from '../services/downloader.service';
+import { LoaderService } from '../services/loader.service';
 import { 
   BatchJob,
   BatchLocation,
   BatchStatus,
   JobsTableParams,
-  columnNames
+  columnNames,
+  csvKeys
 } from '../models/batch';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 
 @Component({
@@ -25,6 +29,8 @@ export class BatchComponent {
   */
   uploadedFile: File;  // user input file
   acceptedType: string = 'csv';  // accepted file type for upload
+  maxFilenameLength: number = 128;  // max allowed length of filename
+  numInputColumns: number = 3;  // number of columns in input file
   status: string = '';  // job status
   pollStatusDelay: number = 2000;  // milliseconds
   intervalProcess: ReturnType<typeof setInterval>;  // keeps track of status polling
@@ -36,11 +42,15 @@ export class BatchComponent {
   displayedColumns: string[] = [];
   columnNames: any[] = columnNames;
 
+  @ViewChild(MatSort) sort: MatSort;
+
   constructor(
     public dialogRef: MatDialogRef<BatchComponent>,
     private authService: AuthService,
     private downloaderService: DownloaderService,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    private loaderService: LoaderService,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private messageDialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -52,12 +62,17 @@ export class BatchComponent {
     this.status = '';
     this.uploadedFile = null;
     this.currentInputFilename = '';
-    clearInterval(this.intervalProcess);
+    this.stopJobPolling();
   }
 
   exit(): void {
     this.dialogRef.close();
     this.ngOnDestroy();
+  }
+
+  stopJobPolling(): void {
+    console.log("Stopping job status polling.")
+    clearInterval(this.intervalProcess);
   }
 
   pollJobStatus(batchStatus: BatchStatus): void {
@@ -66,20 +81,28 @@ export class BatchComponent {
     */
     console.log("Starting job status polling.")
     this.intervalProcess = setInterval(() => {
+      if (!this.authService.checkUserAuthentication()) { 
+        // Prevents polling forever from idle user
+        this.stopJobPolling();
+        return;
+      }
       this.downloaderService.checkBatchJobStatus(batchStatus).subscribe(response => {
         if (response['status'].length > 0) {
           this.status = response['status'];
         }
-        if (response['status'].includes("Failed")) {
-          console.log("Stopping job status polling.")
-          clearInterval(this.intervalProcess);
-        }
-        else if (this.finishedStates.includes(this.currentJobStatus.job_status)) {
-          console.log("Stopping job status polling.")
-          clearInterval(this.intervalProcess);
-        }
+
         this.currentJobStatus.job_id = response['job_id'];
         this.currentJobStatus.job_status = response['job_status'];
+
+        if (
+          response['status'].includes("Failed")
+          || this.finishedStates.includes(response['job_status'])
+        ) {
+          // Stops if job failed or is in a finished state.
+          this.stopJobPolling();
+          return;
+        }
+
       });
     }, this.pollStatusDelay);
   }
@@ -90,14 +113,18 @@ export class BatchComponent {
     */
     let uploadedFile = event.target.files[0];
 
+    // Checks if filename has been defined:
     if (uploadedFile === undefined || uploadedFile.length <= 0) {
       return {"error": "Error uploading file."};
     }
 
-    // TODO: Filename length check.
+    // Performs max filename length check:
+    if (uploadedFile.length > this.maxFilenameLength) {
+      return {"error": "Filename is too long (max " + this.maxFilenameLength + ")"}
+    }
 
+    // Checks for ".csv" extension at end of filename:
     let fileExtension = uploadedFile.name.split(".").splice(-1)[0];
-
     if (fileExtension != this.acceptedType) {
       return {"error": "File is not of type CSV."};
     }
@@ -105,12 +132,27 @@ export class BatchComponent {
     return uploadedFile;
   }
 
-  validateFileContent(fileContent) {
+  validateFileContent(fileContent): any {
     /*
-    TODO
+    Validates content of CSV input file.
     */
-    // TODO 1: Check that the headers are correct.
-    return fileContent;
+
+    let rows = fileContent.split('\n');
+    let headers = rows[0].split(',');
+
+    if (headers.length != this.numInputColumns) {
+      return {'error': 'Input file has incorrect number of columns'};
+    }
+
+    // headers.forEach(item => {
+    for (let index in headers) {
+      let item = headers[index];
+      if (!csvKeys.includes(this.cleanString(item))) {
+        return {'error': 'Column "' + item + '" is an incorrect column name'};
+      }
+    }
+
+    return {'data': fileContent};
   }
 
   cleanString(str) {
@@ -148,8 +190,9 @@ export class BatchComponent {
 
     let file = this.validateUploadedFile(event);
     
-    if ("error" in file) {
-      this.status = file.error;
+    if ('error' in file) {
+      // this.status = file.error;
+      this.displayMessageDialog(file.error);
       this.uploadedFile = null;
       return;
     }
@@ -160,7 +203,16 @@ export class BatchComponent {
     let reader = new FileReader();
 
     reader.onload = (e) => {
-      let csvContent: string = this.validateFileContent(reader.result);
+      let csvContent = this.validateFileContent(reader.result);
+
+      if ('error' in csvContent) {
+        this.displayMessageDialog(csvContent.error);
+        this.uploadedFile = null;
+        return;
+      }
+      else {
+        csvContent = csvContent.data;
+      }
       
       let locationObjects: BatchLocation[] = this.createBatchLocations(csvContent);
 
@@ -169,18 +221,7 @@ export class BatchComponent {
       batchJob.locations = locationObjects;
       batchJob.status = new BatchStatus();
 
-      this.currentInputFilename = this.uploadedFile.name;
-
-      // Kicks off batch/celery process via API:
-      this.downloaderService.startBatchJob(batchJob).subscribe(response => {
-        this.status = response['status'];
-        if (this.status.includes("Failed")) {
-          return;  // halts job if there was an issue
-        }
-        batchJob.status.job_id = response['job_id'];
-        batchJob.status.job_status = response['job_status'];
-        this.pollJobStatus(batchJob.status);
-      });
+      this.makeJobStartRequest(batchJob);  // starts batch job
 
     }
     reader.readAsText(this.uploadedFile);
@@ -190,23 +231,106 @@ export class BatchComponent {
     /*
     Handles batch job tab change event.
     */
-    console.log(event);
     if (event.index == 1) {
-      // Loads all of user's jobs
+      // "Jobs" tab - loads all of user's jobs
       this.downloaderService.getBatchJobs().subscribe(response => {
         if (response['status'] == false) {
-          console.log("Error getting batch jobs");
-          alert("Error getting batch jobs");
+          this.displayMessageDialog("Cannot display batch jobs");
         }
         this.createTable(response);
       });
     }
   }
 
-  createTable(jobsResponse) {
-    console.log("Creating job table.");
+  createTable(jobsResponse): void {
+    /*
+    Creates table object in "Jobs" tab.
+    */
     let tableArray: JobsTableParams[] = jobsResponse['jobs'];
     this.dataSource = new MatTableDataSource(tableArray);
+    this.sortTable();
+  }
+
+  sortTable() {
+    /*
+    Adds sorting feature to table columns.
+    */
+    this.dataSource.sort = this.sort;
+  }
+
+  cancelJob(rowData: JobsTableParams = null) {
+    /*
+    Handles job cancel event from "Run" and "Jobs" tab.
+    */
+
+    let batchJobStatus = new BatchStatus(); 
+
+    if (rowData == null) {
+      // "Run" tab - uses current job.
+      batchJobStatus.job_id = this.currentJobStatus.job_id;
+      batchJobStatus.job_status = this.currentJobStatus.job_status;
+    }
+    else {
+      // "Jobs" tab - uses job from table.
+      batchJobStatus.job_id = rowData.jobId;
+      batchJobStatus.job_status = rowData.jobStatus;
+    }
+
+    if (this.finishedStates.includes(batchJobStatus.job_status)) {
+      // Skips cancel request if job already finished.
+      this.displayMessageDialog("Job is already complete");
+      this.stopJobPolling();
+      return;
+    }
+
+    this.makeCancelJobRequest(batchJobStatus, rowData);
+
+  }
+
+  makeCancelJobRequest(batchJobStatus: BatchStatus, rowData: JobsTableParams): void {
+    /*
+    Makes request to cancel user's active job.
+    */
+    this.loaderService.show();
+    this.downloaderService.cancelBatchJob(batchJobStatus).subscribe(response => {
+      this.loaderService.hide();
+      this.status = response['status'];
+      this.currentJobStatus.job_status = response['job_status'];
+      this.displayMessageDialog(response['status']);
+      this.stopJobPolling();
+      if (rowData != null) {
+        // Updates table job status if canceled from table.
+        rowData.jobStatus = response['job_status'];
+      }
+    });
+  }
+
+  makeJobStartRequest(batchJob: BatchJob) {
+    /*
+    Kicks off batch/celery process via API.
+    */
+    this.loaderService.show();
+    this.downloaderService.startBatchJob(batchJob).subscribe(response => {
+      this.loaderService.hide();
+      this.status = response['status'];
+      this.currentInputFilename = this.uploadedFile.name;
+      this.currentJobStatus.job_id = response['job_id'];
+      this.currentJobStatus.job_status = response['job_status'];
+      if (!this.status.includes("Failed")) {
+        this.pollJobStatus(this.currentJobStatus);
+      }
+    });
+  }
+
+  displayMessageDialog(message: string) {
+    /*
+    Displays dialog messages to user.
+    */
+    this.messageDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
   }
 
 }

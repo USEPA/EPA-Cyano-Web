@@ -26,6 +26,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { MatTableModule } from '@angular/material/table';
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -148,6 +149,7 @@ import { BatchComponent } from './batch/batch.component';
     MatToolbarModule,
     MatTableModule,
     MatSidenavModule,
+    MatSortModule,
     Ng5SliderModule,
     BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
