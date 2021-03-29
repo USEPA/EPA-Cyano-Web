@@ -10,40 +10,38 @@ export class BatchLocation {
   type: string;	
 }
 
+export const csvKeys = [
+  'latitude',
+  'longitude',
+  'type'
+]
+
 export class BatchStatus {
 	job_id: string;
   job_status: string;	
 }
 
 export interface JobsTableParams {
+  jobNum: string;
 	jobId: string;
 	jobStatus: string;
 	inputFile: string;
 	numLocations: number;
 	receivedDatetime: string;
-	startedDatetime: string;
+	// startedDatetime: string;
 	finishedDatetime: string;
 }
 
-export const jobsTableCols = [
-	'jobId',
-	'jobStatus',
-	'inputFile',
-	'numLocations',
-	'receivedDatetime',
-	'startedDatetime',
-	'finishedDatetime'
-]
-
+// "Jobs" table columns
 export const columnNames = [
   {
-    id: 'jobId',
-    value: 'Job ID'
+    id: 'jobNum',
+    value: 'Job'
     
   },
   {
     id: 'jobStatus',
-    value: 'Job Status'
+    value: 'Status'
     
   },
   {
@@ -61,11 +59,11 @@ export const columnNames = [
     value: 'Received'
     
   },
-  {
-    id: 'startedDatetime',
-    value: 'Started'
+  // {
+  //   id: 'startedDatetime',
+  //   value: 'Started'
     
-  },
+  // },
   {
     id: 'finishedDatetime',
     value: 'Finished'
