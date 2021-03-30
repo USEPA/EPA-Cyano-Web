@@ -12,7 +12,7 @@
 			<p>{{status}}</p><br>
 			<div *ngIf="currentInputFilename">
 				<p><b>Input Filename:</b> {{currentInputFilename}}</p>
-				<p><b>Job ID:</b> {{currentJobStatus.job_id}}</p>
+				<p><b>Job Number:</b> {{currentJobStatus.job_num}}</p>
 				<p><b>Job Status:</b> {{currentJobStatus.job_status}}</p>
 				<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Job</button>
 			</div>
@@ -21,7 +21,7 @@
 
 	<!-- Jobs/History tab -->
 	<mat-tab label="Jobs">
-		<br><p>List of all user jobs</p><br>
+		<br><p>List of user's jobs</p><br>
 		<div class="table-responsive">
 			<mat-table #table [dataSource]="dataSource" matSort>
 				<ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">
