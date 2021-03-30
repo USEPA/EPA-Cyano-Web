@@ -47,4 +47,81 @@ describe('BatchComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  fit('should test clearFile() - uploader element cleared', () => {
+
+  });
+
+  fit('should test stopJobPolling()', () => {
+
+  });
+
+  fit('should test pollJobStatus()', () => {
+
+  });
+
+  fit('should test validateUploadedFile()', () => {
+
+  });
+
+  fit('should test validateFileContent()', () => {
+
+  });
+
+  fit('should test cleanString()', () => {
+
+  });
+
+  fit('should test createBatchLocations()', () => {
+
+  });
+
+  fit('should test clearInputFields()', () => {
+
+  });
+
+  fit('should test uploadFile()', () => {
+
+  });
+
+  fit('should test tabChange()', () => {
+
+  });
+
+  fit('should test createTable()', () => {
+
+  });
+
+  fit('should test sortTable()', () => {
+
+  });
+
+  fit('should test cancelJob()', () => {
+
+  });
+
+  fit('should test makeCancelJobRequest()', () => {
+
+  });
+
+  fit('should test makeJobStartRequest()', () => {
+
+  });
+
+  fit('should test displayMessageDialog()', () => {
+
+  });
+
+  fit('should test convertJobsDatetimesToLocal()', () => {
+
+  });
+
+  fit('should test convertDatetime()', () => {
+
+  });
+
+  fit('should test updateTableJob()', () => {
+
+  });
+  
 });

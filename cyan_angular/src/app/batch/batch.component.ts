@@ -374,10 +374,6 @@ export class BatchComponent {
     }
   }
 
-  updateCurrentJob() {
-
-  }
-
   updateTableJob(jobData: JobsTableParams) {
     /*
     Updates job info in "Jobs" table.
