@@ -545,7 +545,7 @@ def get_batch_status(response_obj):
     else:
         response_obj["status"] = ""
 
-    response_obj["job_id"] = (user_job.job_id)
+    response_obj["job_id"] = user_job.job_id
     response_obj["job_status"] = user_job.job_status
     response_obj["job"] = Job.create_jobs_json([user_job])[0]
     return response_obj, 200
@@ -610,7 +610,9 @@ def start_batch_job(request_obj):
     response_obj[
         "status"
     ] = "Job started.\nAn email will be sent to {} \
-		  when the job is complete".format(user.email)
+		  when the job is complete".format(
+        user.email
+    )
     response_obj["job"] = Job.create_jobs_json([job_obj])[0]
     response_obj["job_status"] = job_status
     response_obj["job_id"] = job_obj.job_id
@@ -655,9 +657,9 @@ def get_all_batch_jobs(request_obj):
 
     user_jobs = celery_handler.get_all_jobs(username)
 
-    jobs = list(reversed(
-        Job.create_jobs_json(user_jobs)
-    ))  # sorts in desc (latest job first)
+    jobs = list(
+        reversed(Job.create_jobs_json(user_jobs))
+    )  # sorts in desc (latest job first)
 
     response_obj = dict(Job.user_jobs_response())
     response_obj["status"] = "success"

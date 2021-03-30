@@ -48,80 +48,80 @@ describe('BatchComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  fit('should test clearFile() - uploader element cleared', () => {
+  it('should test clearFile() - uploader element cleared', () => {
 
   });
 
-  fit('should test stopJobPolling()', () => {
+  it('should test stopJobPolling()', () => {
 
   });
 
-  fit('should test pollJobStatus()', () => {
+  it('should test pollJobStatus()', () => {
 
   });
 
-  fit('should test validateUploadedFile()', () => {
+  it('should test validateUploadedFile()', () => {
 
   });
 
-  fit('should test validateFileContent()', () => {
+  it('should test validateFileContent()', () => {
 
   });
 
-  fit('should test cleanString()', () => {
+  it('should test cleanString()', () => {
 
   });
 
-  fit('should test createBatchLocations()', () => {
+  it('should test createBatchLocations()', () => {
 
   });
 
-  fit('should test clearInputFields()', () => {
+  it('should test clearInputFields()', () => {
 
   });
 
-  fit('should test uploadFile()', () => {
+  it('should test uploadFile()', () => {
 
   });
 
-  fit('should test tabChange()', () => {
+  it('should test tabChange()', () => {
 
   });
 
-  fit('should test createTable()', () => {
+  it('should test createTable()', () => {
 
   });
 
-  fit('should test sortTable()', () => {
+  it('should test sortTable()', () => {
 
   });
 
-  fit('should test cancelJob()', () => {
+  it('should test cancelJob()', () => {
 
   });
 
-  fit('should test makeCancelJobRequest()', () => {
+  it('should test makeCancelJobRequest()', () => {
 
   });
 
-  fit('should test makeJobStartRequest()', () => {
+  it('should test makeJobStartRequest()', () => {
 
   });
 
-  fit('should test displayMessageDialog()', () => {
+  it('should test displayMessageDialog()', () => {
 
   });
 
-  fit('should test convertJobsDatetimesToLocal()', () => {
+  it('should test convertJobsDatetimesToLocal()', () => {
 
   });
 
-  fit('should test convertDatetime()', () => {
+  it('should test convertDatetime()', () => {
 
   });
 
-  fit('should test updateTableJob()', () => {
+  it('should test updateTableJob()', () => {
 
   });
-  
+
 });
