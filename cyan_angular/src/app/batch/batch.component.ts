@@ -32,6 +32,7 @@ export class BatchComponent {
   acceptedType: string = 'csv';  // accepted file type for upload
   maxFilenameLength: number = 128;  // max allowed length of filename
   numInputColumns: number = 3;  // number of columns in input file
+  maxNumLocations: number = 1e3;  // max number of locations in input file
   status: string = '';  // job status
   pollStatusDelay: number = 2000;  // milliseconds
   intervalProcess: ReturnType<typeof setInterval>;  // keeps track of status polling
@@ -147,12 +148,16 @@ export class BatchComponent {
     /*
     Validates content of CSV input file.
     */
-
+    
     let rows = fileContent.split('\n');
     let headers = rows[0].split(',');
 
     if (headers.length != this.numInputColumns) {
       return {'error': 'Input file has incorrect number of columns'};
+    }
+
+    if (rows.length > this.maxNumLocations) {
+      return {'error': 'Number of locations exceeded (max is ' + this.maxNumLocations + ')'}
     }
 
     for (let index in headers) {
