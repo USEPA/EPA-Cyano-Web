@@ -3,6 +3,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatTableDataSource } from '@angular/material/table';
 import { DataSource } from '@angular/cdk/table';
 import { MatSort } from '@angular/material/sort';
+import { DatePipe } from '@angular/common';
 
 import { AuthService } from '../services/auth.service';
 import { DownloaderService } from '../services/downloader.service';
@@ -51,7 +52,8 @@ export class BatchComponent {
     private downloaderService: DownloaderService,
     private loaderService: LoaderService,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private messageDialog: MatDialog
+    private messageDialog: MatDialog,
+    private datePipe: DatePipe,
   ) { }
 
   ngOnInit(): void {
@@ -96,8 +98,12 @@ export class BatchComponent {
           this.status = response['status'];
         }
 
+        // Updates "Run" tab info
         this.currentJobStatus.job_id = response['job_id'];
         this.currentJobStatus.job_status = response['job_status'];
+
+        // Updates "Jobs" tab info
+        this.updateTableJob(response['job']);
 
         if (
           response['status'].includes("Failed")
@@ -149,7 +155,6 @@ export class BatchComponent {
       return {'error': 'Input file has incorrect number of columns'};
     }
 
-    // headers.forEach(item => {
     for (let index in headers) {
       let item = headers[index];
       if (!csvKeys.includes(this.cleanString(item))) {
@@ -196,7 +201,6 @@ export class BatchComponent {
     let file = this.validateUploadedFile(event);
     
     if ('error' in file) {
-      // this.status = file.error;
       this.displayMessageDialog(file.error);
       this.uploadedFile = null;
       return;
@@ -211,7 +215,6 @@ export class BatchComponent {
       let csvContent = this.validateFileContent(reader.result);
 
       if ('error' in csvContent) {
-        // this.status = csvContent.error;
         this.displayMessageDialog(csvContent.error);
         this.uploadedFile = null;
         return;
@@ -223,7 +226,7 @@ export class BatchComponent {
       let locationObjects: BatchLocation[] = this.createBatchLocations(csvContent);
 
       let batchJob: BatchJob = new BatchJob();
-      batchJob.filename = this.uploadedFile.name;  // TODO: Validate/sanitize filename
+      batchJob.filename = this.uploadedFile.name;
       batchJob.locations = locationObjects;
       batchJob.status = new BatchStatus();
 
@@ -237,7 +240,9 @@ export class BatchComponent {
 
   tabChange(event): void {
     /*
-    Handles batch job tab change event.
+    Handles batch job tab change event, which
+    makes a request to get user's jobs for building
+    the "Jobs" table.
     */
     if (event.index == 1) {
       // "Jobs" tab - loads all of user's jobs
@@ -255,6 +260,7 @@ export class BatchComponent {
     Creates table object in "Jobs" tab.
     */
     let tableArray: JobsTableParams[] = jobsResponse['jobs'];
+    tableArray = this.convertJobsDatetimesToLocal(tableArray);
     this.dataSource = new MatTableDataSource(tableArray);
     this.sortTable();
   }
@@ -324,6 +330,9 @@ export class BatchComponent {
       this.currentInputFilename = this.uploadedFile.name;
       this.currentJobStatus.job_id = response['job_id'];
       this.currentJobStatus.job_status = response['job_status'];
+      if ('job' in response) {
+        this.currentJobStatus.job_num = response['job']['jobNum'];
+      }
       if (!this.status.includes("Failed")) {
         this.pollJobStatus(this.currentJobStatus);
       }
@@ -337,6 +346,53 @@ export class BatchComponent {
     this.messageDialog.open(DialogComponent, {
       data: {
         dialogMessage: message
+      }
+    });
+  }
+
+  convertJobsDatetimesToLocal(jobsData: JobsTableParams[]) {
+    /*
+    Converts datetime values to local time for "Jobs" table.
+    */
+    jobsData.forEach(job => {
+      job.receivedDatetime = this.convertDatetime(job.receivedDatetime);
+      job.finishedDatetime = this.convertDatetime(job.finishedDatetime);
+    });
+    return jobsData;
+  }
+
+  convertDatetime(datetime: string) {
+    /*
+    Converts datetime string into local timezone.
+    */
+    if (datetime == 'None') {
+      return datetime;
+    }
+    else {
+      let utcFormattedDate = new Date(datetime + ' UTC');  // time in UTC from backend
+      return this.datePipe.transform(utcFormattedDate, 'yyyy-MM-dd HH:mm:ss');
+    }
+  }
+
+  updateCurrentJob() {
+
+  }
+
+  updateTableJob(jobData: JobsTableParams) {
+    /*
+    Updates job info in "Jobs" table.
+    */
+    // Get row data from table using jobid:
+    if (this.dataSource == null) {
+      return;
+    }
+
+    this.dataSource.filteredData.some(rowData => {
+      if (rowData.jobId == jobData.jobId) {
+        // Updates job status and finished time of matching job id
+        rowData.jobStatus = jobData.jobStatus;
+        rowData.finishedDatetime = this.convertDatetime(jobData.finishedDatetime);
+        return true;  // breaks out of iteration
       }
     });
   }

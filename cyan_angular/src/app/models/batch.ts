@@ -19,6 +19,7 @@ export const csvKeys = [
 export class BatchStatus {
 	job_id: string;
   job_status: string;	
+  job_num: string = "";
 }
 
 export interface JobsTableParams {
