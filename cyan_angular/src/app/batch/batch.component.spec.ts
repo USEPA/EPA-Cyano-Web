@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
@@ -23,6 +24,7 @@ describe('BatchComponent', () => {
       providers: [
         AuthService,
         LoaderService,
+        DatePipe,
         {
           provide: MatDialogRef,
           useValue: {}
