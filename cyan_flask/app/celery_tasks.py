@@ -168,10 +168,12 @@ class CeleryHandler:
         request_obj["job_id"] = job_id
 
         user = User.query.filter_by(username=username).first()  # gets user from db
+        user_jobs = Job.query.filter_by(user_id=user.id).all()  # gets user jobs
 
         # Creates initial job entry:
         job_obj = Job(
             user_id=user.id,
+            job_num=len(user_jobs) + 1,
             job_id=job_id,
             job_status="RECEIVED",
             input_file=filename,
@@ -187,7 +189,7 @@ class CeleryHandler:
             args=[request_obj], queue="celery", task_id=job_id
         )
 
-        return celery_job.id
+        return job_obj
 
     def get_active_user_job(self, username):
         """

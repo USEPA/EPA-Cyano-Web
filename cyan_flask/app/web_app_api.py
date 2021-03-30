@@ -545,8 +545,9 @@ def get_batch_status(response_obj):
     else:
         response_obj["status"] = ""
 
-    response_obj["job_id"] = (user_job.job_id,)
+    response_obj["job_id"] = (user_job.job_id)
     response_obj["job_status"] = user_job.job_status
+    response_obj["job"] = Job.create_jobs_json([user_job])[0]
     return response_obj, 200
 
 
@@ -589,31 +590,31 @@ def start_batch_job(request_obj):
         return response_obj, 200
 
     try:
-        job_id = celery_handler.start_task(request_obj)  # starts a new job
-        job_status = celery_handler.check_celery_job_status(job_id)
+        job_obj = celery_handler.start_task(request_obj)  # starts a new job
+        job_status = celery_handler.check_celery_job_status(job_obj.job_id)
     except Exception as e:
         logging.error("start_batch_job exception: {}".format(e))
         response_obj["status"] = "Failed - error starting job"
         response_obj["job_status"] = job_status
-        response_obj["job_id"] = job_id
+        response_obj["job_id"] = job_obj.job_id
         return response_obj, 500
 
     # Checks for job starting errors:
     if job_status in celery_handler.fail_states:
         response_obj["status"] = "Failed - error starting job"
         response_obj["job_status"] = job_status
-        response_obj["job_id"] = job_id
+        response_obj["job_id"] = job_obj.job_id
         return response_obj, 500
 
     # Returns info for successfully created job:
     response_obj[
         "status"
     ] = "Job started.\nAn email will be sent to {} \
-								when the job is complete".format(
-        user.email
-    )
+		  when the job is complete".format(user.email)
+    response_obj["job"] = Job.create_jobs_json([job_obj])[0]
     response_obj["job_status"] = job_status
-    response_obj["job_id"] = job_id
+    response_obj["job_id"] = job_obj.job_id
+
     return response_obj, 202
 
 
@@ -627,27 +628,17 @@ def cancel_batch_job(request_obj):
     except KeyError:
         return {"error": "Invalid key in request"}, 400
 
-    # user = User.query.filter_by(username=username).first()  # gets user email from db
-    # user_job = celery_handler.get_active_user_job(
-    #     username
-    # )  # gets any active job user may have
-
     user_job = celery_handler.get_job_from_db(username, job_id)
 
     if not user_job:
         # No job to cancel, user doesn't have this job, skip revoking.
-        # TODO: Complete
-        pass
+        return {"error": "User job not found"}, 200
 
     cancel_response = celery_handler.revoke_job(job_id)
-
-    # TODO: Check if revoke worked then update DB.
 
     # Updates job status in DB.
     user_job.job_status = "REVOKED"
     db.session.commit()
-
-    # TODO: Send jobId back and status for updating table.
 
     response_obj = dict(Job.user_jobs_response())
     response_obj["status"] = cancel_response["status"]

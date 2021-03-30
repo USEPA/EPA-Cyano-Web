@@ -22,6 +22,7 @@ def upgrade():
         "job",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("job_num", sa.Integer(), nullable=False),
         sa.Column("job_id", sa.String(length=256), nullable=False),
         sa.Column("job_status", sa.String(length=32), nullable=False),
         sa.Column("input_file", sa.String(length=128), nullable=False),

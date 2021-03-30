@@ -94,6 +94,7 @@ class Job(db.Model):
     __tablename__ = "job"
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    job_num = db.Column(db.Integer, nullable=False)
     job_id = db.Column(db.String(256), nullable=False)  # batch job ID
     job_status = db.Column(db.String(32), nullable=False)  # batch job status
     input_file = db.Column(db.String(128), nullable=False)  # user input filename
@@ -134,10 +135,9 @@ class Job(db.Model):
         Creates json object of user jobs for frontend table.
         """
         jobs_json = []
-        _id = 1
         for job in user_jobs:
             job_obj = dict(cls.job_response_obj())
-            job_obj["jobNum"] = _id
+            job_obj["jobNum"] = job.job_num
             job_obj["jobId"] = job.job_id
             job_obj["jobStatus"] = job.job_status
             job_obj["inputFile"] = job.input_file
@@ -150,5 +150,4 @@ class Job(db.Model):
                 job.finished_datetime
             )
             jobs_json.append(job_obj)
-            _id += 1
         return jobs_json
