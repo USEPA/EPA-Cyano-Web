@@ -343,7 +343,7 @@ export class LocationDetailsComponent implements OnInit {
     if (this.selectedLayer != undefined) {
       this.getImageDate();  // updates image date
       this.getImageName();  // updates image name
-      this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+      this.mapService.setMiniMarker(this.mapService.createMarker(this.current_location));  // updates marker on minimap
     }
   }
 
@@ -559,7 +559,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   onMapReady(map: Map): void {
-    let marker = this.createMarker();
+    let marker = this.mapService.createMarker(this.current_location);
     this.mapService.setMinimap(map, marker);
     setTimeout(() => {
       map.invalidateSize();
@@ -567,23 +567,8 @@ export class LocationDetailsComponent implements OnInit {
     }, 200);
   }
 
-  createMarker(): Marker {
-    return marker(this.mapService.getLatLng(this.current_location), {
-      icon: icon({
-        iconSize: [30, 36],
-        iconAnchor: [13, 41],
-        iconUrl: this.mapService.getMarker(this.current_location),
-        shadowUrl: 'leaflet/marker-shadow.png'
-      }),
-      alt: "Map marker for " + this.current_location.name,
-      title: this.current_location.name,
-      riseOnHover: true,
-      zIndexOffset: 10000
-    });
-  }
-
   changeMarker(): void {
-    this.mapService.setMiniMarker(this.createMarker());
+    this.mapService.setMiniMarker(this.mapService.createMarker(this.current_location));
     this.mapService.getMinimap().flyTo(this.mapService.getLatLng(this.current_location), 6);
   }
 
@@ -620,17 +605,41 @@ export class LocationDetailsComponent implements OnInit {
     }
   }
 
+  addMarkerOnClick(e: any): void {
+    /*
+    Adds marker to the location-details miniMap
+    (and the main map as well).
+    */
+
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    let map = this.mapService.getMinimap();
+    let lat = e.latlng.lat;
+    let lng = e.latlng.lng;
+
+    let name = 'To Be Updated...';
+    let cellCon = 0;
+    let maxCellCon = 0;
+    let cellChange = 0;
+    let dataDate = '01/01/2018';
+    let source = 'OLCI';
+
+    let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
+    map.setView(e.latlng, 12);
+    let m = this.mapService.addMarker(location);  // adds marker to main map
+    m.fireEvent('click');
+
+    let marker = this.mapService.createMarker(location, true);  // gets blank marker
+    this.mapService.setMinimap(map, marker);
+
+  }
+
   openNotes(l: Location): void {
     this.bottomSheet.open(LocationDetailsNotes, {
       data: {
         location: l
       }
     });
-
-  }
-
-  openCyanoDetails() {
-    console.log("openCyanoDetails() called.");
   }
 
 }

@@ -243,27 +243,12 @@ export class LatestImageComponent implements OnInit {
 	}
 
 	onMapReady(map: Map): void {
-		let marker = this.createMarker();
+		let marker = this.mapService.createMarker(this.location);
 		this.mapService.setMinimap(map, marker);
 		setTimeout(() => {
 			map.invalidateSize();
 			map.flyTo(this.mapService.getLatLng(this.location));
 		}, 200);
-	}
-
-	createMarker(): Marker {
-		let m = marker(this.mapService.getLatLng(this.location), {
-			icon: icon({
-				iconSize: [30, 36],
-				iconAnchor: [13, 41],
-				iconUrl: this.mapService.getMarker(this.location),
-				shadowUrl: 'leaflet/marker-shadow.png'
-			}),
-			title: this.location.name,
-			riseOnHover: true,
-			zIndexOffset: 10000
-		});
-		return m;
 	}
 
 }

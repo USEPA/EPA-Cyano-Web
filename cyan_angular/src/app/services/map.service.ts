@@ -33,12 +33,12 @@ export class MapService {
 
   setMiniMarker(mk: Marker): void {
     if (mk != undefined) {
-      if (this.cyanMap.miniMarker != undefined && this.cyanMap.miniMap.hasLayer(this.cyanMap.miniMarker)) {
-        this.cyanMap.miniMap.removeLayer(this.cyanMap.miniMarker);
-      }
+      // Removes any existing marker from minimap:
+      // if (this.cyanMap.miniMarker != undefined && this.cyanMap.miniMap.hasLayer(this.cyanMap.miniMarker)) {
+      //   this.cyanMap.miniMap.removeLayer(this.cyanMap.miniMarker);
+      // }
       this.cyanMap.miniMarker = mk;
       this.cyanMap.miniMap.addLayer(mk);
-      // console.log(mk);
     }
   }
 
@@ -69,19 +69,41 @@ export class MapService {
     }
   }
 
-  addMarker(ln: Location): Marker {
-    let map = this.getMap();
-    let m = marker(this.getLatLng(ln), {
-      icon: icon({
-        iconSize: [30, 36],
-        iconAnchor: [13, 41],
-        iconUrl: this.getMarker(ln),
-        shadowUrl: 'leaflet/marker-shadow.png',
-      }),
+  createMarker(location: Location, useBlank: boolean = false): Marker {
+    /*
+    Creates leaflet marker for map.
+    */
+
+    let markerLocation = useBlank ? null : location
+
+    let m = marker(this.getLatLng(location), {
+      icon: this.createIcon(markerLocation),
+      title: location.name,
+      alt: "Map marker for " + location.name,
       riseOnHover: true,
-      zIndexOffset: 10000,
-      alt: "Map marker for " + ln.name
+      zIndexOffset: 10000
     });
+
+    return m;
+  }
+
+  createIcon(location: Location) {
+    /*
+    Creates icon for map marker.
+    */
+    return icon({
+      iconSize: [30, 36],
+      iconAnchor: [13, 41],
+      iconUrl: this.getMarker(location),
+      shadowUrl: 'leaflet/marker-shadow.png'
+    });
+  }
+
+  addMarker(ln: Location, isMiniMap: boolean = false): Marker {
+
+    let map = this.getMap();
+    let m = this.createMarker(ln);
+
     let self = this;
     m.on('click', function(e) {
       let p = self.createPopup(ln);
@@ -103,12 +125,7 @@ export class MapService {
   }
 
   updateMarker(ln: Location): void {
-    let _icon = icon({
-      iconSize: [30, 36],
-      iconAnchor: [13, 41],
-      iconUrl: this.getMarker(ln),
-      shadowUrl: 'leaflet/marker-shadow.png'
-    });
+    let _icon = this.createIcon(ln);
     let marker = this.marker_list[ln.id];
     if (marker) {
       marker.setTooltipContent(ln.name + '<br>' + ln.dataDate);
@@ -117,9 +134,8 @@ export class MapService {
   }
 
   deleteMarker(ln: Location): void {
-    // console.log("Deleting layer from map")
+
     let marker = this.marker_list[ln.id];
-    // console.log(marker)
     this.cyanMap.markers.removeLayer(marker);
     delete this.marker_list[ln.id];
 
@@ -144,7 +160,16 @@ export class MapService {
     return popup;
   }
 
-  getMarker(ln: Location): string {
+  getMarker(ln: Location = null): string {
+    /*
+    Gets marker image URL for location based on
+    cell concentration and mark(ed).
+    */
+
+    if (ln === null) {
+      return 'assets/images/map_pin_blank.png';
+    }
+
     let n = ln.cellConcentration;
     let c = ln.marked;
     let userSettings = this.userService.getUserSettings();
