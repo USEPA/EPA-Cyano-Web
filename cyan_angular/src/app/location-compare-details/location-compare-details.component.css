@@ -600,6 +600,7 @@
     display: inline-block;
     height: 100%;
     width: 100%;
+    overflow-y: scroll;
 }
 .mini_map_block {
     display: inline-flex;
