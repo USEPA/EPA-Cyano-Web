@@ -613,7 +613,6 @@ export class LocationDetailsComponent implements OnInit {
 
     if (!this.authService.checkUserAuthentication()) { return; }
 
-    let map = this.mapService.getMinimap();
     let lat = e.latlng.lat;
     let lng = e.latlng.lng;
 
@@ -625,13 +624,36 @@ export class LocationDetailsComponent implements OnInit {
     let source = 'OLCI';
 
     let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
-    map.setView(e.latlng, 12);
+
+    let miniMap = this.mapService.getMinimap();
+    miniMap.setView(e.latlng, 12);
+
     let m = this.mapService.addMarker(location);  // adds marker to main map
     m.fireEvent('click');
+    this.mapService.getMap().closePopup();  // closes popup on main map
 
-    let marker = this.mapService.createMarker(location, true);  // gets blank marker
-    this.mapService.setMinimap(map, marker);
+    let miniMarker = this.mapService.addMiniMarker(location);  // adds blank marker to minimap
 
+    this.setMiniMarkerEvents(miniMarker, location);
+
+  }
+
+  setMiniMarkerEvents(miniMarker: Marker, location: Location): void {
+    /*
+    Adds marker events to marker on the mini map.
+    */
+    let self = this;
+    miniMarker.on('click', function(e) {
+      self.mapService.deleteMiniMarker(location);  // remove from miniMap
+      self.mapService.deleteMarker(location);  // remove from main map
+      self.locationService.deleteLocation(location);  // remove location from user db
+    });
+    miniMarker.on('mouseover', function(e) {
+      miniMarker.setIcon(self.mapService.createIcon(null, 'remove'));
+    });
+    miniMarker.on('mouseout', function(e) {
+      miniMarker.setIcon(self.mapService.createIcon(null));
+    });
   }
 
   openNotes(l: Location): void {

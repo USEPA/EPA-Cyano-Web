@@ -14,6 +14,8 @@ export class MapService {
   cyan_ranges: ConcentrationRanges;
 
   marker_list = {};
+  mini_marker_list = {};
+
   private data_source = 'OLCI';
 
   public mainTileLayer: string = '';
@@ -87,14 +89,14 @@ export class MapService {
     return m;
   }
 
-  createIcon(location: Location) {
+  createIcon(location: Location, markerType: string = null) {
     /*
     Creates icon for map marker.
     */
     return icon({
       iconSize: [30, 36],
       iconAnchor: [13, 41],
-      iconUrl: this.getMarker(location),
+      iconUrl: this.getMarker(location, markerType),
       shadowUrl: 'leaflet/marker-shadow.png'
     });
   }
@@ -124,6 +126,16 @@ export class MapService {
     return m;
   }
 
+  addMiniMarker(ln: Location): Marker {
+    /*
+    Adds marker to mini map.
+    */
+    let marker = this.createMarker(ln, true);
+    this.setMinimap(this.cyanMap.miniMap, marker);
+    this.mini_marker_list[ln.id] = marker;
+    return marker;
+  }
+
   updateMarker(ln: Location): void {
     let _icon = this.createIcon(ln);
     let marker = this.marker_list[ln.id];
@@ -140,6 +152,16 @@ export class MapService {
     delete this.marker_list[ln.id];
 
     this.cyanMap.map.closePopup();
+  }
+
+  deleteMiniMarker(ln: Location): void {
+    /*
+    Removes marker from mini map.
+    */
+    let miniMarker = this.mini_marker_list[ln.id];
+    this.cyanMap.miniMap.removeLayer(miniMarker);
+    delete this.mini_marker_list[ln.id];
+    this.cyanMap.miniMap.closePopup();
   }
 
   getSource(): string {
@@ -160,14 +182,17 @@ export class MapService {
     return popup;
   }
 
-  getMarker(ln: Location = null): string {
+  getMarker(ln: Location = null, markerType: string = null): string {
     /*
     Gets marker image URL for location based on
     cell concentration and mark(ed).
     */
 
-    if (ln === null) {
-      return 'assets/images/map_pin_blank.png';
+    if (ln === null && markerType == 'remove') {
+      return 'assets/images/map_pin_blank_remove.png';
+    }
+    else if (ln == null) {
+      return 'assets/images/map_pin_blank.png'; 
     }
 
     let n = ln.cellConcentration;
