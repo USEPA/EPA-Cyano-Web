@@ -167,6 +167,7 @@ import { BatchComponent } from './batch/batch.component';
     AuthGuard,
     AddComment,
     DialogComponent,
+    CoordinatesComponent,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

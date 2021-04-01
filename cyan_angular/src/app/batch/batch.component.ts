@@ -17,6 +17,7 @@ import {
   csvKeys
 } from '../models/batch';
 import { DialogComponent } from '../shared/dialog/dialog.component';
+import { CoordinatesComponent } from '../coordinates/coordinates.component';
 
 
 @Component({
@@ -33,6 +34,7 @@ export class BatchComponent {
   maxFilenameLength: number = 128;  // max allowed length of filename
   numInputColumns: number = 3;  // number of columns in input file
   maxNumLocations: number = 1e3;  // max number of locations in input file
+  allowedDataTypes: string[] = ['daily', 'weekly'];  // allowed data types
   status: string = '';  // job status
   pollStatusDelay: number = 2000;  // milliseconds
   intervalProcess: ReturnType<typeof setInterval>;  // keeps track of status polling
@@ -55,11 +57,13 @@ export class BatchComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private messageDialog: MatDialog,
     private datePipe: DatePipe,
+    private coords: CoordinatesComponent
   ) { }
 
   ngOnInit(): void {
     this.currentJobStatus = new BatchStatus();
     this.displayedColumns = this.columnNames.map(x => x.id);
+    this.coords.selectedKey = 'dd';  // uses decimal degrees for all lat/lon in batch feature
   }
 
   ngOnDestroy(): void {
@@ -81,6 +85,17 @@ export class BatchComponent {
   stopJobPolling(): void {
     console.log("Stopping job status polling.")
     clearInterval(this.intervalProcess);
+  }
+
+  handleError(error: string): void {
+    /*
+    Handles error message to user and any housekeeping,
+    and halts the execution by throwing error.
+    */
+    this.displayMessageDialog(error);
+    this.uploadedFile = null;
+    this.clearInputFields();
+    throw error;
   }
 
   pollJobStatus(batchStatus: BatchStatus): void {
@@ -127,18 +142,18 @@ export class BatchComponent {
 
     // Checks if filename has been defined:
     if (uploadedFile === undefined || uploadedFile.length <= 0) {
-      return {"error": "Error uploading file."};
+      this.handleError('Error uploading file.');
     }
 
     // Performs max filename length check:
     if (uploadedFile.length > this.maxFilenameLength) {
-      return {"error": "Filename is too long (max " + this.maxFilenameLength + ")"}
+      this.handleError('Filename is too long (max ' + this.maxFilenameLength + ')');
     }
 
-    // Checks for ".csv" extension at end of filename:
-    let fileExtension = uploadedFile.name.split(".").splice(-1)[0];
+    // Checks for '.csv' extension at end of filename:
+    let fileExtension = uploadedFile.name.split('.').splice(-1)[0];
     if (fileExtension != this.acceptedType) {
-      return {"error": "File is not of type CSV."};
+      this.handleError('File is not of type CSV.');
     }
 
     return uploadedFile;
@@ -150,46 +165,112 @@ export class BatchComponent {
     */
     
     let rows = fileContent.split('\n');
-    let headers = rows[0].split(',');
+    let headers = this.splitRowData(rows[0]);
 
+    // Checks number of columns:
     if (headers.length != this.numInputColumns) {
-      return {'error': 'Input file has incorrect number of columns'};
+      this.handleError('Input file has incorrect number of columns');
     }
 
+    // Checks number of locations:
     if (rows.length > this.maxNumLocations) {
-      return {'error': 'Number of locations exceeded (max is ' + this.maxNumLocations + ')'}
+      this.handleError('Number of locations exceeded (max is ' + this.maxNumLocations + ')');
     }
 
+    // Checks column headers:
     for (let index in headers) {
       let item = headers[index];
       if (!csvKeys.includes(this.cleanString(item))) {
-        return {'error': 'Column "' + item + '" is an incorrect column name'};
+        this.handleError('Column "' + item + '" is an incorrect column name');
       }
     }
 
-    return {'data': fileContent};
+    return fileContent;
+
+  }
+
+  validateRowData(rowArray, rowIndex: number): any {
+    /*
+    Validates row data itself.
+    rowArray - [latitude, longitude, type]
+    */
+
+    // Checks row length:
+    if (rowArray.length != this.numInputColumns) {
+      this.handleError(
+        'Row "' + rowIndex + '" has incorrect number of columns'
+      );
+    }
+
+    // Checks that data type is correct:
+    if (!this.allowedDataTypes.includes(rowArray[2])) {
+      this.handleError(
+        'Data type column must be one of the following: ' +
+        this.allowedDataTypes
+      );
+    }
+
+    // Checks if any values are blank:
+    for (let index in rowArray) {
+      let item = rowArray[index];
+      if (!item || item.length < 1) {
+        this.handleError('Row "' + rowIndex + '" -- item in row is blank');
+      }
+    }
+
+    // Checks for valid coordinates:
+    if(!this.coords.withinConus(rowArray[0], rowArray[1])) {
+      this.handleError(
+        'Row "' + rowIndex +
+        '" with coordinates "'+ rowArray[0] + ', ' + rowArray[1] +
+        '" are not within CONUS'
+      );
+    }
+
+    return rowArray;
+
   }
 
   cleanString(str) {
     return str.replace(/\r?\n|\r/g, "");
   }
 
+  splitRowData(row: string): string[] {
+    /*
+    Splits up CSV row in an array whether it's
+    comma, space, or tab delimited.
+    */
+    return row.split(/[ ,\t]+/);
+  }
+
   createBatchLocations(csvData: string): BatchLocation[] {
-    // csvData ex: lat,lon,type\nval1,val2,val3\n
+    /*
+    csvData ex: lat,lon,type\nval1,val2,val3\n
+    */
+
     let batchLocations: BatchLocation[] = [];
     let rows = csvData.split('\n');
+    let rowIndex = 1;
+
     rows.slice(1, -1).forEach(row => {
-      let rowArray = row.split(',');
+      
+      let rowArray = this.splitRowData(row);
+      rowArray = this.validateRowData(rowArray, rowIndex);
+
       let batchLocation: BatchLocation = new BatchLocation();
       batchLocation.latitude = parseFloat(rowArray[0]);
       batchLocation.longitude = parseFloat(rowArray[1]);
       batchLocation.type = this.cleanString(rowArray[2]);  // weekly/daily
       batchLocations.push(batchLocation);
+      
+      rowIndex += 1;
     });
+
     return batchLocations;
   }
 
   clearInputFields(): void {
+    this.status = '';
     this.currentJobStatus.job_id = '';
     this.currentJobStatus.job_status = '';
     this.currentInputFilename = '';
@@ -203,31 +284,13 @@ export class BatchComponent {
 
     this.clearInputFields();
 
-    let file = this.validateUploadedFile(event);
-    
-    if ('error' in file) {
-      this.displayMessageDialog(file.error);
-      this.uploadedFile = null;
-      return;
-    }
-    else {
-      this.uploadedFile = file;
-    }
+    this.uploadedFile = this.validateUploadedFile(event);
 
     let reader = new FileReader();
 
     reader.onload = (e) => {
-      let csvContent = this.validateFileContent(reader.result);
 
-      if ('error' in csvContent) {
-        this.displayMessageDialog(csvContent.error);
-        this.uploadedFile = null;
-        return;
-      }
-      else {
-        csvContent = csvContent.data;
-      }
-      
+      let csvContent = this.validateFileContent(reader.result);      
       let locationObjects: BatchLocation[] = this.createBatchLocations(csvContent);
 
       let batchJob: BatchJob = new BatchJob();
