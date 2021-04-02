@@ -48,7 +48,7 @@ export class ViewComment implements OnInit {
     let newReply = new Reply();
     newReply.comment_id = this.comment.id;
     newReply.comment_user = this.comment.username;
-    newReply.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    newReply.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd HH:mm:ss');
     newReply.body = this.body;  // reply content
     return newReply;
   }

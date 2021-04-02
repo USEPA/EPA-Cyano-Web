@@ -23,33 +23,34 @@ runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 crypt_manager = CryptManager()
 
+
 class TestAuth(unittest.TestCase):
     """
-	Unit test class for web_app_api.py module, which is the Flask app
-	that defines the API endpoints.
-	"""
+    Unit test class for web_app_api.py module, which is the Flask app
+    that defines the API endpoints.
+    """
 
     print("cyan_flask auth.py unittests conducted at " + str(datetime.datetime.today()))
 
     def setUp(self):
         """
-		Setup routine called before each unit tests.
-		:return:
-		"""
+        Setup routine called before each unit tests.
+        :return:
+        """
         pass
 
     def tearDown(self):
         """
-		teardown called after each test
-		:return:
-		"""
+        teardown called after each test
+        :return:
+        """
         pass
 
     @patch("cyan_flask.app.auth.PasswordHandler._create_reset_link")
     def test__create_email_message(self, password_handler_mock):
         """
-		_create_email_message
-		"""
+        _create_email_message
+        """
         server_email = "test@smtp.com"
         user_email = "test@email.com"
         subject = "Password reset for Cyano Web"
@@ -78,8 +79,8 @@ class TestAuth(unittest.TestCase):
     @patch("cyan_flask.app.auth.JwtHandler.encode_auth_token")
     def test__create_reset_link(self, encode_auth_token_mock):
         """
-		_create_reset_link
-		"""
+        _create_reset_link
+        """
         user_email = "test@email.com"
         test_reset_link = (
             os.environ.get("HOST_DOMAIN") + "/reset?token=somerandomtokenvalue"
@@ -95,8 +96,8 @@ class TestAuth(unittest.TestCase):
     @patch("cyan_flask.app.auth.smtplib.SMTP_SSL")
     def test__send_mail_1(self, smtp_mock):
         """
-		_send_mail
-		"""
+        _send_mail
+        """
         smtp_email = "test@smtp.com"
         smtp_pass = "testpass"
         user_email = "test@email.com"
@@ -123,8 +124,8 @@ class TestAuth(unittest.TestCase):
 
     def test__send_mail_2(self):
         """
-		_send_mail
-		"""
+        _send_mail
+        """
         smtp_email = "test@smtp.com"
         smtp_pass = "testpass"
         user_email = "test@email.com"
@@ -151,10 +152,12 @@ class TestAuth(unittest.TestCase):
 
     def test__handle_config_password(self):
         """
-		_handle_config_password
-		"""
+        _handle_config_password
+        """
         smtp_pass = "testpass"
-        smtp_pass_obscured = crypt_manager.encrypt_message(crypt_manager.get_key(), smtp_pass)
+        smtp_pass_obscured = crypt_manager.encrypt_message(
+            crypt_manager.get_key(), smtp_pass
+        )
 
         expected_result = smtp_pass
         actual_result = PasswordHandler()._handle_config_password(smtp_pass_obscured)
@@ -164,8 +167,8 @@ class TestAuth(unittest.TestCase):
     @patch("cyan_flask.app.auth.hashlib.sha256")
     def test_hash_password(self, salt_mock):
         """
-		hash_password
-		"""
+        hash_password
+        """
         test_pass = "testpass"
         test_salt = b"57f2503ff578a334cc7de42a6270ee7a762a543c49ff286f1807ef791171daac"
 
@@ -178,8 +181,8 @@ class TestAuth(unittest.TestCase):
 
     def test_test_password(self):
         """
-		test_password
-		"""
+        test_password
+        """
         test_pass = "testpass"
         test_salt = b"57f2503ff578a334cc7de42a6270ee7a762a543c49ff286f1807ef791171daac"
         salted_password = "57f2503ff578a334cc7de42a6270ee7a762a543c49ff286f1807ef791171daac697900f85f1cfa8102863a3125cbe3fa437827732e2f3d4e1e8f5459af10bd8c30cef0c10c714863994eac2790e21e87971fac85fddbb3311c528ce4fa67c9b3"
@@ -196,8 +199,8 @@ class TestAuth(unittest.TestCase):
         self, _handle_config_password_mock, _create_email_message_mock, _send_mail_mock
     ):
         """
-		send_password_reset_email
-		"""
+        send_password_reset_email
+        """
         request_obj = {"user_email": "test@email.com"}
         email_response = {"success": "Email sent."}
 
@@ -210,8 +213,8 @@ class TestAuth(unittest.TestCase):
 
     def test_encode_auth_token(self):
         """
-		encode_auth_token
-		"""
+        encode_auth_token
+        """
         user = "test"
 
         actual_result = JwtHandler().encode_auth_token(user)
@@ -221,8 +224,8 @@ class TestAuth(unittest.TestCase):
 
     def test_decode_auth_token(self):
         """
-		decode_auth_token
-		"""
+        decode_auth_token
+        """
         user = "test"
 
         token = JwtHandler().encode_auth_token(user)
@@ -233,8 +236,8 @@ class TestAuth(unittest.TestCase):
     @patch("cyan_flask.app.auth.time.time")
     def test_check_time_delta(self, time_mock):
         """
-		check_time_delta
-		"""
+        check_time_delta
+        """
         token_expiry = 1592964121.4339767
 
         time_mock.return_value = token_expiry
@@ -246,8 +249,8 @@ class TestAuth(unittest.TestCase):
 
     def test_get_user_from_token_1(self):
         """
-		get_user_from_token
-		"""
+        get_user_from_token
+        """
         user = "test"
         token = "Bearer " + JwtHandler().encode_auth_token(user).decode()
         request = Response()
@@ -260,8 +263,8 @@ class TestAuth(unittest.TestCase):
 
     def test_get_user_from_token_2(self):
         """
-		get_user_from_token
-		"""
+        get_user_from_token
+        """
         user = "test"
         token = "Bearer " + JwtHandler().encode_auth_token(user).decode()
         request = Response()
@@ -274,8 +277,8 @@ class TestAuth(unittest.TestCase):
 
     def test_get_user_token(self):
         """
-		get_user_token
-		"""
+        get_user_token
+        """
         os.environ.setdefault("SECRET_KEY", "testsecret")
         user = "test"
         token = JwtHandler().encode_auth_token(user).decode()

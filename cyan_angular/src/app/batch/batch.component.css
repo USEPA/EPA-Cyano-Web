@@ -1,0 +1,43 @@
+.jobs_tab_group {
+	height: 100%;
+	width: 100%;
+}
+
+.table-responsive {
+	overflow-y: scroll;
+	height: 80%;
+	width: 100%;
+}
+
+.exit-button {
+	float: right;
+	font-size: x-large;
+}
+
+::ng-deep.mat-dialog-container {
+	overflow: unset;
+}
+
+.cancel-icon:hover {
+	opacity: 1.0;
+	cursor: pointer;
+}
+
+.cancel-icon {
+	color: #EF0000;
+	opacity: 0.6;
+}
+
+.mat-column-numLocations, .mat-column-jobNum, .mat-column-jobStatus {
+	max-width: 10%;
+}
+
+.mat-column-receivedDatetime, .mat-column-finishedDatetime {
+	max-width: 15%;
+}
+
+.mat-column-inputFile {
+	max-width: 40%;
+	word-break: break-all;
+	padding: 0 2% 0 2%;
+}

@@ -32,9 +32,9 @@ runtime_env.load_deployment_environment()
 
 class TestWebAppApi(unittest.TestCase):
     """
-	Unit test class for web_app_api.py module, which is the Flask app
-	that defines the API endpoints.
-	"""
+    Unit test class for web_app_api.py module, which is the Flask app
+    that defines the API endpoints.
+    """
 
     print(
         "cyan_flask web_app_api.py unittests conducted at "
@@ -43,16 +43,16 @@ class TestWebAppApi(unittest.TestCase):
 
     def setUp(self):
         """
-		Setup routine called before each unit tests.
-		:return:
-		"""
+        Setup routine called before each unit tests.
+        :return:
+        """
         pass
 
     def tearDown(self):
         """
-		teardown called after each test
-		:return:
-		"""
+        teardown called after each test
+        :return:
+        """
         pass
 
     def test_register_user_1(self):
@@ -149,8 +149,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_login_user_1(self):
         """
-		login_user invalid key.
-		"""
+        login_user invalid key.
+        """
         test_request = {"wrongkey": "test", "password": "test"}
         expected_result = {"error": "Invalid key in request"}, 400
         actual_result = web_app_api.login_user(test_request)
@@ -160,8 +160,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_login_user_2(self, user_query_mock):
         """
-		login_user invalid user credentials.
-		"""
+        login_user invalid user credentials.
+        """
         test_request = {"user": "test", "password": "test", "dataType": 1}
         # query_database_mock.return_value = []
         user_query_mock.return_value.filter_by.return_value.first.return_value = None
@@ -175,8 +175,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_login_user_3(self, user_query_mock, password_mock):
         """
-		login_user invalid password.
-		"""
+        login_user invalid password.
+        """
         example_db_result = User(
             username="test",
             email="test@email.com",
@@ -215,8 +215,8 @@ class TestWebAppApi(unittest.TestCase):
         user_locations_mock,
     ):
         """
-		login_user success.
-		"""
+        login_user success.
+        """
         example_db_result = User(
             username="test",
             email="test@email.com",
@@ -275,8 +275,8 @@ class TestWebAppApi(unittest.TestCase):
         user_locations_mock,
     ):
         """
-		login_user success.
-		"""
+        login_user success.
+        """
         example_db_result = User(
             username="test",
             email="test@email.com",
@@ -334,8 +334,8 @@ class TestWebAppApi(unittest.TestCase):
         user_locations_mock,
     ):
         """
-		login_user success.
-		"""
+        login_user success.
+        """
         example_db_result = User(
             username="test",
             email="test@email.com",
@@ -377,8 +377,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_add_location_1(self):
         """
-		add_location invalid key in request.
-		"""
+        add_location invalid key in request.
+        """
         request_obj = {
             # 'owner': "test",  # missing key
             "id": None,
@@ -400,8 +400,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_add_location_2(self, location_query_mock):
         """
-		add_location record exist.
-		"""
+        add_location record exist.
+        """
         request_obj = {
             "owner": "test",
             "id": None,
@@ -438,8 +438,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_add_location_3(self, location_query_mock, db_mock):
         """
-		add_location success.
-		"""
+        add_location success.
+        """
         request_obj = {
             "owner": "test",
             "id": None,
@@ -465,8 +465,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_delete_location_1(self, location_query_mock, db_mock):
         """
-		delete_location success.
-		"""
+        delete_location success.
+        """
         user = "test"
         _id = 1
         data_type = 1
@@ -478,8 +478,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_edit_location_1(self):
         """
-		edit_location invalid key request.
-		"""
+        edit_location invalid key request.
+        """
         request_obj = {
             # 'owner': "test",  # missing key
             "id": None,
@@ -501,8 +501,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_edit_location_2(self, location_query_mock, db_mock):
         """
-		edit_location success.
-		"""
+        edit_location success.
+        """
         request_obj = {
             "owner": "test",
             "id": None,
@@ -524,8 +524,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_user_locations(self, location_query_mock, read_location_row_mock):
         """
-		get_user_locations.
-		"""
+        get_user_locations.
+        """
         user = "test"
         data_type = 1
         location_json = {
@@ -564,8 +564,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_read_location_row(self):
         """
-		read_location_row
-		"""
+        read_location_row
+        """
         location_json = {
             "owner": "test",
             "id": None,
@@ -598,8 +598,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_location_1(self, location_query_mock):
         """
-		get_location location not found.
-		"""
+        get_location location not found.
+        """
         user = "test"
         _id = 1
         data_type = 1
@@ -617,8 +617,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_location_2(self, location_query_mock, read_location_row_mock):
         """
-		get_location success.
-		"""
+        get_location success.
+        """
         user = "test"
         _id = 1
         data_type = 1
@@ -666,8 +666,8 @@ class TestWebAppApi(unittest.TestCase):
         parse_notifications_response_mock,
     ):
         """
-		get_notifications no notifications
-		"""
+        get_notifications no notifications
+        """
         user = "test"
         last_visit = datetime.date.today().isoformat()
 
@@ -696,8 +696,8 @@ class TestWebAppApi(unittest.TestCase):
         convert_notification_to_list_mock,
     ):
         """
-		get_notifications with notifications
-		"""
+        get_notifications with notifications
+        """
         user = "test"
         last_visit = str(datetime.datetime.now()).split(".")[0]
         example_notification = {
@@ -745,8 +745,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_convert_notification_to_list_1(self):
         """
-		convert_notification_to_list
-		"""
+        convert_notification_to_list
+        """
         user = "test"
         last_visit = str(datetime.datetime.now()).split(".")[0]
         example_db_result = Notifications(
@@ -773,8 +773,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_parse_notifications_response_1(self):
         """
-		parse_notifications_response no new notifications
-		"""
+        parse_notifications_response no new notifications
+        """
         new_notifications = None
         last_visit = str(datetime.datetime.now()).split(".")[0]
         user = "test"
@@ -789,8 +789,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("cyan_flask.app.web_app_api.utils.convert_to_timestamp")
     def test_parse_notifications_response_2(self, convert_to_timestamp_mock):
         """
-		parse_notifications_response new notifications
-		"""
+        parse_notifications_response new notifications
+        """
         new_notifications = None
         last_visit = str(datetime.datetime.now()).split(".")[0]
         user = "test"
@@ -807,9 +807,7 @@ class TestWebAppApi(unittest.TestCase):
                 "thumb": False,
             },
         }
-        converted_timestamp = (
-            "2015-11-05 20:08:53"
-        )  # example notification dateSent converted to timestamp
+        converted_timestamp = "2015-11-05 20:08:53"  # example notification dateSent converted to timestamp
         example_db_result = Notifications(
             owner=user,
             id=example_notification["id"],
@@ -832,8 +830,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_edit_notifications_1(self, notification_query_mock, db_mock):
         """
-		edit_notifications
-		"""
+        edit_notifications
+        """
         user = "test"
         _id = 1
 
@@ -846,8 +844,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_delete_notifications_1(self, notification_query_mock, db_mock):
         """
-		delete_notifications
-		"""
+        delete_notifications
+        """
         user = "test"
 
         expected_result = {"status": "success"}, 200
@@ -858,8 +856,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_user_settings_1(self, settings_query_mock):
         """
-		get_user_settings
-		"""
+        get_user_settings
+        """
         user_id = 1
 
         settings_query_mock.return_value.filter_by.return_value.first.return_value = (
@@ -880,8 +878,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_user_settings_2(self, settings_query_mock):
         """
-		get_user_settings
-		"""
+        get_user_settings
+        """
         user_id = 1
 
         settings_query_mock.return_value.filter_by.return_value.first.return_value = (
@@ -909,8 +907,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_edit_settings_1(self):
         """
-		edit_settings
-		"""
+        edit_settings
+        """
         request_obj = {
             # 'owner': "test",  # missing key
             "level_low": 100000,
@@ -929,8 +927,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_edit_settings_2(self, settings_query_mock, db_mock):
         """
-		edit_settings
-		"""
+        edit_settings
+        """
         request_obj = {
             "owner": "test",
             "level_low": 100000,
@@ -967,8 +965,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_reset_password_1(self):
         """
-		reset_password no email
-		"""
+        reset_password no email
+        """
         email = "test@email.com"
         request_obj = {"email_wrong_key": email}
 
@@ -980,8 +978,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_reset_password_2(self, user_query_mock):
         """
-		reset_password email address not found
-		"""
+        reset_password email address not found
+        """
         email = "test@email.com"
         request_obj = {"email": email}
 
@@ -996,8 +994,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_reset_password_3(self, user_query_mock, password_mock):
         """
-		reset_password reset email failed
-		"""
+        reset_password reset email failed
+        """
         email = "test@email.com"
         request_obj = {"email": email}
         error_obj = {"error": "testing error"}
@@ -1013,8 +1011,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_reset_password_4(self, user_query_mock, password_mock):
         """
-		reset_password reset email successfully sent
-		"""
+        reset_password reset email successfully sent
+        """
         email = "test@email.com"
         request_obj = {"email": email}
 
@@ -1025,8 +1023,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_set_new_password_1(self):
         """
-		set_new_password no email provided
-		"""
+        set_new_password no email provided
+        """
         email = "test@email.com"
         request_obj = {"email_wrong_key": email}
 
@@ -1040,8 +1038,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_set_new_password_2(self, user_query_mock, password_mock, db_mock):
         """
-		set_new_password failed password update
-		"""
+        set_new_password failed password update
+        """
         email = "test@email.com"
         request_obj = {"email": email, "newPassword": "newpass"}
 
@@ -1059,8 +1057,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_set_new_password_3(self, user_query_mock, password_mock, db_mock):
         """
-		set_new_password failed password update
-		"""
+        set_new_password failed password update
+        """
         email = "test@email.com"
         request_obj = {"email": email, "newPassword": "newpass"}
 
@@ -1074,8 +1072,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_comments_1(self, comments_query_mock):
         """
-		get_comments no comments
-		"""
+        get_comments no comments
+        """
 
         comments_query_mock.return_value.order_by.return_value.all.return_value = []
 
@@ -1088,8 +1086,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("flask_sqlalchemy._QueryProperty.__get__")
     def test_get_comments_2(self, comments_query_mock, build_comments_json_mock):
         """
-		get_comments with comments
-		"""
+        get_comments with comments
+        """
         comment_json = {
             "id": 1,
             "title": "",
@@ -1114,8 +1112,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_add_user_comment_1(self):
         """
-		add_user_comment invalid key
-		"""
+        add_user_comment invalid key
+        """
         request_obj = {
             # 'title': '',  # missing key
             "date": datetime.datetime.now(),
@@ -1137,8 +1135,8 @@ class TestWebAppApi(unittest.TestCase):
         self, db_mock, build_comments_json_mock, save_image_source_mock
     ):
         """
-		add_user_comment
-		"""
+        add_user_comment
+        """
         request_obj = {
             "id": 1,
             "title": "test title",
@@ -1172,8 +1170,8 @@ class TestWebAppApi(unittest.TestCase):
 
     def test_add_comment_reply_1(self):
         """
-		add_comment_reply invalid key
-		"""
+        add_comment_reply invalid key
+        """
         request_obj = {
             # 'comment_id': 1,  # missing key,
             "comment_user": "test",
@@ -1191,8 +1189,8 @@ class TestWebAppApi(unittest.TestCase):
     @patch("cyan_flask.app.web_app_api.db")
     def test_add_comment_reply_2(self, db_mock, build_replies_json_mock):
         """
-		add_comment_reply
-		"""
+        add_comment_reply
+        """
         request_obj = {
             "comment_id": 1,
             "comment_user": "test",
