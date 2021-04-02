@@ -14,6 +14,7 @@ import logging
 import requests
 import simplejson
 from sqlalchemy import desc
+import sys
 
 # Local imports:
 from auth import PasswordHandler, JwtHandler
@@ -25,12 +26,15 @@ from models import (
     Comment,
     CommentImages,
     Reply,
+    Job,
     db,
 )
 import utils
+from celery_tasks import CeleryHandler
+from csv_handler import CSVHandler
 
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+celery_handler = CeleryHandler()
+csv_handler = CSVHandler()
 
 
 def register_user(post_data):
@@ -76,7 +80,7 @@ def login_user(post_data):
         return {"error": "Invalid user credentials."}, 401
     else:
         if not PasswordHandler().test_password(user_obj.password, password):
-            return {"error": "Invalid password"}, 401
+            return {"error": "Invalid username and/or password."}, 401
 
     last_visit_unix = time.mktime(user_obj.last_visit.timetuple())
     notifications = get_notifications(user, last_visit_unix)
@@ -177,8 +181,8 @@ def edit_location(post_data):
 
 def get_user_locations(user="", data_type=""):
     """
-	Returns user locations based on user and data type.
-	"""
+    Returns user locations based on user and data type.
+    """
     user_locations = Location.query.filter_by(
         owner=user, type=data_type
     ).all()  # gets all locations for owner + data_type
@@ -207,9 +211,9 @@ def read_location_row(location):
 
 def get_location(user="", _id="", data_type=""):
     """
-	Returns user location based on user and location ID.
-	TODO: How to prevent any user getting user locations if they could guess a username?
-	"""
+    Returns user location based on user and location ID.
+    TODO: How to prevent any user getting user locations if they could guess a username?
+    """
     user_location = Location.query.filter_by(id=_id, owner=user, type=data_type).first()
     if not user_location:
         return {"error": "Location not found"}, 404
@@ -218,9 +222,9 @@ def get_location(user="", _id="", data_type=""):
 
 def get_notifications(user, last_visit):
     """
-	Populates the notifications list.
-	Populate with all notifications if new user / registered??
-	"""
+    Populates the notifications list.
+    Populate with all notifications if new user / registered??
+    """
 
     all_notifications = get_users_notifications(
         user
@@ -249,8 +253,8 @@ def get_notifications(user, last_visit):
         db.session.commit()
 
     all_notifications += (
-        db_values_list
-    )  # adds list of Notifications db vals to user's Notifications
+        db_values_list  # adds list of Notifications db vals to user's Notifications
+    )
 
     return all_notifications
 
@@ -306,9 +310,9 @@ def parse_notifications_response(new_notifications, latest_time, user):
 
 def edit_notifications(user, _id):
     """
-	Updates user's notification that has been read,
-	e.g., sets is_new to false.
-	"""
+    Updates user's notification that has been read,
+    e.g., sets is_new to false.
+    """
     Notifications.query.filter_by(owner=user, id=_id).update(dict(is_new=False))
     db.session.commit()
     return {"status": "success"}, 200
@@ -316,8 +320,8 @@ def edit_notifications(user, _id):
 
 def delete_notifications(user):
     """
-	Removes user's notifications (event: "Clear" button hit)
-	"""
+    Removes user's notifications (event: "Clear" button hit)
+    """
     user_notifications = Notifications.query.filter_by(owner=user).delete()
     db.session.commit()
     return {"status": "success"}, 200
@@ -379,9 +383,9 @@ def edit_settings(post_data):
 
 def reset_password(request):
     """
-	Resets user password routine using
-	reset_password.py module.
-	"""
+    Resets user password routine using
+    reset_password.py module.
+    """
     try:
         user_email = request["email"]
     except KeyError:
@@ -401,8 +405,8 @@ def reset_password(request):
 
 def set_new_password(request):
     """
-	Sets new password for user.
-	"""
+    Sets new password for user.
+    """
     try:
         user_email = request["email"]
     except KeyError:
@@ -424,8 +428,8 @@ def set_new_password(request):
 
 def get_comments():
     """
-	Gets all user comments.
-	"""
+    Gets all user comments.
+    """
     comments = Comment.query.order_by(
         desc(Comment.date)
     ).all()  # gets all users' comments
@@ -437,8 +441,8 @@ def get_comments():
 
 def add_user_comment(post_data):
     """
-	Adds user comment.
-	"""
+    Adds user comment.
+    """
     try:
         # _id = post_data['id']
         title = post_data["title"]
@@ -492,8 +496,8 @@ def add_user_comment(post_data):
 
 def add_comment_reply(post_data):
     """
-	Adds reply to a user's comment.
-	"""
+    Adds reply to a user's comment.
+    """
     try:
         comment_id = post_data["comment_id"]
         comment_user = post_data["comment_user"]
@@ -519,3 +523,164 @@ def add_comment_reply(post_data):
     # return {"status": "success"}, 201
     reply_json = utils.build_replies_json([reply_obj])[0]
     return reply_json, 201
+
+
+def get_batch_status(response_obj):
+    """
+    Gets job ID from DB and returns the
+    job's status from celery worker.
+    """
+    try:
+        job_id = response_obj["job_id"]
+        username = response_obj["username"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+
+    user_job = celery_handler.get_job_from_db(username, job_id)
+
+    if not user_job:
+        response_obj["status"] = "Failed - job not found."
+    elif user_job.job_status in celery_handler.fail_states:
+        response_obj["status"] = "Failed - error processing job."
+    else:
+        response_obj["status"] = ""
+
+    response_obj["job_id"] = user_job.job_id
+    response_obj["job_status"] = user_job.job_status
+    response_obj["job"] = Job.create_jobs_json([user_job])[0]
+    return response_obj, 200
+
+
+def start_batch_job(request_obj):
+    """
+    Starts a user's batch request/job.
+    """
+    try:
+        username = request_obj["username"]
+        filename = request_obj["filename"]
+        locations = request_obj["locations"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+
+    user = User.query.filter_by(username=username).first()  # gets user email from db
+    user_job = celery_handler.get_active_user_job(
+        username
+    )  # gets any active job user may have
+
+    request_obj["user_email"] = user.email
+
+    response_obj = dict(Job.job_response())
+
+    # Checks number of locations requested:
+    if len(locations) > celery_handler.locations_limit:
+        response_obj[
+            "status"
+        ] = "Failed - number of locations exceeds limit ({})".format(
+            celery_handler.locations_limit
+        )
+        response_obj["job_status"] = ""
+        response_obj["job_id"] = ""
+        return response_obj, 200
+
+    # Checks if user already has a job in progress:
+    if user_job and user_job.job_status in celery_handler.pending_states:
+        response_obj["status"] = "Failed - user already has a job in progress"
+        response_obj["job_status"] = user_job.job_status
+        response_obj["job_id"] = user_job.job_id
+        return response_obj, 200
+
+    try:
+        job_obj = celery_handler.start_task(request_obj)  # starts a new job
+        job_status = celery_handler.check_celery_job_status(job_obj.job_id)
+    except Exception as e:
+        logging.error("start_batch_job exception: {}".format(e))
+        response_obj["status"] = "Failed - error starting job"
+        response_obj["job_status"] = job_status
+        response_obj["job_id"] = job_obj.job_id
+        return response_obj, 500
+
+    # Checks for job starting errors:
+    if job_status in celery_handler.fail_states:
+        response_obj["status"] = "Failed - error starting job"
+        response_obj["job_status"] = job_status
+        response_obj["job_id"] = job_obj.job_id
+        return response_obj, 500
+
+    # Returns info for successfully created job:
+    response_obj[
+        "status"
+    ] = "Job started.\nAn email will be sent to {} \
+		  when the job is complete".format(
+        user.email
+    )
+    response_obj["job"] = Job.create_jobs_json([job_obj])[0]
+    response_obj["job_status"] = job_status
+    response_obj["job_id"] = job_obj.job_id
+
+    return response_obj, 202
+
+
+def cancel_batch_job(request_obj):
+    """
+    Cancels a user's batch job.
+    """
+    try:
+        job_id = request_obj["job_id"]
+        username = request_obj["username"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+
+    user_job = celery_handler.get_job_from_db(username, job_id)
+
+    if not user_job:
+        # No job to cancel, user doesn't have this job, skip revoking.
+        return {"error": "User job not found"}, 200
+
+    cancel_response = celery_handler.revoke_job(job_id)
+
+    # Updates job status in DB.
+    user_job.job_status = "REVOKED"
+    db.session.commit()
+
+    response_obj = dict(Job.user_jobs_response())
+    response_obj["status"] = cancel_response["status"]
+    response_obj["job_status"] = "REVOKED"
+
+    return response_obj, 200
+
+
+def get_all_batch_jobs(request_obj):
+    """
+    Gets all batch jobs from a user.
+    """
+    username = request_obj["username"]
+
+    user_jobs = celery_handler.get_all_jobs(username)
+
+    jobs = list(
+        reversed(Job.create_jobs_json(user_jobs))
+    )  # sorts in desc (latest job first)
+
+    response_obj = dict(Job.user_jobs_response())
+    response_obj["status"] = "success"
+    response_obj["jobs"] = jobs
+
+    return response_obj, 200
+
+
+def get_batch_job(request_obj):
+    """
+    Gets a specific batch job.
+    """
+    job_id = request_obj["job_id"]
+    username = request_obj["username"]
+
+    user_jobs = celery_handler.get_job_from_db(username, job_id)
+
+    # TODO: This endpoint is in progress.
+
+    response_obj = dict(Job.user_jobs_response())
+    response_obj["status"] = "success"
+    response_obj["jobs"] = Job.create_jobs_json([user_jobs])
+
+    return response_obj, 200

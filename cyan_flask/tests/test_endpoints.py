@@ -40,9 +40,9 @@ def create_test_headers(token):
 
 class TestEndpoints(unittest.TestCase):
     """
-	Unit test class for app.py module, which is the Flask app
-	that defines the API endpoints.
-	"""
+    Unit test class for app.py module, which is the Flask app
+    that defines the API endpoints.
+    """
 
     print(
         "cyan_flask endpoints.py unittests conducted at "
@@ -51,30 +51,30 @@ class TestEndpoints(unittest.TestCase):
 
     def setUp(self):
         """
-		Setup routine called before each unit tests.
-		:return:
-		"""
+        Setup routine called before each unit tests.
+        :return:
+        """
         pass
 
     def tearDown(self):
         """
-		teardown called after each test
-		:return:
-		"""
+        teardown called after each test
+        :return:
+        """
         pass
 
     def test_statustest_get(self):
         """
-		Tests StatusTest endpoint GET request.
-		"""
+        Tests StatusTest endpoint GET request.
+        """
         expected_result = {"status": "cyan flask up and running."}
         actual_result = endpoints.StatusTest().get()
         self.assertEqual(actual_result, expected_result)
 
     def test_register_get(self):
         """
-		Tests Register endpoint GET request.
-		"""
+        Tests Register endpoint GET request.
+        """
         expected_result = {"status": "register endpoint"}
         actual_result = endpoints.Register().get()
         self.assertEqual(actual_result, expected_result)
@@ -85,8 +85,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.register_user")
     def test_register_post(self, register_user_mock):
         """
-		Tests Register endpoint POST request.
-		"""
+        Tests Register endpoint POST request.
+        """
         test_request = {"user": "test", "password": "test", "email": "test@email.com"}
         expected_result_user_created = (
             {"status": "success", "username": "test", "email": "test@email.com"},
@@ -100,8 +100,8 @@ class TestEndpoints(unittest.TestCase):
 
     def test_login_get(self):
         """
-		Tests Login endpoint GET request.
-		"""
+        Tests Login endpoint GET request.
+        """
         expected_result = {"status": "login endpoint"}
         actual_result = endpoints.Login().get()
         self.assertEqual(actual_result, expected_result)
@@ -109,8 +109,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.login_user")
     def test_login_post(self, reqister_user_mock):
         """
-		Tests Login endpoint POST request.
-		"""
+        Tests Login endpoint POST request.
+        """
         test_request = {"user": "test", "password": "test", "dataType": 1}
         expected_result = test_request, 200
         with app.test_request_context() as client:
@@ -120,8 +120,8 @@ class TestEndpoints(unittest.TestCase):
 
     def test_add_location_get(self):
         """
-		Tests AddLocation endpoint GET request.
-		"""
+        Tests AddLocation endpoint GET request.
+        """
         expected_result = {"status": "location endpoint"}
         actual_result = endpoints.AddLocation().get()
         self.assertEqual(actual_result, expected_result)
@@ -129,8 +129,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.add_location")
     def test_add_location_post(self, add_user_mock):
         """
-		Tests AddLocation endpoint POST request.
-		"""
+        Tests AddLocation endpoint POST request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -148,8 +148,8 @@ class TestEndpoints(unittest.TestCase):
 
     def test_edit_location_get(self):
         """
-		Tests EditLocation endpoint GET request.
-		"""
+        Tests EditLocation endpoint GET request.
+        """
         expected_result = {"status": "edit location endpoint"}
         actual_result = endpoints.EditLocation().get()
         self.assertEqual(actual_result, expected_result)
@@ -157,8 +157,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.edit_location")
     def test_edit_location_post(self, edit_location_mock):
         """
-		Tests EditLocation endpoint POST request.
-		"""
+        Tests EditLocation endpoint POST request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -178,8 +178,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.delete_location")
     def test_delete_location_get(self, delete_location_mock):
         """
-		Tests DeleteLocation endpoint GET request.
-		"""
+        Tests DeleteLocation endpoint GET request.
+        """
         user = "test"
         _id = 1
         _type = 1
@@ -199,8 +199,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.get_user_locations")
     def test_get_user_locations_get(self, get_user_locations_mock):
         """
-		Tests GetUserLocations endpoint GET request.
-		"""
+        Tests GetUserLocations endpoint GET request.
+        """
         user = "test"
         _type = 1
         test_token = create_test_token(user)
@@ -218,8 +218,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.get_location")
     def test_get_location_get(self, get_location_mock):
         """
-		Tests GetLocation endpoint GET request.
-		"""
+        Tests GetLocation endpoint GET request.
+        """
         user = "test"
         _id = 1
         _type = 1
@@ -238,8 +238,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.edit_notifications")
     def test_edit_notification_get(self, edit_notifications_mock):
         """
-		Tests EditNotification endpoint GET request.
-		"""
+        Tests EditNotification endpoint GET request.
+        """
         user = "test"
         _id = 1
         test_token = create_test_token(user)
@@ -257,8 +257,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.delete_notifications")
     def test_delete_notification_get(self, delete_notifications_mock):
         """
-		Tests DeleteNotification endpoint GET request.
-		"""
+        Tests DeleteNotification endpoint GET request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -274,8 +274,8 @@ class TestEndpoints(unittest.TestCase):
 
     def test_edit_settings_get(self):
         """
-		Tests EditSettings endpoint GET request.
-		"""
+        Tests EditSettings endpoint GET request.
+        """
         expected_result = {"status": "edit settings endpoint"}
         actual_result = endpoints.EditSettings().get()
         self.assertEqual(actual_result, expected_result)
@@ -283,8 +283,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.edit_settings")
     def test_edit_settings_post(self, edit_settings_mock):
         """
-		Tests EditSettings endpoint GET request.
-		"""
+        Tests EditSettings endpoint GET request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -301,8 +301,8 @@ class TestEndpoints(unittest.TestCase):
 
     def test_refresh_get(self):
         """
-		Tests Refresh endpoint GET request.
-		"""
+        Tests Refresh endpoint GET request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -318,8 +318,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.reset_password")
     def test_reset_post(self, reset_password_mock):
         """
-		Tests Reset endpoint POST request.
-		"""
+        Tests Reset endpoint POST request.
+        """
         user = "test"
         request_obj = {"owner": user, "email": "test@test.com"}
         reset_password_mock.return_value = {"status": "success"}, 200
@@ -331,8 +331,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.set_new_password")
     def test_reset_put(self, set_new_password_mock):
         """
-		Tests Reset endpoint PUT request.
-		"""
+        Tests Reset endpoint PUT request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -350,8 +350,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.get_comments")
     def test_comment_get(self, get_comments_mock):
         """
-		Tests Comment endpoint GET request.
-		"""
+        Tests Comment endpoint GET request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -368,8 +368,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.add_user_comment")
     def test_comment_post(self, add_user_comment_mock):
         """
-		Tests Comment endpoint POST request.
-		"""
+        Tests Comment endpoint POST request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)
@@ -386,8 +386,8 @@ class TestEndpoints(unittest.TestCase):
 
     def test_reply_get(self):
         """
-		Tests Reply endpoint GET request.
-		"""
+        Tests Reply endpoint GET request.
+        """
         expected_result = {"status": "reply endpoint"}
         actual_result = endpoints.Reply().get()
         self.assertEqual(actual_result, expected_result)
@@ -395,8 +395,8 @@ class TestEndpoints(unittest.TestCase):
     @patch("cyan_flask.app.endpoints.web_app_api.add_comment_reply")
     def test_reply_post(self, add_comment_reply_mock):
         """
-		Tests Reply endpoint POST request.
-		"""
+        Tests Reply endpoint POST request.
+        """
         user = "test"
         test_token = create_test_token(user)
         headers = create_test_headers(test_token)

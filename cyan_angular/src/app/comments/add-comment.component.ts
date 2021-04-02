@@ -50,7 +50,7 @@ export class AddComment implements OnInit {
   	let newComment = new Comment();
     if (!commentData) {
       newComment.title = this.title;
-      newComment.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+      newComment.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd HH:mm:ss');
       newComment.device = this.device;
       newComment.browser = this.browser;
       newComment.comment_text = this.comment_text;

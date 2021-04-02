@@ -22,9 +22,11 @@ import {MatDatepickerModule } from '@angular/material/datepicker';
 import {MatMenuModule } from '@angular/material/menu'; 
 import {MatDialogModule } from '@angular/material/dialog'; 
 import {MatDialogRef } from '@angular/material/dialog'; 
-import {MatToolbarModule} from '@angular/material/toolbar'; 
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { MatTableModule } from '@angular/material/table';
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -63,7 +65,6 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
 import { BottomMenuComponent } from './bottom-menu/bottom-menu.component';
 import { ResetComponent } from './reset/reset.component';
 
-// import { AuthInterceptor, JwtInterceptor, LoaderInterceptor } from './interceptors';
 import { AuthInterceptor, JwtInterceptor } from './interceptors';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -76,6 +77,7 @@ import { ViewComment, ViewImage } from './comments/view-comment.component';
 import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
+import { BatchComponent } from './batch/batch.component';
 
 @NgModule({
   declarations: [
@@ -108,7 +110,8 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     MeterComponent,
     DialogComponent,
     SessionTimeoutComponent,
-    LocationSearchComponent
+    LocationSearchComponent,
+    BatchComponent
   ],
   imports: [
     BrowserModule,
@@ -144,7 +147,9 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     MatBadgeModule,
     MatDialogModule,
     MatToolbarModule,
+    MatTableModule,
     MatSidenavModule,
+    MatSortModule,
     Ng5SliderModule,
     BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
@@ -162,6 +167,7 @@ import { LocationSearchComponent } from './location-search/location-search.compo
     AuthGuard,
     AddComment,
     DialogComponent,
+    CoordinatesComponent,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

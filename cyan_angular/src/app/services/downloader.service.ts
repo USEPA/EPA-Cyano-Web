@@ -7,6 +7,7 @@ import { Location } from '../models/location';
 import { LocationType } from '../models/location';
 import { UserSettings } from '../models/settings';
 import { Comment, Reply } from '../models/comment';
+import { BatchJob, BatchStatus } from '../models/batch';
 
 import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
@@ -197,6 +198,38 @@ export class DownloaderService {
     */
     let url = this.envService.config.baseServerUrl + 'reply';
     return this.executeAuthorizedPostRequest(url, reply);
+  }
+
+  startBatchJob(batchRequest: BatchJob) {
+    /*
+    Kicks off batch job on celery worker.
+    */
+    let url = this.envService.config.baseServerUrl + 'batch';
+    return this.executeAuthorizedPostRequest(url, batchRequest);
+  }
+
+  checkBatchJobStatus(batchStatusRequest: BatchStatus) {
+    /*
+    Gets status of user's batch job.
+    */
+    let url = this.envService.config.baseServerUrl + 'batch/status';
+    return this.executeAuthorizedPostRequest(url, batchStatusRequest);
+  }
+
+  cancelBatchJob(batchStatusRequest: BatchStatus) {
+    /*
+    Cancels user's batch job.
+    */
+    let url = this.envService.config.baseServerUrl + 'batch/cancel';
+    return this.executeAuthorizedPostRequest(url, batchStatusRequest);
+  }
+
+  getBatchJobs(batchJob: string = "") {
+    /*
+    Returns batch job(s).
+    */
+    let url = this.envService.config.baseServerUrl + 'batch';
+    return this.executeAuthorizedGetRequest(url);
   }
 
   executeAuthorizedPostRequest(url: string, body: any) {

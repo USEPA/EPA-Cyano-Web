@@ -682,7 +682,7 @@ export class LocationDetailsNotes {
      Adds the note entered in the note bottom sheet.
      */
     let noteTextbox = <HTMLInputElement>document.getElementById('note-textarea');  // NOTE: casted as HTMLInputElement to make Typescript happy
-    let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd HH:mm:ss');
     let noteObj = {
       timestamp: dateTime,
       note: noteTextbox.value
