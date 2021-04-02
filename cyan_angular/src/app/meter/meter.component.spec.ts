@@ -102,7 +102,8 @@ describe('MeterComponent', () => {
   it('should test setConcentration()', () => {
     const testConcentration = 10;
     const testColor = 'green';
-    let expectedResult = `<div style="color: ${testColor};">${testConcentration}</div>`;
+    // let expectedResult = `<div style="color: ${testColor};">${testConcentration}</div>`;
+    let expectedResult = `<div>${component.formatNumber(testConcentration)}</div>`;
     conSpy.and.callThrough();
     
     let result = component.setConcentration(testConcentration, testColor);

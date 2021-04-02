@@ -133,27 +133,12 @@ describe('LocationCompareDetailsComponent', () => {
     latLonArray.push(latLon)
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
-    spyOn<any>(component['mapService'], 'setMinimap');
-    spyOn(component, 'createMarker');
     let mapSpy = spyOn(testMap, 'invalidateSize');
     spyOn(testMap, 'flyToBounds');
 
     component.onMapReady(testMap);
 
     expect(mapSpy).toHaveBeenCalled();
-  });
-
-  it('should test createMarker', () => {
-    const testImageUrl = 'test/image.png'
-    let latLon = new LatLng(testLocation.latitude, testLocation.longitude);
-    spyOn<any>(component['mapService'], 'getLatLng')
-      .and.returnValue(latLon);
-    spyOn<any>(component['mapService'], 'getMarker')
-      .and.returnValue(testImageUrl);
-
-    let result = component.createMarker(testLocation);
-
-    expect(result.options.title).toMatch(testLocation.name);
   });
 
   it('should test getPercentage', () => {
