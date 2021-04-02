@@ -33,7 +33,13 @@
               <div class="map-legend leaflet-top leaflet-left" *ngIf="showLegend">
                 <img src="assets/images/legend.png" />
               </div>
-              <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
+              <div class="mini_map"
+                leaflet
+                [leafletOptions]="options"
+                (leafletMapReady)="onMapReady($event)"
+                (leafletClick)="addMarkerOnClick($event)"
+              >
+              </div>
             </div>
           </mat-card-content>
         </mat-card>

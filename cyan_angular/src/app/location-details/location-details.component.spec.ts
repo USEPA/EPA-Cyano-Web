@@ -559,26 +559,12 @@ describe('LocationDetailsComponent', () => {
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
     let mapSpy = spyOn<any>(component['mapService'], 'setMinimap');
-    spyOn(component, 'createMarker');
     spyOn(testMap, 'invalidateSize');
     spyOn(testMap, 'flyToBounds');
 
     component.onMapReady(testMap);
 
     expect(mapSpy).toHaveBeenCalled();
-  });
-
-  it('should test createMarker', () => {
-    const testImageUrl = 'test/image.png'
-    let testLatLon = new LatLng(testLocation.latitude, testLocation.longitude);
-    spyOn<any>(component['mapService'], 'getLatLng')
-      .and.returnValue(testLatLon);
-    spyOn<any>(component['mapService'], 'getMarker')
-      .and.returnValue(testImageUrl);
-
-    let result = component.createMarker();
-
-    expect(result.options.title).toMatch(testLocation.name);
   });
 
   it('should test changeMarker', () => {

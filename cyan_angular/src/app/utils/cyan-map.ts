@@ -9,6 +9,7 @@ export class CyanMap {
 
   markers: LayerGroup;
   miniMarker: Marker;
+  miniMarkers: LayerGroup;
 
   getLocationLatLng(ln: Location): LatLng {
     let lat = ln.latitude_deg + ln.latitude_min / 60.0 + ln.latitude_sec / 3600.0;
