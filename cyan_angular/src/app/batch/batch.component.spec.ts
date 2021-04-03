@@ -4,8 +4,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
+import { CyanMap } from '../utils/cyan-map';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
+import { CoordinatesComponent } from '../coordinates/coordinates.component';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 import { BatchComponent } from './batch.component';
 
 describe('BatchComponent', () => {
@@ -25,6 +28,9 @@ describe('BatchComponent', () => {
         AuthService,
         LoaderService,
         DatePipe,
+        CyanMap,
+        DialogComponent,
+        CoordinatesComponent,
         {
           provide: MatDialogRef,
           useValue: {}
