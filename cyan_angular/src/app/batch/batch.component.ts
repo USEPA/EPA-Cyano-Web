@@ -203,7 +203,9 @@ export class BatchComponent {
     }
 
     // Checks that data type is correct:
-    if (!this.allowedDataTypes.includes(rowArray[2])) {
+    if (!this.allowedDataTypes.includes(
+        this.cleanString(rowArray[2])
+    )) {
       this.handleError(
         'Data type column must be one of the following: ' +
         this.allowedDataTypes
