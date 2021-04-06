@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Location as NgLocation } from '@angular/common';
 import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map } from 'leaflet';
+
 import { Router } from '@angular/router';
 
 import { LocationService } from '../services/location.service';
@@ -20,6 +21,7 @@ export class MarkerMapComponent implements OnInit {
 
   panDelay: number = 5000;  // panning event delay (ms)
   isEnabled: boolean = true;
+  isClicking: boolean = false;  // tracks user click for distinguishing pan vs click
 
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
@@ -73,6 +75,16 @@ export class MarkerMapComponent implements OnInit {
     this.tileLayerEvents();  // updates main map's tile layer for minimap to access
   }
 
+  ngAfterViewInit() {
+    this.mapService.getMap().on('mousedown', event => {
+      // console.log("mousedown event")
+      this.isClicking = true;
+    });
+    this.mapService.getMap().on('mouseup', event => {
+      // console.log("mouseup event")
+    });
+  }
+
   tileLayerEvents() {
     this.esriImagery.on('load', event => {
       this.mapService.mainTileLayer = "Imagery Maps";  
@@ -88,6 +100,8 @@ export class MarkerMapComponent implements OnInit {
   mapPanEvent(e: any): void {
 
     if (!this.authService.checkUserAuthentication()) { return; }  // won't auto log out, just skips refresh
+
+    this.isClicking = false;
 
     if (this.isEnabled == true) {
       this.isEnabled = false;
@@ -108,6 +122,11 @@ export class MarkerMapComponent implements OnInit {
   addMarkerOnClick(e: any): void {
     if (!this.authService.checkUserAuthentication()) { return; }
 
+    if (!this.isClicking) {
+      console.log("Panning occurred during mousedown event. Skipping click event.")
+      return;
+    }
+
     let map = this.mapService.getMap();
     let lat = e.latlng.lat;
     let lng = e.latlng.lng;
@@ -123,6 +142,7 @@ export class MarkerMapComponent implements OnInit {
     map.setView(e.latlng, 12);
     let m = this.mapService.addMarker(location);
     m.fireEvent('click');
+
   }
 
 }
