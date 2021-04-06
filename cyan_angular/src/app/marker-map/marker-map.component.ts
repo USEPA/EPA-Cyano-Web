@@ -78,7 +78,7 @@ export class MarkerMapComponent implements OnInit {
   ngAfterViewInit() {
     this.mapService.getMap().on('mousedown', event => {
       // console.log("mousedown event")
-      this.isClicking = true;
+      this.isClicking = true;  // initally assumes user intends to click
     });
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
@@ -101,7 +101,7 @@ export class MarkerMapComponent implements OnInit {
 
     if (!this.authService.checkUserAuthentication()) { return; }  // won't auto log out, just skips refresh
 
-    this.isClicking = false;
+    this.isClicking = false;  // assumes user intends to pan instead of placing location
 
     if (this.isEnabled == true) {
       this.isEnabled = false;
@@ -123,6 +123,7 @@ export class MarkerMapComponent implements OnInit {
     if (!this.authService.checkUserAuthentication()) { return; }
 
     if (!this.isClicking) {
+      // Discards click if panning occurred during click down/up
       console.log("Panning occurred during mousedown event. Skipping click event.")
       return;
     }
