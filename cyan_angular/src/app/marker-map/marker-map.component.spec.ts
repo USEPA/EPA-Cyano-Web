@@ -152,6 +152,7 @@ describe('MarkerMapComponent', () => {
     };
     let testMarkerEvent = new MockMarker();
     let testMap = new MockMap();
+    component.isClicking = true;
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
     spyOn<any>(component['mapService'], 'getMap')

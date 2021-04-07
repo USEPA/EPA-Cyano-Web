@@ -50,7 +50,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/flask/Dockerfile
-    image: cyan-api
+    image: cyan-celery
     container_name: cyan-celery
     command: celery -A celery_worker.celery worker --loglevel=INFO -c 1
     depends_on:
@@ -61,7 +61,6 @@ services:
       - ../cyan_flask/:/cyan_flask
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
-      - MYSQL_ROOT_PASSWORD
     env_file:
       - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
 
