@@ -1,5 +1,6 @@
 <div id="bottom-menu-bar">
   
+  <!-- Data Type selection -->
   <div class="bottom-menu-title-block">
     <button mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type</button>
     <mat-menu #dataType="matMenu" class="bottom-menu-link-block">
@@ -8,6 +9,7 @@
     </mat-menu>
   </div>
 
+  <!-- Reload data -->
   <div class="bottom-menu-title-block">
     <button mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">Reload Data</button>
   </div>
@@ -15,6 +17,11 @@
   <!-- Upload CSV / batch feature -->
   <div class="bottom-menu-title-block">
     <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
+  </div>
+
+  <!-- Waterbody Stats -->
+  <div class="bottom-menu-title-block">
+    <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['/wbstats']">WB Stats</button>
   </div>
 
 </div>

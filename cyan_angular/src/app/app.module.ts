@@ -78,6 +78,7 @@ import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
+import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
 
 @NgModule({
   declarations: [
@@ -111,7 +112,8 @@ import { BatchComponent } from './batch/batch.component';
     DialogComponent,
     SessionTimeoutComponent,
     LocationSearchComponent,
-    BatchComponent
+    BatchComponent,
+    WaterbodyStatsComponent
   ],
   imports: [
     BrowserModule,

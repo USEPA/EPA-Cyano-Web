@@ -13,6 +13,7 @@ import { LatestImageComponent } from './latest-image/latest-image.component';
 import { ResetComponent } from './reset/reset.component';
 import { CommentsComponent } from './comments/comments.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
+import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
 
 import { AuthGuard } from './guards/auth.guard';
 
@@ -28,7 +29,8 @@ const routes: Routes = [
 	{ path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
 	{ path: 'latestimage', component: LatestImageComponent, canActivate: [AuthGuard] },
 	{ path: 'comments', component: CommentsComponent, canActivate: [AuthGuard] },
-	{ path: 'search', component: LocationSearchComponent, canActivate: [AuthGuard]}
+	{ path: 'search', component: LocationSearchComponent, canActivate: [AuthGuard]},
+	{ path: 'wbstats', component: WaterbodyStatsComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
