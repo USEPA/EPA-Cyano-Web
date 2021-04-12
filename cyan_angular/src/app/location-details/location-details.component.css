@@ -931,3 +931,7 @@ mat-card-content {
     height: auto;
     max-width: 100%;
 }
+
+.map-legend-toggle:hover {
+    cursor: pointer;
+}
