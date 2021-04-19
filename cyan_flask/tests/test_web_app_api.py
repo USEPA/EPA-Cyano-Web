@@ -192,7 +192,7 @@ class TestWebAppApi(unittest.TestCase):
 
         password_mock.return_value.test_password.return_value = False
 
-        expected_result = {"error": "Invalid password"}, 401
+        expected_result = {"error": "Invalid username and/or password."}, 401
         actual_result = web_app_api.login_user(test_request)
 
         self.assertEqual(actual_result, expected_result)
