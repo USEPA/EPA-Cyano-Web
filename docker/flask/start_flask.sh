@@ -3,10 +3,10 @@
 cd /cyan_flask  # switch to cyan_flask directory
 
 # Runs unit tests:
-# python -m unittest
+python -m unittest
 
 # Runs integration tests (tests/integration_tests.py):
-# python -m unittest tests/integration_tests.py
+python -m unittest tests/integration_tests.py
 
 # Performs any database migrations
 echo "### Performing database migrations."
