@@ -70,7 +70,7 @@ class Login(Resource):
     parser = parser_base.copy()
     parser.add_argument("user", type=str)
     parser.add_argument("password", type=str)
-    parser.add_argument("dataType", type=int)
+    parser.add_argument("dataType", type=int, choices=(1, 2))
 
     def get(self):
         return {"status": "login endpoint"}
