@@ -28,7 +28,7 @@ crypt_manager = CryptManager()
 
 # DB connection settings:
 retries = 0
-max_retries = 20
+max_retries = 3
 retry_timeout_secs = 2
 
 
@@ -76,7 +76,6 @@ def retry_db_command():
     retries += 1
     time.sleep(retry_timeout_secs)
     if retries <= max_retries:
-        print("Can't connect to mysql instance. Retrying...")
         return True
     else:
         return False

@@ -14,14 +14,22 @@ COPY cyan_flask/ /cyan_flask
 
 COPY docker/ /docker
 
+# COPY config/ config/
+
 RUN pip install --requirement /cyan_flask/requirements.txt
 
-# EXPOSE 5001
-
+# RUN chmod -R 755 /config && \
+# 	chmod 755 /docker/flask/start_flask.sh
 RUN mkdir /config && \
 	chmod -R 755 /config && \
 	chmod 755 /docker/flask/start_flask.sh
 
 WORKDIR /cyan_flask
+
+# Runs unit tests (needs secret file to run)
+# RUN python -m unittest
+
+# IMPORTANT: Removes secret files from image
+# RUN rm -f /config/secrets/*
 
 CMD ["sh", "/docker/flask/start_flask.sh"]
