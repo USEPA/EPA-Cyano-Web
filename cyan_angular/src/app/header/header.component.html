@@ -31,8 +31,8 @@
                          </div>
                     </button>
                     <button mat-menu-item class="comments menu-link" [routerLink]="['/comments']">
-                        <div class="menu-div" aria-label="Comments">
-                            <span class="tab-title">Comments</span>
+                        <div class="menu-div" aria-label="User guide">
+                            <span class="tab-title">User Guide</span>
                         </div>
                     </button>
                     <button mat-menu-item class="location-search menu-link" [routerLink]="['/search']">
@@ -44,13 +44,15 @@
             </div>
             <nav class="config-links menu-block">
                 <div class="account config-item" (click)="displayLogout()" aria-label="Account">
-                    <img aria-label="User account" class="header-icon icon-img" src="assets/images/user_icon_large.png" height="42" width="42"/>
+                    <mat-icon class="header-icon mat_icon">person</mat-icon>
                 </div>
                 <div class="settings config-item" [routerLink]="['/configs']" aria-label="Settings">
-                    <img aria-label="User settings" class="header-icon" src="assets/images/header_settings.png"/>
+                    <mat-icon class="header-icon mat_icon">settings</mat-icon>
                 </div>
-                <div class="comments config-item" [routerLink]="['/comments']" aria-label="Comments">
-                    <mat-icon class="header-icon mat_icon">question_answer</mat-icon>
+                <div class="comments config-item" aria-label="User guide">
+                    <a href="assets/CYANWEB USERS GUIDE APRIL 2021-FINAL-MGFINAL_TAGGED.PDF" target="_blank">
+                        <mat-icon class="header-icon mat_icon">help_outline</mat-icon>
+                    </a>
                 </div>
                 <div class="location-search config-item" [routerLink]="['/search']" aria-label="Location Search">
                     <mat-icon class="header-icon mat_icon">search</mat-icon>
