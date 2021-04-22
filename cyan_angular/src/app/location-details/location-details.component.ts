@@ -139,9 +139,6 @@ export class LocationDetailsComponent implements OnInit {
     center: latLng([this.lat_0, this.lng_0])
   };
 
-  hideMinimapMarkers: boolean = false;
-  envNameSub: Subscription;
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -159,11 +156,6 @@ export class LocationDetailsComponent implements OnInit {
   ngOnInit() {
 
     if (!this.authService.checkUserAuthentication()) { return; }
-
-    // Hides location-details minimap marker feature based on environment:
-    this.envNameSub = this.envService.envNameObserverable.subscribe(hideFeature => {
-      this.hideMinimapMarkers = hideFeature;
-    });
 
     this.imageCollection = null;
     this.route.params.subscribe(
@@ -210,10 +202,6 @@ export class LocationDetailsComponent implements OnInit {
 
     // reset location cell/date to latest image
     this.locationService.resetLocationsLatestData();
-
-    if (this.envNameSub) {
-      this.envNameSub.unsubscribe();
-    }
   }
 
   removeThumbHighlights() {
@@ -625,7 +613,7 @@ export class LocationDetailsComponent implements OnInit {
     if (!this.authService.checkUserAuthentication()) { return; }
 
     // NOTE: Ignores click event based on deployed environment.
-    if(this.hideMinimapMarkers === true) {
+    if(this.envService.config.disableMarkers === true) {
       return;
     }
 

@@ -19,7 +19,7 @@ export class BottomMenuComponent implements OnInit {
   public data_type: LocationType;
 
   hideUpload: boolean = false;
-  envNameSub: Subscription;
+  configSetSub: Subscription;
 
   constructor(
     private locationService: LocationService,
@@ -31,16 +31,15 @@ export class BottomMenuComponent implements OnInit {
   ngOnInit() {
     this.data_type = this.locationService.getDataType();
 
-    // Hides upload feature based on environment:
-    this.envNameSub = this.envService.envNameObserverable.subscribe(hideFeature => {
-      this.hideUpload = hideFeature;
+    this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
+      this.hideUpload = this.envService.config.disableUpload;
     });
 
   }
 
   ngOnDestroy() {
-    if (this.envNameSub) {
-      this.envNameSub.unsubscribe();
+    if (this.configSetSub) {
+      this.configSetSub.unsubscribe();
     }
   }
 
