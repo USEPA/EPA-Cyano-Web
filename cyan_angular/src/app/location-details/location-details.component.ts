@@ -610,8 +610,12 @@ export class LocationDetailsComponent implements OnInit {
     Adds marker to the location-details miniMap
     (and the main map as well).
     */
-
     if (!this.authService.checkUserAuthentication()) { return; }
+
+    // NOTE: Ignores click event based on deployed environment.
+    if(this.envService.config.disableMarkers === true) {
+      return;
+    }
 
     let lat = e.latlng.lat;
     let lng = e.latlng.lng;
