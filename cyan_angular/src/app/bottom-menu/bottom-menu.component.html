@@ -13,7 +13,7 @@
   </div>
 
   <!-- Upload CSV / batch feature -->
-  <div class="bottom-menu-title-block">
+  <div *ngIf="!hideUpload" class="bottom-menu-title-block">
     <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
   </div>
 
