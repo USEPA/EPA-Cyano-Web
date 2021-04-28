@@ -117,7 +117,7 @@ def login_user(post_data):
 def add_location(post_data):
     try:
         user = post_data["owner"]
-        _id = post_data["id"]
+        _id = Location.valdiate_id(post_data["id"])
         data_type = post_data["type"]
         name = post_data["name"]
         latitude = post_data["latitude"]
@@ -127,6 +127,10 @@ def add_location(post_data):
         notes = post_data["notes"] or []
     except KeyError:
         return {"error": "Invalid key in request"}, 400
+
+    if not _id:
+        return {"error": "Invalid key in request"}, 400
+
     # Checks if location already exists for user:
     location_obj = Location.query.filter_by(id=_id, owner=user, type=data_type).first()
     if location_obj:
