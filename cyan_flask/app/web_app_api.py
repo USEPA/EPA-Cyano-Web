@@ -117,7 +117,7 @@ def login_user(post_data):
 def add_location(post_data):
     try:
         user = post_data["owner"]
-        _id = Location.valdiate_id(post_data["id"])
+        _id = Location.validate_id(post_data["id"])
         data_type = post_data["type"]
         name = post_data["name"]
         latitude = post_data["latitude"]
