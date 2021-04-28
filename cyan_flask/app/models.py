@@ -38,6 +38,22 @@ class Location(db.Model):
     notes = db.Column(db.Text, nullable=False)
     compare = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 
+    @staticmethod
+    def validate_id(location_id):
+        """
+        Validation on location parameters before committing to DB.
+        """
+        try:
+            location_id = int(location_id)
+        except ValueError as e:
+            return False
+        if not isinstance(location_id, int):
+            return False
+        if location_id < 1:
+            return False
+
+        return location_id
+
 
 class Notifications(db.Model):
     __tablename__ = "notifications"

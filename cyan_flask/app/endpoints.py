@@ -51,12 +51,9 @@ class Register(Resource):
     parser.add_argument("email", type=str)
     parser.add_argument("password", type=str)
 
-    def get(self):
-        return {"status": "register endpoint"}
-
     def post(self):
         # Adds user to user table:
-        args = request.get_json()
+        args = self.parser.parse_args()
         results, status_code = web_app_api.register_user(args)
         return results, status_code
 
@@ -66,18 +63,14 @@ class Login(Resource):
     Endpoint for logging user in.
     URL: /app/api/user
     """
-
     parser = parser_base.copy()
     parser.add_argument("user", type=str)
     parser.add_argument("password", type=str)
     parser.add_argument("dataType", type=int, choices=(1, 2))
 
-    def get(self):
-        return {"status": "login endpoint"}
-
     def post(self):
         # Gets user from user table:
-        args = request.get_json()  # self.parser.parse_args()
+        args = self.parser.parse_args()
         results, status_code = web_app_api.login_user(args)
         results = simplejson.loads(
             simplejson.dumps(results)
@@ -90,10 +83,6 @@ class AddLocation(Resource):
     Endpoint for adding user location.
     URL: /app/api/location/add
     """
-
-    def get(self):
-        return {"status": "location endpoint"}
-
     @login_required
     def post(self, id=None):
         # Adds a new location to location table:
@@ -109,10 +98,6 @@ class EditLocation(Resource):
     Endpoint for editing user location.
     URL: /app/api/location/edit
     """
-
-    def get(self):
-        return {"status": "edit location endpoint"}
-
     @login_required
     def post(self):
         args = request.get_json()
