@@ -304,7 +304,7 @@
 .help {
   display: none;
 }
-.comments, .location-search {
+.comments, .location-search, .settings, .account {
   margin-top: 5px;
 }
 .header-version {

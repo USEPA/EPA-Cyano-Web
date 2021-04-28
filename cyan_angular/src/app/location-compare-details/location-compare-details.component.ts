@@ -224,7 +224,7 @@ export class LocationCompareDetailsComponent implements OnInit {
     map.invalidateSize();  // will this fix the gray map?
     this.mapService.setMinimap(map, null);
     this.locations.forEach(loc => {
-      let marker = this.createMarker(loc);
+      let marker = this.mapService.createMarker(loc);
       this.mapService.setMiniMarkerForCompare(marker);
       latLngArray.push(this.mapService.getLatLng(loc));
     });
@@ -232,22 +232,6 @@ export class LocationCompareDetailsComponent implements OnInit {
       map.invalidateSize();
       map.flyToBounds(latLngArray);
     }, 200);
-  }
-
-  createMarker(loc: Location): Marker {
-    let m = marker(this.mapService.getLatLng(loc), {
-      icon: icon({
-        iconSize: [30, 36],
-        iconAnchor: [13, 41],
-        iconUrl: this.mapService.getMarker(loc),
-        shadowUrl: 'leaflet/marker-shadow.png'
-      }),
-      title: loc.name,
-      alt: "Map marker for " + loc.name,
-      riseOnHover: true,
-      zIndexOffset: 10000
-    });
-    return m;
   }
 
   getArrow(l: Location) {

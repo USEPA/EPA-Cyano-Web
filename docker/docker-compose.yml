@@ -22,8 +22,6 @@ services:
       - "80:80"
     links:
       - cyan-api:uwsgi_flask
-    volumes:
-      - ../cyan_angular/src/assets/env.json:/usr/share/nginx/html/assets/env.json
 
   cyan-api:
     build:
@@ -37,13 +35,29 @@ services:
       - cyan-db
     volumes:
       - ../config/:/config
+      - ../cyan_flask/:/cyan_flask
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
-      - MYSQL_ROOT_PASSWORD
     env_file:
       - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
-    links:
+
+  cyan-celery:
+    build:
+      context: ../
+      dockerfile: ./docker/flask/Dockerfile
+    image: cyan-celery
+    container_name: cyan-celery
+    command: celery -A celery_worker.celery worker --loglevel=INFO -c 1
+    depends_on:
       - cyan-db
+      - redis
+    volumes:
+      - ../config/:/config
+      - ../cyan_flask/:/cyan_flask
+    environment:
+      - DOCKER_HOSTNAME=${HOSTNAME}
+    env_file:
+      - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
 
   cyan-db:
     build:
@@ -55,11 +69,11 @@ services:
       - ${SQL_DUMP:-../cyan_mysql/no_dump.txt}:/tmp/dump.sql  # use optional dump file to build container DB
       - /var/www/app_data/cyano:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
     env_file:
       - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
-      # - MYSQL_DATABASE=${DB_NAME}
-      # - DB_NAME
-      # NOTE: Below env vars create one-time pass displayed once in container stdout
-      # - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      # - MYSQL_ONETIME_PASSWORD
+
+  redis:
+    image: redis:latest
+    expose:
+      - "6379"

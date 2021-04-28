@@ -1,24 +1,32 @@
 import os
+from os.path import basename
 import datetime
 import time
 import hashlib
 import binascii
 import jwt
 import smtplib
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import COMMASPACE, formatdate
 import logging
 import secrets
 import zlib
 from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
 
 from cyan_flask.crypt import CryptManager
+from csv_handler import CSVHandler
 
 crypt_manager = CryptManager()
+csv_handler = CSVHandler()
+
 
 class PasswordHandler:
     def __init__(self):
         pass
 
-    def _create_email_message(self, server_email, user_email):
+    def _create_reset_email_message(self, server_email, user_email):
         subject = "Password reset for Cyano Web"
         user_link = self._create_reset_link(user_email)
         msg = "\r\n".join(
@@ -32,13 +40,45 @@ class PasswordHandler:
         )
         return msg
 
+    def _create_job_email_message(self, server_email, user_email, file=None):
+        subject = "Cyano job complete"
+        text = "Cyano job is complete"  # TODO: Add more info in body
+        msg = MIMEMultipart()
+        msg["From"] = server_email
+        msg["To"] = user_email
+        msg["Date"] = formatdate(localtime=True)
+        msg["Subject"] = subject
+
+        msg.attach(MIMEText(text))
+
+        if file:
+            with open(file, "r") as file_obj:
+                part = MIMEApplication(file_obj.read(), Name=basename(file))
+                part["Content-Disposition"] = "attachment; filename={}".format(
+                    basename(file)
+                )
+                msg.attach(part)
+
+        return msg.as_string()
+
     def _create_reset_link(self, user_email):
         jwt_token = JwtHandler().encode_auth_token(
             user_email
-        )  # NOTE: usering email for 'sub' in token
+        )  # NOTE: using email for 'sub' in token
         return (
             os.environ.get("HOST_DOMAIN", "http://localhost:4200")
             + "/reset?token="
+            + jwt_token.decode("utf-8")
+        )
+
+    def _create_csv_link(self, username):
+        jwt_token = JwtHandler().encode_auth_token(
+            username
+        )  # NOTE: username for 'sub' in token
+        return (
+            os.environ.get("HOST_DOMAIN", "http://localhost:4200")
+            + os.environ.get("API_URL", "/cyan/app/api/")
+            + "csv?token="
             + jwt_token.decode("utf-8")
         )
 
@@ -77,13 +117,27 @@ class PasswordHandler:
 
     def send_password_reset_email(self, request):
         """
-		Handled contacts page comment submission by sending email
-		to cts email using an smtp server.
-		"""
+        Handled contacts page comment submission by sending email
+        to cts email using an smtp server.
+        """
         smtp_pass = self._handle_config_password(os.environ.get("EMAIL_PASS"))
         smtp_email = os.environ.get("EMAIL")
         user_email = request.get("user_email")
-        msg = self._create_email_message(smtp_email, user_email)
+        msg = self._create_reset_email_message(smtp_email, user_email)
+        return self._send_mail(smtp_email, smtp_pass, user_email, msg)
+
+    def send_batch_job_complete_email(self, request):
+        """
+        Sends email to user that batch job is complete.
+        Includes info about job and link to download CSV.
+        """
+        smtp_pass = self._handle_config_password(os.environ.get("EMAIL_PASS"))
+        smtp_email = os.environ.get("EMAIL")
+        user_email = request.get("user_email")
+        input_filename = request.get("filename")
+        output_filename = csv_handler.generate_output_filename(input_filename)
+        file_path = csv_handler.build_csv_file_path(output_filename)
+        msg = self._create_job_email_message(smtp_email, user_email, file_path)
         return self._send_mail(smtp_email, smtp_pass, user_email, msg)
 
 
@@ -93,8 +147,8 @@ class JwtHandler:
 
     def encode_auth_token(self, user):
         """
-		Generates the Auth Token.
-		"""
+        Generates the Auth Token.
+        """
         try:
             payload = {
                 "exp": datetime.datetime.utcnow()
@@ -104,15 +158,17 @@ class JwtHandler:
                 "iat": datetime.datetime.utcnow(),
                 "sub": user,
             }
-            enc_token = jwt.encode(payload, os.environ.get("SECRET_KEY"), algorithm="HS256")
+            enc_token = jwt.encode(
+                payload, os.environ.get("SECRET_KEY"), algorithm="HS256"
+            )
             return crypt_manager.convert_to_bytes(enc_token)
         except Exception as e:
             return e
 
     def decode_auth_token(self, auth_token):
         """
-		Decodes the auth token.
-		"""
+        Decodes the auth token.
+        """
         try:
             return jwt.decode(
                 auth_token, os.environ.get("SECRET_KEY"), algorithms=["HS256"]
@@ -126,16 +182,16 @@ class JwtHandler:
 
     def check_time_delta(self, token_expiry):
         """
-		Calculates seconds between current time and
-		token's expiration time. > 0 indicates number of seconds
-		until expiration, < 0 indicates an expired token.
-		"""
+        Calculates seconds between current time and
+        token's expiration time. > 0 indicates number of seconds
+        until expiration, < 0 indicates an expired token.
+        """
         return token_expiry - time.time()
 
     def get_user_from_token(self, request):
         """
-		Gets user/owner name from token.
-		"""
+        Gets user/owner name from token.
+        """
         token = request.headers.get("Authorization", None)
         if token:
             print(token)
@@ -145,65 +201,9 @@ class JwtHandler:
 
     def get_user_token(self, request):
         """
-		Gets user's token.
-		"""
+        Gets user's token.
+        """
         token = request.headers.get("Authorization", None)
         if token:
             return self.decode_auth_token(token.split(" ")[1])
         return None
-
-
-class ConfigCrypt:
-    """
-	Encrypts/decrypts a byte string using a 
-	provided password or key. Also option for
-	obscuring/unobscuring byte strings, which is not
-	secure.
-	"""
-
-    def __init__(self):
-        # self.backend = default_backend()
-        # self.iterations = 100000
-        pass
-
-    # def _derive_key(self, password, salt):
-    # 	"""
-    # 	Derive a secret key from a given password and salt
-    # 	"""
-    # 	kdf = PBKDF2HMAC(
-    # 		algorithm=hashes.SHA256(), length=32, salt=salt,
-    # 		iterations=self.iterations, backend=self.backend)
-    # 	return b64e(kdf.derive(password))
-
-    # def encrypt_password(self, message, password):
-    # 	assert type(message) is bytes, 'message must be type bytes, e.g., "test string".encode()'
-    # 	salt = secrets.token_bytes(16)
-    # 	key = self._derive_key(password.encode(), salt)
-    # 	return b64e(
-    # 		b'%b%b%b' % (
-    # 			salt,
-    # 			self.iterations.to_bytes(4, 'big'),
-    # 			b64d(Fernet(key).encrypt(message)),
-    # 		)
-    # 	)
-
-    # def decrypt_password(self, token, password):
-    # 	assert type(token) is bytes, 'token must be type bytes'
-    # 	decoded = b64d(token)
-    # 	salt, iter, token = decoded[:16], decoded[16:20], b64e(decoded[20:])
-    # 	self.iterations = int.from_bytes(iter, 'big')
-    # 	key = self._derive_key(password.encode(), salt)
-    # 	return Fernet(key).decrypt(token)
-
-    def obscure(self, data):
-        """
-		Obscures a byte string (not secure, any item using this
-		must still be kept secret).
-		"""
-        return b64e(zlib.compress(data, 9))
-
-    def unobscure(self, obscured):
-        """
-		Unobscures a byte string.
-		"""
-        return zlib.decompress(b64d(obscured))

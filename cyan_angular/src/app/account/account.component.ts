@@ -28,7 +28,7 @@ export class AccountComponent implements OnInit {
   hideRegisterPasswordCheck: boolean = true;
 
   description: string =
-    'This experimental web application provides provisional satellite derived measures of cyanobacteria, which may contain errors and should be considered a research tool. Users should refer to the app help menu for more details. The focus of this application is to provide cyanobacteria measure for larger lakes and reservoirs within the continental US. Data products are 7-day maximum cyanobacteria measures updated weekly.';
+    'This experimental web application provides provisional satellite derived measures of cyanobacteria, which may contain errors and should be considered a research tool. Users should refer to the app help menu for more details. The focus of this application is to provide cyanobacteria measures for larger lakes and reservoirs within the continental US. Data products are 7-day maximum cyanobacteria measures updated weekly and, beginning late July 2020, daily snapshots of cyanobacteria measures updated every day.';
 
   public userLoggedIn: boolean = false;
   hidePassword: boolean = true;

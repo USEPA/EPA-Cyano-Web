@@ -9,9 +9,9 @@ from auth import JwtHandler
 
 def _check_for_refresh(auth_token):
     """
-	Gets new token for valid user if token
-	is near expiring.
-	"""
+    Gets new token for valid user if token
+    is near expiring.
+    """
     expiry_time = JwtHandler().check_time_delta(auth_token["exp"])
     if expiry_time >= 0:
         auth_token = JwtHandler().encode_auth_token(auth_token["sub"])

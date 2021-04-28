@@ -1,6 +1,7 @@
 # Angular settings
 dist/
 cyan_angular/dist/
+env.json
 
 # Python settings
 __pycache__/
@@ -8,8 +9,9 @@ __pycache__/
 # Pycharm settings
 .idea
 
-# Angular settings
-env.json
+# Flask settings
+cyan_flask/user_images/*
+cyan_flask/user_jobs/*
 
 # Docker settings
 .env

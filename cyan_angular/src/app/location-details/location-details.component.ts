@@ -343,7 +343,7 @@ export class LocationDetailsComponent implements OnInit {
     if (this.selectedLayer != undefined) {
       this.getImageDate();  // updates image date
       this.getImageName();  // updates image name
-      this.mapService.setMiniMarker(this.createMarker());  // updates marker on minimap
+      this.mapService.setMiniMarker(this.mapService.createMarker(this.current_location));  // updates marker on minimap
     }
   }
 
@@ -559,7 +559,7 @@ export class LocationDetailsComponent implements OnInit {
   }
 
   onMapReady(map: Map): void {
-    let marker = this.createMarker();
+    let marker = this.mapService.createMarker(this.current_location);
     this.mapService.setMinimap(map, marker);
     setTimeout(() => {
       map.invalidateSize();
@@ -567,23 +567,8 @@ export class LocationDetailsComponent implements OnInit {
     }, 200);
   }
 
-  createMarker(): Marker {
-    return marker(this.mapService.getLatLng(this.current_location), {
-      icon: icon({
-        iconSize: [30, 36],
-        iconAnchor: [13, 41],
-        iconUrl: this.mapService.getMarker(this.current_location),
-        shadowUrl: 'leaflet/marker-shadow.png'
-      }),
-      alt: "Map marker for " + this.current_location.name,
-      title: this.current_location.name,
-      riseOnHover: true,
-      zIndexOffset: 10000
-    });
-  }
-
   changeMarker(): void {
-    this.mapService.setMiniMarker(this.createMarker());
+    this.mapService.setMiniMarker(this.mapService.createMarker(this.current_location));
     this.mapService.getMinimap().flyTo(this.mapService.getLatLng(this.current_location), 6);
   }
 
@@ -620,17 +605,67 @@ export class LocationDetailsComponent implements OnInit {
     }
   }
 
+  addMarkerOnClick(e: any): void {
+    /*
+    Adds marker to the location-details miniMap
+    (and the main map as well).
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    // NOTE: Ignores click event based on deployed environment.
+    if(this.envService.config.disableMarkers === true) {
+      return;
+    }
+
+    let lat = e.latlng.lat;
+    let lng = e.latlng.lng;
+
+    let name = 'To Be Updated...';
+    let cellCon = 0;
+    let maxCellCon = 0;
+    let cellChange = 0;
+    let dataDate = '01/01/2018';
+    let source = 'OLCI';
+
+    let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
+
+    let miniMap = this.mapService.getMinimap();
+    miniMap.setView(e.latlng, 12);
+
+    let m = this.mapService.addMarker(location);  // adds marker to main map
+    m.fireEvent('click');
+    this.mapService.getMap().closePopup();  // closes popup on main map
+
+    let miniMarker = this.mapService.addMiniMarker(location);  // adds blank marker to minimap
+
+    this.setMiniMarkerEvents(miniMarker, location);
+
+  }
+
+  setMiniMarkerEvents(miniMarker: Marker, location: Location): void {
+    /*
+    Adds marker events to marker on the mini map.
+    */
+    let self = this;
+    miniMarker.on('click', function(e) {
+      self.mapService.deleteMiniMarker(location);  // remove from miniMap
+      self.mapService.deleteMarker(location);  // remove from main map
+      self.locationService.deleteLocation(location);  // remove location from user db
+    });
+    miniMarker.on('mouseover', function(e) {
+      miniMarker.setIcon(self.mapService.createIcon(null, 'remove'));
+    });
+    miniMarker.on('mouseout', function(e) {
+      miniMarker.setIcon(self.mapService.createIcon(null));
+    });
+  }
+
   openNotes(l: Location): void {
     this.bottomSheet.open(LocationDetailsNotes, {
       data: {
         location: l
       }
     });
-
-  }
-
-  openCyanoDetails() {
-    console.log("openCyanoDetails() called.");
   }
 
 }
@@ -682,7 +717,7 @@ export class LocationDetailsNotes {
      Adds the note entered in the note bottom sheet.
      */
     let noteTextbox = <HTMLInputElement>document.getElementById('note-textarea');  // NOTE: casted as HTMLInputElement to make Typescript happy
-    let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    let dateTime = this.datePipe.transform(new Date(), 'yyyy-MM-dd HH:mm:ss');
     let noteObj = {
       timestamp: dateTime,
       note: noteTextbox.value

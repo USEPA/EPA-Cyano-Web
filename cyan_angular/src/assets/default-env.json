@@ -1,4 +1,6 @@
 {
   "baseServerUrl": "/cyan/app/api/",
-  "tomcatApiUrl": "https://cyan.epa.gov/cyan/cyano/"
+  "tomcatApiUrl": "https://cyan.epa.gov/cyan/cyano/",
+  "disableUpload": false,
+  "disableMarkers": false
 }

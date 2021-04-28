@@ -153,17 +153,4 @@ describe('LatestImageComponent', () => {
   //   // TODO
   // });
 
-  it('should test createMarker()', () => {
-    const testLatLng = latLng(34, -81);
-    const testMarkerUrl = 'test/image.png';
-    spyOn<any>(component['mapService'], 'getLatLng')
-      .and.returnValue(testLatLng);
-    spyOn<any>(component['mapService'], 'getMarker')
-      .and.returnValue(testMarkerUrl);
-
-    let result = component.createMarker();
-
-    expect(result.options.title).toMatch(component.location.name);
-  });
-
 });
