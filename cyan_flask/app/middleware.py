@@ -2,6 +2,7 @@ from functools import wraps
 from flask import request, g, abort
 import json
 import logging
+import os
 
 # Local imports:
 from auth import JwtHandler
@@ -44,6 +45,25 @@ def login_required(f):
                 401,
                 {"Content-Type": "application/json"},
             )
+        return f(*args, **kwargs)
+
+    return wrap
+
+
+def check_referrer(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        
+        origin = request.environ.get("HTTP_ORIGIN", "")
+        app_header = request.headers.get("App-Name", "")
+
+        if not os.getenv("HOST_DOMAIN") in origin or app_header != "Cyanweb":
+            return (
+                {"error": "Not a valid request"},
+                418,
+                {"Content-Type": "application/json"},   
+            )
+
         return f(*args, **kwargs)
 
     return wrap
