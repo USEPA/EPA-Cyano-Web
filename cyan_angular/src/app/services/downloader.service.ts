@@ -8,6 +8,7 @@ import { LocationType } from '../models/location';
 import { UserSettings } from '../models/settings';
 import { Comment, Reply } from '../models/comment';
 import { BatchJob, BatchStatus } from '../models/batch';
+import { headerOptions } from '../models/headers';
 
 import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
@@ -54,11 +55,6 @@ export class RawData {
   location: Location = null;
 }
 
-const headerOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json'
-  })
-};
 
 @Injectable({
   providedIn: 'root'
@@ -239,7 +235,7 @@ export class DownloaderService {
 
   executeAuthorizedGetRequest(url: string) {
     if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.get(url);
+    return this.http.get(url, headerOptions);
   }
 
   ajaxRequest(ln: Location, username: string, url: string) {
