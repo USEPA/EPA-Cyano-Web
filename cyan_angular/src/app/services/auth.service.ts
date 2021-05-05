@@ -6,12 +6,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { EnvService } from '../services/env.service';
 
+import { headerOptions } from '../models/headers'; 
 
-const headerOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json'
-  })
-};
 
 
 @Injectable()
@@ -97,7 +93,7 @@ export class AuthService {
     */
     if (!this.isAuthenticated()) { return; }
     let url = this.envService.config.baseServerUrl + 'refresh';
-    return this.http.get(url).subscribe();
+    return this.http.get(url, headerOptions).subscribe();
   }
 
   sendResetEmail(resetEmail) {
