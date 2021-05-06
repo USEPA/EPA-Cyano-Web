@@ -404,7 +404,7 @@ class TestWebAppApi(unittest.TestCase):
         """
         request_obj = {
             "owner": "test",
-            "id": None,
+            "id": 1,
             "type": 1,
             "name": "location name",
             "latitude": 80.00,
@@ -442,7 +442,7 @@ class TestWebAppApi(unittest.TestCase):
         """
         request_obj = {
             "owner": "test",
-            "id": None,
+            "id": 1,
             "type": 1,
             "name": "location name",
             "latitude": 80.00,
