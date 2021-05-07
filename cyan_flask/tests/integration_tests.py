@@ -171,6 +171,8 @@ class TestApiIntegration(unittest.TestCase):
             "Access-Control-Allow-Headers": "Authorization",
             "Authorization": "Bearer {}".format(self.test_token),
             "Content-Type": "application/json",
+            "Origin": os.getenv("HTTP_DOMAIN", ""),
+            "App-Name": "Cyanweb"
         }
 
     def _make_request(self, url, data, headers):
@@ -212,7 +214,7 @@ class TestApiIntegration(unittest.TestCase):
             "email": self.test_user_email,
         }
         with app_instance.test_client() as c:
-            actual_response = c.post(url, json=post_data).get_json()
+            actual_response = c.post(url, json=post_data, headers=self._get_auth_headers()).get_json()
             self.assertEqual(actual_response, expected_response)
 
     def login_user(self):
@@ -243,7 +245,7 @@ class TestApiIntegration(unittest.TestCase):
             },
         }
         with app_instance.test_client() as c:
-            actual_response = c.post(url, json=post_data).get_json()
+            actual_response = c.post(url, json=post_data, headers=self._get_auth_headers()).get_json()
             self.test_token = actual_response["user"][
                 "auth_token"
             ]  # sets auth token for subsequent requests
