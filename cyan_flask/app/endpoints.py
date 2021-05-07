@@ -216,7 +216,6 @@ class Refresh(Resource):
     def get(self):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        # return {'success': True}, 200, headers
         return {"status": "success"}, 200, headers
 
 
@@ -294,10 +293,6 @@ class Reply(Resource):
     """
     Endpoints for user comment replies.
     """
-
-    def get(self):
-        """"""
-        return {"status": "reply endpoint"}
 
     @login_required
     @check_referrer
@@ -431,17 +426,3 @@ api.add_resource(BatchJobStatus, api_url + "batch/status")
 api.add_resource(BatchJobCancel, api_url + "batch/cancel")
 
 print("CyAN Flask app started.")
-# print("CyAN Flask app started.\nLive endpoints:")
-# print(base_url + "/test")
-# print(base_url + api_url + "user")
-# print(base_url + api_url + "user/register")
-# print(base_url + api_url + "location/add")
-# print(base_url + api_url + "location/edit")
-# print(base_url + api_url + "location/delete/<string:_id>")
-# print(base_url + api_url + "location/<string:_id>/<string:type>")
-# print(base_url + api_url + "locations/<string:type>")
-# print(base_url + api_url + "notification/edit/<string:_id>")
-# print(base_url + api_url + "notification/delete")
-# print(base_url + api_url + "settings/edit")
-# print(base_url + api_url + "refresh")
-# print(base_url + api_url + "reset")

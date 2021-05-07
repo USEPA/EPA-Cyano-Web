@@ -57,7 +57,7 @@ def check_referrer(f):
         origin = request.environ.get("HTTP_ORIGIN", "")
         app_header = request.headers.get("App-Name", "")
 
-        if not origin in os.getenv("HOST_DOMAIN") or app_header != "Cyanweb":
+        if not origin in os.getenv("HOST_DOMAIN") or app_header != os.getenv("APP_NAME"):
             return (
                 {"error": "Not a valid request"},
                 418,

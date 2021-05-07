@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
@@ -39,6 +39,15 @@ export class EnvService {
         this.retries += 1;
         this.setConfig("./assets/default-env.json");
       });
+  }
+
+  getHeaders() {
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'App-Name': this.config.appName
+      })
+    };
   }
 
 }
