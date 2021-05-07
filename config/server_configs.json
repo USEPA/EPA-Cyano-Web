@@ -1,10 +1,5 @@
 [
 	{
-		"SERVER_NAME": "UberTool-Dev",
-		"ENV": "cdx_azure_dev.env",
-		"DESCRIPTION": "CGI Azure Linux server for testing."
-	},
-	{
 		"SERVER_NAME": "ceam-rhel-dev",
 		"ENV": "gdit_aws_dev.env",
 		"DESCRIPTION": "GDIT development server environment."
