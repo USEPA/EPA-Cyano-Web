@@ -7,12 +7,6 @@ import { environment } from '../../environments/environment';
 import { EnvService } from '../services/env.service';
 
 
-const headerOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json'
-  })
-};
-
 
 @Injectable()
 export class AuthService {
@@ -97,7 +91,7 @@ export class AuthService {
     */
     if (!this.isAuthenticated()) { return; }
     let url = this.envService.config.baseServerUrl + 'refresh';
-    return this.http.get(url).subscribe();
+    return this.http.get(url, this.envService.getHeaders()).subscribe();
   }
 
   sendResetEmail(resetEmail) {
@@ -106,7 +100,7 @@ export class AuthService {
     */
     let url = this.envService.config.baseServerUrl + 'reset';
     let body = { email: resetEmail };
-    return this.http.post(url, body, headerOptions);
+    return this.http.post(url, body, this.envService.getHeaders());
   }
 
   resetPassword(newPassword) {
@@ -116,7 +110,7 @@ export class AuthService {
     if (!this.checkUserAuthentication()) { return; }
     let url = this.envService.config.baseServerUrl + 'reset';
     let body = { newPassword: newPassword };
-    return this.http.put(url, body, headerOptions);
+    return this.http.put(url, body, this.envService.getHeaders());
   }
 
   emailIsValid (email) {

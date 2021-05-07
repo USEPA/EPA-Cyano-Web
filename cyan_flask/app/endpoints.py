@@ -6,7 +6,7 @@ from flask_restful import Api, Resource, reqparse
 
 # Local imports:
 from auth import JwtHandler
-from middleware import login_required
+from middleware import login_required, check_headers
 import web_app_api
 
 
@@ -51,6 +51,7 @@ class Register(Resource):
     parser.add_argument("email", type=str)
     parser.add_argument("password", type=str)
 
+    @check_headers
     def post(self):
         # Adds user to user table:
         args = self.parser.parse_args()
@@ -68,6 +69,7 @@ class Login(Resource):
     parser.add_argument("password", type=str)
     parser.add_argument("dataType", type=int, choices=(1, 2))
 
+    @check_headers
     def post(self):
         # Gets user from user table:
         args = self.parser.parse_args()
@@ -84,6 +86,7 @@ class AddLocation(Resource):
     URL: /app/api/location/add
     """
     @login_required
+    @check_headers
     def post(self, id=None):
         # Adds a new location to location table:
         args = request.get_json()
@@ -99,6 +102,7 @@ class EditLocation(Resource):
     URL: /app/api/location/edit
     """
     @login_required
+    @check_headers
     def post(self):
         args = request.get_json()
         args["owner"] = JwtHandler().get_user_from_token(request)
@@ -114,6 +118,7 @@ class DeleteLocation(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self, _id="", type=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
@@ -127,6 +132,7 @@ class GetUserLocations(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self, type=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
@@ -141,6 +147,7 @@ class GetLocation(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self, _id="", type=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
@@ -155,6 +162,7 @@ class EditNotification(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self, _id=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
@@ -168,6 +176,7 @@ class DeleteNotification(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
@@ -185,6 +194,7 @@ class EditSettings(Resource):
         return {"status": "edit settings endpoint"}
 
     @login_required
+    @check_headers
     def post(self):
         args = request.get_json()
         args["owner"] = JwtHandler().get_user_from_token(request)
@@ -202,10 +212,10 @@ class Refresh(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        # return {'success': True}, 200, headers
         return {"status": "success"}, 200, headers
 
 
@@ -227,6 +237,7 @@ class Reset(Resource):
         return results, status_code
 
     @login_required
+    @check_headers
     def put(self):
         """
         Reset password form handler (after user has verified email).
@@ -251,6 +262,7 @@ class Comment(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self):
         """
         Get all user comments.
@@ -262,6 +274,7 @@ class Comment(Resource):
         return results, status_code, headers
 
     @login_required
+    @check_headers
     def post(self):
         """
         Adds a user comment.
@@ -281,11 +294,8 @@ class Reply(Resource):
     Endpoints for user comment replies.
     """
 
-    def get(self):
-        """"""
-        return {"status": "reply endpoint"}
-
     @login_required
+    @check_headers
     def post(self):
         """
         Adds replay to a user's comment.
@@ -304,6 +314,7 @@ class BatchJobStatus(Resource):
     """"""
 
     @login_required
+    @check_headers
     def post(self):
         """
         Gets status of a given job ID.
@@ -327,6 +338,7 @@ class Batch(Resource):
     """
 
     @login_required
+    @check_headers
     def get(self, job_id=""):
         """
         Gets batch job from db for user.
@@ -341,6 +353,7 @@ class Batch(Resource):
         return results, status_code, headers
 
     @login_required
+    @check_headers
     def post(self):
         """
         Starts a user's batch request/job.
@@ -362,6 +375,7 @@ class BatchJobCancel(Resource):
     """
 
     @login_required
+    @check_headers
     def post(self):
         args = request.get_json()
         args["username"] = JwtHandler().get_user_from_token(
@@ -412,17 +426,3 @@ api.add_resource(BatchJobStatus, api_url + "batch/status")
 api.add_resource(BatchJobCancel, api_url + "batch/cancel")
 
 print("CyAN Flask app started.")
-# print("CyAN Flask app started.\nLive endpoints:")
-# print(base_url + "/test")
-# print(base_url + api_url + "user")
-# print(base_url + api_url + "user/register")
-# print(base_url + api_url + "location/add")
-# print(base_url + api_url + "location/edit")
-# print(base_url + api_url + "location/delete/<string:_id>")
-# print(base_url + api_url + "location/<string:_id>/<string:type>")
-# print(base_url + api_url + "locations/<string:type>")
-# print(base_url + api_url + "notification/edit/<string:_id>")
-# print(base_url + api_url + "notification/delete")
-# print(base_url + api_url + "settings/edit")
-# print(base_url + api_url + "refresh")
-# print(base_url + api_url + "reset")
