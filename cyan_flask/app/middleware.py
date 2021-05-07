@@ -50,14 +50,19 @@ def login_required(f):
     return wrap
 
 
-def check_referrer(f):
+def check_headers(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         
         origin = request.environ.get("HTTP_ORIGIN", "")
         app_header = request.headers.get("App-Name", "")
 
+        logging.info("Origin: {}\nDomain: {}\nApp: {}".format(
+            origin, os.getenv("HOST_DOMAIN"), app_header
+        ))
+
         if not origin in os.getenv("HOST_DOMAIN") or app_header != os.getenv("APP_NAME"):
+            logging.warning("Request Origin or App does not match. Skipping request.")
             return (
                 {"error": "Not a valid request"},
                 418,
