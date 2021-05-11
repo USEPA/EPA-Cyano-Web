@@ -19,6 +19,7 @@ import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { EnvService } from '../services/env.service';
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
 
 
 @Component({
@@ -150,7 +151,8 @@ export class LocationDetailsComponent implements OnInit {
     private user: UserService,
     private authService: AuthService,
     private configService: ConfigService,
-    private envService: EnvService
+    private envService: EnvService,
+    private markerMap: MarkerMapComponent
   ) { }
 
   ngOnInit() {
@@ -610,54 +612,7 @@ export class LocationDetailsComponent implements OnInit {
     Adds marker to the location-details miniMap
     (and the main map as well).
     */
-    if (!this.authService.checkUserAuthentication()) { return; }
-
-    // NOTE: Ignores click event based on deployed environment.
-    if(this.envService.config.disableMarkers === true) {
-      return;
-    }
-
-    let lat = e.latlng.lat;
-    let lng = e.latlng.lng;
-
-    let name = 'To Be Updated...';
-    let cellCon = 0;
-    let maxCellCon = 0;
-    let cellChange = 0;
-    let dataDate = '01/01/2018';
-    let source = 'OLCI';
-
-    let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
-
-    let miniMap = this.mapService.getMinimap();
-    miniMap.setView(e.latlng, 12);
-
-    let m = this.mapService.addMarker(location);  // adds marker to main map
-    m.fireEvent('click');
-    this.mapService.getMap().closePopup();  // closes popup on main map
-
-    let miniMarker = this.mapService.addMiniMarker(location);  // adds blank marker to minimap
-
-    this.setMiniMarkerEvents(miniMarker, location);
-
-  }
-
-  setMiniMarkerEvents(miniMarker: Marker, location: Location): void {
-    /*
-    Adds marker events to marker on the mini map.
-    */
-    let self = this;
-    miniMarker.on('click', function(e) {
-      self.mapService.deleteMiniMarker(location);  // remove from miniMap
-      self.mapService.deleteMarker(location);  // remove from main map
-      self.locationService.deleteLocation(location);  // remove location from user db
-    });
-    miniMarker.on('mouseover', function(e) {
-      miniMarker.setIcon(self.mapService.createIcon(null, 'remove'));
-    });
-    miniMarker.on('mouseout', function(e) {
-      miniMarker.setIcon(self.mapService.createIcon(null));
-    });
+    this.markerMap.addMiniMarkerOnClick(e);
   }
 
   openNotes(l: Location): void {
