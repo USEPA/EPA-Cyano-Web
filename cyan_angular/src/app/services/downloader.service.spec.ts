@@ -11,7 +11,7 @@ import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
 import { DownloaderService, RawData, LocationDataAll } from './downloader.service';
-import { MockEnvService } from '../test-data/env-service-mock';
+import { MockEnvService } from '../../testing/mocks/env-service-mock';
 
 let rawDataResponse = require('../../testing/mocks/raw-data-response.json');
 

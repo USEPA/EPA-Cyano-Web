@@ -5,7 +5,7 @@ import { of } from 'rxjs';
 
 import { EnvService } from './env.service';
 import { AuthService } from './auth.service';
-import { MockEnvService } from '../test-data/env-service-mock';
+import { MockEnvService } from '../../testing/mocks/env-service-mock';
 
 describe('AuthService', () => {
 
