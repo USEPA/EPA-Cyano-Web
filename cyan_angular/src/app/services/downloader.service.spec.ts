@@ -11,6 +11,7 @@ import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
 import { DownloaderService, RawData, LocationDataAll } from './downloader.service';
+import { MockEnvService } from '../test-data/env-service-mock';
 
 let rawDataResponse = require('../../testing/mocks/raw-data-response.json');
 
@@ -23,11 +24,6 @@ describe('DownloaderService', () => {
 	const testType = 1;
 	const testUrl = 'http://testurl/';
 	let service: DownloaderService;
-	let mockEnvService = {
-		config: {
-			baseServerUrl: testUrl
-		}
-	};
 	let testLocation: MockLocation = new MockLocation();
 	let testSettings: UserSettings = {
     level_low: 0,
@@ -106,7 +102,7 @@ describe('DownloaderService', () => {
 				CyanMap,
 				{
 					provide: EnvService,
-					useValue: mockEnvService
+					useClass: MockEnvService
 				}
 			]
 		});
