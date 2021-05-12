@@ -19,6 +19,8 @@ import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { EnvService } from '../services/env.service';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -59,6 +61,9 @@ export class LocationDetailsComponent implements OnInit {
 
   opacityValue = 0.7;
   showLegend = false;
+
+  downloadingData: boolean = false;
+  downloadBtnDebounce: number = 1000;
 
   // Variables for chart
   dataDownloaded: boolean = false;
@@ -150,7 +155,8 @@ export class LocationDetailsComponent implements OnInit {
     private user: UserService,
     private authService: AuthService,
     private configService: ConfigService,
-    private envService: EnvService
+    private envService: EnvService,
+    private messageDialog: MatDialog,
   ) { }
 
   ngOnInit() {
@@ -664,6 +670,96 @@ export class LocationDetailsComponent implements OnInit {
     this.bottomSheet.open(LocationDetailsNotes, {
       data: {
         location: l
+      }
+    });
+  }
+
+  downloadChartCSV(): void {
+    /*
+    Initiates bloom chart CSV download.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    if (this.downloadingData === true) { return; }
+
+    this.downloadingData = true;
+    setTimeout(() => {
+      this.downloadingData = false
+    }, this.downloadBtnDebounce);  // disables dl btn temporarily
+
+    let chartData = this.curateChartData(this.chartData);
+    this.downloadFile(chartData);
+  }
+
+  curateChartData(chartData: Array<any>): Array<any> {
+    /*
+    Gets data from chart data for CSV download.
+    */
+    let dataSets = [];
+    let csvArray = [];
+
+    for (let dataIndex in chartData) {
+      dataSets.push(chartData[dataIndex]['data']);
+    }
+
+    // Assumes single dataset:
+    dataSets[0].forEach((item, index) => {
+      csvArray.push({'date': item.x, 'concentration': item.y})
+    });
+
+    // Handles multiple datasets (e.g., location-compare-details):
+    // for (let dataIndex in chartData) {
+    //   dataSets.push(chartData[dataIndex]['data']);
+    // }
+    // // Handles multiple datasets (cols: x1, y1, x2, y2):
+    // this.zip(dataSets).forEach((item, index) => {
+    //   csvArray.push({'date': item[0].x, 'concentration': item[0].y})
+    // });
+
+    // Returns data array by earliest date first
+    return csvArray.reverse();
+  }
+
+  downloadFile(data: any) {
+    /*
+    Creates CSV link and clicks it for downloading.
+    */
+    const filename = 'CellConcentration' +
+      this.current_location.name.replace(/\s/g, '').replace('--', '') +
+      '.csv';
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = Object.keys(data[0]);
+    const csv = data.map((row) =>
+      header
+        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+        .join(',')
+    );
+    csv.unshift(header.join(','));
+    const csvArray = csv.join('\r\n');
+
+    const a = document.createElement('a');
+    const blob = new Blob([csvArray], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  }
+
+  /*
+  Simulates python "zip" function
+  */
+  zip= rows=>rows[0].map((_,c)=>rows.map(row=>row[c]));
+
+  displayMessageDialog(message: string) {
+    /*
+    Displays dialog messages to user.
+    */
+    this.messageDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
       }
     });
   }
