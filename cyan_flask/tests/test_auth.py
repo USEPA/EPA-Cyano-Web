@@ -47,7 +47,7 @@ class TestAuth(unittest.TestCase):
         pass
 
     @patch("cyan_flask.app.auth.PasswordHandler._create_reset_link")
-    def test__create_email_message(self, password_handler_mock):
+    def test__create_reset_email_message(self, password_handler_mock):
         """
         _create_email_message
         """
@@ -70,7 +70,7 @@ class TestAuth(unittest.TestCase):
             ]
         )
 
-        actual_result = PasswordHandler()._create_email_message(
+        actual_result = PasswordHandler()._create_reset_email_message(
             server_email, user_email
         )
 
@@ -193,7 +193,7 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch("cyan_flask.app.auth.PasswordHandler._send_mail")
-    @patch("cyan_flask.app.auth.PasswordHandler._create_email_message")
+    @patch("cyan_flask.app.auth.PasswordHandler._create_reset_email_message")
     @patch("cyan_flask.app.auth.PasswordHandler._handle_config_password")
     def test_send_password_reset_email(
         self, _handle_config_password_mock, _create_email_message_mock, _send_mail_mock

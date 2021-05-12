@@ -192,7 +192,7 @@ class TestWebAppApi(unittest.TestCase):
 
         password_mock.return_value.test_password.return_value = False
 
-        expected_result = {"error": "Invalid password"}, 401
+        expected_result = {"error": "Invalid username and/or password."}, 401
         actual_result = web_app_api.login_user(test_request)
 
         self.assertEqual(actual_result, expected_result)
@@ -404,7 +404,7 @@ class TestWebAppApi(unittest.TestCase):
         """
         request_obj = {
             "owner": "test",
-            "id": None,
+            "id": 1,
             "type": 1,
             "name": "location name",
             "latitude": 80.00,
@@ -442,7 +442,7 @@ class TestWebAppApi(unittest.TestCase):
         """
         request_obj = {
             "owner": "test",
-            "id": None,
+            "id": 1,
             "type": 1,
             "name": "location name",
             "latitude": 80.00,

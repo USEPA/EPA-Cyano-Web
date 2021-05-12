@@ -54,11 +54,6 @@ export class RawData {
   location: Location = null;
 }
 
-const headerOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json'
-  })
-};
 
 @Injectable({
   providedIn: 'root'
@@ -85,13 +80,13 @@ export class DownloaderService {
   registerUser(username: string, email: string, password: string) {
     let url = this.envService.config.baseServerUrl + 'user/register';
     let body = { user: username, email: email, password: password };
-    return this.http.post(url, body, headerOptions);
+    return this.http.post(url, body, this.envService.getHeaders());
   }
 
   userLogin(username: string, password: string) {
     let url = this.envService.config.baseServerUrl + 'user';
     let body = { user: username, password: password, dataType: LocationType.OLCI_WEEKLY };
-    return this.http.post(url, body, headerOptions);
+    return this.http.post(url, body, this.envService.getHeaders());
   }
 
   addUserLocation(username: string, ln: Location) {
@@ -234,12 +229,12 @@ export class DownloaderService {
 
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.post(url, body, headerOptions);
+    return this.http.post(url, body, this.envService.getHeaders());
   }
 
   executeAuthorizedGetRequest(url: string) {
     if (!this.authService.checkUserAuthentication()) { return; }
-    return this.http.get(url);
+    return this.http.get(url, this.envService.getHeaders());
   }
 
   ajaxRequest(ln: Location, username: string, url: string) {
