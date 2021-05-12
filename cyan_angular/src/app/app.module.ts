@@ -168,6 +168,7 @@ import { BatchComponent } from './batch/batch.component';
     AddComment,
     DialogComponent,
     CoordinatesComponent,
+    MarkerMapComponent,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
