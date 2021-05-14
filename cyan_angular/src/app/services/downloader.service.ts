@@ -242,7 +242,10 @@ export class DownloaderService {
     self.loaderService.show();
     console.log("Tracker: " + this.requestsTracker);
     self.requestsTracker += 1;
-    ajax(url).subscribe(data => {
+    ajax({
+      url: url,
+      crossDomain: true
+    }).subscribe(data => {
       let d = data.response;
       let loc = self.createLocation(ln, username, d);
       let index = this.getLocationIndex(loc);
