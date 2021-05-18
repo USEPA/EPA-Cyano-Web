@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
-import 'rxjs/add/operator/do';
+import { tap } from 'rxjs/operators';
 import { switchMap, filter, take, finalize } from 'rxjs/operators';
 import { 
 	HttpRequest,
@@ -73,8 +73,10 @@ export class JwtInterceptor implements HttpInterceptor {
 		private authService: AuthService
 	) {};
 
+	// intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-		return next.handle(request).do((event: HttpEvent<any>) => {
+		return next.handle(request).pipe(tap((event: HttpEvent<any>) => {
+		// return next.handle(request).do((event: HttpEvent<any>) => {
 			if (event instanceof HttpResponse) {
 				// A successful response (200)
 				const auth_token = event.headers.get('Authorization');
@@ -91,7 +93,7 @@ export class JwtInterceptor implements HttpInterceptor {
 					this.authService.logout(err.error);  // logs out unauthenticated user, redirects to login route
 				}
 			}
-		});
+		}));
 	}
 
 }
