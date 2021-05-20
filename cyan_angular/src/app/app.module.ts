@@ -171,6 +171,7 @@ import { WaterbodyStatsComponent, WaterBodyStatsDialog } from './waterbody-stats
     DialogComponent,
     CoordinatesComponent,
     WaterBodyStatsDialog,
+    MarkerMapComponent,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

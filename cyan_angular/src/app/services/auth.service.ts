@@ -90,6 +90,7 @@ export class AuthService {
     Refreshes token for authenticated user.
     */
     if (!this.isAuthenticated()) { return; }
+
     let url = this.envService.config.baseServerUrl + 'refresh';
     return this.http.get(url, this.envService.getHeaders()).subscribe();
   }
