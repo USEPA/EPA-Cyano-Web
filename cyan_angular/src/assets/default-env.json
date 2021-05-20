@@ -1,6 +1,7 @@
 {
   "baseServerUrl": "/cyan/app/api/",
   "tomcatApiUrl": "https://cyan.epa.gov/cyan/cyano/",
+  "waterbodyUrl": "http://127.0.0.1:8080/waterbody/",
   "disableUpload": false,
   "disableMarkers": false,
   "appName": ""
