@@ -8,6 +8,7 @@ import { LocationType } from '../models/location';
 import { UserSettings } from '../models/settings';
 import { Comment, Reply } from '../models/comment';
 import { BatchJob, BatchStatus } from '../models/batch';
+import { WaterBody } from '../models/waterbody';
 
 import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
@@ -227,6 +228,46 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
+  getAllWaterbodies() {
+    /*
+    Makes request to cyan-waterbody for all available waterbodies.
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?name=';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  searchForWaterbodyByCoords(latitude: number, longitude: number) {
+    /*
+    Searches for available waterbody using lat/lon.
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?lat=' + latitude + '&lng=' + longitude;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  searchForWaterbodyByName(name: string) {
+    /*
+    Searches for available waterbody using name. 
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?name=' + name;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getWaterbodyData(objectid: number) {
+    /*
+    Gets waterbody data.
+    */
+    let url = this.envService.config.waterbodyUrl + 'data/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyProperties(objectid: number) {
+    /*
+    Gets waterbody properties.
+    */
+    let url = this.envService.config.waterbodyUrl + 'properties/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
@@ -240,7 +281,7 @@ export class DownloaderService {
   ajaxRequest(ln: Location, username: string, url: string) {
     let self = this;
     self.loaderService.show();
-    console.log("Tracker: " + this.requestsTracker);
+    // console.log("Tracker: " + this.requestsTracker);
     self.requestsTracker += 1;
     ajax(url).subscribe(data => {
       let d: LocationDataAll = data.response;
@@ -350,6 +391,9 @@ export class DownloaderService {
       ln.marked = false;
     }
     ln.compare = loc.compare;
+
+    ln.waterbody = new WaterBody();
+    ln.waterbody.objectid = null;
 
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {
