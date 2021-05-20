@@ -78,7 +78,7 @@ import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
-import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
+import { WaterbodyStatsComponent, WaterBodyStatsDialog } from './waterbody-stats/waterbody-stats.component';
 
 @NgModule({
   declarations: [
@@ -170,6 +170,7 @@ import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.compo
     AddComment,
     DialogComponent,
     CoordinatesComponent,
+    WaterBodyStatsDialog,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
