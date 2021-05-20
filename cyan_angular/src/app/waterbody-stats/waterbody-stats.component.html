@@ -1,3 +1,61 @@
 <div class="details_block_0">
-	<p>waterbody-stats works!</p>
+
+	<div class="locations-block">
+		
+		<button mat-button class="locations-exit" [routerLink]="['']">X</button>
+		<div class="locations-title">
+			<h2>Waterbody Search</h2>
+		</div>
+
+		<!-- Search type selection -->
+		<div class="wb-name-div" style="width:100%;display: inline-block;">
+			<mat-form-field>
+				<label style="float:left;">Search for waterbody by:</label>
+				<mat-select style="float:right;" [value]="defaultSelected" (selectionChange)="onSelect($event);">
+					<mat-option *ngFor="let searchType of searchSelect | keyvalue" [value]="searchType.key">
+						{{searchType.value}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		
+		<!-- Search by name -->
+		<div class="wb-name-div" *ngIf="selectedKey == 'name'">
+			<mat-form-field id="wb-name-form">
+				<mat-label>Enter a waterbody name to search</mat-label>
+				<input matInput id="wb-name-input" [(ngModel)]="waterbodyName" (keyup.enter)="searchForWaterbodyByName();">
+			</mat-form-field>
+			<br>
+			<button id="wb-name-search-btn" mat-raised-button color="primary" (click)="searchForWaterbodyByName();">Search</button>
+		</div>
+
+		<!-- Search by coords -->
+		<div class="wb-name-div" *ngIf="selectedKey == 'coords'">
+			<h1 class="label">Latitude:</h1>
+			<input type="number" placeholder="Enter latitude" [(ngModel)]="waterbodyLat" style="width:50%;">
+			<br><br>
+			<h1 class="label">Longitude: </h1>
+			<input type="number" placeholder="Enter longitude" [(ngModel)]="waterbodyLon" style="width:50%;">
+			<br><br>
+			<button id="wb-name-search-btn" mat-raised-button color="primary" (click)="searchForWaterbodyByCoords();">Search</button>
+		</div>	
+
+		<!-- Results list -->
+		<h4 class="results-title" *ngIf="waterbodyResults?.length > 0">Results: {{waterbodyResults.length}}</h4>
+		<div *ngIf="waterbodyResults?.length > 0" class="user-locations">
+			<br>
+			<ul>
+				<!-- <li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="openWaterbodyStatsDialog(waterbody);"> -->
+				<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="panToWaterbody(waterbody);">
+					<div class="location-item-left">
+						<p><b>{{waterbody.name}}</b>
+						<br>
+						{{waterbody.centroid_lat}}, {{waterbody.centroid_lng}}</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		
+	</div>
+
 </div>
