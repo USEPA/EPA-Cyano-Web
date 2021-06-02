@@ -19,6 +19,7 @@ import { CyanMap } from '../utils/cyan-map';
 import { EnvService } from '../services/env.service';
 import { DownloaderService } from '../services/downloader.service';
 import { LocationService } from '../services/location.service';
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details.component';
 
 let latestImageJson = require('../../testing/mocks/all-images-response.json');
@@ -54,6 +55,7 @@ describe('LocationDetailsComponent', () => {
         AuthService,
         LoaderService,
         CyanMap,
+        MarkerMapComponent,
         {
           provide: ActivatedRoute,
           useValue: {

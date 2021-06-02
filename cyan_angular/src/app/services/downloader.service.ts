@@ -251,8 +251,11 @@ export class DownloaderService {
     self.loaderService.show();
     console.log("Tracker: " + this.requestsTracker);
     self.requestsTracker += 1;
-    ajax(url).subscribe(data => {
-      let d: LocationDataAll = data.response;
+    ajax({
+      url: url,
+      crossDomain: true
+    }).subscribe(data => {
+      let d = data.response;
       let loc = self.createLocation(ln, username, d);
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
@@ -303,7 +306,7 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-  createLocation(loc: Location, username: string, data: LocationDataAll): Location {
+  createLocation(loc: Location, username: string, data): Location {
 
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
     let name = loc.name;

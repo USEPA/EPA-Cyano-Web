@@ -14,6 +14,7 @@ import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
 import { LatestImageComponent } from './latest-image.component';
 import { Degree } from '../services/location.service';
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
 
 let latestImageJson = require('../../testing/mocks/all-images-response.json');
 
@@ -35,7 +36,8 @@ describe('LatestImageComponent', () => {
       providers: [
         AuthService,
         LoaderService,
-        CyanMap
+        CyanMap,
+        MarkerMapComponent
       ]
     })
     .compileComponents();
