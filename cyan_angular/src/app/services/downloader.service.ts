@@ -398,10 +398,10 @@ export class DownloaderService {
       }
     });
     if (matchedLocations.length == 0) {
-      ln.name = ln.name + " -- 1";  
+      ln.name = ln.name + " -- 1";
     }
     else if (matchedLocations.length > 0) {
-      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();  
+      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();
     }
     else {
       ln.name = ln.name;
