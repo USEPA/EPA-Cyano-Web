@@ -5,10 +5,9 @@ import { DatePipe } from '@angular/common';
 
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 
-import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, ImageOverlay } from 'leaflet';
+import { latLng, latLngBounds, tileLayer, Map, ImageOverlay } from 'leaflet';
 import { Subscription } from 'rxjs';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MapService } from '../services/map.service';
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -647,18 +646,15 @@ export class LocationDetailsComponent implements OnInit {
     /*
     Gets data from chart data for CSV download.
     */
-    let dataSets = [];
     let csvArray = [];
 
-    for (let dataIndex in chartData) {
-      dataSets.push(chartData[dataIndex]['data']);
+    if (chartData.length > 0) {
+      // use only first dataset in array
+      let dataSet = chartData[0]['data'];
+      dataSet.forEach((item, index) => {
+        csvArray.push({'date': item.x, 'concentration': item.y})
+      });
     }
-
-    // Assumes single dataset:
-    dataSets[0].forEach((item, index) => {
-      csvArray.push({'date': item.x, 'concentration': item.y})
-    });
-
     // Returns data array by earliest date first
     return csvArray.reverse();
   }
@@ -690,11 +686,6 @@ export class LocationDetailsComponent implements OnInit {
     window.URL.revokeObjectURL(url);
     a.remove();
   }
-
-  /*
-  Simulates python "zip" function
-  */
-  zip= rows=>rows[0].map((_,c)=>rows.map(row=>row[c]));
 
   displayMessageDialog(message: string) {
     /*

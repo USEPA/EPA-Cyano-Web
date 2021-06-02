@@ -227,15 +227,6 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
-  downloadChartData(chartData: any) {
-    /*
-    Returns bloom chart data as CSV.
-    */
-    console.log("Making downloadChartData request from DownloaderService")
-    let url = this.envService.config.baseServerUrl + 'download/chart';
-    return this.executeAuthorizedPostRequest(url, chartData);
-  }
-
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
@@ -407,10 +398,10 @@ export class DownloaderService {
       }
     });
     if (matchedLocations.length == 0) {
-      ln.name = ln.name + " -- 1";  
+      ln.name = ln.name + " -- 1";
     }
     else if (matchedLocations.length > 0) {
-      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();  
+      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();
     }
     else {
       ln.name = ln.name;
