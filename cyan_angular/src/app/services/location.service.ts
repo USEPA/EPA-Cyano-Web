@@ -14,7 +14,7 @@ import { LoaderService } from "../services/loader.service";
   providedIn: "root",
 })
 export class LocationService {
-  private data_type: LocationType = LocationType.OLCI_WEEKLY;
+  private data_type: LocationType = LocationType.OLCI_ALL;
 
   @Input() locations: Location[] = [];
   @Input() compare_locations: Location[] = [];
@@ -42,6 +42,9 @@ export class LocationService {
     let origin_type = this.data_type;
 
     switch (dataType) {
+      case 0:
+        this.data_type = LocationType.OLCI_ALL;
+        break;
       case 1:
         this.data_type = LocationType.OLCI_WEEKLY;
         break;
@@ -79,7 +82,7 @@ export class LocationService {
 
     // fetch data
     this.downloader
-      .getUserLocations(this.user.getUserName(), this.data_type)
+      .getUserLocations(this.user.getUserName())
       .subscribe((locations: UserLocations[]) => {
         self.user.currentAccount.locations = locations;
         self.getUserLocations();
@@ -125,7 +128,6 @@ export class LocationService {
             let l = new Location();
             l.id = location.id;
             l.name = location.name;
-            l.type = location.type;
             let coord = self.convertCoordinates(
               location.latitude,
               location.longitude
@@ -204,7 +206,7 @@ export class LocationService {
 
   downloadLocation(location: Location): void {
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(username, location);
+    this.downloader.getAjaxData(username, location, this.data_type);
   }
 
   getData(): void {
@@ -298,8 +300,7 @@ export class LocationService {
     if (index >= 0) {
       this.downloader.deleteUserLocation(
         this.user.getUserName(),
-        ln.id,
-        ln.type
+        ln.id
       );
       this.locations.splice(index, 1);
     }

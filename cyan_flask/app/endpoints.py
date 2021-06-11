@@ -1,7 +1,6 @@
 import os
-import logging
 import simplejson
-from flask import Blueprint, request, jsonify, g
+from flask import request, g
 from flask_restful import Api, Resource, reqparse
 
 # Local imports:
@@ -64,10 +63,10 @@ class Login(Resource):
     Endpoint for logging user in.
     URL: /app/api/user
     """
+
     parser = parser_base.copy()
     parser.add_argument("user", type=str)
     parser.add_argument("password", type=str)
-    parser.add_argument("dataType", type=int, choices=(1, 2))
 
     @check_headers
     def post(self):
@@ -85,6 +84,7 @@ class AddLocation(Resource):
     Endpoint for adding user location.
     URL: /app/api/location/add
     """
+
     @login_required
     @check_headers
     def post(self, id=None):
@@ -101,6 +101,7 @@ class EditLocation(Resource):
     Endpoint for editing user location.
     URL: /app/api/location/edit
     """
+
     @login_required
     @check_headers
     def post(self):
@@ -119,10 +120,10 @@ class DeleteLocation(Resource):
 
     @login_required
     @check_headers
-    def get(self, _id="", type=""):
+    def get(self, _id=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        results, status_code = web_app_api.delete_location(user, _id, type)
+        results, status_code = web_app_api.delete_location(user, _id)
         return results, status_code, headers
 
 
@@ -133,10 +134,10 @@ class GetUserLocations(Resource):
 
     @login_required
     @check_headers
-    def get(self, type=""):
+    def get(self):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        results = web_app_api.get_user_locations(user, type)
+        results = web_app_api.get_user_locations(user)
         results = simplejson.loads(simplejson.dumps(results))
         return results, 200, headers
 
@@ -148,10 +149,10 @@ class GetLocation(Resource):
 
     @login_required
     @check_headers
-    def get(self, _id="", type=""):
+    def get(self, _id=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        results, status_code = web_app_api.get_location(user, _id, type)
+        results, status_code = web_app_api.get_location(user, _id)
         results = simplejson.loads(simplejson.dumps(results))
         return results, status_code, headers
 
@@ -397,9 +398,9 @@ api.add_resource(Register, api_url + "user/register")
 # Location endpoints:
 api.add_resource(AddLocation, api_url + "location/add")
 api.add_resource(EditLocation, api_url + "location/edit")
-api.add_resource(DeleteLocation, api_url + "location/delete/<string:_id>/<string:type>")
-api.add_resource(GetLocation, api_url + "location/<string:_id>/<string:type>")
-api.add_resource(GetUserLocations, api_url + "locations/<string:type>")
+api.add_resource(DeleteLocation, api_url + "location/delete/<string:_id>")
+api.add_resource(GetLocation, api_url + "location/<string:_id>")
+api.add_resource(GetUserLocations, api_url + "locations")
 
 # Notifications endpoints:
 api.add_resource(EditNotification, api_url + "notification/edit/<string:_id>")

@@ -181,9 +181,7 @@ class JwtHandler:
                 "iat": datetime.datetime.utcnow(),
                 "sub": user,
             }
-            enc_token = jwt.encode(
-                payload, os.getenv("SECRET_KEY"), algorithm="HS256"
-            )
+            enc_token = jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
             return crypt_manager.convert_to_bytes(enc_token)
         except Exception as e:
             return e
@@ -193,9 +191,7 @@ class JwtHandler:
         Decodes the auth token.
         """
         try:
-            return jwt.decode(
-                auth_token, os.getenv("SECRET_KEY"), algorithms=["HS256"]
-            )
+            return jwt.decode(auth_token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return {"error": "Signature expired. Please log in again."}
         except jwt.InvalidTokenError:

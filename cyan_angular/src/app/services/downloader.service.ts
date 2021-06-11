@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, Subscription, BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
@@ -9,7 +9,6 @@ import { UserSettings } from '../models/settings';
 import { Comment, Reply } from '../models/comment';
 import { BatchJob, BatchStatus } from '../models/batch';
 
-import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { EnvService } from '../services/env.service';
@@ -85,7 +84,7 @@ export class DownloaderService {
 
   userLogin(username: string, password: string) {
     let url = this.envService.config.baseServerUrl + 'user';
-    let body = { user: username, password: password, dataType: LocationType.OLCI_WEEKLY };
+    let body = { user: username, password: password };
     return this.http.post(url, body, this.envService.getHeaders());
   }
 
@@ -95,7 +94,6 @@ export class DownloaderService {
       owner: username,
       id: ln.id,
       name: ln.name,
-      type: ln.type,
       latitude: ln.latitude,
       longitude: ln.longitude,
       marked: ln.marked,
@@ -110,7 +108,6 @@ export class DownloaderService {
     let body = {
       owner: username,
       id: ln.id,
-      type: ln.type,
       name: ln.name,
       marked: ln.marked,
       compare: ln.compare,
@@ -119,9 +116,9 @@ export class DownloaderService {
     this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
-  deleteUserLocation(username: string, id: number, type: number) {
+  deleteUserLocation(username: string, id: number) {
     delete this.locationsData[id];
-    let url = this.envService.config.baseServerUrl + 'location/delete/' + id + '/' + type;
+    let url = this.envService.config.baseServerUrl + 'location/delete/' + id;
     this.executeDeleteUserLocation(url).subscribe();
   }
 
@@ -134,8 +131,8 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
-  getUserLocations(username: string, type: number) {
-    let url = this.envService.config.baseServerUrl + 'locations/' + type;
+  getUserLocations(username: string) {
+    let url = this.envService.config.baseServerUrl + 'locations';
     return this.executeAuthorizedGetRequest(url);
   }
 
@@ -263,19 +260,22 @@ export class DownloaderService {
     });
   }
 
-  getAjaxData(username: string, ln: Location) {
+  getAjaxData(username: string, ln: Location, datatype: LocationType = 0) {
     // Checks if token is valid before making requests:
     if (!this.authService.checkUserAuthentication()) { return; }
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.envService.config.tomcatApiUrl + "location/data/" + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
-      switch (ln.type) {
+      switch (datatype) {
+        case LocationType.OLCI_ALL:
+          url += '?type=olci';
+          break;
         case LocationType.OLCI_WEEKLY:
-              url += '?type=olci&frequency=weekly';
-              break;
+          url += '?type=olci&frequency=weekly';
+          break;
         case LocationType.OLCI_DAILY:
-              url += '?type=olci&frequency=daily';
-              break;
+          url += '?type=olci&frequency=daily';
+          break;
       }
       this.ajaxRequest(ln, username, url);
     }

@@ -62,7 +62,7 @@ describe('LocationService', () => {
 				CyanMap,
 				{
 					provide: UserService,
-					useClass: MockUserService 
+					useClass: MockUserService
 				}
 			]
 		});
@@ -114,7 +114,7 @@ describe('LocationService', () => {
 	it('should test getDataType()', () => {
 		let result = service.getDataType();
 
-		expect(result).toEqual(1);
+		expect(result).toEqual(0);
 	});
 
 	it('should test loadUser', () => {
@@ -210,25 +210,25 @@ describe('LocationService', () => {
 
 	it('should test getLocations()', () => {
 		service.locations = [testLocation];
-		
+
 		let result = service.getLocations('');
-		
+
 		expect(service.locations.length).toBeGreaterThan(0);
 	});
 
 	it('should test getStaticLocations()', () => {
 		service.locations = [testLocation];
-		
+
 		let result = service.getStaticLocations();
-		
+
 		expect(service.locations.length).toBeGreaterThan(0);
 	});
 
 	it('should test getLocationByID()', () => {
 		service.locations = [testLocation];
-		
+
 		let result = service.getLocationByID(testLocation.id);
-		
+
 		expect(result.id).toEqual(testLocation.id);
 	});
 

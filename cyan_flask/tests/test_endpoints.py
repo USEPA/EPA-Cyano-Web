@@ -1,14 +1,9 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import sys
 import os
 import datetime
-import inspect
-import requests
-import random
-import string
 import flask
-import logging
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(
@@ -37,7 +32,7 @@ def create_test_headers(token):
         "Access-Control-Allow-Headers": "Authorization",
         "Authorization": "Bearer {}".format(token),
         "Origin": os.getenv("HOST_DOMAIN"),
-        "App-Name": "Cyanweb"
+        "App-Name": "Cyanweb",
     }
 
 
@@ -97,7 +92,7 @@ class TestEndpoints(unittest.TestCase):
         """
         Tests Login endpoint POST request.
         """
-        test_request = {"user": "test", "password": "test", "dataType": 1}
+        test_request = {"user": "test", "password": "test"}
         expected_result = test_request, 200
         with app.test_request_context() as client:
             client.request.headers = dict(create_test_headers(""))
@@ -144,14 +139,13 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         _id = 1
-        _type = 1
         test_token = create_test_token(user)
         headers = dict(create_test_headers(test_token))
         api_response = {"status": "success"}, 200
         delete_location_mock.return_value = api_response
         with app.test_request_context(headers=headers) as client:
             expected_result = api_response
-            actual_result = endpoints.DeleteLocation().get(_id, _type)
+            actual_result = endpoints.DeleteLocation().get(_id)
             self.assertEqual(actual_result[0], expected_result[0])
 
     @patch("cyan_flask.app.endpoints.web_app_api.get_user_locations")
@@ -160,13 +154,12 @@ class TestEndpoints(unittest.TestCase):
         Tests GetUserLocations endpoint GET request.
         """
         user = "test"
-        _type = 1
         test_token = create_test_token(user)
         headers = dict(create_test_headers(test_token))
         get_user_locations_mock.return_value = []
         with app.test_request_context(headers=headers) as client:
             expected_result = [], 200, headers
-            actual_result = endpoints.GetUserLocations().get(_type)
+            actual_result = endpoints.GetUserLocations().get()
             self.assertEqual(actual_result[0], expected_result[0])
 
     @patch("cyan_flask.app.endpoints.web_app_api.get_location")
@@ -176,13 +169,12 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         _id = 1
-        _type = 1
         test_token = create_test_token(user)
         headers = dict(create_test_headers(test_token))
         get_location_mock.return_value = [], 200
         with app.test_request_context(headers=headers) as client:
             expected_result = [], 200, headers
-            actual_result = endpoints.GetLocation().get(_id, _type)
+            actual_result = endpoints.GetLocation().get(_id)
             self.assertEqual(actual_result[0], expected_result[0])
 
     @patch("cyan_flask.app.endpoints.web_app_api.edit_notifications")

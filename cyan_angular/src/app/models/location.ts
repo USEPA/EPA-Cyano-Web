@@ -32,6 +32,7 @@ export class Location {
 }
 
 export enum LocationType {
+  OLCI_ALL = 0,
   OLCI_WEEKLY = 1,
   OLCI_DAILY = 2,
 }
