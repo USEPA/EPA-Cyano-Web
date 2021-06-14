@@ -83,10 +83,33 @@ class PasswordHandler:
         )
 
     def _send_mail(self, smtp_email, smtp_pass, user_email, msg):
+        if os.getenv("EMAIL_SMTP") == "smtp.epa.gov":
+            return self._send_mail_epa(smtp_email, user_email, msg)
+        else:
+            return self._send_mail_gmail(smtp_email, smtp_pass, user_email, msg)
+
+    def _send_mail_gmail(self, smtp_email, smtp_pass, user_email, msg):
+        """
+        Sends email using Gmail SMTP.
+        """
         try:
-            server = smtplib.SMTP_SSL(os.getenv('EMAIL_SMTP'), os.getenv('EMAIL_PORT'))
+            server = smtplib.SMTP_SSL(os.getenv("EMAIL_SMTP"), os.getenv("EMAIL_PORT"))
             server.ehlo()
             server.login(smtp_email, smtp_pass)
+            server.sendmail(smtp_email, user_email, msg)
+            server.close()
+            return {"success": "Email sent."}
+        except Exception as e:
+            logging.warning("Error sending reset email: {}".format(e))
+            return {"error": "Unable to send email."}
+
+    def _send_mail_epa(self, smtp_email, user_email, msg):
+        """
+        Sends email using EPA SMTP.
+        """
+        try:
+            server = smtplib.SMTP(os.getenv("EMAIL_SMTP"), os.getenv("EMAIL_PORT"))
+            server.ehlo()
             server.sendmail(smtp_email, user_email, msg)
             server.close()
             return {"success": "Email sent."}
