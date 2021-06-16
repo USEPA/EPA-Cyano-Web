@@ -8,6 +8,7 @@ import requests
 import random
 import string
 import flask
+import logging
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(
@@ -35,7 +36,7 @@ def create_test_headers(token):
         "Access-Control-Expose-Headers": "Authorization",
         "Access-Control-Allow-Headers": "Authorization",
         "Authorization": "Bearer {}".format(token),
-        "Origin": os.getenv("HTTP_DOMAIN"),
+        "Origin": os.getenv("HOST_DOMAIN"),
         "App-Name": "Cyanweb"
     }
 
@@ -111,15 +112,10 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         request_obj = {"owner": user}
         add_user_mock.return_value = [], 200
-        with app.test_request_context(json=request_obj) as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
-            client.request.data = request_obj
+        with app.test_request_context(json=request_obj, headers=headers) as client:
             expected_result = [], 200, headers
             actual_result = endpoints.AddLocation().post()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -131,15 +127,11 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         api_response = {"status": "success"}, 200
         request_obj = {"owner": user}
         edit_location_mock.return_value = api_response
-        with app.test_request_context(json=request_obj) as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(json=request_obj, headers=headers) as client:
             client.request.data = request_obj
             expected_result = api_response
             actual_result = endpoints.EditLocation().post()
@@ -154,14 +146,10 @@ class TestEndpoints(unittest.TestCase):
         _id = 1
         _type = 1
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         api_response = {"status": "success"}, 200
         delete_location_mock.return_value = api_response
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(headers=headers) as client:
             expected_result = api_response
             actual_result = endpoints.DeleteLocation().get(_id, _type)
             self.assertEqual(actual_result[0], expected_result[0])
@@ -174,13 +162,9 @@ class TestEndpoints(unittest.TestCase):
         user = "test"
         _type = 1
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         get_user_locations_mock.return_value = []
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(headers=headers) as client:
             expected_result = [], 200, headers
             actual_result = endpoints.GetUserLocations().get(_type)
             self.assertEqual(actual_result[0], expected_result[0])
@@ -194,13 +178,9 @@ class TestEndpoints(unittest.TestCase):
         _id = 1
         _type = 1
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         get_location_mock.return_value = [], 200
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(headers=headers) as client:
             expected_result = [], 200, headers
             actual_result = endpoints.GetLocation().get(_id, _type)
             self.assertEqual(actual_result[0], expected_result[0])
@@ -213,13 +193,9 @@ class TestEndpoints(unittest.TestCase):
         user = "test"
         _id = 1
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         edit_notifications_mock.return_value = {"status": "success"}, 200
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(headers=headers) as client:
             expected_result = {"status": "success"}, 200, headers
             actual_result = endpoints.EditNotification().get(_id)
             self.assertEqual(actual_result[0], expected_result[0])
@@ -231,13 +207,9 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         delete_notifications_mock.return_value = {"status": "success"}, 200
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(headers=headers) as client:
             expected_result = {"status": "success"}, 200, headers
             actual_result = endpoints.DeleteNotification().get()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -249,14 +221,10 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         request_obj = {"owner": user}
         edit_settings_mock.return_value = {"status": "success"}, 200
-        with app.test_request_context(json=request_obj) as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(json=request_obj, headers=headers) as client:
             expected_result = {"status": "success"}, 200, headers
             actual_result = endpoints.EditSettings().post()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -267,12 +235,8 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        headers = dict(create_test_headers(test_token))
+        with app.test_request_context(headers=headers) as client:
             expected_result = {"status": "success"}, 200, headers
             actual_result = endpoints.Refresh().get()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -298,14 +262,10 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         request_obj = {"owner": user, "newPassword": "password123"}
         set_new_password_mock.return_value = {"status": "success"}, 200
-        with app.test_request_context(json=request_obj) as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(json=request_obj, headers=headers) as client:
             expected_result = {"status": "success"}, 200, headers
             actual_result = endpoints.Reset().put()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -317,13 +277,9 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         get_comments_mock.return_value = [], 200
-        with app.test_request_context() as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(headers=headers) as client:
             expected_result = [], 200, headers
             actual_result = endpoints.Comment().get()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -335,14 +291,10 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         request_obj = {"username": user}
         add_user_comment_mock.return_value = [], 200
-        with app.test_request_context(json=request_obj) as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(json=request_obj, headers=headers) as client:
             expected_result = [], 200, headers
             actual_result = endpoints.Comment().post()
             self.assertEqual(actual_result[0], expected_result[0])
@@ -354,14 +306,10 @@ class TestEndpoints(unittest.TestCase):
         """
         user = "test"
         test_token = create_test_token(user)
-        headers = create_test_headers(test_token)
+        headers = dict(create_test_headers(test_token))
         request_obj = {"username": user}
         add_comment_reply_mock.return_value = [], 200
-        with app.test_request_context(json=request_obj) as client:
-            client.request.headers = dict(headers)
-            client.request.headers["authorization"] = "Bearer {}".format(
-                test_token
-            )  # NOTE: upper vs lower cases here, resolve this.}
+        with app.test_request_context(json=request_obj, headers=headers) as client:
             expected_result = [], 200, headers
             actual_result = endpoints.Reply().post()
             self.assertEqual(actual_result[0], expected_result[0])

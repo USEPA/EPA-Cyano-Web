@@ -14,6 +14,6 @@ cyan_flask/user_images/*
 cyan_flask/user_jobs/*
 
 # Docker settings
-.env
+.env*
 docker/angular/package.json*
 docker/flask/requirements.*
