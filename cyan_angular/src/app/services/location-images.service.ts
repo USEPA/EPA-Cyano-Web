@@ -35,9 +35,6 @@ export class LocationImagesService {
 
   addImagesParameter(url: string, locationType: LocationType) {
     switch (locationType) {
-      case LocationType.OLCI_ALL:
-        url += '?type=olci';
-        break;
       case LocationType.OLCI_WEEKLY:
         url += '?type=olci&frequency=weekly';
         break;

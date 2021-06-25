@@ -14,7 +14,7 @@ import { LoaderService } from "../services/loader.service";
   providedIn: "root",
 })
 export class LocationService {
-  private data_type: LocationType = LocationType.OLCI_ALL;
+  private data_type: LocationType = LocationType.OLCI_WEEKLY;
 
   @Input() locations: Location[] = [];
   @Input() compare_locations: Location[] = [];
@@ -42,9 +42,6 @@ export class LocationService {
     let origin_type = this.data_type;
 
     switch (dataType) {
-      case 0:
-        this.data_type = LocationType.OLCI_ALL;
-        break;
       case 1:
         this.data_type = LocationType.OLCI_WEEKLY;
         break;

@@ -260,16 +260,13 @@ export class DownloaderService {
     });
   }
 
-  getAjaxData(username: string, ln: Location, datatype: LocationType = 0) {
+  getAjaxData(username: string, ln: Location, datatype: LocationType = 1) {
     // Checks if token is valid before making requests:
     if (!this.authService.checkUserAuthentication()) { return; }
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.envService.config.tomcatApiUrl + "location/data/" + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
       switch (datatype) {
-        case LocationType.OLCI_ALL:
-          url += '?type=olci';
-          break;
         case LocationType.OLCI_WEEKLY:
           url += '?type=olci&frequency=weekly';
           break;

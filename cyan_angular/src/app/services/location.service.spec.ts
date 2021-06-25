@@ -114,7 +114,7 @@ describe('LocationService', () => {
 	it('should test getDataType()', () => {
 		let result = service.getDataType();
 
-		expect(result).toEqual(0);
+		expect(result).toEqual(1);
 	});
 
 	it('should test loadUser', () => {
