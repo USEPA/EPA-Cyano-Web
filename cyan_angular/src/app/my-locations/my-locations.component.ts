@@ -9,7 +9,8 @@ import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
-import { WaterBodyStatsDialog } from '../waterbody-stats/waterbody-stats.component';
+import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
+import { WaterBodyStatsDialog } from '../waterbody-stats/waterbody-stats-details.component';
 
 export interface Sort {
   value: string;
@@ -41,7 +42,7 @@ export class MyLocationsComponent implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private messageDialog: MatDialog,
-    private wbStatsDialog: WaterBodyStatsDialog
+    private waterbodyStats: WaterbodyStatsComponent
   ) {}
 
   ngOnInit() {
@@ -50,6 +51,10 @@ export class MyLocationsComponent implements OnInit {
     }
     this.getLocations();
     this.sortLocations();
+  }
+
+  ngOnDestroy() {
+    this.waterbodyStats.ngOnDestroy();
   }
 
   getSource(): string {
@@ -159,8 +164,8 @@ export class MyLocationsComponent implements OnInit {
     */
     if (!this.authService.checkUserAuthentication()) { return; }
     const dialogRef = this.messageDialog.open(WaterBodyStatsDialog, {
-      width: '50%',
-      height: '50%',
+      width: '100%',
+      height: '100%',
       data: {
         selectedWaterbody: l.waterbody
       }
