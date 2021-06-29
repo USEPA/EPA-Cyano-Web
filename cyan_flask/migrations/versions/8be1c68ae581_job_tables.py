@@ -33,10 +33,7 @@ def upgrade():
         sa.Column("finished_datetime", sa.DateTime(), nullable=True),
         sa.Column("queue_time", sa.Integer(), nullable=True),
         sa.Column("exec_time", sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["user.id"],
-        ),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###

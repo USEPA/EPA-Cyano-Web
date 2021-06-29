@@ -25,12 +25,6 @@ class Location(db.Model):
     __tablename__ = "location"
     owner = db.Column(db.String(35), nullable=False, primary_key=True)
     id = db.Column(db.Integer, nullable=False, primary_key=True)
-    type = db.Column(
-        db.SmallInteger,
-        nullable=False,
-        server_default=expression.true(),
-        primary_key=True,
-    )
     name = db.Column(db.String(256), nullable=False)
     latitude = db.Column(db.Numeric(12, 10), nullable=False)
     longitude = db.Column(db.Numeric(13, 10), nullable=False)
