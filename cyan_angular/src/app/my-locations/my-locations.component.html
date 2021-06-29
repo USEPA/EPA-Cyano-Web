@@ -31,7 +31,8 @@
           <div class="location_max">(Max adjacent cells: {{formatNumber(location.maxCellConcentration)}})</div>
           <mat-icon class="alert" *ngIf="exceedAlertValue(location)">error_outline</mat-icon>
           <br>
-          <mat-icon class="wb-icon" *ngIf="location.waterbody.objectid" (click)="viewWaterbodyStats(location);$event.stopPropagation();">travel_explore</mat-icon>
+          <!-- <mat-icon class="wb-icon" *ngIf="location.waterbody.objectid" (click)="viewWaterbodyStats(location);$event.stopPropagation();">travel_explore</mat-icon> -->
+          <mat-icon class="wb-icon" *ngIf="location.waterbody.objectid" (click)="this.waterbodyStats.handleWaterbodySelect(location.waterbody);$event.stopPropagation();">travel_explore</mat-icon>
         </div>
         <div class="location_block_1">
           <div class="location_cell">
