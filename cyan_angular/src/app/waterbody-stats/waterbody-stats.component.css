@@ -10,6 +10,36 @@
 	font-size: x-large;
 }
 
+mat-card {
+    display: inline-block;
+    border-radius: 0;
+    width: 50%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    float: left;
+    box-shadow: none;
+}
+
+.data-item {
+	display: inline-block;
+    border-radius: 0;
+    width: 50%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    float: left;
+}
+
+.details_tab {
+    /*display: grid;*/
+    /*display: inline-block;*/
+    height: 100%;
+    width: 100%;
+}
+
 @media screen and (min-width: 980px) {
 	.locations-block {
 		width: 30vw;
@@ -132,4 +162,15 @@ h2.label {
 .results-title {
 	margin-top: 4%;
 	padding-left: 4%;
+}
+
+::ng-deep.hightlight-date-class { 
+	background: red;
+	border-radius: 100%;
+}
+
+.chart_graph {
+	display: block;
+	height: 100%;
+	width: 100%;
 }

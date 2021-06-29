@@ -1,10 +1,15 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ajax } from 'rxjs/ajax';
-import { tileLayer, geoJSON, latLng, LatLng, Map, icon, marker, canvas, circleMarker } from 'leaflet';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { tileLayer, geoJSON, latLng, LatLng, Map, icon, marker, canvas, circleMarker, DomEvent } from 'leaflet';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSelect } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { DatePipe } from '@angular/common';
 
-import { WaterBody } from '../models/waterbody';
+import { WaterBody, WaterBodyStats, WaterBodyData } from '../models/waterbody';
+import { WaterBodyStatsDialog } from './waterbody-stats-details.component';
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 import { MapService } from '../services/map.service';
@@ -30,8 +35,7 @@ export class WaterbodyStatsComponent implements OnInit {
 	lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
-  wbLayer = geoJSON();
-  wbUrl = 'assets/waterbodies_4.json';
+  wbLayer = null;
 
   searchSelect: any = {
   	'name': 'Name',
@@ -40,7 +44,6 @@ export class WaterbodyStatsComponent implements OnInit {
   defaultSelected: string = 'name';
 	selectedKey: string = 'name';  // name or coords
 
-  // canvasRenderer = canvas({padding: 0.5});
   canvasRenderer = canvas();
 
   wbMarkers = [];
@@ -51,18 +54,18 @@ export class WaterbodyStatsComponent implements OnInit {
   	private router: Router,
   	private mapService: MapService,
   	private cyanMap: CyanMap,
-  	private messageDialog: MatDialog,
+  	private wbDialog: MatDialog,
+    private dialog: DialogComponent,
   	private loaderService: LoaderService
   ) { }
 
   ngOnInit(): void {
-  	// this.getAllWaterbodies();
-  	// this.getWaterbodyShapes();
-    this.addWaterbodyCentroids();
+
   }
 
   ngOnDestroy(): void {
   	this.removeWaterbodyCentroids();
+    this.removeGeojsonLayer();
   }
 
   exit(): void {
@@ -79,28 +82,6 @@ export class WaterbodyStatsComponent implements OnInit {
   	this.selectedKey = selectedValue.value;
   }
 
-  handleError(error: string): void {
-    /*
-    Handles error message to user and any housekeeping,
-    and halts the execution by throwing error.
-    */
-    this.displayMessageDialog(error);
-    // this.uploadedFile = null;
-    // this.clearInputFields();
-    throw error;
-  }
-
-  displayMessageDialog(message: string): void {
-    /*
-    Displays dialog messages to user.
-    */
-    this.messageDialog.open(DialogComponent, {
-      data: {
-        dialogMessage: message
-      }
-    });
-  }
-
   getAllWaterbodies(): void {
   	/*
   	Returns full list of waterbodies with their names
@@ -109,24 +90,40 @@ export class WaterbodyStatsComponent implements OnInit {
   	this.loaderService.show();
   	this.downloader.getAllWaterbodies().subscribe(response => {
   		this.loaderService.hide();
-  		console.log("getAllWaterbodies response: ")
-  		console.log(response)
-  		// TODO: Set waterbodies parameter with response data.
   	});
   }
 
-  getWaterbodyShapes(): void {
-  	/*
-  	Loads waterbody geoJSON onto map.
-  	*/
-  	this.loaderService.show();
-  	ajax(this.wbUrl).subscribe(data => {
-  		this.loaderService.hide();
-    	console.log("incoming data: ")
-    	console.log(data);
-    	this.wbLayer.addData(data.response);
-    	this.cyanMap.map.addLayer(this.wbLayer);
+  getWaterbodyGeojson(wb: WaterBody): void {
+    /*
+    Makes request to cyan-waterbody to get
+    geojson of selected waterbody.
+    */
+    this.removeGeojsonLayer();
+
+    this.downloader.getWaterbodyGeometry(wb.objectid).subscribe(response => {
+
+      let geojson = response['geojson'][0][0];  // TODO: Account for > 1 features
+      
+      this.wbLayer = geoJSON(geojson, {
+        bubblingMouseEvents: false  // prevents wb shape click event from trigger location creation
+      });
+      
+      this.cyanMap.map.addLayer(this.wbLayer);
+      
+      this.wbLayer.on('click', event => {
+        this.openWaterbodyStatsDialog(wb);
+      });
+
     });
+  }
+
+  removeGeojsonLayer(): void {
+    /*
+    Removes geoJSON layer from map.
+    */
+    if (this.wbLayer) {
+      this.cyanMap.map.removeLayer(this.wbLayer);
+    }
   }
 
   addWaterbodyCentroids(): void {
@@ -135,17 +132,15 @@ export class WaterbodyStatsComponent implements OnInit {
     waterbody centroids.
     */
     this.downloader.getAllWaterbodies().subscribe(response => {
-      console.log("all WBs response: ")
-      console.log(response)
 
       let waterbodies = this.checkWaterbodyResponse(response);
 
       waterbodies.forEach(wb => {
         let m = circleMarker(latLng(wb['centroid_lat'], wb['centroid_lng']), {
           renderer: this.canvasRenderer,
-          radius: 5,
+          radius: 3,
           fill: true,
-          fillOpacity: 0.9
+          fillOpacity: 1.0
         }).addTo(this.cyanMap.map).bindPopup(this.createPopupData(wb));
         this.wbMarkers.push(m);
       });
@@ -189,7 +184,6 @@ export class WaterbodyStatsComponent implements OnInit {
   	/*
   	Searches for waterbody by lat/lon coords.
   	*/
-    console.log("Search waterbody using coordinates")
   	this.loaderService.show();
   	this.downloader.searchForWaterbodyByCoords(this.waterbodyLat, this.waterbodyLon).subscribe(wbInfoResult => {
       this.loaderService.hide();
@@ -203,10 +197,10 @@ export class WaterbodyStatsComponent implements OnInit {
   	Checks response from waterbody name search.
   	*/
   	if (!waterbodyResponse.hasOwnProperty('waterbodies')) {
-  		this.handleError('No waterbodies data');
+  		this.dialog.handleError('No waterbodies data');
   	}
   	else if (waterbodyResponse['waterbodies'] == 'NA') {
-  		this.handleError('No waterbodies found');
+  		this.dialog.handleError('No waterbodies found');
   	}
   	return waterbodyResponse['waterbodies'];
   }
@@ -233,17 +227,20 @@ export class WaterbodyStatsComponent implements OnInit {
     waterbody stats.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    const dialogRef = this.messageDialog.open(WaterBodyStatsDialog, {
+    const dialogRef = this.wbDialog.open(WaterBodyStatsDialog, {
       // panelClass: 'view-comment-dialog',
       // TODO: Use class to account for various device sizes
-      // width: '60%',
-      // maxWidth: '75%',
-      // height: '75%'
-      width: '50%',
-      height: '50%',
+      // width: '75%',
+      // height: '75%',
+      maxWidth: '95%',
+      maxHeight: '95%',
       data: {
         selectedWaterbody: selectedWaterbody
       }
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.ngOnDestroy();
     });
 
   }
@@ -252,8 +249,6 @@ export class WaterbodyStatsComponent implements OnInit {
     /*
     Pans to the selected waterbody and displays popup.
     */
-    console.log("panToWaterbody() called.")
-    console.log(this.cyanMap.map['layers']);
     this.cyanMap.map.flyTo(
       latLng(
         selectedWaterbody['centroid_lat'],
@@ -262,62 +257,9 @@ export class WaterbodyStatsComponent implements OnInit {
     );
   }
 
-  hightlightWaterbodies(waterbodies: WaterBody[]) {
-    /*
-    Hightlights waterbody markers that show up in search results.
-    */
-
-  }
-
-}
-
-
-
-@Component({
-  selector: 'app-waterbody-stats-details',
-  templateUrl: './waterbody-stats-details.component.html',
-  styleUrls: ['./waterbody-stats.component.css']
-})
-export class WaterBodyStatsDialog {
-  /*
-  Dialog for viewing waterbody stats.
-  */
-
-  // dialogMessage: string = "";
-  selectedWaterbody: WaterBody;
-  waterbodyData: any = {};
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogComponent>,
-    private authService: AuthService,
-    private downloader: DownloaderService,
-    private loaderService: LoaderService,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) { }
-
-  ngOnInit() {
-    // this.dialogMessage = this.data.dialogMessage;
-    this.selectedWaterbody = this.data.selectedWaterbody;
-    this.getWaterbodyData();
-  }
-
-  exit(): void {
-    this.dialogRef.close();
-  }
-
-  getWaterbodyData() {
-    /*
-    Makes request to get selected waterbody data.
-    */
-    console.log("Getting waterbody data")
-    // this.loaderService.show();
-    this.downloader.getWaterbodyData(this.selectedWaterbody.objectid).subscribe(result => {
-      // this.loaderService.hide();
-      console.log("getWaterbodyData results: ")
-      console.log(result)
-      this.waterbodyData['daily'] = result['daily']
-      this.waterbodyData['data'] = JSON.stringify(result['data'])
-    });
+  handleWaterbodySelect(selectedWaterbody: WaterBody): void {
+    this.panToWaterbody(selectedWaterbody);
+    this.getWaterbodyGeojson(selectedWaterbody);
   }
 
 }

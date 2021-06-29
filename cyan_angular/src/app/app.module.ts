@@ -27,6 +27,7 @@ import { MatTableModule } from '@angular/material/table';
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -78,7 +79,8 @@ import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
-import { WaterbodyStatsComponent, WaterBodyStatsDialog } from './waterbody-stats/waterbody-stats.component';
+import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
+import { WaterBodyStatsDialog } from './waterbody-stats/waterbody-stats-details.component';
 
 @NgModule({
   declarations: [
@@ -113,7 +115,8 @@ import { WaterbodyStatsComponent, WaterBodyStatsDialog } from './waterbody-stats
     SessionTimeoutComponent,
     LocationSearchComponent,
     BatchComponent,
-    WaterbodyStatsComponent
+    WaterbodyStatsComponent,
+    WaterBodyStatsDialog
   ],
   imports: [
     BrowserModule,
@@ -152,6 +155,7 @@ import { WaterbodyStatsComponent, WaterBodyStatsDialog } from './waterbody-stats
     MatTableModule,
     MatSidenavModule,
     MatSortModule,
+    MatGridListModule,
     Ng5SliderModule,
     BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
@@ -172,6 +176,7 @@ import { WaterbodyStatsComponent, WaterBodyStatsDialog } from './waterbody-stats
     CoordinatesComponent,
     WaterBodyStatsDialog,
     MarkerMapComponent,
+    WaterbodyStatsComponent,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

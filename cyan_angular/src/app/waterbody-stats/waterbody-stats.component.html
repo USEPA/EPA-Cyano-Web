@@ -46,7 +46,7 @@
 			<br>
 			<ul>
 				<!-- <li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="openWaterbodyStatsDialog(waterbody);"> -->
-				<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="panToWaterbody(waterbody);">
+				<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="handleWaterbodySelect(waterbody);">
 					<div class="location-item-left">
 						<p><b>{{waterbody.name}}</b>
 						<br>
