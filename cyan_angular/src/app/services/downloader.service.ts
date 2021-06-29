@@ -252,11 +252,21 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
-  getWaterbodyData(objectid: number) {
+  getWaterbodyData(
+    objectid: number,
+    daily: string = 'True',
+    startYear: number = null,
+    startDay: number = null,
+    endYear: number = null,
+    endDay: number = null,
+    ranges: Array<any> = null
+  ) {
     /*
     Gets waterbody data.
     */
-    let url = this.envService.config.waterbodyUrl + 'data/?OBJECTID=' + objectid;
+    let url = this.envService.config.waterbodyUrl + 
+              'data/?OBJECTID=' + objectid +
+              '&daily=' + daily;
     return this.executeAuthorizedGetRequest(url); 
   }
 
@@ -265,6 +275,14 @@ export class DownloaderService {
     Gets waterbody properties.
     */
     let url = this.envService.config.waterbodyUrl + 'properties/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyGeometry(objectid: number) {
+    /*
+    Gets waterbody geometry.
+    */
+    let url = this.envService.config.waterbodyUrl + 'geometry/?OBJECTID=' + objectid;
     return this.executeAuthorizedGetRequest(url); 
   }
 
