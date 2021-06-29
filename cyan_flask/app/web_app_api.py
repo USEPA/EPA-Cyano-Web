@@ -3,18 +3,11 @@ NOTE: From qed_cyan/cyan_app django application.
 
 Handles user account interactions.
 """
-import uuid
 import time
 import datetime
-import sqlite3
-import mysql.connector
 import json
-import os
 import logging
-import requests
-import simplejson
 from sqlalchemy import desc
-import sys
 
 # Local imports:
 from auth import PasswordHandler, JwtHandler
@@ -71,7 +64,6 @@ def login_user(post_data):
     try:
         user = post_data["user"]
         password = post_data["password"]
-        data_type = post_data["dataType"]
     except KeyError as e:
         logging.error(e)
         return {"error": "Invalid key in request"}, 400
@@ -96,7 +88,7 @@ def login_user(post_data):
             "email": user_obj.email,
             "auth_token": JwtHandler().encode_auth_token(user),
         }
-        data = get_user_locations(user, data_type)
+        data = get_user_locations(user)
         return (
             {
                 "user": user_data,
@@ -118,7 +110,6 @@ def add_location(post_data):
     try:
         user = post_data["owner"]
         _id = Location.validate_id(post_data["id"])
-        data_type = post_data["type"]
         name = post_data["name"]
         latitude = post_data["latitude"]
         longitude = post_data["longitude"]
@@ -132,14 +123,13 @@ def add_location(post_data):
         return {"error": "Invalid key in request"}, 400
 
     # Checks if location already exists for user:
-    location_obj = Location.query.filter_by(id=_id, owner=user, type=data_type).first()
+    location_obj = Location.query.filter_by(id=_id, owner=user).first()
     if location_obj:
         return {"error": "Record with same key exists"}, 409
     # Inserts new location into database:
     location_obj = Location(
         owner=user,
         id=_id,
-        type=data_type,
         name=name,
         latitude=latitude,
         longitude=longitude,
@@ -152,8 +142,8 @@ def add_location(post_data):
     return {"status": "success"}, 201
 
 
-def delete_location(user="", _id="", data_type=""):
-    Location.query.filter_by(id=_id, owner=user, type=data_type).delete()
+def delete_location(user="", _id=""):
+    Location.query.filter_by(id=_id, owner=user).delete()
     db.session.commit()
     # TODO: Exception handling.
     return {"status": "success"}, 200
@@ -163,7 +153,6 @@ def edit_location(post_data):
     try:
         user = post_data["owner"]
         _id = post_data["id"]
-        data_type = post_data["type"]
         name = post_data["name"]
         marked = post_data["marked"]
         compare = (
@@ -175,21 +164,17 @@ def edit_location(post_data):
     updated_values = dict(
         name=name, marked=marked, compare=compare, notes=json.dumps(notes)
     )
-    location_obj = Location.query.filter_by(owner=user, id=_id, type=data_type).update(
-        updated_values
-    )
+    location_obj = Location.query.filter_by(owner=user, id=_id).update(updated_values)
     db.session.commit()
     # TODO: Exception handling.
     return {"status": "success"}, 200
 
 
-def get_user_locations(user="", data_type=""):
+def get_user_locations(user=""):
     """
     Returns user locations based on user and data type.
     """
-    user_locations = Location.query.filter_by(
-        owner=user, type=data_type
-    ).all()  # gets all locations for owner + data_type
+    user_locations = Location.query.filter_by(owner=user).all()
     results = []
     for location in user_locations:
         results.append(read_location_row(location))
@@ -200,7 +185,6 @@ def read_location_row(location):
     loc_data = {
         "owner": location.owner,
         "id": location.id,
-        "type": location.type,
         "name": location.name,
         "latitude": location.latitude,
         "longitude": location.longitude,
@@ -213,12 +197,12 @@ def read_location_row(location):
     return loc_data
 
 
-def get_location(user="", _id="", data_type=""):
+def get_location(user="", _id=""):
     """
     Returns user location based on user and location ID.
     TODO: How to prevent any user getting user locations if they could guess a username?
     """
-    user_location = Location.query.filter_by(id=_id, owner=user, type=data_type).first()
+    user_location = Location.query.filter_by(id=_id, owner=user).first()
     if not user_location:
         return {"error": "Location not found"}, 404
     return read_location_row(user_location), 200

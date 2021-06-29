@@ -66,7 +66,7 @@ class PasswordHandler:
             user_email
         )  # NOTE: using email for 'sub' in token
         return (
-            os.environ.get("HOST_DOMAIN", "http://localhost:4200")
+            os.getenv("HOST_DOMAIN", "http://localhost:4200")
             + "/reset?token="
             + jwt_token.decode("utf-8")
         )
@@ -76,17 +76,40 @@ class PasswordHandler:
             username
         )  # NOTE: username for 'sub' in token
         return (
-            os.environ.get("HOST_DOMAIN", "http://localhost:4200")
-            + os.environ.get("API_URL", "/cyan/app/api/")
+            os.getenv("HOST_DOMAIN", "http://localhost:4200")
+            + os.getenv("API_URL", "/cyan/app/api/")
             + "csv?token="
             + jwt_token.decode("utf-8")
         )
 
     def _send_mail(self, smtp_email, smtp_pass, user_email, msg):
+        if os.getenv("EMAIL_SMTP") == "smtp.epa.gov":
+            return self._send_mail_epa(smtp_email, user_email, msg)
+        else:
+            return self._send_mail_gmail(smtp_email, smtp_pass, user_email, msg)
+
+    def _send_mail_gmail(self, smtp_email, smtp_pass, user_email, msg):
+        """
+        Sends email using Gmail SMTP.
+        """
         try:
-            server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+            server = smtplib.SMTP_SSL(os.getenv("EMAIL_SMTP"), os.getenv("EMAIL_PORT"))
             server.ehlo()
             server.login(smtp_email, smtp_pass)
+            server.sendmail(smtp_email, user_email, msg)
+            server.close()
+            return {"success": "Email sent."}
+        except Exception as e:
+            logging.warning("Error sending reset email: {}".format(e))
+            return {"error": "Unable to send email."}
+
+    def _send_mail_epa(self, smtp_email, user_email, msg):
+        """
+        Sends email using EPA SMTP.
+        """
+        try:
+            server = smtplib.SMTP(os.getenv("EMAIL_SMTP"), os.getenv("EMAIL_PORT"))
+            server.ehlo()
             server.sendmail(smtp_email, user_email, msg)
             server.close()
             return {"success": "Email sent."}
@@ -120,8 +143,8 @@ class PasswordHandler:
         Handled contacts page comment submission by sending email
         to cts email using an smtp server.
         """
-        smtp_pass = self._handle_config_password(os.environ.get("EMAIL_PASS"))
-        smtp_email = os.environ.get("EMAIL")
+        smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
+        smtp_email = os.getenv("EMAIL")
         user_email = request.get("user_email")
         msg = self._create_reset_email_message(smtp_email, user_email)
         return self._send_mail(smtp_email, smtp_pass, user_email, msg)
@@ -131,8 +154,8 @@ class PasswordHandler:
         Sends email to user that batch job is complete.
         Includes info about job and link to download CSV.
         """
-        smtp_pass = self._handle_config_password(os.environ.get("EMAIL_PASS"))
-        smtp_email = os.environ.get("EMAIL")
+        smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
+        smtp_email = os.getenv("EMAIL")
         user_email = request.get("user_email")
         input_filename = request.get("filename")
         output_filename = csv_handler.generate_output_filename(input_filename)
@@ -153,14 +176,12 @@ class JwtHandler:
             payload = {
                 "exp": datetime.datetime.utcnow()
                 + datetime.timedelta(
-                    seconds=int(os.environ.get("SESSION_EXPIRE_SECONDS", 300))
+                    seconds=int(os.getenv("SESSION_EXPIRE_SECONDS", 300))
                 ),
                 "iat": datetime.datetime.utcnow(),
                 "sub": user,
             }
-            enc_token = jwt.encode(
-                payload, os.environ.get("SECRET_KEY"), algorithm="HS256"
-            )
+            enc_token = jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
             return crypt_manager.convert_to_bytes(enc_token)
         except Exception as e:
             return e
@@ -170,9 +191,7 @@ class JwtHandler:
         Decodes the auth token.
         """
         try:
-            return jwt.decode(
-                auth_token, os.environ.get("SECRET_KEY"), algorithms=["HS256"]
-            )
+            return jwt.decode(auth_token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return {"error": "Signature expired. Please log in again."}
         except jwt.InvalidTokenError:

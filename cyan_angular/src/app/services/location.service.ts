@@ -80,7 +80,7 @@ export class LocationService {
 
     // fetch data
     this.downloader
-      .getUserLocations(this.user.getUserName(), this.data_type)
+      .getUserLocations(this.user.getUserName())
       .subscribe((locations: UserLocations[]) => {
         self.user.currentAccount.locations = locations;
         self.getUserLocations();
@@ -126,7 +126,6 @@ export class LocationService {
             let l = new Location();
             l.id = location.id;
             l.name = location.name;
-            l.type = location.type;
             let coord = self.convertCoordinates(
               location.latitude,
               location.longitude
@@ -208,7 +207,7 @@ export class LocationService {
 
   downloadLocation(location: Location): void {
     let username = this.user.getUserName();
-    this.downloader.getAjaxData(username, location);
+    this.downloader.getAjaxData(username, location, this.data_type);
   }
 
   getData(): void {
@@ -311,8 +310,7 @@ export class LocationService {
     if (index >= 0) {
       this.downloader.deleteUserLocation(
         this.user.getUserName(),
-        ln.id,
-        ln.type
+        ln.id
       );
       this.locations.splice(index, 1);
     }

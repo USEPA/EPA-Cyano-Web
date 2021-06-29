@@ -1,8 +1,6 @@
 <div id="bottom-menu-bar">
-  
-  <!-- Data Type selection -->
   <div class="bottom-menu-title-block">
-    <button mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type</button>
+    <button mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type: {{ data_type == 1 ? "Weekly" : "Daily" }}</button>
     <mat-menu #dataType="matMenu" class="bottom-menu-link-block">
       <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 1}" (click)="dataTypeClick(1)" [routerLink]="['']">OLCI - Weekly </button>
       <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 2}" (click)="dataTypeClick(2)" [routerLink]="['']">OLCI - Daily</button>

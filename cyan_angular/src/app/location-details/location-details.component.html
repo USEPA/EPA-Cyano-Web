@@ -172,7 +172,10 @@
     <!-- Chart-tab -->
     <mat-tab label="Chart">
       <div class="chart_header">
-        <div class="chart_title">Blooming Chart</div>
+        <div class="chart_title">
+          Blooming Chart
+          <mat-icon id="download-btn" (click)="downloadChartCSV()" class="mat_icon">file_download</mat-icon>
+        </div>
         <div class="chart_source_selection"></div>
       </div>
       <div class="chart_graph" *ngIf="dataDownloaded">

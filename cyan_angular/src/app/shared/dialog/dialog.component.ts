@@ -6,11 +6,12 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from "@angular/material/dial
 @Component({
   selector: 'app-dialog',
   template: `
-  <br><br>
   <div class="center-wrapper">
+  <button style="float:right;font-size:x-large;" mat-button (click)="exit(false);">X</button>
+  <br><br>
   <h6 class="center-item">{{dialogMessage}}</h6>
   <br><br>
-  <button class="center-item" mat-raised-button color="primary" (click)="exit();">OK</button>
+  <button class="center-item" mat-raised-button color="primary" (click)="exit(true);">OK</button>
   </div>
   <br>
   `,
@@ -25,7 +26,6 @@ export class DialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
-    // private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public messageDialog: MatDialog
   ) { }
@@ -34,8 +34,8 @@ export class DialogComponent {
     this.dialogMessage = this.data.dialogMessage;
   }
 
-  exit(): void {
-    this.dialogRef.close();
+  exit(response: boolean): void {
+    this.dialogRef.close(response);
   }
 
   displayMessageDialog(message: string): void {
