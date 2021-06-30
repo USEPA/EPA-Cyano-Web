@@ -2,11 +2,10 @@ import {Component, OnInit, Input, Inject, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { DatePipe } from '@angular/common';
-
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
-
 import { latLng, latLngBounds, tileLayer, Map, ImageOverlay } from 'leaflet';
 import { Subscription } from 'rxjs';
+import { BaseChartDirective } from 'ng2-charts';
 
 import { MapService } from '../services/map.service';
 import { Location } from '../models/location';
@@ -63,6 +62,7 @@ export class LocationDetailsComponent implements OnInit {
   showLegend = false;
 
   // Variables for chart
+  @ViewChild('cyanChart') cyanChart: BaseChartDirective;
   dataDownloaded: boolean = false;
   @Input() chartData: Array<any> = [
     {
@@ -84,6 +84,24 @@ export class LocationDetailsComponent implements OnInit {
           }
         }
       }]
+    },
+    plugins: {
+      zoom: {
+        zoom: {
+          enabled: true,
+          wheel: {
+            enabled: true
+          },
+          pinch: {
+            enabled: true
+          },
+          mode: 'xy'
+        },
+        pan: {
+          enabled: true,
+          mode: 'xy'
+        }
+      }
     }
   };
   public chartColors: Array<any> = [
@@ -696,6 +714,13 @@ export class LocationDetailsComponent implements OnInit {
         dialogMessage: message
       }
     });
+  }
+
+  resetZoom(event) {
+    /*
+    Resets plot to its default position and zoom.
+    */
+    this.cyanChart.chart['resetZoom']();
   }
 
 }

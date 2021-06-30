@@ -939,6 +939,12 @@ mat-card-content {
 .mat_icon {
     float: right;
     margin-right: 5%;
+    margin-top: 4px;
+}
+
+.reset-button {
+    float: right;
+    margin-right: 5%;
     margin-top: 2px;
 }
 
