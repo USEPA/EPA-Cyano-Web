@@ -23,9 +23,6 @@ import { UserService } from '../services/user.service';
 import { ConfigService } from '../services/config.service';
 
 
-let dataByRange: WaterBodyDataByRange;
-let chartLabels: string[] = ['low', 'medium', 'high', 'veryHigh'];
-
 
 @Component({
   selector: 'app-waterbody-stats-details',
@@ -51,6 +48,8 @@ export class WaterBodyStatsDialog {
   wbStats: WaterBodyStats = new WaterBodyStats();
   wbProps: WaterBodyProperties = new WaterBodyProperties();
   rangeStats: RangeItem = new RangeItem();
+
+  dataByRange: WaterBodyDataByRange = new WaterBodyDataByRange();
 
   minDate: Date = new Date();
   maxDate: Date = new Date();
@@ -231,9 +230,6 @@ export class WaterBodyStatsDialog {
     /*
     Selection change for data type.
     */
-    // TODO: Does selectedDataType need explicitly set here? Seems
-    // like it gets set in the template with data binding.
-    this.selectedDataType = dataTypeValue;
     this.calculateWaterbodyStats();
   }
 
@@ -242,7 +238,7 @@ export class WaterBodyStatsDialog {
     Selection change for range for histo chart.
     Updates plot with selected range.
     */
-    this.plotHistoData(dataByRange);
+    this.plotHistoData(this.dataByRange);
   }
 
   public chartClick(event) {
@@ -251,7 +247,7 @@ export class WaterBodyStatsDialog {
     Displays histo chart of clicked/selected range.
     */
     let clickedLabelIndex: number = event.active[0]['_index'];
-    let clickedLabel: string = chartLabels[clickedLabelIndex].toString();
+    let clickedLabel: string = this.chartLabels[clickedLabelIndex].toString();
     this.selectedRange = clickedLabel;
     this.updateHistoChart();
   }
@@ -277,6 +273,10 @@ export class WaterBodyStatsDialog {
     /*
     Plots histo of cell concentration for a given range.
     */
+    if (this.selectedRange === 'all') {
+      this.plotFullHistoData(this.dataByRange);
+      return;
+    }
     this.chartHistoLabels = chartData[this.selectedRange].data.map(obj => obj.concentration);
     this.chartHistoData[0].data = chartData[this.selectedRange].data.map(obj => obj.count);
     this.chartHistoData[0].backgroundColor = this.getColor(this.selectedRange);
@@ -284,6 +284,28 @@ export class WaterBodyStatsDialog {
     this.rangeStats.max = chartData[this.selectedRange].max;
     this.rangeStats.average = chartData[this.selectedRange].average;
     this.rangeStats.stddev = chartData[this.selectedRange].stddev;
+  }
+
+  plotFullHistoData(chartData) {
+    /*
+    Plots all ranges color-coded cell concentration histogram.
+    */
+    let histoLabels = [];
+    let histoData = [];
+    let histoColors = [];
+    let index = 0;
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      chartData[key].data.forEach(obj => {
+        histoLabels.push(obj.concentration);
+        histoData.push(obj.count);
+        histoColors.push(this.getColor(key));
+       });
+      index++;
+    }
+    this.chartHistoLabels = histoLabels;
+    this.chartHistoData[0].data = histoData;
+    this.chartHistoData[0].backgroundColor = histoColors;
   }
 
   getColor(selectedRange: string): string {
@@ -384,7 +406,7 @@ export class WaterBodyStatsDialog {
     let totalCounts = 0.0;
     let totalConcentration = 0.0;
 
-    dataByRange = new WaterBodyDataByRange();
+    this.dataByRange = new WaterBodyDataByRange();
 
     concentrationData.forEach(dataObj => {
 
@@ -395,20 +417,20 @@ export class WaterBodyStatsDialog {
       totalConcentration += concentration;
 
       if (concentration <= userSettings.level_low) {
-        dataByRange.low.countSum += counts;
-        dataByRange.low.data.push(dataObj);
+        this.dataByRange.low.countSum += counts;
+        this.dataByRange.low.data.push(dataObj);
       }
       else if (concentration > userSettings.level_low && concentration <= userSettings.level_medium) {
-        dataByRange.medium.countSum += counts;
-        dataByRange.medium.data.push(dataObj);
+        this.dataByRange.medium.countSum += counts;
+        this.dataByRange.medium.data.push(dataObj);
       }
       else if (concentration > userSettings.level_medium && concentration <= userSettings.level_high) {
-        dataByRange.high.countSum += counts;
-        dataByRange.high.data.push(dataObj);
+        this.dataByRange.high.countSum += counts;
+        this.dataByRange.high.data.push(dataObj);
       }
       else if (concentration > userSettings.level_high) {
-        dataByRange.veryHigh.countSum += counts;
-        dataByRange.veryHigh.data.push(dataObj);
+        this.dataByRange.veryHigh.countSum += counts;
+        this.dataByRange.veryHigh.data.push(dataObj);
       }
       else {
         this.dialog.handleError('Unknown error occurred');
@@ -416,105 +438,105 @@ export class WaterBodyStatsDialog {
 
     });
 
-    dataByRange.totalCounts = totalCounts;
-    dataByRange.totalConcentration = totalConcentration;
-    dataByRange.totalPixelArea = 0.09 * totalCounts;  // total pixels X pixel size (sq. km)
-    dataByRange = this.calculateRangeArea(dataByRange);
-    dataByRange = this.calculatePercentOfArea(dataByRange);
-    dataByRange = this.calculatePercentOfTotalArea(dataByRange);
-    dataByRange = this.calculateAverageForRange(dataByRange);
-    dataByRange = this.calculateStddevForRange(dataByRange);
-    dataByRange = this.calculateMinForRange(dataByRange);
-    dataByRange = this.calculateMaxForRange(dataByRange);
+    this.dataByRange.totalCounts = totalCounts;
+    this.dataByRange.totalConcentration = totalConcentration;
+    this.dataByRange.totalPixelArea = 0.09 * totalCounts;  // total pixels X pixel size (sq. km)
+    this.dataByRange = this.calculateRangeArea();
+    this.dataByRange = this.calculatePercentOfArea();
+    this.dataByRange = this.calculatePercentOfTotalArea();
+    this.dataByRange = this.calculateAverageForRange();
+    this.dataByRange = this.calculateStddevForRange();
+    this.dataByRange = this.calculateMinForRange();
+    this.dataByRange = this.calculateMaxForRange();
 
-    return dataByRange;
+    return this.dataByRange;
   }
 
-  calculateRangeArea(dataByRange) {
+  calculateRangeArea() {
     /*
     Calculates sq. area for each concentration range.
     Each pixel is 300m x 300m (0.09 sq. km).
     */
-    for (let key in dataByRange) {
-      if (!chartLabels.includes(key)) { continue; }
-      dataByRange[key].areaPerRange = 0.09 * dataByRange[key].countSum;
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      this.dataByRange[key].areaPerRange = 0.09 * this.dataByRange[key].countSum;
     }
-    return dataByRange;
+    return this.dataByRange;
   }
 
-  calculatePercentOfArea(dataByRange) {
+  calculatePercentOfArea() {
     /*
     Calcuates the percent area of each range compared to
     the total area (using pixel values, not actual/recorded WB area).
     */
-    for (let key in dataByRange) {
-      if (!chartLabels.includes(key)) { continue; }
-      dataByRange[key].percentOfArea = this.roundValue(100.0 * (dataByRange[key].areaPerRange / dataByRange.totalPixelArea));
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      this.dataByRange[key].percentOfArea = this.roundValue(100.0 * (this.dataByRange[key].areaPerRange / this.dataByRange.totalPixelArea));
     }
-    return dataByRange;
+    return this.dataByRange;
   }
 
-  calculatePercentOfTotalArea(dataByRange) {
+  calculatePercentOfTotalArea() {
     /*
     Calculates percent of area for cyano counts relative
     to the area of the WB itself.
     */
-    dataByRange.percentOfTotalArea = this.roundValue(100.0 * (dataByRange.totalPixelArea / this.wbProps.areasqkm));
-    return dataByRange;
+    this.dataByRange.percentOfTotalArea = this.roundValue(100.0 * (this.dataByRange.totalPixelArea / this.wbProps.areasqkm));
+    return this.dataByRange;
   }
 
-  calculateAverageForRange(dataByRange) {
+  calculateAverageForRange() {
     /*
     Calculates average cyano levels per range.
     */
-    for (let key in dataByRange) {
-      if (!chartLabels.includes(key)) { continue; }
-      dataByRange[key].average = this.roundValue(this.calculateAverage(dataByRange[key].data));
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      this.dataByRange[key].average = this.roundValue(this.calculateAverage(this.dataByRange[key].data));
     }
-    return dataByRange;
+    return this.dataByRange;
   }
 
-  calculateStddevForRange(dataByRange) {
+  calculateStddevForRange() {
     /*
     Calculates Stddev cyano levels per range.
     */
-    for (let key in dataByRange) {
-      if (!chartLabels.includes(key)) { continue; }
-      dataByRange[key].stddev = this.roundValue(this.calculateStdDev(dataByRange[key].data));
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      this.dataByRange[key].stddev = this.roundValue(this.calculateStdDev(this.dataByRange[key].data));
     }
-    return dataByRange;
+    return this.dataByRange;
   }
 
-  calculateMinForRange(dataByRange) {
-    for (let key in dataByRange) {
-      if (!chartLabels.includes(key)) { continue; }
-      let filteredArray = dataByRange[key].data
+  calculateMinForRange() {
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      let filteredArray = this.dataByRange[key].data
         .filter(obj => obj.count > 0)
         .map(obj => obj.concentration);
       if (filteredArray.length < 1) {
-        dataByRange[key].min = null;
+        this.dataByRange[key].min = null;
       }
       else {
-       dataByRange[key].min = Math.min(...filteredArray); 
+       this.dataByRange[key].min = Math.min(...filteredArray); 
       }
     }
-    return dataByRange
+    return this.dataByRange
   }
 
-  calculateMaxForRange(dataByRange) {
-    for (let key in dataByRange) {
-      if (!chartLabels.includes(key)) { continue; }
-      let filteredArray = dataByRange[key].data
+  calculateMaxForRange() {
+    for (let key in this.dataByRange) {
+      if (!this.chartLabels.includes(key)) { continue; }
+      let filteredArray = this.dataByRange[key].data
         .filter(obj => obj.count > 0)
         .map(obj => obj.concentration);
       if (filteredArray.length < 1) {
-        dataByRange[key].max = null;
+        this.dataByRange[key].max = null;
       }
       else {
-       dataByRange[key].max = Math.max(...filteredArray); 
+       this.dataByRange[key].max = Math.max(...filteredArray); 
       }
     }
-    return dataByRange
+    return this.dataByRange
   }
 
 }
