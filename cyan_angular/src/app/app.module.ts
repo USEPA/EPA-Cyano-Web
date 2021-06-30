@@ -50,7 +50,6 @@ import { MapService } from './services/map.service';
 import { AuthService } from './services/auth.service';
 import { EnvService } from './services/env.service';
 
-
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
@@ -78,6 +77,9 @@ import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
+
+import 'hammerjs';
+import 'chartjs-plugin-zoom';
 
 @NgModule({
   declarations: [
