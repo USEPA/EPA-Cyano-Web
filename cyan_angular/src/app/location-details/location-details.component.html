@@ -174,12 +174,13 @@
       <div class="chart_header">
         <div class="chart_title">
           Blooming Chart
+          <button class="reset-button" mat-raised-button color="primary" (click)="resetZoom($event);">Reset zoom</button>
           <mat-icon id="download-btn" (click)="downloadChartCSV()" class="mat_icon">file_download</mat-icon>
         </div>
         <div class="chart_source_selection"></div>
       </div>
       <div class="chart_graph" *ngIf="dataDownloaded">
-        <canvas aria-label="Location bloom chart" baseChart class="cyan_chart" width="1" height="1"
+        <canvas aria-label="Location bloom chart" baseChart #cyanChart="base-chart" class="cyan_chart" width="1" height="1"
           [datasets]="chartData"
           [labels]="chartDataLabels"
           [options]="chartOptions"
@@ -188,6 +189,7 @@
           [chartType]="chartType"
           (chartHover)="chartHover($event)"></canvas>
       </div>
+
     </mat-tab>
   </mat-tab-group>
 </div>

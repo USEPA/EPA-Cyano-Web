@@ -1,8 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { latLng, latLngBounds, tileLayer, marker, icon, Map, Layer, Marker, ImageOverlay, LayerGroup } from 'leaflet';
 import { Subscription } from 'rxjs';
+import { BaseChartDirective } from 'ng2-charts';
 
 import { MapService } from '../services/map.service';
 import { Location } from '../models/location';
@@ -55,6 +56,7 @@ export class LocationCompareDetailsComponent implements OnInit {
   showMap = false;
 
   // Variables for chart
+  @ViewChild('cyanChart') cyanChart: BaseChartDirective;
   dataDownloaded: boolean = false;
   @Input() chartData: Array<any> = [];
   public chartOptions: any = {
@@ -71,6 +73,24 @@ export class LocationCompareDetailsComponent implements OnInit {
           }
         }
       }]
+    },
+    plugins: {
+      zoom: {
+        zoom: {
+          enabled: true,
+          wheel: {
+            enabled: true
+          },
+          pinch: {
+            enabled: true
+          },
+          mode: 'xy'
+        },
+        pan: {
+          enabled: true,
+          mode: 'xy'
+        }
+      }
     }
   };
   public chartColors: Array<any> = [
@@ -257,6 +277,10 @@ export class LocationCompareDetailsComponent implements OnInit {
 
   getArrowColor(l: Location, delta: boolean) {
     return this.locationService.getColor(l, delta);
+  }
+
+  resetZoom() {
+    this.cyanChart.chart['resetZoom']();
   }
 
 }

@@ -51,7 +51,6 @@ import { MapService } from './services/map.service';
 import { AuthService } from './services/auth.service';
 import { EnvService } from './services/env.service';
 
-
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
@@ -81,6 +80,9 @@ import { LocationSearchComponent } from './location-search/location-search.compo
 import { BatchComponent } from './batch/batch.component';
 import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
 import { WaterBodyStatsDialog } from './waterbody-stats/waterbody-stats-details.component';
+
+import 'hammerjs';
+import 'chartjs-plugin-zoom';
 
 @NgModule({
   declarations: [
