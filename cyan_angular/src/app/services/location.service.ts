@@ -540,12 +540,24 @@ export class LocationService {
       if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
         return;
       }
-      wbInfoResult['waterbodies'].forEach(waterbodyData => {
-        const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
-        this.locations[index].waterbody.objectid = waterbodyData['objectid'];
-        this.locations[index].waterbody.name = waterbodyData['name'];
-        this.locations[index].waterbody.centroid_lat = waterbodyData['centroid_lat'];
-        this.locations[index].waterbody.centroid_lng = waterbodyData['centroid_lng'];
+
+      const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
+      const tolerance = 0.1;
+
+      wbInfoResult['waterbodies'].forEach(wbData => {
+
+        if (
+          Math.abs(ln.latitude - wbData['centroid_lat']) < tolerance &&
+          Math.abs(ln.longitude - wbData['centroid_lng']) < tolerance
+        ) {
+          // Adds WB to nearest location based on tolerance
+          this.locations[index].waterbody.objectid = wbData['objectid'];
+          this.locations[index].waterbody.name = wbData['name'];
+          this.locations[index].waterbody.centroid_lat = wbData['centroid_lat'];
+          this.locations[index].waterbody.centroid_lng = wbData['centroid_lng'];
+          return;
+        }
+
       });
     });
   }
