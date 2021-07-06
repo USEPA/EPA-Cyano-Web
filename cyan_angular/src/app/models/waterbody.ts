@@ -3,6 +3,8 @@ export class WaterBody {
 	name: string;
 	centroid_lat: number;
 	centroid_lng: number;
+	areasqkm: number;
+	state_abbr: string;
 }
 
 export class WaterBodyData {

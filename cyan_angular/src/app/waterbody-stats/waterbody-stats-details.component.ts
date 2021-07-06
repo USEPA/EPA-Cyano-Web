@@ -147,11 +147,15 @@ export class WaterBodyStatsDialog {
     Calculates min/max, mean, medium, mode, std dev for cyano data
     based on dayOfYear (ex: "2020 1").
     */
-    if (this.waterbodyData[this.selectedDataType] == null) {
-      this.dialog.handleError('No ' + this.selectedDataType + 'waterbody data');
+    if (
+      Object.keys(this.waterbodyData[this.selectedDataType]).length <= 0 ||
+      Object.keys(this.waterbodyData[this.selectedDataType]['data']).length <= 0
+    ) {
+      this.dialog.handleError('No ' + this.selectedDataType + ' waterbody data currently available');
     }
 
     let dates: Array<string> = Object.keys(this.waterbodyData[this.selectedDataType]['data']);
+
     let dateArray = (dayOfYear ?? dates[0]).split(' ');
     let year = parseInt(dateArray[0]);
     let day = parseInt(dateArray[1]);

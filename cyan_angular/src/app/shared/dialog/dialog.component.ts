@@ -49,7 +49,7 @@ export class DialogComponent {
     });
   }
 
-  handleError(errorMessage: string): void {
+  public handleError(errorMessage: string): void {
     /*
     Display error message and throws exception, which
     halts the execution of following statements.

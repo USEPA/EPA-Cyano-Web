@@ -29,8 +29,8 @@ export class WaterbodyStatsComponent implements OnInit {
 	waterbodyResults: WaterBody[];
 
 	waterbodyName: string = '';
-	waterbodyLat: number;
-	waterbodyLon: number;
+	waterbodyLat: number = null;
+	waterbodyLon: number = null;
 
 	lat_0: number = 33.927945;
   lng_0: number = -83.346554;
@@ -172,6 +172,9 @@ export class WaterbodyStatsComponent implements OnInit {
   	/*
   	Searches for waterbody by name.
   	*/
+    if (this.waterbodyName.length <= 0) {
+      this.dialog.handleError('Provide a waterbody name to search');
+    }
   	this.loaderService.show();
   	this.downloader.searchForWaterbodyByName(this.waterbodyName).subscribe(result => {
   		this.loaderService.hide();
@@ -184,6 +187,9 @@ export class WaterbodyStatsComponent implements OnInit {
   	/*
   	Searches for waterbody by lat/lon coords.
   	*/
+    if (!this.waterbodyLat || !this.waterbodyLon) {
+      this.dialog.handleError('Provide a latitude and longitude to search for a waterbody');
+    }
   	this.loaderService.show();
   	this.downloader.searchForWaterbodyByCoords(this.waterbodyLat, this.waterbodyLon).subscribe(wbInfoResult => {
       this.loaderService.hide();
@@ -216,6 +222,8 @@ export class WaterbodyStatsComponent implements OnInit {
   		waterbody.name = waterbodyData['name'];
   		waterbody.centroid_lat = waterbodyData['centroid_lat'];
   		waterbody.centroid_lng = waterbodyData['centroid_lng'];
+      waterbody.areasqkm = waterbodyData['areasqkm'];
+      waterbody.state_abbr = waterbodyData['state_abbr'];
   		waterbodyResults.push(waterbody);
   	});
 		return waterbodyResults;

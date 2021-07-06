@@ -45,12 +45,15 @@
 		<div *ngIf="waterbodyResults?.length > 0" class="user-locations">
 			<br>
 			<ul>
-				<!-- <li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="openWaterbodyStatsDialog(waterbody);"> -->
 				<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="handleWaterbodySelect(waterbody);">
 					<div class="location-item-left">
-						<p><b>{{waterbody.name}}</b>
-						<br>
-						{{waterbody.centroid_lat}}, {{waterbody.centroid_lng}}</p>
+						<p>
+							<b>{{waterbody.name}}</b><br>
+							<b>COMID:</b> {{waterbody.objectid}}<br>
+							<b>Coordinates:</b> {{waterbody.centroid_lat}}, {{waterbody.centroid_lng}}<br>
+							<b>Area:</b> {{waterbody.areasqkm}}km<sup>2</sup><br>
+							<b>State:</b> {{waterbody.state_abbr}}
+						</p>
 					</div>
 				</li>
 			</ul>
