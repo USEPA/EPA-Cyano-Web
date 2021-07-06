@@ -80,7 +80,6 @@ export class MapService {
 
     let m = marker(this.getLatLng(location), {
       icon: this.createIcon(markerLocation),
-      title: location.name,
       alt: "Map marker for " + location.name,
       riseOnHover: true,
       zIndexOffset: 10000
