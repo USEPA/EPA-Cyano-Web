@@ -16,6 +16,7 @@ import { MapService } from '../services/map.service';
 import { CyanMap } from '../utils/cyan-map';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { LoaderService } from '../services/loader.service';
+import { CoordinatesComponent } from '../coordinates/coordinates.component';
 
 
 @Component({
@@ -32,8 +33,10 @@ export class WaterbodyStatsComponent implements OnInit {
 	waterbodyLat: number = null;
 	waterbodyLon: number = null;
 
-	lat_0: number = 33.927945;
-  lng_0: number = -83.346554;
+  searchResultLimit: number = 100;  // max allowed search results
+  searchCharMin: number = 3;  // min allowed characters for WB searching
+  searchCharMax: number = 256;  // max allowed characters for WB searching
+
 
   wbLayer = null;
 
@@ -56,7 +59,8 @@ export class WaterbodyStatsComponent implements OnInit {
   	private cyanMap: CyanMap,
   	private wbDialog: MatDialog,
     private dialog: DialogComponent,
-  	private loaderService: LoaderService
+  	private loaderService: LoaderService,
+    private coords: CoordinatesComponent
   ) { }
 
   ngOnInit(): void {
@@ -172,9 +176,7 @@ export class WaterbodyStatsComponent implements OnInit {
   	/*
   	Searches for waterbody by name.
   	*/
-    if (this.waterbodyName.length <= 0) {
-      this.dialog.handleError('Provide a waterbody name to search');
-    }
+    this.validateNameSearchInputs();
   	this.loaderService.show();
   	this.downloader.searchForWaterbodyByName(this.waterbodyName).subscribe(result => {
   		this.loaderService.hide();
@@ -187,9 +189,7 @@ export class WaterbodyStatsComponent implements OnInit {
   	/*
   	Searches for waterbody by lat/lon coords.
   	*/
-    if (!this.waterbodyLat || !this.waterbodyLon) {
-      this.dialog.handleError('Provide a latitude and longitude to search for a waterbody');
-    }
+    this.validateCoordSearchInputs();
   	this.loaderService.show();
   	this.downloader.searchForWaterbodyByCoords(this.waterbodyLat, this.waterbodyLon).subscribe(wbInfoResult => {
       this.loaderService.hide();
@@ -208,6 +208,9 @@ export class WaterbodyStatsComponent implements OnInit {
   	else if (waterbodyResponse['waterbodies'] == 'NA') {
   		this.dialog.handleError('No waterbodies found');
   	}
+    else if (waterbodyResponse['waterbodies'].length > this.searchResultLimit) {
+      this.dialog.handleError('Too many results from search');
+    }
   	return waterbodyResponse['waterbodies'];
   }
 
@@ -268,6 +271,33 @@ export class WaterbodyStatsComponent implements OnInit {
   handleWaterbodySelect(selectedWaterbody: WaterBody): void {
     this.panToWaterbody(selectedWaterbody);
     this.getWaterbodyGeojson(selectedWaterbody);
+  }
+
+  validateCoordSearchInputs() {
+    /*
+    Validates user input for searching WBs by coordinates.
+    */
+    if (!this.waterbodyLat || !this.waterbodyLon) {
+      this.dialog.handleError('Provide a latitude and longitude to search for a waterbody');
+    }
+    else if(!this.coords.withinConus(this.waterbodyLat, this.waterbodyLon)) {
+      this.dialog.handleError('Coordinates are not within CONUS');
+    }
+  }
+
+  validateNameSearchInputs() {
+    /*
+    Validates user input for searching WBs by name.
+    */
+    if (this.waterbodyName.length <= 0) {
+      this.dialog.handleError('Provide a waterbody name to search');
+    }
+    else if (this.waterbodyName.length < this.searchCharMin) {
+      this.dialog.handleError('Waterbody name is too small');
+    }
+    else if (this.waterbodyName.length > this.searchCharMax) {
+      this.dialog.handleError('Waterbody name is too large');
+    }
   }
 
 }
