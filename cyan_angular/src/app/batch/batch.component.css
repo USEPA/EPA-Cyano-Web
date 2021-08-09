@@ -1,10 +1,4 @@
-@media screen and (min-width: 980px) {
-}
-
-@media screen and (max-width: 979px) and (min-width: 401px) {
-}
-
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 980px) {
 	.jobs_tab_group {
 		width: 100vw;
 	}
@@ -47,14 +41,6 @@
 	overflow: scroll;
 	height: 80%;
 	width: 100%;
-}
-/*.table-responsive thead th {
-	position: sticky;
-	top: 0;
-}*/
-::ng-deep.mat-header-cell {
-	position: sticky;
-	top: 0;
 }
 
 .exit-button {
