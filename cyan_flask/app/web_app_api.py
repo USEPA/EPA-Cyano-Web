@@ -384,7 +384,7 @@ def reset_password(request):
         # Send invalid email response
         return {"error": "User email address not found."}, 401
 
-    response = PasswordHandler().send_password_reset_email({"user_email": user_email})
+    response = PasswordHandler().send_password_reset_email({"user_email": user_email, "username": user.username})
     if "error" in response:
         return response, 500
 

@@ -26,7 +26,7 @@ class PasswordHandler:
     def __init__(self):
         pass
 
-    def _create_reset_email_message(self, server_email, user_email):
+    def _create_reset_email_message(self, server_email, user_email, username):
         subject = "Password reset for Cyano Web"
         user_link = self._create_reset_link(user_email)
         msg = "\r\n".join(
@@ -35,7 +35,7 @@ class PasswordHandler:
                 "To: {}".format(user_email),
                 "Subject: {}".format(subject),
                 "",
-                "Follow link to reset password: {}".format(user_link),
+                "Follow link to reset password for {}: {}".format(username, user_link),
             ]
         )
         return msg
@@ -146,7 +146,8 @@ class PasswordHandler:
         smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
         smtp_email = os.getenv("EMAIL")
         user_email = request.get("user_email")
-        msg = self._create_reset_email_message(smtp_email, user_email)
+        username = request.get("username")
+        msg = self._create_reset_email_message(smtp_email, user_email, username)
         return self._send_mail(smtp_email, smtp_pass, user_email, msg)
 
     def send_batch_job_complete_email(self, request):
