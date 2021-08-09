@@ -53,6 +53,7 @@ class TestAuth(unittest.TestCase):
         """
         server_email = "test@smtp.com"
         user_email = "test@email.com"
+        username = "testuser"
         subject = "Password reset for Cyano Web"
         test_reset_link = (
             os.environ.get("HOST_DOMAIN") + "/reset?token=somerandomtokenvalue"
@@ -66,12 +67,12 @@ class TestAuth(unittest.TestCase):
                 "To: {}".format(user_email),
                 "Subject: {}".format(subject),
                 "",
-                "Follow link to reset password: {}".format(test_reset_link),
+                "Follow link to reset password for {}: {}".format(username, test_reset_link),
             ]
         )
 
         actual_result = PasswordHandler()._create_reset_email_message(
-            server_email, user_email
+            server_email, user_email, username
         )
 
         self.assertEqual(actual_result, expected_result)
