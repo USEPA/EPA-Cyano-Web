@@ -1,13 +1,14 @@
-@media screen and (min-width: 1048px) {
+@media screen and (min-width: 500px) {
   .menu-block {
     display: inline-block;
+    width: 100%;
   }
   .menu-block-icon {
     display: none;
   }
 }
 
-@media screen and (max-width: 1047px), screen and (max-height: 1028px) {
+@media screen and (max-width: 499px), screen and (max-height: 700px) {
   .menu-block {
     display: none;
   }
