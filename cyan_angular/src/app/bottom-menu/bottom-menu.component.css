@@ -6,6 +6,10 @@
   .menu-block-icon {
     display: none;
   }
+
+  ::ng-deep.csv-dialog {
+    width: 80%;
+  }
 }
 
 @media screen and (max-width: 499px), screen and (max-height: 700px) {
@@ -14,6 +18,11 @@
   }
   .menu-block-icon {
     display: inline-block;
+  }
+
+  ::ng-deep.csv-dialog {
+    width: 100%;
+    height: 100%;
   }
 }
 
