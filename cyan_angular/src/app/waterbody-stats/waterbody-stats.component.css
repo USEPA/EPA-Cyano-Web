@@ -25,12 +25,12 @@ mat-card {
 .data-item {
 	display: inline-block;
     border-radius: 0;
-    width: 50%;
+    width: 48%;
     height: 100%;
     padding: 0;
     margin: 0;
     top: 0;
-    float: left;
+    /*float: left;*/
 }
 
 .details_tab {
@@ -42,7 +42,7 @@ mat-card {
 
 @media screen and (min-width: 980px) {
 	.locations-block {
-		width: 30vw;
+		width: 40vw;
 		height: 100%;
 		background: white;
 	}
@@ -164,13 +164,48 @@ h2.label {
 	padding-left: 4%;
 }
 
-::ng-deep.hightlight-date-class { 
-	background: red;
-	border-radius: 100%;
-}
-
 .chart_graph {
 	display: block;
 	height: 100%;
 	width: 100%;
+}
+
+.chart-toggle:hover {
+	cursor: pointer;
+}
+
+.mini_map {
+	height: 100%;
+	width: 100%;
+}
+
+.location_block_0 {
+  height: 100%;
+  overflow-y: scroll;
+  position: relative;
+  background: white;
+  padding-left: 2%;
+}
+
+#selected-dates-div {
+
+}
+
+#selected-dates-list {
+	overflow-y: auto;
+	max-height: 10vh;
+	width: 50%;
+}
+
+.hightlight-date {
+	background-color: rgba(0,0,0,0.12);
+}
+
+.selected-dates-item {
+	font-weight: normal;
+}
+
+
+.map-legend-toggle:hover {
+    cursor: pointer;
 }

@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { Component, OnInit, Inject, Input, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelect } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field'
-import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, ImageOverlay } from 'leaflet';
+import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, geoJSON, imageOverlay, ImageOverlay } from 'leaflet';
 import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Label, BaseChartDirective } from 'ng2-charts';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   WaterBody,
@@ -21,6 +22,9 @@ import { LoaderService } from '../services/loader.service';
 import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
 import { ConfigService } from '../services/config.service';
+import { LocationService } from '../services/location.service';
+import { Calculations } from './calculations';
+import { Charts } from './charts';
 
 
 
@@ -29,16 +33,15 @@ import { ConfigService } from '../services/config.service';
   templateUrl: './waterbody-stats-details.component.html',
   styleUrls: ['./waterbody-stats.component.css']
 })
-export class WaterBodyStatsDialog {
+export class WaterBodyStatsDetails {
   /*
   Dialog for viewing waterbody stats.
   */
-
   selectedWaterbody: WaterBody = null;
   waterbodyData: any = {
     'daily': {},
     'weekly': {}
-  };
+  };  // raw wb data from api
 
   dataTypeRequestMap: any = {
     'daily': 'True',
@@ -51,54 +54,87 @@ export class WaterBodyStatsDialog {
 
   dataByRange: WaterBodyDataByRange = new WaterBodyDataByRange();
 
-  minDate: Date = new Date();
-  maxDate: Date = new Date();
-  startDate: Date = new Date();
-  endDate: Date = new Date();
-
   selectedDate: string = '';  // dates selection element
+  selectedAvailableDate: string = '';
+
   selectedDataType: string = '';  // daily or weekly selection element
-  selectedDates: Array<string> = [];  // array of checked dates for WB stats calculations
+  dataTypes: string[] = ['daily', 'weekly'];
+
   selectedRange: string = 'low';  // selected range for stats (e.g., low, medium, high, veryHigh)
+  ranges: string[] = ['low', 'medium', 'high', 'veryHigh'];
+
+  selectedDateRange: string = 'single';  // single, 7day, or 30day
+  dateRanges: string[] = ['single', '7day', '30day'];
+  datesWithinRange: string[] = [];
+
+  plotTypes: string[] = ['Total Cell Counts', 'Percentage of Detected Area', 'Percentage of Total Area'];
+  selectedPlotType: string = this.plotTypes[0];
 
   calculatingStats: boolean = false;
   plotStats: boolean = false;
 
-  // Variables for chart
-  // ++++++++++++++++++++++++++
-  public chartLabels: Label[] = ['low', 'medium', 'high', 'veryHigh'];
-  @Input() chartData: ChartDataSets[] = [
-    {
-      data: [],
-      label: ''
-    }
-  ];
-  public chartHistoLabels: Label[] = [];  // TODO: define dynamically
-  @Input() chartHistoData: ChartDataSets[] = [
-    {
-      data: [],
-      label: ''
-    }
-  ];
-  public chartOptions: ChartOptions = {
-    responsive: true,
-    legend: {
-      display: false
-    }
+  curatedData: any = {
+    daily: {},
+    weekly: {}
   };
-  public chartColors: Array<any> = [
+
+  selectedData: any = {};  // selected date's data for plots
+  selectedStats: any = {};  // selected date's stats
+
+  slidershow: boolean = false;
+  selectedDateIndex: number = 0;
+
+  // Bar chart parameters:
+  public chartLabels: Label[] = this.ranges;
+  public chartLabels1: Label[] = this.ranges;
+  public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'no data'];
+  @Input() chartData: ChartDataSets[] = this.charts.chartData;
+  public chartOptions: ChartOptions = this.charts.chartOptions;
+  public chartColors: Array<any> = this.charts.chartColors
+  public chartLegend: boolean = this.charts.chartLegend;
+  public chartType: ChartType = this.charts.chartType;
+
+  @Input() pieChartData: ChartDataSets[] = this.charts.pieChartData;
+  public pieChartOptions: ChartOptions = this.charts.pieChartOptions;
+  public pieChartColors: Array<any> = this.charts.pieChartColors
+  public pieChartLegend: boolean = this.charts.pieChartLegend;
+  public pieChartType: ChartType = this.charts.pieChartType;
+
+  // Stacked bar chart parameters:
+  public stackedChartData: ChartDataSets[] = this.charts.stackedChartData;
+  public stackedChartOptions: ChartOptions = this.charts.stackedChartOptions;
+  public stackedChartColors: Array<any> = this.charts.stackedChartColors;
+  public stackedChartType: ChartType = this.charts.stackedChartType;
+  public stackedChartLabels: Label[] = this.charts.stackedChartLabels;
+
+  showStacked: boolean = false;
+  showPie: boolean = false;
+  showBars: boolean = true;
+
+  // Histo chart parameters:
+  public histoChartLabels: Label[] = [];  // TODO: define dynamically
+  @Input() histoChartData: ChartDataSets[] = [
     {
-      backgroundColor: [
-        this.configService.green,
-        this.configService.yellow,
-        this.configService.orange,
-        this.configService.red
-      ]
+      data: [],
+      label: ''
     }
   ];
-  public chartLegend: boolean = true;
-  public chartType: ChartType = 'bar';
-  // ++++++++++++++++++++++++++
+  public histoChartType: ChartType = 'bar';
+
+  // Line chart parameters:
+  public lineChartData: ChartDataSets[] = this.charts.lineChartData;
+  public lineChartOptions: ChartOptions = this.charts.lineChartOptions;
+  public lineChartColors: Array<any> = this.charts.lineChartColors;
+  public lineChartType: ChartType = this.charts.lineChartType;
+  public lineChartLabels: Label[] = this.charts.lineChartLabels;
+
+  wbLayer = null;
+  wbImageLayer = null;
+
+  requestsTracker: number = 0;
+  totalRequests: number = 0;
+
+  showLegend: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
@@ -109,27 +145,47 @@ export class WaterBodyStatsDialog {
     private dialog: DialogComponent,
     private mapService: MapService,
     private userService: UserService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private locationService: LocationService,
+    private activatedRoute: ActivatedRoute,
+    private cyanMap: CyanMap,
+    private calcs: Calculations,
+    private charts: Charts,
+    private router: Router,
   ) { }
 
   ngOnInit() {
-    this.selectedWaterbody = this.data.selectedWaterbody;
-    this.getWaterbodyData('daily');
-    this.getWaterbodyData('weekly');
-    this.getWaterbodyProperties();
+    this.activatedRoute.params.subscribe(params => {
+      console.log("waterbody-stats-details ngOnInit() params: ")
+      console.log(params);
+      this.selectedWaterbody = JSON.parse(params.selectedWaterbody);
+      this.loaderService.showProgressBar();
+      this.loaderService.show();
+      this.getWaterbodyData('daily');
+      this.getWaterbodyData('weekly');
+      this.getWaterbodyProperties();
+      this.getWaterbodyGeojson(this.selectedWaterbody);
+    });
   }
 
   exit(): void {
     this.dialogRef.close();
   }
 
+  ngOnDestroy() {
+    this.removeLayers();
+  }
+
   getWaterbodyData(dataType: string = 'daily') {
     /*
     Makes request to get selected waterbody data.
     */
+    this.incrementRequest();
     this.downloader.getWaterbodyData(this.selectedWaterbody.objectid, this.dataTypeRequestMap[dataType]).subscribe(result => {
+      this.updateProgressBar();
       this.waterbodyData[dataType]['daily'] = result['daily'];
       this.waterbodyData[dataType]['data'] = result['data'];
+      this.calculateAllWaterbodyStats(dataType);
     });
   }
 
@@ -137,12 +193,106 @@ export class WaterBodyStatsDialog {
     /*
     Gets waterbody properties.
     */
+    this.incrementRequest();
     this.downloader.getWaterbodyProperties(this.selectedWaterbody.objectid).subscribe(result => {
+      this.updateProgressBar();
       this.createWaterbodyProperties(result);
     });
   }
 
-  calculateWaterbodyStats(dayOfYear: string = null) {
+  getWaterbodyGeojson(wb: WaterBody): void {
+    /*
+    Makes request to cyan-waterbody to get
+    geojson of selected waterbody, then adds
+    it as a map layer.
+    */
+    this.removeLayers();
+    this.incrementRequest();
+    this.downloader.getWaterbodyGeometry(wb.objectid).subscribe(response => {
+      this.updateProgressBar();
+      let geojson = response['geojson'][0][0];  // TODO: Account for > 1 features
+      this.wbLayer = geoJSON(geojson, {
+        style: {
+          fill: false,
+          weight: 2
+        },
+        bubblingMouseEvents: false  // prevents wb shape click event from trigger location creation
+      });
+      this.cyanMap.map.addLayer(this.wbLayer);
+    });
+  }
+
+  removeLayers(): void {
+    /*
+    Removes geoJSON layer from map.
+    */
+    if (this.wbLayer) {
+      this.cyanMap.map.removeLayer(this.wbLayer);
+    }
+    if (this.wbImageLayer) {
+      this.cyanMap.map.removeLayer(this.wbImageLayer);
+    }
+  }
+
+  getWaterbodyImage(objectid: number, year: number, day: number): void {
+    /*
+    Adds waterbody pixel image as a map layer.
+    */
+    this.loaderService.show();
+    this.downloader.getWaterbodyImage(objectid, year, day).subscribe(response => {
+      if (this.wbImageLayer) {
+        console.log("Removing image layer")
+        this.cyanMap.map.removeLayer(this.wbImageLayer);
+      }
+      let imageBlob = response.body;
+      let bbox = JSON.parse(response.headers.get('bbox'));
+      this.addImageLayer(imageBlob, bbox);
+      this.loaderService.hide();
+    });
+  }
+
+  calculateAllWaterbodyStats(dataType: string) {
+    /*
+    Calculates all WB stats for all dates.
+    */
+    if (
+      Object.keys(this.waterbodyData[dataType]).length <= 0 ||
+      Object.keys(this.waterbodyData[dataType]['data']).length <= 0
+    ) {
+      this.dialog.handleError('No ' + this.selectedDataType + ' waterbody data currently available');
+    }
+
+    this.curatedData[dataType]['dates'] = Object.keys(this.waterbodyData[dataType]['data']);
+    this.curatedData[dataType]['formattedDates'] = this.curatedData[dataType].dates.map(date => {
+      return this.calcs.getDateFromDayOfYear(date);
+    });
+
+    if (this.curatedData[dataType]['dates'].length < 1) {
+      this.dialog.handleError('No ' + this.selectedDataType + 'data found for waterbody');
+    }
+
+    this.curatedData[dataType].dates.forEach((date, index) => {
+      this.curatedData[dataType][date] = {
+        stats: null,  // waterbody stats
+        data: null  // curated data for plots, divided by range
+      };
+      let dataArray = this.waterbodyData[dataType].data[date];
+      let concentrationData = this.createCellArray(dataArray);  // array of concentration, count, index objects
+      let concentrationArray = concentrationData.filter(obj => obj.count > 0).map(obj => obj.concentration);
+      let wbStats = new WaterBodyStats();
+      wbStats.date = this.calcs.getDateFromDayOfYear(date);
+      wbStats.min = this.calcs.roundValue(Math.min(...concentrationArray));  // min concentration with at least one count
+      wbStats.max = this.calcs.roundValue(Math.max(...concentrationArray));  // max concentration with at least one count
+      wbStats.average = this.calcs.calculateAverage(concentrationData);
+      wbStats.stddev = this.calcs.calculateStdDev(concentrationData);
+      let chartData = this.createChartData(concentrationData);  // data by range for date
+      this.curatedData[dataType][date].stats = wbStats;
+      this.curatedData[dataType][date].data = chartData;
+    });
+
+  }
+
+  calculateWaterbodyStats(formattedDate: string = null) {
     /*
     Calculates min/max, mean, medium, mode, std dev for cyano data
     based on dayOfYear (ex: "2020 1").
@@ -153,88 +303,106 @@ export class WaterBodyStatsDialog {
     ) {
       this.dialog.handleError('No ' + this.selectedDataType + ' waterbody data currently available');
     }
-
-    let dates: Array<string> = Object.keys(this.waterbodyData[this.selectedDataType]['data']);
-
-    let dateArray = (dayOfYear ?? dates[0]).split(' ');
-    let year = parseInt(dateArray[0]);
-    let day = parseInt(dateArray[1]);
-    let dataArray = this.waterbodyData[this.selectedDataType]['data'][dayOfYear ?? dates[0]];
-    
-    if (dates.length < 1) {
+    let dataObj = this.curatedData[this.selectedDataType];
+    let index = dataObj.formattedDates.indexOf(formattedDate);
+    let dateKey = dataObj.dates[index];
+    let selectedData = dataObj[dateKey].data;
+    let selectedStats = dataObj[dateKey].stats;
+    let year = dateKey.split(' ')[0];  // e.g., "2021 03"
+    let day = dateKey.split(' ')[1];
+    if (dataObj.dates.length < 1) {
       this.dialog.handleError('No ' + this.selectedDataType + 'data found for waterbody');
     }
-
-    let concentrationData = this.createCellArray(dataArray);  // array of concentration, count, index objects
-    let concentrationArray = concentrationData.filter(obj => obj.count > 0).map(obj => obj.concentration);
-
+    this.getWaterbodyImage(this.wbProps.objectid, year, day);
     this.wbStats = new WaterBodyStats();
-    this.wbStats.dates = dates;
-    this.wbStats.date = this.getDateFromDayOfYear(year, day);
-    this.wbStats.min = this.roundValue(Math.min(...concentrationArray));  // min concentration with at least one count
-    this.wbStats.max = this.roundValue(Math.max(...concentrationArray));  // max concentration with at least one count
-    this.wbStats.average = this.roundValue(this.calculateAverage(concentrationData));
-    this.wbStats.stddev = this.roundValue(this.calculateStdDev(concentrationData));
-
-    let chartData = this.createChartData(concentrationData);
-    this.plotTotalCounts(chartData);
-    this.plotHistoData(chartData);
-
-    this.calculatingStats = true;
-    this.plotStats = true;
-
-  }
-
-  calculateAverage(wbData): number {
-    let sum = 0.0;
-    wbData.forEach(datum => {
-      sum += datum['concentration'];
-    });
-    return sum / wbData.length;
-  }
-
-  calculateStdDev(wbData): number {
-    let average = this.calculateAverage(wbData);
-    let diffSum = 0.0;
-    wbData.forEach(datum => {
-      diffSum += Math.pow(datum['concentration'] - average, 2)
-    });
-    return Math.sqrt(diffSum / wbData.length);
-  }
-
-  roundValue(value: number): number {
-    /*
-    Rounds value to two decimal places.
-    */
-    return Math.round((value + Number.EPSILON) * 100) / 100;
-  }
-
-  getDayOfYear(d: Date) {
-    /*
-    Returns the day number out of the year (1..365/366) from a date (YYYY-MM-DD).
-    */
-    // let now = new Date();
-    let start = new Date(d.getFullYear(), 0, 0);
-    let diff = (d.getTime() - start.getTime()) + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60 * 1000);
-    let oneDay = 1000 * 60 * 60 * 24;
-    let day = Math.floor(diff / oneDay);
-    return day;
-  }
-
-  getDateFromDayOfYear(year: number, dayOfYear: number) {
-    /*
-    Returns date (YYYY-MM-DD) from a year and day of year.
-    */
-    let initDate: Date = new Date(year, 0);  // initializes date in year (year-01-01)
-    let date: Date = new Date(initDate.setDate(dayOfYear));
-    return date.toLocaleDateString();
+    this.wbStats.dates = dataObj.formattedDates;
+    this.wbStats.date = formattedDate;
+    this.wbStats.min = selectedStats.min;
+    this.wbStats.max = selectedStats.max;
+    this.wbStats.average = selectedStats.average;
+    this.wbStats.stddev = selectedStats.stddev;
+    this.selectedAvailableDate = this.wbStats.date;  // sets selectedDate
+    this.handlePlot(selectedData);
+    if (this.selectedDate == 'all') {
+      this.plotLineData(dataObj.formattedDates);
+    }
+    else {
+      this.plotHistoData(selectedData);
+    }
+    this.calculatingStats = true;  // displays stats for selected date
+    this.plotStats = true;  // displays plot of cell counts
   }
 
   updateDataType(dataTypeValue: string) {
     /*
     Selection change for data type.
     */
-    this.calculateWaterbodyStats();
+    this.wbStats.dates = this.curatedData[dataTypeValue].formattedDates;  // sets dates based on selected data type (daily/weekly)
+
+    if (!this.dataTypes.includes(dataTypeValue)) {
+      this.dialog.handleError('Data type must be "daily" or "weekly"');
+    } 
+    else if(!this.selectedAvailableDate || !this.dateRanges.includes(this.selectedDateRange)) {
+      return;
+    }
+    this.calculateWaterbodyStats(this.selectedAvailableDate);
+  }
+
+  updateDate(dateValue: string) {
+    /*
+    Selection change for available dates.
+    */
+
+    // TODO: Account for date range choice for plots.
+
+    this.calculateWaterbodyStats(dateValue);
+  }
+
+  updateDateRange(dateRangeValue: string) {
+    /*
+    Updates selected date range.
+    */
+
+    // TODO: Disable plot title toggle if multi day option
+
+    if (
+      !this.dataTypes.includes(this.selectedDataType) ||
+      !this.dateRanges.includes(this.selectedDateRange)
+    ) {
+      this.dialog.handleError('Select a data type and/or date range first');
+    }
+
+    if (['7day', '30day'].includes(dateRangeValue)) {
+      // Multi-day range
+      this.selectedPlotType = this.plotTypes[0];  // sets title for stacked bars
+      let range = parseInt(dateRangeValue.split('day')[0]);
+      let d = new Date(this.selectedAvailableDate);
+      let endDate = d.getTime();
+      let startDate = new Date(this.selectedAvailableDate).setDate(d.getDate() - range);
+      this.datesWithinRange = this.curatedData[this.selectedDataType].formattedDates.filter(date => {
+        let d = new Date(date).getTime();
+        if (d <= endDate && d > startDate) {
+          return true;
+        }
+      });
+      this.plotRangeOfTotalCounts(this.datesWithinRange);
+      this.plotLineData(this.datesWithinRange);
+    }
+    else {
+      // Single-day range
+
+      // TODO: Plot classic bars and histo for selected available date.
+      // TODO: Plot bars or pie based on selectedPlotType
+
+      console.log("updateDateRange() single day range: " + this.selectedAvailableDate);
+
+      this.datesWithinRange = [];
+
+      this.calculateWaterbodyStats(this.selectedAvailableDate);
+
+
+    }
+
   }
 
   updateHistoChart() {
@@ -242,7 +410,64 @@ export class WaterBodyStatsDialog {
     Selection change for range for histo chart.
     Updates plot with selected range.
     */
-    this.plotHistoData(this.dataByRange);
+    if (!this.selectedAvailableDate) {
+      this.dialog.handleError('No selected date.');
+    }
+    let date = this.calcs.getDayOfYear(this.selectedAvailableDate);
+    this.plotHistoData(this.curatedData[this.selectedDataType][date].data);
+  }
+
+  handlePlot(chartData) {
+    /*
+    Handles total count/percent area/percent total area plotting
+    based on selectedPlotType.
+    */
+    if (this.selectedPlotType == this.plotTypes[0]) {
+      this.plotTotalCounts(chartData);
+    }
+    else if (this.selectedPlotType == this.plotTypes[1]) {
+      this.plotPercentDetectedArea(chartData);
+    }
+    else if (this.selectedPlotType == this.plotTypes[2]) {
+      this.plotPercentTotalArea(chartData);
+    }
+    else {
+      this.selectedPlotType = this.plotTypes[0];
+      this.plotTotalCounts(chartData);
+    }
+  }
+
+  togglePlotType() {
+    /*
+    Toggles between plot types.
+    */
+
+    if (['7day', '30day'].includes(this.selectedDateRange)) {
+      console.log("Skipping plot toggling for multi-day modes")
+      return;
+    }
+
+    let dateIndex = this.curatedData[this.selectedDataType].formattedDates.indexOf(this.selectedAvailableDate);
+    let date = this.calcs.getDayOfYear(this.selectedAvailableDate);
+    let chartData = this.curatedData[this.selectedDataType][date].data;
+    const plotIndex = this.plotTypes.indexOf(this.selectedPlotType);  // currently selected plot type
+    let nextPlotType = this.plotTypes[plotIndex + 1];
+    if (!nextPlotType || nextPlotType == this.plotTypes[0]) {
+      // toggles to cell concentration
+      this.plotTotalCounts(chartData);
+    }
+    else if (nextPlotType == this.plotTypes[1]) {
+      // toggles to total percentage of detected area
+      this.plotPercentDetectedArea(chartData);
+    }
+    else if (nextPlotType == this.plotTypes[2]) {
+      // toggles to total percentage of total area
+      this.plotPercentTotalArea(chartData);
+    }
+    else {
+      // toggles to cell concentration
+      this.plotTotalCounts(chartData);
+    }
   }
 
   public chartClick(event) {
@@ -256,14 +481,20 @@ export class WaterBodyStatsDialog {
     this.updateHistoChart();
   }
 
-  public chartHover(event) {
-    // console.log(event);
+  toggleLegend() {
+    this.showLegend = !this.showLegend;
   }
 
   plotTotalCounts(chartData) {
     /*
     Plots total cell counts for each range.
     */
+    this.chartData[0].data = [];
+    this.chartLabels = this.chartLabels1;
+    this.selectedPlotType = this.plotTypes[0];
+    this.showStacked = false;
+    this.showPie = false;
+    this.showBars = true;
     let conData = [
       chartData.low.countSum,
       chartData.medium.countSum,
@@ -273,17 +504,86 @@ export class WaterBodyStatsDialog {
     this.chartData[0].data = conData;
   }
 
+  plotPercentDetectedArea(chartData) {
+    /*
+    Plots pie chart of percent area for each cyano range.
+    */ 
+    this.selectedPlotType = this.plotTypes[1];
+    this.showStacked = false;
+    this.showPie = true;
+    this.showBars = false;
+    this.chartLabels = this.chartLabels1;
+    let percentAreaData = [
+      chartData.low.percentOfArea,
+      chartData.medium.percentOfArea,
+      chartData.high.percentOfArea,
+      chartData.veryHigh.percentOfArea
+    ];
+    this.pieChartData[0].data = percentAreaData;
+  }
+
+  plotPercentTotalArea(chartData) {
+    /*
+    Plots pie chart of percentage of total area for a given range.
+    */
+    this.selectedPlotType = this.plotTypes[2];
+    this.showStacked = false;
+    this.showPie = true;
+    this.showBars = false;
+    this.chartLabels = this.chartLabels2;
+    let percentAreaData = [
+      (chartData.low.percentOfArea * chartData.percentOfTotalArea) / 100.0,
+      (chartData.medium.percentOfArea * chartData.percentOfTotalArea) / 100.0,
+      (chartData.high.percentOfArea * chartData.percentOfTotalArea) / 100.0,
+      (chartData.veryHigh.percentOfArea * chartData.percentOfTotalArea) / 100.0,
+      100.0 - chartData.percentOfTotalArea
+    ];
+    this.pieChartData[0].data = percentAreaData;
+
+    if (this.chartLabels.length > 4) {
+      this.chartLabels.push('no data')
+    }
+  }
+
+  plotRangeOfTotalCounts(dates: string[]) {
+    /*
+    Stacked bar chart of selected date range.
+    */
+    this.showStacked = true;
+    this.showPie = false;
+    this.showBars = false;
+    this.selectedPlotType = this.plotTypes[0];
+
+    this.stackedChartLabels = [];
+    this.stackedChartData[0].data = [];
+    this.stackedChartData[1].data = [];
+    this.stackedChartData[2].data = [];
+    this.stackedChartData[3].data = [];
+
+    dates.forEach(date => {
+      let dayOfYear = this.calcs.getDayOfYear(date);
+      let dataObj = this.curatedData[this.selectedDataType][dayOfYear];
+      this.stackedChartLabels.push(date);
+      this.stackedChartData[0].data.push(dataObj.data.low.countSum);
+      this.stackedChartData[1].data.push(dataObj.data.medium.countSum);
+      this.stackedChartData[2].data.push(dataObj.data.high.countSum);
+      this.stackedChartData[3].data.push(dataObj.data.veryHigh.countSum);
+    });
+
+  }
+
   plotHistoData(chartData) {
     /*
     Plots histo of cell concentration for a given range.
     */
     if (this.selectedRange === 'all') {
-      this.plotFullHistoData(this.dataByRange);
+      this.plotFullHistoData(chartData);
+      // TODO: full histo stats
       return;
     }
-    this.chartHistoLabels = chartData[this.selectedRange].data.map(obj => obj.concentration);
-    this.chartHistoData[0].data = chartData[this.selectedRange].data.map(obj => obj.count);
-    this.chartHistoData[0].backgroundColor = this.getColor(this.selectedRange);
+    this.histoChartLabels = chartData[this.selectedRange].data.map(obj => obj.concentration);
+    this.histoChartData[0].data = chartData[this.selectedRange].data.map(obj => obj.count);
+    this.histoChartData[0].backgroundColor = this.getColor(this.selectedRange);
     this.rangeStats.min = chartData[this.selectedRange].min;
     this.rangeStats.max = chartData[this.selectedRange].max;
     this.rangeStats.average = chartData[this.selectedRange].average;
@@ -307,9 +607,29 @@ export class WaterBodyStatsDialog {
        });
       index++;
     }
-    this.chartHistoLabels = histoLabels;
-    this.chartHistoData[0].data = histoData;
-    this.chartHistoData[0].backgroundColor = histoColors;
+    this.histoChartLabels = histoLabels;
+    this.histoChartData[0].data = histoData;
+    this.histoChartData[0].backgroundColor = histoColors;
+  }
+
+  plotLineData(dates: string[]) {
+    /*
+    Plots line data for each range.
+    */
+    this.lineChartLabels = [];
+    this.lineChartData[0].data = [];
+    this.lineChartData[1].data = [];
+    this.lineChartData[2].data = [];
+    this.lineChartData[3].data = [];
+    dates.forEach(date => {
+      let dayOfYear = this.calcs.getDayOfYear(date);
+      let dataObj = this.curatedData[this.selectedDataType][dayOfYear];
+      this.lineChartLabels.push(date);
+      this.lineChartData[0].data.push(dataObj.data.low.countSum);
+      this.lineChartData[1].data.push(dataObj.data.medium.countSum);
+      this.lineChartData[2].data.push(dataObj.data.high.countSum);
+      this.lineChartData[3].data.push(dataObj.data.veryHigh.countSum);
+    });
   }
 
   getColor(selectedRange: string): string {
@@ -340,8 +660,8 @@ export class WaterBodyStatsDialog {
     if (!('properties' in propResults)) {
       this.dialog.handleError("No properties found for waterbody");
     }
-    this.wbProps.areasqkm = this.roundValue(propResults['properties']['AREASQKM']);
-    this.wbProps.elevation = this.roundValue(propResults['properties']['ELEVATION']);
+    this.wbProps.areasqkm = this.calcs.roundValue(propResults['properties']['AREASQKM']);
+    this.wbProps.elevation = this.calcs.roundValue(propResults['properties']['ELEVATION']);
     this.wbProps.fcode = propResults['properties']['FCODE'];
     this.wbProps.fdate = propResults['properties']['FDATE'];
     this.wbProps.ftype = propResults['properties']['FTYPE'];
@@ -352,8 +672,8 @@ export class WaterBodyStatsDialog {
     this.wbProps.permanent_ = propResults['properties']['PERMANENT_'];
     this.wbProps.reachcode = propResults['properties']['REACHCODE'];
     this.wbProps.resolution = propResults['properties']['RESOLUTION'];
-    this.wbProps.shape_area = this.roundValue(propResults['properties']['SHAPE_AREA']);
-    this.wbProps.shape_leng = this.roundValue(propResults['properties']['SHAPE_LENG']);
+    this.wbProps.shape_area = this.calcs.roundValue(propResults['properties']['SHAPE_AREA']);
+    this.wbProps.shape_leng = this.calcs.roundValue(propResults['properties']['SHAPE_LENG']);
     this.wbProps.state_abbr = propResults['properties']['STATE_ABBR'];
     this.wbProps.visibility = propResults['properties']['VISIBILITY'];
     this.wbProps.c_lat = propResults['properties']['c_lat'];
@@ -372,13 +692,6 @@ export class WaterBodyStatsDialog {
     return (dayOfYear ?? dates[0]).split(' ');
   }
 
-  calculateConcentration(index: number) {
-    /*
-    Calculates concentration (cells/ml) for each pixel value.
-    */
-    return Math.pow(10, 8) * Math.pow(10, (3.0 / 250) * index - 4.2);
-  }
-
   createCellArray(wbResults: Array<number>) {
     /*
     Creates array of cell concentration (cells/mL) for each index.
@@ -394,7 +707,7 @@ export class WaterBodyStatsDialog {
       let dataObj = {
         index: index,
         count: item,
-        concentration: this.roundValue(this.calculateConcentration(index))
+        concentration: this.calcs.roundValue(this.calcs.calculateConcentration(index))
       };
       cellArray.push(dataObj);
     });
@@ -409,17 +722,12 @@ export class WaterBodyStatsDialog {
     let userSettings = this.userService.getUserSettings();
     let totalCounts = 0.0;
     let totalConcentration = 0.0;
-
     this.dataByRange = new WaterBodyDataByRange();
-
     concentrationData.forEach(dataObj => {
-
       let concentration = dataObj.concentration;
       let counts = dataObj.count;
-
       totalCounts += counts;
       totalConcentration += concentration;
-
       if (concentration <= userSettings.level_low) {
         this.dataByRange.low.countSum += counts;
         this.dataByRange.low.data.push(dataObj);
@@ -439,108 +747,142 @@ export class WaterBodyStatsDialog {
       else {
         this.dialog.handleError('Unknown error occurred');
       }
-
     });
-
     this.dataByRange.totalCounts = totalCounts;
     this.dataByRange.totalConcentration = totalConcentration;
     this.dataByRange.totalPixelArea = 0.09 * totalCounts;  // total pixels X pixel size (sq. km)
-    this.dataByRange = this.calculateRangeArea();
-    this.dataByRange = this.calculatePercentOfArea();
-    this.dataByRange = this.calculatePercentOfTotalArea();
-    this.dataByRange = this.calculateAverageForRange();
-    this.dataByRange = this.calculateStddevForRange();
-    this.dataByRange = this.calculateMinForRange();
-    this.dataByRange = this.calculateMaxForRange();
-
+    this.dataByRange = this.calcs.calculateRangeArea(this.dataByRange, this.chartLabels);
+    this.dataByRange = this.calcs.calculatePercentOfArea(this.dataByRange, this.chartLabels);
+    this.dataByRange = this.calcs.calculatePercentOfTotalArea(this.dataByRange, this.wbProps);
+    this.dataByRange = this.calcs.calculateAverageForRange(this.dataByRange, this.chartLabels);
+    this.dataByRange = this.calcs.calculateStddevForRange(this.dataByRange, this.chartLabels);
+    this.dataByRange = this.calcs.calculateMinForRange(this.dataByRange, this.chartLabels);
+    this.dataByRange = this.calcs.calculateMaxForRange(this.dataByRange, this.chartLabels);
     return this.dataByRange;
   }
 
-  calculateRangeArea() {
-    /*
-    Calculates sq. area for each concentration range.
-    Each pixel is 300m x 300m (0.09 sq. km).
-    */
-    for (let key in this.dataByRange) {
-      if (!this.chartLabels.includes(key)) { continue; }
-      this.dataByRange[key].areaPerRange = 0.09 * this.dataByRange[key].countSum;
+  addImageLayer(image: Blob, bounds: any): any {
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      let topLeft = latLng(bounds[1][0], bounds[1][1]);
+      let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+      let imageBounds = latLngBounds(bottomRight, topLeft);
+      let imageUrl = reader.result.toString();
+      this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+      this.cyanMap.map.addLayer(this.wbImageLayer);
+
+      console.log("WB Image Layer: ")
+      console.log(this.wbImageLayer)
+
+      return reader.result;
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
     }
-    return this.dataByRange;
   }
 
-  calculatePercentOfArea() {
-    /*
-    Calcuates the percent area of each range compared to
-    the total area (using pixel values, not actual/recorded WB area).
-    */
-    for (let key in this.dataByRange) {
-      if (!this.chartLabels.includes(key)) { continue; }
-      this.dataByRange[key].percentOfArea = this.roundValue(100.0 * (this.dataByRange[key].areaPerRange / this.dataByRange.totalPixelArea));
+  incrementRequest() {
+    this.requestsTracker++;
+    this.totalRequests++;
+  }
+
+  updateProgressBar(): void {
+    this.requestsTracker--;
+    let progressValue = 100 * (1 - (this.requestsTracker / this.totalRequests));
+    this.loaderService.progressValue.next(progressValue);
+    if (this.requestsTracker <= 0) {
+      this.loaderService.hide();
+      this.loaderService.progressValue.next(0);
     }
-    return this.dataByRange;
   }
 
-  calculatePercentOfTotalArea() {
-    /*
-    Calculates percent of area for cyano counts relative
-    to the area of the WB itself.
-    */
-    this.dataByRange.percentOfTotalArea = this.roundValue(100.0 * (this.dataByRange.totalPixelArea / this.wbProps.areasqkm));
-    return this.dataByRange;
-  }
-
-  calculateAverageForRange() {
-    /*
-    Calculates average cyano levels per range.
-    */
-    for (let key in this.dataByRange) {
-      if (!this.chartLabels.includes(key)) { continue; }
-      this.dataByRange[key].average = this.roundValue(this.calculateAverage(this.dataByRange[key].data));
+  toggleSlideShow() {
+    let delay = 2000; // 2 seconds
+    if (this.slidershow && this.router.isActive('wbstats', false)) {
+      let self = this;
+      setTimeout(function() {
+        self.cycleSelectedDates();
+      }, delay);
     }
-    return this.dataByRange;
   }
-
-  calculateStddevForRange() {
+  cycleSelectedDates() {
     /*
-    Calculates Stddev cyano levels per range.
+    Cycles through selected dates and displays the image,
+    highlights dates, updates plots if applicable (what about
+    showing "all" histo vs line chart?)
     */
-    for (let key in this.dataByRange) {
-      if (!this.chartLabels.includes(key)) { continue; }
-      this.dataByRange[key].stddev = this.roundValue(this.calculateStdDev(this.dataByRange[key].data));
-    }
-    return this.dataByRange;
-  }
+    let selectedDates = this.datesWithinRange;
+    console.log("Dates within range: ")
+    console.log(selectedDates)
 
-  calculateMinForRange() {
-    for (let key in this.dataByRange) {
-      if (!this.chartLabels.includes(key)) { continue; }
-      let filteredArray = this.dataByRange[key].data
-        .filter(obj => obj.count > 0)
-        .map(obj => obj.concentration);
-      if (filteredArray.length < 1) {
-        this.dataByRange[key].min = null;
+    let selectedAvailableDate = this.selectedAvailableDate;
+    console.log("Selected avilable date: " + selectedAvailableDate)
+
+    if (this.selectedDate.length <= 0) {
+      this.selectedDate = this.selectedAvailableDate;
+    }
+
+    let selectedDate = this.selectedDate;
+   
+
+    this.selectedDateIndex = selectedDates.indexOf(selectedDate);
+    console.log("Current selected date index: " + this.selectedDateIndex)
+
+    // Cycle back to beginning if at last index
+    // this.selectedDateIndex = this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1 ? 0 : this.selectedDateIndex++;
+    if (this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1) {
+      console.log("selectedDateIndex < 0 or >= date range array")
+      this.selectedDateIndex = 0;
+    }
+    else {
+      this.selectedDateIndex++;
+    }
+    console.log("New selected date index: " + this.selectedDateIndex)
+
+    // TODO: Highlight new date in list.
+    this.selectedDate = this.datesWithinRange[this.selectedDateIndex];
+
+    let date = this.calcs.getDayOfYear(this.selectedDate);
+    let year = parseInt(date.split(' ')[0]);
+    let day = parseInt(date.split(' ')[1]);
+
+    // TODO: Cycle image.
+    this.getWaterbodyImage(this.wbProps.objectid, year, day);
+
+
+    
+    // TODO: Highlight bar in stacked bar plot for date.
+    this.stackedChartData.forEach(dataObj => {
+      console.log("stacked chart data obj: ")
+      console.log(dataObj)
+    })
+    let labelIndex = 0;
+    this.stackedChartLabels.forEach(dateLabel => {
+      console.log("stackedChartLabels: " + dateLabel)
+      if (dateLabel != this.selectedDate) {
+         // gray-out dates not selected
+         this.stackedChartData[labelIndex].backgroundColor + '4D';
+      }
+      labelIndex++;
+    })
+
+    labelIndex = 0;
+    // TODO: Highlight points in line chart for date.
+    this.lineChartLabels.forEach(dateLabel => {
+      console.log("line chart label: ")
+      console.log(dateLabel)
+      if (dateLabel == this.selectedDate) {
+        // increase point size to highlight
+        this.lineChartData[labelIndex].pointRadius = 5;
       }
       else {
-       this.dataByRange[key].min = Math.min(...filteredArray); 
+        this.lineChartData[labelIndex].pointRadius = 1; 
       }
-    }
-    return this.dataByRange
-  }
+      labelIndex++;
+    });
 
-  calculateMaxForRange() {
-    for (let key in this.dataByRange) {
-      if (!this.chartLabels.includes(key)) { continue; }
-      let filteredArray = this.dataByRange[key].data
-        .filter(obj => obj.count > 0)
-        .map(obj => obj.concentration);
-      if (filteredArray.length < 1) {
-        this.dataByRange[key].max = null;
-      }
-      else {
-       this.dataByRange[key].max = Math.max(...filteredArray); 
-      }
-    }
-    return this.dataByRange
+    this.toggleSlideShow();
+
   }
 
 }

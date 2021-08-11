@@ -283,6 +283,25 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url); 
   }
 
+  getWaterbodyImage(objectid: number, year: number, day: number) {
+    /*
+    Gets waterbody image for a given date (year and day-of-year).
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'image/?OBJECTID=' + objectid + 
+      '&year=' + year + 
+      '&day=' + day;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/png',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
