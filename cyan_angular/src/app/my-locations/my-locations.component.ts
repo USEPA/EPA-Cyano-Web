@@ -10,7 +10,7 @@ import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
-import { WaterBodyStatsDialog } from '../waterbody-stats/waterbody-stats-details.component';
+import { WaterBodyStatsDetails } from '../waterbody-stats/waterbody-stats-details.component';
 
 export interface Sort {
   value: string;
@@ -157,18 +157,5 @@ export class MyLocationsComponent implements OnInit {
       },
     ]);
   }
-
-  viewWaterbodyStats(l: Location) {
-    /*
-    Shows waterbody agg stats for selected location.
-    */
-    if (!this.authService.checkUserAuthentication()) { return; }
-    const dialogRef = this.messageDialog.open(WaterBodyStatsDialog, {
-      width: '100%',
-      height: '100%',
-      data: {
-        selectedWaterbody: l.waterbody
-      }
-    });
-  }
+  
 }

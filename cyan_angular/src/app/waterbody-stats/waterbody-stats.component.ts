@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { DatePipe } from '@angular/common';
 
 import { WaterBody, WaterBodyStats, WaterBodyData } from '../models/waterbody';
-import { WaterBodyStatsDialog } from './waterbody-stats-details.component';
+import { WaterBodyStatsDetails } from './waterbody-stats-details.component';
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 import { MapService } from '../services/map.service';
@@ -68,7 +68,6 @@ export class WaterbodyStatsComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-  	this.removeWaterbodyCentroids();
     this.removeGeojsonLayer();
   }
 
@@ -114,9 +113,7 @@ export class WaterbodyStatsComponent implements OnInit {
       
       this.cyanMap.map.addLayer(this.wbLayer);
       
-      this.wbLayer.on('click', event => {
-        this.openWaterbodyStatsDialog(wb);
-      });
+      this.openWaterbodyStatsDialog(wb);
 
     });
   }
@@ -128,37 +125,6 @@ export class WaterbodyStatsComponent implements OnInit {
     if (this.wbLayer) {
       this.cyanMap.map.removeLayer(this.wbLayer);
     }
-  }
-
-  addWaterbodyCentroids(): void {
-    /*
-    Adds map layer of dots indicating the available
-    waterbody centroids.
-    */
-    this.downloader.getAllWaterbodies().subscribe(response => {
-
-      let waterbodies = this.checkWaterbodyResponse(response);
-
-      waterbodies.forEach(wb => {
-        let m = circleMarker(latLng(wb['centroid_lat'], wb['centroid_lng']), {
-          renderer: this.canvasRenderer,
-          radius: 3,
-          fill: true,
-          fillOpacity: 1.0
-        }).addTo(this.cyanMap.map).bindPopup(this.createPopupData(wb));
-        this.wbMarkers.push(m);
-      });
-
-    });
-  }
-
-  removeWaterbodyCentroids(): void {
-    /*
-    Removes waterbody markers from map.
-    */
-    this.wbMarkers.forEach(marker => {
-      this.cyanMap.map.removeLayer(marker);
-    });
   }
 
   createPopupData(wb): string {
@@ -238,22 +204,10 @@ export class WaterbodyStatsComponent implements OnInit {
     waterbody stats.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    const dialogRef = this.wbDialog.open(WaterBodyStatsDialog, {
-      // panelClass: 'view-comment-dialog',
-      // TODO: Use class to account for various device sizes
-      // width: '75%',
-      // height: '75%',
-      maxWidth: '95%',
-      maxHeight: '95%',
-      data: {
-        selectedWaterbody: selectedWaterbody
+    this.router.navigate(['/wbstats', {
+        selectedWaterbody: JSON.stringify(selectedWaterbody)
       }
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      this.ngOnDestroy();
-    });
-
+    ]);
   }
 
   panToWaterbody(selectedWaterbody: WaterBody) {
@@ -270,7 +224,8 @@ export class WaterbodyStatsComponent implements OnInit {
 
   handleWaterbodySelect(selectedWaterbody: WaterBody): void {
     this.panToWaterbody(selectedWaterbody);
-    this.getWaterbodyGeojson(selectedWaterbody);
+    // this.getWaterbodyGeojson(selectedWaterbody);
+    this.openWaterbodyStatsDialog(selectedWaterbody);
   }
 
   validateCoordSearchInputs() {
