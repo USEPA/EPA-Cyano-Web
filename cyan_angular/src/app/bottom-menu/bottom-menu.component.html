@@ -1,25 +1,52 @@
 <div id="bottom-menu-bar">
-  <div class="bottom-menu-title-block">
-    <button mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type: {{ data_type == 1 ? "Weekly" : "Daily" }}</button>
-    <mat-menu #dataType="matMenu" class="bottom-menu-link-block">
-      <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 1}" (click)="dataTypeClick(1)" [routerLink]="['']">OLCI - Weekly </button>
-      <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 2}" (click)="dataTypeClick(2)" [routerLink]="['']">OLCI - Daily</button>
+
+  <div class="menu-block-icon">
+    <button aria-label="User options" mat-button [matMenuTriggerFor]="linksRight" class="menu-right-block-button">
+        <mat-icon class="header-icon mat_icon">expand_less</mat-icon>
+    </button>
+    <mat-menu #linksRight="matMenu" class="menu-link-block" panelClass="links-right-menu">
+        <button mat-menu-item mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type: {{ data_type == 1 ? "Weekly" : "Daily" }}</button>
+        <mat-menu #dataType="matMenu" class="bottom-menu-link-block">
+          <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 1}" (click)="dataTypeClick(1)" [routerLink]="['']">OLCI - Weekly </button>
+          <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 2}" (click)="dataTypeClick(2)" [routerLink]="['']">OLCI - Daily</button>
+        </mat-menu>
+        <button mat-menu-item mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">
+            <div class="menu-div" aria-label="Reload data button">
+                <span class="tab-title">Reload Data</span>
+             </div>
+        </button>
+        <button mat-menu-item mat-button (click)="openCsvDialog()" [routerLink]="['']" class="bottom-menu-title">
+          <div class="menu-div" aria-label="User guide">
+            <span class="tab-title">Upload CSV</span>
+          </div>
+        </button>
+        <button mat-menu-item mat-button [routerLink]="['/wbsearch']" class="bottom-menu-title">
+          <div class="menu-div" aria-label="Waterbody statistics button">
+            <span class="tab-title">WB Stats</span>
+          </div>
+        </button>
     </mat-menu>
   </div>
 
-  <!-- Reload data -->
-  <div class="bottom-menu-title-block">
-    <button mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">Reload Data</button>
-  </div>
-
-  <!-- Upload CSV / batch feature -->
-  <div *ngIf="!hideUpload" class="bottom-menu-title-block">
-    <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
-  </div>
-
-  <!-- Waterbody Stats -->
-  <div class="bottom-menu-title-block">
-    <button mat-button class="bottom-menu-title" [routerLink]="['/wbsearch']">WB Stats</button>
+  <div class="menu-block">
+    <div class="bottom-menu-title-block">
+      <button mat-button [matMenuTriggerFor]="dataType" class="bottom-menu-title">Data Type: {{ data_type == 1 ? "Weekly" : "Daily" }}</button>
+      <mat-menu #dataType="matMenu" class="bottom-menu-link-block">
+        <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 1}" (click)="dataTypeClick(1)" [routerLink]="['']">OLCI - Weekly </button>
+        <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 2}" (click)="dataTypeClick(2)" [routerLink]="['']">OLCI - Daily</button>
+      </mat-menu>
+    </div>
+    <div class="bottom-menu-title-block">
+      <button mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">Reload Data</button>
+    </div>
+    <!-- Upload CSV / batch feature -->
+    <div *ngIf="!hideUpload" class="bottom-menu-title-block">
+      <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
+    </div>
+    <!-- Waterbody Stats -->
+    <div class="bottom-menu-title-block">
+      <button mat-button class="bottom-menu-title" [routerLink]="['/wbsearch']">WB Stats</button>
+    </div>  
   </div>
 
 </div>
