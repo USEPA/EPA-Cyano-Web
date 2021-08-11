@@ -267,6 +267,11 @@ export class WaterBodyStatsDetails {
       return this.calcs.getDateFromDayOfYear(date);
     });
 
+    console.log("calculateAllWaterbodyStats() called, available dates: ")
+    console.log(this.waterbodyData[dataType]['data'])
+    console.log(this.curatedData[dataType]['dates'])
+    console.log(this.curatedData[dataType]['formattedDates'])
+
     if (this.curatedData[dataType]['dates'].length < 1) {
       this.dialog.handleError('No ' + this.selectedDataType + 'data found for waterbody');
     }
@@ -352,10 +357,9 @@ export class WaterBodyStatsDetails {
     /*
     Selection change for available dates.
     */
-
     // TODO: Account for date range choice for plots.
-
-    this.calculateWaterbodyStats(dateValue);
+    // this.calculateWaterbodyStats(dateValue);
+    this.updateDateRange(this.selectedDateRange);  // TODO: refactor code from this func to its own func
   }
 
   updateDateRange(dateRangeValue: string) {
@@ -390,17 +394,11 @@ export class WaterBodyStatsDetails {
     }
     else {
       // Single-day range
-
       // TODO: Plot classic bars and histo for selected available date.
       // TODO: Plot bars or pie based on selectedPlotType
-
       console.log("updateDateRange() single day range: " + this.selectedAvailableDate);
-
       this.datesWithinRange = [];
-
       this.calculateWaterbodyStats(this.selectedAvailableDate);
-
-
     }
 
   }
