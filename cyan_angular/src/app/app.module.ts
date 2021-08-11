@@ -28,6 +28,7 @@ import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatListModule } from '@angular/material/list';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -79,7 +80,9 @@ import { SessionTimeoutComponent } from './session-timeout/session-timeout.compo
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
 import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
-import { WaterBodyStatsDialog } from './waterbody-stats/waterbody-stats-details.component';
+import { WaterBodyStatsDetails } from './waterbody-stats/waterbody-stats-details.component';
+import { Calculations } from './waterbody-stats/calculations';
+import { Charts } from './waterbody-stats/charts';
 
 import 'hammerjs';
 import 'chartjs-plugin-zoom';
@@ -118,7 +121,7 @@ import 'chartjs-plugin-zoom';
     LocationSearchComponent,
     BatchComponent,
     WaterbodyStatsComponent,
-    WaterBodyStatsDialog
+    WaterBodyStatsDetails
   ],
   imports: [
     BrowserModule,
@@ -158,6 +161,7 @@ import 'chartjs-plugin-zoom';
     MatSidenavModule,
     MatSortModule,
     MatGridListModule,
+    MatListModule,
     Ng5SliderModule,
     BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
@@ -176,9 +180,11 @@ import 'chartjs-plugin-zoom';
     AddComment,
     DialogComponent,
     CoordinatesComponent,
-    WaterBodyStatsDialog,
+    WaterBodyStatsDetails,
     MarkerMapComponent,
     WaterbodyStatsComponent,
+    Calculations,
+    Charts,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
