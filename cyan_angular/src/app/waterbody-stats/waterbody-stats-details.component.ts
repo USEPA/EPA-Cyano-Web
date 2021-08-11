@@ -262,10 +262,10 @@ export class WaterBodyStatsDetails {
       this.dialog.handleError('No ' + this.selectedDataType + ' waterbody data currently available');
     }
 
-    this.curatedData[dataType]['dates'] = Object.keys(this.waterbodyData[dataType]['data']);
-    this.curatedData[dataType]['formattedDates'] = this.curatedData[dataType].dates.map(date => {
-      return this.calcs.getDateFromDayOfYear(date);
-    });
+    // this.curatedData[dataType]['dates'] = Object.keys(this.waterbodyData[dataType]['data']);
+    // this.curatedData[dataType]['formattedDates'] = this.curatedData[dataType].dates.map(date => {
+    //   return this.calcs.getDateFromDayOfYear(date);
+    // });
 
     console.log("calculateAllWaterbodyStats() called, available dates: ")
     console.log(this.waterbodyData[dataType]['data'])
@@ -276,7 +276,11 @@ export class WaterBodyStatsDetails {
       this.dialog.handleError('No ' + this.selectedDataType + 'data found for waterbody');
     }
 
-    this.curatedData[dataType].dates.forEach((date, index) => {
+    this.curatedData[dataType]['dates'] = [];
+    this.curatedData[dataType]['formattedDates'] = [];
+
+    // this.curatedData[dataType].dates.forEach((date, index) => {
+    this.waterbodyData[dataType].forEach((date, index) => {
       this.curatedData[dataType][date] = {
         stats: null,  // waterbody stats
         data: null  // curated data for plots, divided by range
@@ -293,6 +297,8 @@ export class WaterBodyStatsDetails {
       let chartData = this.createChartData(concentrationData);  // data by range for date
       this.curatedData[dataType][date].stats = wbStats;
       this.curatedData[dataType][date].data = chartData;
+      this.curatedData[dataType][date].dates.push(date);
+      this.curatedData[dataType][date].formattedDates.push(wbStats.date);
     });
 
   }
