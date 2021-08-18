@@ -9,7 +9,7 @@ def cyan_access_view(request, exception=None):
 	"""
 	Access epa-cyano-web Angular application.
 	"""
-	html = render_to_string('cyano_webapp/index.html')  # loads from templates_qed
+	html = render_to_string("EPA-Cyano-Web/index.html")  # loads from templates_qed
 	response = HttpResponse()
 	response.write(html)
 	return response
