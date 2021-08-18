@@ -159,11 +159,11 @@ export class WaterBodyStatsDetails {
       console.log("waterbody-stats-details ngOnInit() params: ")
       console.log(params);
       this.selectedWaterbody = JSON.parse(params.selectedWaterbody);
+      this.wbProps = JSON.parse(params.wbProps);
       this.loaderService.showProgressBar();
       this.loaderService.show();
       this.getWaterbodyData('daily');
       this.getWaterbodyData('weekly');
-      this.getWaterbodyProperties();
       this.getWaterbodyGeojson(this.selectedWaterbody);
     });
   }
@@ -186,17 +186,6 @@ export class WaterBodyStatsDetails {
       this.waterbodyData[dataType]['daily'] = result['daily'];
       this.waterbodyData[dataType]['data'] = result['data'];
       this.calculateAllWaterbodyStats(dataType);
-    });
-  }
-
-  getWaterbodyProperties() {
-    /*
-    Gets waterbody properties.
-    */
-    this.incrementRequest();
-    this.downloader.getWaterbodyProperties(this.selectedWaterbody.objectid).subscribe(result => {
-      this.updateProgressBar();
-      this.createWaterbodyProperties(result);
     });
   }
 
@@ -269,6 +258,8 @@ export class WaterBodyStatsDetails {
     this.curatedData[dataType]['dates'] = [];
     this.curatedData[dataType]['formattedDates'] = [];
 
+    // this.calcs.sortByDate(this.waterbodyData[dataType]);
+
     for (let date in this.waterbodyData[dataType]['data']) {
       this.curatedData[dataType][date] = {
         stats: null,  // waterbody stats
@@ -297,6 +288,7 @@ export class WaterBodyStatsDetails {
     Calculates min/max, mean, medium, mode, std dev for cyano data
     based on dayOfYear (ex: "2020 1").
     */
+    console.log("calculateWaterbodyStats() formattedDate: " + formattedDate)
     if (
       Object.keys(this.waterbodyData[this.selectedDataType]).length <= 0 ||
       Object.keys(this.waterbodyData[this.selectedDataType]['data']).length <= 0
@@ -646,37 +638,6 @@ export class WaterBodyStatsDetails {
     }
   }
 
-  createWaterbodyProperties(propResults) {
-    /*
-    Creates WaterBodyProperties objects from properties results.
-    */
-    if (!('properties' in propResults)) {
-      this.dialog.handleError("No properties found for waterbody");
-    }
-    this.wbProps.areasqkm = this.calcs.roundValue(propResults['properties']['AREASQKM']);
-    this.wbProps.elevation = this.calcs.roundValue(propResults['properties']['ELEVATION']);
-    this.wbProps.fcode = propResults['properties']['FCODE'];
-    this.wbProps.fdate = propResults['properties']['FDATE'];
-    this.wbProps.ftype = propResults['properties']['FTYPE'];
-    this.wbProps.globalid = propResults['properties']['GLOBALID'];
-    this.wbProps.gnis_id = propResults['properties']['GNIS_ID'];
-    this.wbProps.gnis_name = propResults['properties']['GNIS_NAME'];
-    this.wbProps.objectid = propResults['properties']['OBJECTID'];
-    this.wbProps.permanent_ = propResults['properties']['PERMANENT_'];
-    this.wbProps.reachcode = propResults['properties']['REACHCODE'];
-    this.wbProps.resolution = propResults['properties']['RESOLUTION'];
-    this.wbProps.shape_area = this.calcs.roundValue(propResults['properties']['SHAPE_AREA']);
-    this.wbProps.shape_leng = this.calcs.roundValue(propResults['properties']['SHAPE_LENG']);
-    this.wbProps.state_abbr = propResults['properties']['STATE_ABBR'];
-    this.wbProps.visibility = propResults['properties']['VISIBILITY'];
-    this.wbProps.c_lat = propResults['properties']['c_lat'];
-    this.wbProps.c_lng = propResults['properties']['c_lng'];
-    this.wbProps.x_max = propResults['properties']['x_max'];
-    this.wbProps.x_min = propResults['properties']['x_min'];
-    this.wbProps.y_max = propResults['properties']['y_max'];
-    this.wbProps.y_min = propResults['properties']['y_min'];
-  }
-
   getDataArrayByDate(dayOfYear: string) {
     /*
     Gets array of WB data using day of year (e.g., "2020 299").
@@ -860,19 +821,19 @@ export class WaterBodyStatsDetails {
     })
 
     labelIndex = 0;
-    // TODO: Highlight points in line chart for date.
-    this.lineChartLabels.forEach(dateLabel => {
-      console.log("line chart label: ")
-      console.log(dateLabel)
-      if (dateLabel == this.selectedDate) {
-        // increase point size to highlight
-        this.lineChartData[labelIndex].pointRadius = 5;
-      }
-      else {
-        this.lineChartData[labelIndex].pointRadius = 1; 
-      }
-      labelIndex++;
-    });
+    // // TODO: Highlight points in line chart for date.
+    // this.lineChartLabels.forEach(dateLabel => {
+    //   console.log("line chart label: ")
+    //   console.log(dateLabel)
+    //   if (dateLabel == this.selectedDate) {
+    //     // increase point size to highlight
+    //     this.lineChartData[labelIndex].pointRadius = 5;
+    //   }
+    //   else {
+    //     this.lineChartData[labelIndex].pointRadius = 1; 
+    //   }
+    //   labelIndex++;
+    // });
 
     this.toggleSlideShow();
 

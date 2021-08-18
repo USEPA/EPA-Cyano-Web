@@ -110,10 +110,7 @@ export class Charts {
     }
   ];
   public stackedChartOptions: ChartOptions = {
-    responsive: true,
-    // legend: {
-    //   display: false
-    // }
+    responsive: true
   };
   public stackedChartColors: Array<any> = [];
   public stackedChartType: ChartType = 'bar';
@@ -149,7 +146,7 @@ export class Charts {
   public lineChartOptions: ChartOptions = {
     responsive: true,
     legend: {
-      display: false
+      // display: false
     },
     elements: {
       line: {

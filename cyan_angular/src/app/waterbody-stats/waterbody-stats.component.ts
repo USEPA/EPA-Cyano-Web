@@ -2,14 +2,15 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ajax } from 'rxjs/ajax';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { tileLayer, geoJSON, latLng, LatLng, Map, icon, marker, canvas, circleMarker, DomEvent } from 'leaflet';
+import { tileLayer, geoJSON, latLng, LatLng, latLngBounds, LatLngBounds, Map, icon, marker, canvas, circleMarker, DomEvent } from 'leaflet';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelect } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { DatePipe } from '@angular/common';
 
-import { WaterBody, WaterBodyStats, WaterBodyData } from '../models/waterbody';
+import { WaterBody, WaterBodyStats, WaterBodyData, WaterBodyProperties } from '../models/waterbody';
 import { WaterBodyStatsDetails } from './waterbody-stats-details.component';
+import { Calculations } from './calculations';
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 import { MapService } from '../services/map.service';
@@ -51,6 +52,8 @@ export class WaterbodyStatsComponent implements OnInit {
 
   wbMarkers = [];
 
+  wbProps: WaterBodyProperties = new WaterBodyProperties();
+
   constructor(
   	private downloader: DownloaderService,
   	private authService: AuthService,
@@ -60,7 +63,9 @@ export class WaterbodyStatsComponent implements OnInit {
   	private wbDialog: MatDialog,
     private dialog: DialogComponent,
   	private loaderService: LoaderService,
-    private coords: CoordinatesComponent
+    private coords: CoordinatesComponent,
+    private wbStats: WaterBodyStatsDetails,
+    private calcs: Calculations
   ) { }
 
   ngOnInit(): void {
@@ -94,28 +99,6 @@ export class WaterbodyStatsComponent implements OnInit {
   	this.downloader.getAllWaterbodies().subscribe(response => {
   		this.loaderService.hide();
   	});
-  }
-
-  getWaterbodyGeojson(wb: WaterBody): void {
-    /*
-    Makes request to cyan-waterbody to get
-    geojson of selected waterbody.
-    */
-    this.removeGeojsonLayer();
-
-    this.downloader.getWaterbodyGeometry(wb.objectid).subscribe(response => {
-
-      let geojson = response['geojson'][0][0];  // TODO: Account for > 1 features
-      
-      this.wbLayer = geoJSON(geojson, {
-        bubblingMouseEvents: false  // prevents wb shape click event from trigger location creation
-      });
-      
-      this.cyanMap.map.addLayer(this.wbLayer);
-      
-      this.openWaterbodyStatsDialog(wb);
-
-    });
   }
 
   removeGeojsonLayer(): void {
@@ -198,34 +181,30 @@ export class WaterbodyStatsComponent implements OnInit {
 		return waterbodyResults;
   }
 
-  openWaterbodyStatsDialog(selectedWaterbody: WaterBody) {
+  openWaterbodyStatsDialog(selectedWaterbody: WaterBody, wbProps: WaterBodyProperties) {
     /*
     Opens dialog showing selected location's
     waterbody stats.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
     this.router.navigate(['/wbstats', {
-        selectedWaterbody: JSON.stringify(selectedWaterbody)
+        selectedWaterbody: JSON.stringify(selectedWaterbody),
+        wbProps: JSON.stringify(wbProps)
       }
     ]);
   }
 
-  panToWaterbody(selectedWaterbody: WaterBody) {
-    /*
-    Pans to the selected waterbody and displays popup.
-    */
-    this.cyanMap.map.flyTo(
-      latLng(
-        selectedWaterbody['centroid_lat'],
-        selectedWaterbody['centroid_lng']
-      ), 12
-    );
-  }
-
   handleWaterbodySelect(selectedWaterbody: WaterBody): void {
-    this.panToWaterbody(selectedWaterbody);
-    // this.getWaterbodyGeojson(selectedWaterbody);
-    this.openWaterbodyStatsDialog(selectedWaterbody);
+    this.loaderService.show();
+    this.downloader.getWaterbodyProperties(selectedWaterbody.objectid).subscribe(result => {
+      this.loaderService.hide();
+      this.createWaterbodyProperties(result);
+      let topLeft = latLng(this.wbProps['y_max'], this.wbProps['x_min']);
+      let bottomRight = latLng(this.wbProps['y_min'], this.wbProps['x_max']);
+      let wbBounds = latLngBounds(topLeft, bottomRight);
+      this.cyanMap.map.flyToBounds(wbBounds);
+      this.openWaterbodyStatsDialog(selectedWaterbody, this.wbProps);
+    });
   }
 
   validateCoordSearchInputs() {
@@ -253,6 +232,37 @@ export class WaterbodyStatsComponent implements OnInit {
     else if (this.waterbodyName.length > this.searchCharMax) {
       this.dialog.handleError('Waterbody name is too large');
     }
+  }
+
+  createWaterbodyProperties(propResults) {
+    /*
+    Creates WaterBodyProperties objects from properties results.
+    */
+    if (!('properties' in propResults)) {
+      this.dialog.handleError("No properties found for waterbody");
+    }
+    this.wbProps.areasqkm = this.calcs.roundValue(propResults['properties']['AREASQKM']);
+    this.wbProps.elevation = this.calcs.roundValue(propResults['properties']['ELEVATION']);
+    this.wbProps.fcode = propResults['properties']['FCODE'];
+    this.wbProps.fdate = propResults['properties']['FDATE'];
+    this.wbProps.ftype = propResults['properties']['FTYPE'];
+    this.wbProps.globalid = propResults['properties']['GLOBALID'];
+    this.wbProps.gnis_id = propResults['properties']['GNIS_ID'];
+    this.wbProps.gnis_name = propResults['properties']['GNIS_NAME'];
+    this.wbProps.objectid = propResults['properties']['OBJECTID'];
+    this.wbProps.permanent_ = propResults['properties']['PERMANENT_'];
+    this.wbProps.reachcode = propResults['properties']['REACHCODE'];
+    this.wbProps.resolution = propResults['properties']['RESOLUTION'];
+    this.wbProps.shape_area = this.calcs.roundValue(propResults['properties']['SHAPE_AREA']);
+    this.wbProps.shape_leng = this.calcs.roundValue(propResults['properties']['SHAPE_LENG']);
+    this.wbProps.state_abbr = propResults['properties']['STATE_ABBR'];
+    this.wbProps.visibility = propResults['properties']['VISIBILITY'];
+    this.wbProps.c_lat = propResults['properties']['c_lat'];
+    this.wbProps.c_lng = propResults['properties']['c_lng'];
+    this.wbProps.x_max = propResults['properties']['x_max'];
+    this.wbProps.x_min = propResults['properties']['x_min'];
+    this.wbProps.y_max = propResults['properties']['y_max'];
+    this.wbProps.y_min = propResults['properties']['y_min'];
   }
 
 }
