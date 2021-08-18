@@ -15,7 +15,7 @@
                 <span class="tab-title">Reload Data</span>
              </div>
         </button>
-        <button mat-menu-item mat-button (click)="openCsvDialog()" [routerLink]="['']" class="bottom-menu-title">
+        <button *ngIf="!hideUpload" mat-menu-item mat-button (click)="openCsvDialog()" [routerLink]="['']" class="bottom-menu-title">
           <div class="menu-div" aria-label="User guide">
             <span class="tab-title">Upload CSV</span>
           </div>
