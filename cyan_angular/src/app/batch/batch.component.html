@@ -5,7 +5,10 @@
 		<!-- Run tab -->
 		<mat-tab label="Run">
 		<div class="">
-			<br><p>Upload CSV for batch processing (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download template input file</a>)</p><br>
+			<br>
+			<p>Upload a CSV file of coordinates in decimal format that are within CONUS to initiate batch processing (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download template/example input file</a>).</p>
+			<p>Once complete, a spreadsheet of cyano concentrations for each location is sent to your email.</p>
+			<br>
 			<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
 			<button mat-raised-button color="primary" (click)="uploader.click()">Upload</button>
 			<br><br>
@@ -21,7 +24,7 @@
 
 	<!-- Jobs/History tab -->
 	<mat-tab label="Jobs">
-		<br><p>List of user's jobs</p><br>
+		<br><p>List of {{username}}'s jobs</p><br>
 		<div class="table-responsive">
 			<mat-table #table [dataSource]="dataSource" matSort>
 				<ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">

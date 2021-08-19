@@ -38,7 +38,7 @@
 
 .table-responsive {
 	/*overflow-y: scroll;*/
-	overflow: scroll;
+	overflow: auto;
 	height: 80%;
 	width: 100%;
 }
