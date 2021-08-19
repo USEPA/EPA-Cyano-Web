@@ -6,7 +6,7 @@
 		<mat-tab label="Run">
 		<div class="">
 			<br>
-			<p>Upload a CSV file of coordinates in decimal format that are within CONUS to initiate batch processing (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download template/example input file</a>).</p>
+			<p>Upload a CSV file of coordinates (decimal format within CONUS) and datatype (daily or weekly) to initiate batch processing (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download template/example input file</a>).</p>
 			<p>Once complete, a spreadsheet of cyano concentrations for each location will be sent to your email.</p>
 			<br>
 			<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
