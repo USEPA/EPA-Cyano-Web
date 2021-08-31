@@ -87,7 +87,8 @@ export class WaterBodyStatsDetails {
   // Bar chart parameters:
   public chartLabels: Label[] = this.ranges;
   public chartLabels1: Label[] = this.ranges;
-  public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'no data'];
+  // public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'no data'];
+  public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'below detection', 'land', 'no data'];
   @Input() chartData: ChartDataSets[] = this.charts.chartData;
   public chartOptions: ChartOptions = this.charts.chartOptions;
   public chartColors: Array<any> = this.charts.chartColors
@@ -99,6 +100,7 @@ export class WaterBodyStatsDetails {
   public pieChartColors: Array<any> = this.charts.pieChartColors
   public pieChartLegend: boolean = this.charts.pieChartLegend;
   public pieChartType: ChartType = this.charts.pieChartType;
+  public pieChartLabels: Label[] = this.charts.pieChartLabels;
 
   // Stacked bar chart parameters:
   public stackedChartData: ChartDataSets[] = this.charts.stackedChartData;
@@ -156,8 +158,6 @@ export class WaterBodyStatsDetails {
 
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
-      console.log("waterbody-stats-details ngOnInit() params: ")
-      console.log(params);
       this.selectedWaterbody = JSON.parse(params.selectedWaterbody);
       this.wbProps = JSON.parse(params.wbProps);
       this.loaderService.showProgressBar();
@@ -230,12 +230,13 @@ export class WaterBodyStatsDetails {
     this.loaderService.show();
     this.downloader.getWaterbodyImage(objectid, year, day).subscribe(response => {
       if (this.wbImageLayer) {
-        console.log("Removing image layer")
         this.cyanMap.map.removeLayer(this.wbImageLayer);
       }
-      let imageBlob = response.body;
-      let bbox = JSON.parse(response.headers.get('bbox'));
-      this.addImageLayer(imageBlob, bbox);
+      // let imageBlob = response.body;
+      // let bbox = JSON.parse(response.headers.get('bbox'));
+      // this.addImageLayer(imageBlob, bbox);
+      let imageUrl = 'data:image/png;base64,' + response['image'];
+      this.addImageLayer(imageUrl, response['bounds']);
       this.loaderService.hide();
     });
   }
@@ -258,28 +259,46 @@ export class WaterBodyStatsDetails {
     this.curatedData[dataType]['dates'] = [];
     this.curatedData[dataType]['formattedDates'] = [];
 
-    // this.calcs.sortByDate(this.waterbodyData[dataType]);
+    let orderedArrayOfData = this.calcs.sortByDate(this.waterbodyData[dataType]['data']);
 
-    for (let date in this.waterbodyData[dataType]['data']) {
+    orderedArrayOfData.forEach(dataObj => {
+
+      let date = Object.keys(dataObj)[0]
+      
       this.curatedData[dataType][date] = {
         stats: null,  // waterbody stats
         data: null  // curated data for plots, divided by range
       };
+
       let dataArray = this.waterbodyData[dataType].data[date];
       let concentrationData = this.createCellArray(dataArray);  // array of concentration, count, index objects
       let concentrationArray = concentrationData.filter(obj => obj.count > 0).map(obj => obj.concentration);
+      let chartData = this.createChartData(concentrationData);  // data by range for date
+
       let wbStats = new WaterBodyStats();
       wbStats.date = this.calcs.getDateFromDayOfYear(date);
       wbStats.min = this.calcs.roundValue(Math.min(...concentrationArray));  // min concentration with at least one count
       wbStats.max = this.calcs.roundValue(Math.max(...concentrationArray));  // max concentration with at least one count
       wbStats.average = this.calcs.calculateAverage(concentrationData);
       wbStats.stddev = this.calcs.calculateStdDev(concentrationData);
-      let chartData = this.createChartData(concentrationData);  // data by range for date
+      
       this.curatedData[dataType][date].stats = wbStats;
       this.curatedData[dataType][date].data = chartData;
       this.curatedData[dataType].dates.push(date);
       this.curatedData[dataType].formattedDates.push(wbStats.date);
-    }
+
+      let belowDetectionCounts = this.waterbodyData[dataType].data[date][0];
+      let landCounts = this.waterbodyData[dataType].data[date][254];
+      let noDataCounts = this.waterbodyData[dataType].data[date][255];
+
+      // this.curatedData[dataType][date].data.percentBelowDetection = 0.09 * belowDetectionCounts;
+      // this.curatedData[dataType][date].data.percentLand = 0.09 * landCounts;
+      // this.curatedData[dataType][date].data.percentNoData = 0.09 * noDataCounts;
+      this.curatedData[dataType][date].data.countsBelowDetection = belowDetectionCounts;
+      this.curatedData[dataType][date].data.countsLand = landCounts;
+      this.curatedData[dataType][date].data.countsNoData = noDataCounts;
+
+    });
 
   }
 
@@ -288,7 +307,6 @@ export class WaterBodyStatsDetails {
     Calculates min/max, mean, medium, mode, std dev for cyano data
     based on dayOfYear (ex: "2020 1").
     */
-    console.log("calculateWaterbodyStats() formattedDate: " + formattedDate)
     if (
       Object.keys(this.waterbodyData[this.selectedDataType]).length <= 0 ||
       Object.keys(this.waterbodyData[this.selectedDataType]['data']).length <= 0
@@ -383,7 +401,6 @@ export class WaterBodyStatsDetails {
       // Single-day range
       // TODO: Plot classic bars and histo for selected available date.
       // TODO: Plot bars or pie based on selectedPlotType
-      console.log("updateDateRange() single day range: " + this.selectedAvailableDate);
       this.datesWithinRange = [];
       this.calculateWaterbodyStats(this.selectedAvailableDate);
     }
@@ -428,7 +445,6 @@ export class WaterBodyStatsDetails {
     */
 
     if (['7day', '30day'].includes(this.selectedDateRange)) {
-      console.log("Skipping plot toggling for multi-day modes")
       return;
     }
 
@@ -497,7 +513,7 @@ export class WaterBodyStatsDetails {
     this.showStacked = false;
     this.showPie = true;
     this.showBars = false;
-    this.chartLabels = this.chartLabels1;
+    this.pieChartLabels = this.chartLabels1;
     let percentAreaData = [
       chartData.low.percentOfArea,
       chartData.medium.percentOfArea,
@@ -515,19 +531,29 @@ export class WaterBodyStatsDetails {
     this.showStacked = false;
     this.showPie = true;
     this.showBars = false;
-    this.chartLabels = this.chartLabels2;
+    this.pieChartLabels = this.chartLabels2;
+
+    let noCyanoPercent = 100.0 - chartData.percentOfTotalArea;
+
+    let noCyanoArea = chartData.totalPixelArea * (noCyanoPercent / chartData.percentOfTotalArea);  // method A
+
+    let noCyanoTotalCounts = chartData.countsBelowDetection + chartData.countsLand + chartData.countsNoData;
+
+    let belowDetectionPercent = chartData.countsBelowDetection / noCyanoTotalCounts;  // decimal percent
+    let landPercent = chartData.countsLand / noCyanoTotalCounts;  // decimal percent
+    let noDataPercent = chartData.countsNoData / noCyanoTotalCounts;  // decimal percent
+
     let percentAreaData = [
       (chartData.low.percentOfArea * chartData.percentOfTotalArea) / 100.0,
       (chartData.medium.percentOfArea * chartData.percentOfTotalArea) / 100.0,
       (chartData.high.percentOfArea * chartData.percentOfTotalArea) / 100.0,
       (chartData.veryHigh.percentOfArea * chartData.percentOfTotalArea) / 100.0,
-      100.0 - chartData.percentOfTotalArea
+      // 100.0 - chartData.percentOfTotalArea
+      100.0 * belowDetectionPercent,
+      100.0 * landPercent,
+      100.0 * noDataPercent
     ];
     this.pieChartData[0].data = percentAreaData;
-
-    if (this.chartLabels.length > 4) {
-      this.chartLabels.push('no data')
-    }
   }
 
   plotRangeOfTotalCounts(dates: string[]) {
@@ -702,9 +728,11 @@ export class WaterBodyStatsDetails {
         this.dialog.handleError('Unknown error occurred');
       }
     });
+
     this.dataByRange.totalCounts = totalCounts;
     this.dataByRange.totalConcentration = totalConcentration;
-    this.dataByRange.totalPixelArea = 0.09 * totalCounts;  // total pixels X pixel size (sq. km)
+    this.dataByRange.totalPixelArea = 0.09 * totalCounts;  // total pixels X pixel size (0.09 sqkm/pixel)
+
     this.dataByRange = this.calcs.calculateRangeArea(this.dataByRange, this.chartLabels);
     this.dataByRange = this.calcs.calculatePercentOfArea(this.dataByRange, this.chartLabels);
     this.dataByRange = this.calcs.calculatePercentOfTotalArea(this.dataByRange, this.wbProps);
@@ -712,28 +740,33 @@ export class WaterBodyStatsDetails {
     this.dataByRange = this.calcs.calculateStddevForRange(this.dataByRange, this.chartLabels);
     this.dataByRange = this.calcs.calculateMinForRange(this.dataByRange, this.chartLabels);
     this.dataByRange = this.calcs.calculateMaxForRange(this.dataByRange, this.chartLabels);
+
     return this.dataByRange;
   }
 
-  addImageLayer(image: Blob, bounds: any): any {
-    let reader = new FileReader();
-    reader.addEventListener("load", () => {
-      let topLeft = latLng(bounds[1][0], bounds[1][1]);
-      let bottomRight = latLng(bounds[0][0], bounds[0][1]);
-      let imageBounds = latLngBounds(bottomRight, topLeft);
-      let imageUrl = reader.result.toString();
-      this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
-      this.cyanMap.map.addLayer(this.wbImageLayer);
-
-      console.log("WB Image Layer: ")
-      console.log(this.wbImageLayer)
-
-      return reader.result;
-    }, false);
-    if (image) {
-      reader.readAsDataURL(image);
-    }
+  addImageLayer(imageUrl: string, bounds: any): any {
+    let topLeft = latLng(bounds[1][0], bounds[1][1]);
+    let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+    let imageBounds = latLngBounds(bottomRight, topLeft);
+    this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+    this.cyanMap.map.addLayer(this.wbImageLayer);
   }
+
+  // addImageLayer(image: Blob, bounds: any): any {
+  //   let reader = new FileReader();
+  //   reader.addEventListener("load", () => {
+  //     let topLeft = latLng(bounds[1][0], bounds[1][1]);
+  //     let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+  //     let imageBounds = latLngBounds(bottomRight, topLeft);
+  //     let imageUrl = reader.result.toString();
+  //     this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+  //     this.cyanMap.map.addLayer(this.wbImageLayer);
+  //     return reader.result;
+  //   }, false);
+  //   if (image) {
+  //     reader.readAsDataURL(image);
+  //   }
+  // }
 
   incrementRequest() {
     this.requestsTracker++;
@@ -766,32 +799,23 @@ export class WaterBodyStatsDetails {
     showing "all" histo vs line chart?)
     */
     let selectedDates = this.datesWithinRange;
-    console.log("Dates within range: ")
-    console.log(selectedDates)
-
     let selectedAvailableDate = this.selectedAvailableDate;
-    console.log("Selected avilable date: " + selectedAvailableDate)
 
     if (this.selectedDate.length <= 0) {
       this.selectedDate = this.selectedAvailableDate;
     }
 
     let selectedDate = this.selectedDate;
-   
-
     this.selectedDateIndex = selectedDates.indexOf(selectedDate);
-    console.log("Current selected date index: " + this.selectedDateIndex)
 
     // Cycle back to beginning if at last index
     // this.selectedDateIndex = this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1 ? 0 : this.selectedDateIndex++;
     if (this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1) {
-      console.log("selectedDateIndex < 0 or >= date range array")
       this.selectedDateIndex = 0;
     }
     else {
       this.selectedDateIndex++;
     }
-    console.log("New selected date index: " + this.selectedDateIndex)
 
     // TODO: Highlight new date in list.
     this.selectedDate = this.datesWithinRange[this.selectedDateIndex];
@@ -802,8 +826,6 @@ export class WaterBodyStatsDetails {
 
     // TODO: Cycle image.
     this.getWaterbodyImage(this.wbProps.objectid, year, day);
-
-
     
     // TODO: Highlight bar in stacked bar plot for date.
     this.stackedChartData.forEach(dataObj => {
@@ -815,7 +837,7 @@ export class WaterBodyStatsDetails {
       console.log("stackedChartLabels: " + dateLabel)
       if (dateLabel != this.selectedDate) {
          // gray-out dates not selected
-         this.stackedChartData[labelIndex].backgroundColor + '4D';
+         // this.stackedChartData[labelIndex].backgroundColor + '4D';
       }
       labelIndex++;
     })

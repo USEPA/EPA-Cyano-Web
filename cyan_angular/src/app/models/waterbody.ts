@@ -51,6 +51,9 @@ export class WaterBodyDataByRange {
   totalCounts: number = 0.0;
   totalPixelArea: number = 0.0;
   percentOfTotalArea: number = 0.0;
+  countsBelowDetection: number = 0.0;
+  countsLand: number = 0.0;
+  countsNoData: number = 0.0;
   totalConcentration: number = 0.0;
   low: RangeItem = new RangeItem();
   medium: RangeItem = new RangeItem();

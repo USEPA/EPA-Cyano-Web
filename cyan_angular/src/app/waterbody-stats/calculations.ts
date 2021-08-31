@@ -147,4 +147,47 @@ export class Calculations {
     return dateObj.toLocaleDateString();
   }
 
+  sortByDate(dataByType: any) {
+
+    let dateKeys = Object.keys(dataByType);
+    let numDates = dateKeys.map(item => {
+      let year = item.split(' ')[0];
+      let day = item.split(' ')[1];
+
+      if (day.length === 1) {
+        day = "00" + day;
+      }
+      else if (day.length === 2) {
+        day = "0" + day;
+      }
+
+      return parseInt(year + day);
+
+    });
+
+    let sortedDates = numDates.sort((a, b) => a - b);
+    let sortedDateKeys = sortedDates.map(item => {
+      return item.toString().slice(0, 4) + " " + item.toString().slice(4);
+    });
+
+    let orderedArrayOfObjects = [];
+
+    // Creating array of objects so they're ordered when looped
+    sortedDateKeys.forEach(sortedDate => {
+      let day = parseInt(sortedDate.split(' ')[1]);  // removes leading zeros
+      sortedDate = sortedDate.split(' ')[0] + ' ' + day;  // reformats sorted date
+      for(let date in dataByType) {
+        if (date === sortedDate) {
+          let dataObj = {};
+          dataObj[sortedDate] = dataByType[sortedDate];
+          orderedArrayOfObjects.push(dataObj);
+          break;
+        }
+      }
+    });
+
+    return orderedArrayOfObjects;
+  
+  }
+
 }
