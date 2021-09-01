@@ -1,5 +1,5 @@
 import { Component, Inject } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from "@angular/material/dialog";
 
 
 
@@ -26,7 +26,8 @@ export class DialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    public messageDialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -35,6 +36,26 @@ export class DialogComponent {
 
   exit(response: boolean): void {
     this.dialogRef.close(response);
+  }
+
+  displayMessageDialog(message: string): void {
+    /*
+    Displays dialog messages to user.
+    */
+    this.messageDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
+  }
+
+  public handleError(errorMessage: string): void {
+    /*
+    Display error message and throws exception, which
+    halts the execution of following statements.
+    */
+    this.displayMessageDialog(errorMessage);
+    throw errorMessage;
   }
 
 }
