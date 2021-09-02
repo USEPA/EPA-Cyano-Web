@@ -38,7 +38,6 @@ export class WaterbodyStatsComponent implements OnInit {
   searchCharMin: number = 3;  // min allowed characters for WB searching
   searchCharMax: number = 256;  // max allowed characters for WB searching
 
-
   wbLayer = null;
 
   searchSelect: any = {
@@ -202,7 +201,15 @@ export class WaterbodyStatsComponent implements OnInit {
       let topLeft = latLng(this.wbProps['y_max'], this.wbProps['x_min']);
       let bottomRight = latLng(this.wbProps['y_min'], this.wbProps['x_max']);
       let wbBounds = latLngBounds(topLeft, bottomRight);
-      this.cyanMap.map.flyToBounds(wbBounds);
+
+      let offsetBounds = wbBounds.pad(0.75);  // expands bounds 25%
+      let offsetDiff = offsetBounds['_northEast']['lng'] - wbBounds['_northEast']['lng'];
+
+      let newTopLeft = latLng(this.wbProps['y_max'], this.wbProps['x_min'] - offsetDiff);
+      let newBottomRight = latLng(this.wbProps['y_min'], this.wbProps['x_max'] - offsetDiff);
+      let newBounds = latLngBounds(newTopLeft, newBottomRight);
+
+      this.cyanMap.map.flyToBounds(newBounds);
       this.openWaterbodyStatsDialog(selectedWaterbody, this.wbProps);
     });
   }

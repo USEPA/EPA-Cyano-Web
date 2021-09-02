@@ -51,6 +51,7 @@ export class WaterBodyStatsDetails {
   wbStats: WaterBodyStats = new WaterBodyStats();
   wbProps: WaterBodyProperties = new WaterBodyProperties();
   rangeStats: RangeItem = new RangeItem();
+  wbTotalPixelArea: number = 0;  // total area calculated with sum of pixel counts
 
   dataByRange: WaterBodyDataByRange = new WaterBodyDataByRange();
 
@@ -137,6 +138,7 @@ export class WaterBodyStatsDetails {
   totalRequests: number = 0;
 
   showLegend: boolean = false;
+  showUserLegend: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
@@ -332,6 +334,10 @@ export class WaterBodyStatsDetails {
     this.wbStats.average = selectedStats.average;
     this.wbStats.stddev = selectedStats.stddev;
     this.selectedAvailableDate = this.wbStats.date;  // sets selectedDate
+
+
+    this.wbTotalPixelArea = this.waterbodyData[this.selectedDataType].data[dateKey].reduce((a, b) => a + b, 0);
+
     this.handlePlot(selectedData);
     if (this.selectedDate == 'all') {
       this.plotLineData(dataObj.formattedDates);
@@ -476,14 +482,21 @@ export class WaterBodyStatsDetails {
     Total concentration count plot click event.
     Displays histo chart of clicked/selected range.
     */
+
     let clickedLabelIndex: number = event.active[0]['_index'];
     let clickedLabel: string = this.chartLabels[clickedLabelIndex].toString();
     this.selectedRange = clickedLabel;
+
+
     this.updateHistoChart();
   }
 
   toggleLegend() {
     this.showLegend = !this.showLegend;
+  }
+
+  toggleUserLegend() {
+    this.showUserLegend = !this.showUserLegend; 
   }
 
   plotTotalCounts(chartData) {
@@ -514,6 +527,7 @@ export class WaterBodyStatsDetails {
     this.showPie = true;
     this.showBars = false;
     this.pieChartLabels = this.chartLabels1;
+    this.pieChartColors = this.charts.pieChartColors;
     let percentAreaData = [
       chartData.low.percentOfArea,
       chartData.medium.percentOfArea,
@@ -532,6 +546,7 @@ export class WaterBodyStatsDetails {
     this.showPie = true;
     this.showBars = false;
     this.pieChartLabels = this.chartLabels2;
+    this.pieChartColors = this.charts.pieChartColors2;
 
     let noCyanoPercent = 100.0 - chartData.percentOfTotalArea;
 
@@ -539,19 +554,20 @@ export class WaterBodyStatsDetails {
 
     let noCyanoTotalCounts = chartData.countsBelowDetection + chartData.countsLand + chartData.countsNoData;
 
+
     let belowDetectionPercent = chartData.countsBelowDetection / noCyanoTotalCounts;  // decimal percent
     let landPercent = chartData.countsLand / noCyanoTotalCounts;  // decimal percent
     let noDataPercent = chartData.countsNoData / noCyanoTotalCounts;  // decimal percent
 
+
     let percentAreaData = [
-      (chartData.low.percentOfArea * chartData.percentOfTotalArea) / 100.0,
-      (chartData.medium.percentOfArea * chartData.percentOfTotalArea) / 100.0,
-      (chartData.high.percentOfArea * chartData.percentOfTotalArea) / 100.0,
-      (chartData.veryHigh.percentOfArea * chartData.percentOfTotalArea) / 100.0,
-      // 100.0 - chartData.percentOfTotalArea
-      100.0 * belowDetectionPercent,
-      100.0 * landPercent,
-      100.0 * noDataPercent
+      this.calcs.roundValue((chartData.low.percentOfArea * chartData.percentOfTotalArea) / 100.0),
+      this.calcs.roundValue((chartData.medium.percentOfArea * chartData.percentOfTotalArea) / 100.0),
+      this.calcs.roundValue((chartData.high.percentOfArea * chartData.percentOfTotalArea) / 100.0),
+      this.calcs.roundValue((chartData.veryHigh.percentOfArea * chartData.percentOfTotalArea) / 100.0),
+      this.calcs.roundValue(100.0 * belowDetectionPercent),
+      this.calcs.roundValue(100.0 * landPercent),
+      this.calcs.roundValue(100.0 * noDataPercent)
     ];
     this.pieChartData[0].data = percentAreaData;
   }
