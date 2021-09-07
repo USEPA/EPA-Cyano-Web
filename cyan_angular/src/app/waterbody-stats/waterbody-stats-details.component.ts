@@ -84,6 +84,7 @@ export class WaterBodyStatsDetails {
 
   slidershow: boolean = false;
   selectedDateIndex: number = 0;
+  slideshowDelay: number = 4000;  // units of seconds
 
   // Bar chart parameters:
   public chartLabels: Label[] = this.ranges;
@@ -234,11 +235,12 @@ export class WaterBodyStatsDetails {
       if (this.wbImageLayer) {
         this.cyanMap.map.removeLayer(this.wbImageLayer);
       }
-      // let imageBlob = response.body;
-      // let bbox = JSON.parse(response.headers.get('bbox'));
-      // this.addImageLayer(imageBlob, bbox);
-      let imageUrl = 'data:image/png;base64,' + response['image'];
-      this.addImageLayer(imageUrl, response['bounds']);
+      let imageBlob = response.body;
+      let bbox = [
+        [this.wbProps.y_min, this.wbProps.x_max],
+        [this.wbProps.y_max, this.wbProps.x_min]
+      ];
+      this.addImageLayer(imageBlob, bbox);
       this.loaderService.hide();
     });
   }
@@ -760,29 +762,29 @@ export class WaterBodyStatsDetails {
     return this.dataByRange;
   }
 
-  addImageLayer(imageUrl: string, bounds: any): any {
-    let topLeft = latLng(bounds[1][0], bounds[1][1]);
-    let bottomRight = latLng(bounds[0][0], bounds[0][1]);
-    let imageBounds = latLngBounds(bottomRight, topLeft);
-    this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
-    this.cyanMap.map.addLayer(this.wbImageLayer);
-  }
-
-  // addImageLayer(image: Blob, bounds: any): any {
-  //   let reader = new FileReader();
-  //   reader.addEventListener("load", () => {
-  //     let topLeft = latLng(bounds[1][0], bounds[1][1]);
-  //     let bottomRight = latLng(bounds[0][0], bounds[0][1]);
-  //     let imageBounds = latLngBounds(bottomRight, topLeft);
-  //     let imageUrl = reader.result.toString();
-  //     this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
-  //     this.cyanMap.map.addLayer(this.wbImageLayer);
-  //     return reader.result;
-  //   }, false);
-  //   if (image) {
-  //     reader.readAsDataURL(image);
-  //   }
+  // addImageLayer(imageUrl: string, bounds: any): any {
+  //   let topLeft = latLng(bounds[1][0], bounds[1][1]);
+  //   let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+  //   let imageBounds = latLngBounds(bottomRight, topLeft);
+  //   this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+  //   this.cyanMap.map.addLayer(this.wbImageLayer);
   // }
+
+  addImageLayer(image: Blob, bounds: any): any {
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      let topLeft = latLng(bounds[1][0], bounds[1][1]);
+      let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+      let imageBounds = latLngBounds(bottomRight, topLeft);
+      let imageUrl = reader.result.toString();
+      this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+      this.cyanMap.map.addLayer(this.wbImageLayer);
+      return reader.result;
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
+    }
+  }
 
   incrementRequest() {
     this.requestsTracker++;
@@ -800,12 +802,11 @@ export class WaterBodyStatsDetails {
   }
 
   toggleSlideShow() {
-    let delay = 2000; // 2 seconds
     if (this.slidershow && this.router.isActive('wbstats', false)) {
       let self = this;
       setTimeout(function() {
         self.cycleSelectedDates();
-      }, delay);
+      }, this.slideshowDelay);
     }
   }
   cycleSelectedDates() {

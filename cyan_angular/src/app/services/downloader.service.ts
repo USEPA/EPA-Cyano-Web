@@ -292,15 +292,14 @@ export class DownloaderService {
       'image/?OBJECTID=' + objectid + 
       '&year=' + year + 
       '&day=' + day;
-    return this.executeAuthorizedGetRequest(url);
-    // return this.http.get(url, {
-    //   headers: {
-    //     'Content-Type': 'image/png',
-    //     'App-Name': this.envService.config.appName,
-    //   },
-    //   responseType: 'blob',
-    //   observe: 'response'
-    // });
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/png',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
+      observe: 'response'
+    });
   }
 
    getTribes() {
