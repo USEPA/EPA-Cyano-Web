@@ -303,6 +303,33 @@ export class DownloaderService {
     // });
   }
 
+   getTribes() {
+    /*
+    Gets tribes with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/tribes/';
+    return this.executeAuthorizedGetRequest(url);
+   }
+
+   getCounties() {
+    /*
+    Gets counties with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/counties/';
+    return this.executeAuthorizedGetRequest(url);
+   }
+
+   getStates() {
+    /*
+    Gets states with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/states/';
+    return this.executeAuthorizedGetRequest(url);
+   }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());

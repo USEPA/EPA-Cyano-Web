@@ -23,8 +23,8 @@ import { MapService } from '../services/map.service';
 import { UserService } from '../services/user.service';
 import { ConfigService } from '../services/config.service';
 import { LocationService } from '../services/location.service';
-import { Calculations } from './calculations';
-import { Charts } from './charts';
+import { Calculations } from './utils/calculations';
+import { Charts } from './utils/charts';
 
 
 

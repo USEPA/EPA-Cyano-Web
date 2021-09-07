@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
 import { Label } from 'ng2-charts';
 
-import { ConfigService } from '../services/config.service';
+import { ConfigService } from '../../services/config.service';
 
 
 @Component({

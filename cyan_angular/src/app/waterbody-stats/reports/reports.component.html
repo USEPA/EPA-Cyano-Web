@@ -1,0 +1,83 @@
+<div class="details_block_0">
+
+	<div class="main-block">
+		
+		<button mat-button class="exit-button" [routerLink]="['']">X</button>
+		<div class="locations-title">
+			<h2>Reports</h2>
+		</div>
+
+		<!-- Report type selection -->
+		<div>
+			<mat-form-field>
+				<label>Generate report using:</label>
+				<br><br>
+				<mat-select (selectionChange)="onReportSelect($event);">
+				<mat-option *ngFor="let reportType of reportTypeOptions | keyvalue" [value]="reportType.key">
+					{{reportType.value}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		
+		<!-- Search by tribe -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'tribe'">
+			<mat-form-field>
+				<label>Select a tribe</label>
+				<br><br>
+				<mat-select (selectionChange)="onTribeSelect($event);">
+				<mat-option *ngFor="let tribe of wbTribes" [value]="tribe.key">
+					{{tribe[1]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Search by state -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'state'">
+			<mat-form-field>
+				<label>Select a state</label>
+				<br><br>
+				<mat-select (selectionChange)="onStateSelect($event);">
+				<mat-option *ngFor="let state of wbStates" [value]="state.key">
+					{{state[1]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Search by county -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'county'">
+			<mat-form-field>
+				<label>Select a county</label>
+				<br><br>
+				<mat-select (selectionChange)="onCountySelect($event);">
+				<mat-option *ngFor="let county of wbCounties" [value]="county.key">
+					{{county[1]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Results list -->
+		<!-- <h4 class="results-title" *ngIf="waterbodyResults?.length > 0">Results: {{waterbodyResults.length}}</h4>
+		<div *ngIf="waterbodyResults?.length > 0" class="user-locations">
+			<br>
+			<ul>
+				<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="handleWaterbodySelect(waterbody);">
+					<div class="location-item-left">
+						<p>
+							<b>{{waterbody.name}}</b><br>
+							<b>COMID:</b> {{waterbody.objectid}}<br>
+							<b>Coordinates:</b> {{waterbody.centroid_lat}}, {{waterbody.centroid_lng}}<br>
+							<b>Area:</b> {{waterbody.areasqkm}}km<sup>2</sup><br>
+							<b>State:</b> {{waterbody.state_abbr}}
+						</p>
+					</div>
+				</li>
+			</ul>
+		</div> -->
+		
+	</div>
+
+</div>

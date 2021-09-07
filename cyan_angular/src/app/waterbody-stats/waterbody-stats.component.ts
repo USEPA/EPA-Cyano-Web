@@ -10,7 +10,7 @@ import { DatePipe } from '@angular/common';
 
 import { WaterBody, WaterBodyStats, WaterBodyData, WaterBodyProperties } from '../models/waterbody';
 import { WaterBodyStatsDetails } from './waterbody-stats-details.component';
-import { Calculations } from './calculations';
+import { Calculations } from './utils/calculations';
 import { DownloaderService } from '../services/downloader.service';
 import { AuthService } from '../services/auth.service';
 import { MapService } from '../services/map.service';

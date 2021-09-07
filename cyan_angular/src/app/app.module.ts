@@ -81,11 +81,12 @@ import { LocationSearchComponent } from './location-search/location-search.compo
 import { BatchComponent } from './batch/batch.component';
 import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
 import { WaterBodyStatsDetails } from './waterbody-stats/waterbody-stats-details.component';
-import { Calculations } from './waterbody-stats/calculations';
-import { Charts } from './waterbody-stats/charts';
+import { Calculations } from './waterbody-stats/utils/calculations';
+import { Charts } from './waterbody-stats/utils/charts';
 
 import 'hammerjs';
 import 'chartjs-plugin-zoom';
+import { ReportsComponent } from './waterbody-stats/reports/reports.component';
 
 @NgModule({
   declarations: [
@@ -121,7 +122,8 @@ import 'chartjs-plugin-zoom';
     LocationSearchComponent,
     BatchComponent,
     WaterbodyStatsComponent,
-    WaterBodyStatsDetails
+    WaterBodyStatsDetails,
+    ReportsComponent
   ],
   imports: [
     BrowserModule,
