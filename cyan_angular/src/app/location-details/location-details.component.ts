@@ -154,7 +154,7 @@ export class LocationDetailsComponent implements OnInit {
 
   options = {
     layers: [this.mapLayer],
-    zoomControl: false,
+    zoomControl: true,
     zoom: 6,
     center: latLng([this.lat_0, this.lng_0])
   };

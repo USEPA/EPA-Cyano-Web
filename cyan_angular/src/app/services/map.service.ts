@@ -26,11 +26,13 @@ export class MapService {
     this.cyanMap.map = map;
     this.cyanMap.markers = new LayerGroup();
     this.cyanMap.markers.addTo(this.cyanMap.map);
+    map.zoomControl.setPosition('bottomright');
   }
 
   setMinimap(map: Map, mk: Marker): void {
     this.cyanMap.miniMap = map;
     this.setMiniMarker(mk);
+    map.zoomControl.setPosition('bottomright');
   }
 
   setMiniMarker(mk: Marker): void {

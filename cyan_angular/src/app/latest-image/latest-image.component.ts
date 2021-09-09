@@ -49,7 +49,7 @@ export class LatestImageComponent implements OnInit {
 
 	options = {
 		layers: [this.topoMap],
-		zoomControl: false,
+		zoomControl: true,
 		zoom: 6,
 		center: latLng([this.lat_0, this.lng_0])
 	};
