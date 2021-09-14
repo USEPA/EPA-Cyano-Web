@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, Input, ViewChild, ViewChildren, ElementRef, QueryList } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelect } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field'
@@ -37,6 +37,14 @@ export class WaterBodyStatsDetails {
   /*
   Dialog for viewing waterbody stats.
   */
+
+  // @ViewChild(BaseChartDirective) private stackedChart: BaseChartDirective;
+  // @ViewChild(BaseChartDirective) private barChart: BaseChartDirective;
+  // @ViewChild(BaseChartDirective) private pieChart: BaseChartDirective;
+  // @ViewChild(BaseChartDirective) private lineChart: BaseChartDirective;
+
+  @ViewChildren(BaseChartDirective) private chartObjs: Array<BaseChartDirective>;
+
   selectedWaterbody: WaterBody = null;
   waterbodyData: any = {
     'daily': {},
@@ -85,6 +93,7 @@ export class WaterBodyStatsDetails {
   slidershow: boolean = false;
   selectedDateIndex: number = 0;
   slideshowDelay: number = 4000;  // units of seconds
+  slideshowStatus: string = this.slidershow ? "Slideshow started" : "Start slideshow";
 
   // Bar chart parameters:
   public chartLabels: Label[] = this.ranges;
@@ -124,6 +133,8 @@ export class WaterBodyStatsDetails {
     }
   ];
   public histoChartType: ChartType = 'bar';
+  public histoChartOptions: ChartOptions = this.charts.histoChartOptions;
+  public histoChartLegend: boolean = this.charts.histoChartLegend;
 
   // Line chart parameters:
   public lineChartData: ChartDataSets[] = this.charts.lineChartData;
@@ -391,6 +402,7 @@ export class WaterBodyStatsDetails {
 
     if (['7day', '30day'].includes(dateRangeValue)) {
       // Multi-day range
+      this.selectedDate = this.selectedAvailableDate;  // initializes selectedDate for slideshow
       this.selectedPlotType = this.plotTypes[0];  // sets title for stacked bars
       let range = parseInt(dateRangeValue.split('day')[0]);
       let d = new Date(this.selectedAvailableDate);
@@ -404,6 +416,7 @@ export class WaterBodyStatsDetails {
       });
       this.plotRangeOfTotalCounts(this.datesWithinRange);
       this.plotLineData(this.datesWithinRange);
+      this.scrollToSelectedDate();
     }
     else {
       // Single-day range
@@ -808,6 +821,9 @@ export class WaterBodyStatsDetails {
         self.cycleSelectedDates();
       }, this.slideshowDelay);
     }
+    else {
+      this.slideshowStatus = ""
+    }
   }
   cycleSelectedDates() {
     /*
@@ -822,8 +838,9 @@ export class WaterBodyStatsDetails {
       this.selectedDate = this.selectedAvailableDate;
     }
 
-    let selectedDate = this.selectedDate;
-    this.selectedDateIndex = selectedDates.indexOf(selectedDate);
+    // let selectedDate = this.selectedDate;
+    // this.selectedDateIndex = selectedDates.indexOf(selectedDate);
+    this.selectedDateIndex = selectedDates.indexOf(this.selectedDate);
 
     // Cycle back to beginning if at last index
     // this.selectedDateIndex = this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1 ? 0 : this.selectedDateIndex++;
@@ -837,29 +854,20 @@ export class WaterBodyStatsDetails {
     // TODO: Highlight new date in list.
     this.selectedDate = this.datesWithinRange[this.selectedDateIndex];
 
+    // let selectedDateElement = document.getElementById('selected-dates-list');
+    // selectedDateElement.children[this.selectedDateIndex].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
+    this.scrollToSelectedDate();
+
+
     let date = this.calcs.getDayOfYear(this.selectedDate);
     let year = parseInt(date.split(' ')[0]);
     let day = parseInt(date.split(' ')[1]);
 
     // TODO: Cycle image.
     this.getWaterbodyImage(this.wbProps.objectid, year, day);
-    
-    // TODO: Highlight bar in stacked bar plot for date.
-    this.stackedChartData.forEach(dataObj => {
-      console.log("stacked chart data obj: ")
-      console.log(dataObj)
-    })
-    let labelIndex = 0;
-    this.stackedChartLabels.forEach(dateLabel => {
-      console.log("stackedChartLabels: " + dateLabel)
-      if (dateLabel != this.selectedDate) {
-         // gray-out dates not selected
-         // this.stackedChartData[labelIndex].backgroundColor + '4D';
-      }
-      labelIndex++;
-    })
 
-    labelIndex = 0;
+    console.log("stackedChartData: ", this.stackedChartData)
+
     // // TODO: Highlight points in line chart for date.
     // this.lineChartLabels.forEach(dateLabel => {
     //   console.log("line chart label: ")
@@ -874,8 +882,56 @@ export class WaterBodyStatsDetails {
     //   labelIndex++;
     // });
 
+    // console.log("Stacked Chart: ", this.stackedChart);
+    // console.log("Bar Chart: ", this.barChart);
+    // console.log("Pie Chart: ", this.pieChart)
+    // console.log("Line chart: ", this.lineChart)
+
+    console.log("charts: ", this.chartObjs);
+
+    this.chartObjs.forEach((chart) => {
+      console.log("Chart: ", chart)
+      this.triggerHover(chart.chart);
+    });
+
+    // TODO: Highlight points in line chart for selected slideshow date:
+
+    // TODO: If x-labels can also correspond to a bar, highlight the date label during slideshow?
+
+    // let chartObj = this.chartObjs['_results'];
+    // let chartObj = this.stackedChart.chart;
+    // this.triggerHover(this.stackedChart.chart);
+    // this.triggerHover(chartObj);
+
     this.toggleSlideShow();
 
+  }
+
+  triggerHover(chart) {
+    // TODO: Remove hover highlighting if slideshow is stopped.
+    // TODO: Go back to original "available date" if slideshow is stopped.
+
+    console.log("triggerHover called.")
+    console.log("Chart: ", chart)
+    console.log("Selected state index: ", this.selectedDateIndex)
+
+    let meta = chart.getDatasetMeta(0);
+    let rect = chart.canvas.getBoundingClientRect();
+    let point = meta.data[this.selectedDateIndex].getCenterPoint();
+    let evt = new MouseEvent('mousemove', {
+      clientX: rect.left + point.x,
+      clientY: rect.top + point.y
+    });
+    let node = chart.canvas;
+    node.dispatchEvent(evt);
+  }
+
+  scrollToSelectedDate() {
+    /*
+    Scrolls to selected date in the "Selected dates" selection list.
+    */
+    let selectedDateElement = document.getElementById('selected-dates-list');
+    selectedDateElement.children[this.selectedDateIndex].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
   }
 
 }

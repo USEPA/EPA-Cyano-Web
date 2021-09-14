@@ -47,17 +47,23 @@
 					</mat-form-field>
 				</div>
 				<!-- Shows list of dates within selected range -->
-				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div" class="data-item">
-					<b>Selected dates</b>
-					<dl id="selected-dates-list">
-						<dt [class.hightlight-date]="date == selectedDate" class="selected-dates-item" *ngFor="let date of datesWithinRange">
-							{{date}}
-						</dt>
-					</dl>
-					<br>
-					<div class="details_slideshow">
-            			<mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">Slideshow</mat-checkbox>
-          			</div>
+				<!-- <div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div" class="data-item"> -->
+				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
+					<div style="float:left;">
+						<b>Selected dates</b>
+						<dl id="selected-dates-list">
+							<dt [class.highlight-date]="date == selectedDate" class="selected-dates-item" *ngFor="let date of datesWithinRange">
+								{{date}}
+							</dt>
+						</dl>
+					</div>
+					<div>
+						<div class="details_slideshow">
+	            			<mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">{{slidershow ? "Slideshow started" : "Start slideshow"}}</mat-checkbox>
+	          			</div>
+	          			<br>
+	          			<p>Current date: {{selectedDate || selectedAvailableDate}}</p>
+	          		</div>
 				</div>
 			</div>
 
@@ -75,7 +81,7 @@
 				    <div class="chart_source_selection"></div>
 				  </div>
 					<div class="chart_graph">
-						<canvas *ngIf="!showStacked && !showPie" aria-label="Total cell counts" baseChart class="cyan_chart left-chart" width="1" height="1"
+						<canvas *ngIf="!showStacked && !showPie" aria-label="Total cell counts" baseChart #barChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
 						  [datasets]="chartData"
 						  [options]="chartOptions"
 						  [colors]="chartColors"
@@ -84,7 +90,7 @@
 						  [labels]="chartLabels"
 						  (chartClick)="chartClick($event)">
 						</canvas>
-						<canvas *ngIf="!showStacked && !showBars" aria-label="Total cell counts" baseChart class="cyan_chart left-chart" width="1" height="1"
+						<canvas *ngIf="!showStacked && !showBars" aria-label="Total cell counts" #stackedChart="base-chart" baseChart class="cyan_chart left-chart" width="1" height="1"
 						  [datasets]="pieChartData"
 						  [options]="pieChartOptions"
 						  [colors]="pieChartColors"
@@ -93,7 +99,7 @@
 						  [labels]="pieChartLabels"
 						  (chartClick)="chartClick($event)">
 						</canvas>
-						<canvas *ngIf="!showPie && !showBars" aria-label="Total cell counts" baseChart class="cyan_chart left-chart" width="1" height="1"
+						<canvas *ngIf="!showPie && !showBars" aria-label="Total cell counts" baseChart #pieChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
 						  [datasets]="stackedChartData"
 						  [options]="stackedChartOptions"
 						  [colors]="stackedChartColors"
@@ -116,12 +122,12 @@
 					<div class="chart_graph">
 						<canvas *ngIf="!showStacked" aria-label="Concentration histogram" baseChart class="cyan_chart right-chart" width="1" height="1"
 						  [datasets]="histoChartData"
-						  [options]="chartOptions"
-						  [legend]="chartLegend"
+						  [options]="histoChartOptions"
+						  [legend]="histoChartLegend"
 						  [chartType]="histoChartType"
 						  [labels]="histoChartLabels">
 						</canvas>
-						<canvas *ngIf="showStacked" aria-label="Total cell counts by range" baseChart class="cyan_chart right-chart" width="1" height="1"
+						<canvas *ngIf="showStacked" aria-label="Total cell counts by range" baseChart class="cyan_chart right-chart" #stackedChart="base-chart" width="1" height="1"
 						  [datasets]="lineChartData"
 						  [options]="lineChartOptions"
 						  [colors]="lineChartColors"

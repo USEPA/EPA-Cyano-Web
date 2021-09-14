@@ -16,7 +16,7 @@ export class Charts {
   chartData: ChartDataSets[] = [
     {
       data: [],
-      label: '',
+      label: ''
     }
   ];
   chartOptions: ChartOptions = {
@@ -24,16 +24,41 @@ export class Charts {
     legend: {
       display: false
     },
-    // tooltips: {
-    //   mode: 'label',
-    //   callbacks: {
-    //     label: (tooltipItem, data) => {
-    //       console.log("tooltipItem: ", tooltipItem)
-    //       console.log("data: ", data)
-    //       return tooltipItem.yLabel.toString()
-    //     }
-    //   }
-    // }
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: true
+        }
+      }],
+      // xAxes: [{
+      //   type: 'time'
+      // }]
+    },
+    plugins: {
+      datalabels: {
+        display: 'auto',
+        color: 'black',
+        // borderColor: 'white',
+        font: {
+          weight: 'bold'
+        },
+        backgroundColor: 'white',
+        // align: (context): any => {
+        //   console.log("Align called. Context: ", context)
+        //   let yTickSize = context.chart.options.scales.yAxes[0].ticks.stepSize;
+        //   let barData = context.dataset.data[barIndex];
+        //   console.log("Bar index: ", barIndex)
+        //   console.log("y tick size: ", yTickSize)
+        //   console.log("Bar data: ", barData)
+        //   if (barData <= yTickSize) {
+        //     return 'top';
+        //   }
+        //   else {
+        //     return 'center';
+        //   }
+        // }
+      }
+    }
   };
   chartColors: Array<any> = [
     {
@@ -58,8 +83,22 @@ export class Charts {
   pieChartOptions: ChartOptions = {
     responsive: true,
     legend: {
-      display: false
+      display: true
+    },
+    plugins: {
+      datalabels: {
+        display: 'auto',
+        color: 'black',
+        backgroundColor: 'white',
+        font: {
+          weight: 'bold'
+        },
+        formatter: (value, dict1) => {
+          return value + '%';
+        }
+      }
     }
+
   };
   pieChartColors: Array<any> = [
     {
@@ -96,6 +135,18 @@ export class Charts {
     }
   ];
   public histoChartType: ChartType = 'pie';
+  public histoChartOptions: ChartOptions = {
+    responsive: true,
+    legend: {
+      display: false
+    },
+    plugins: {
+      datalabels: {
+        display: false
+      }
+    }
+  };
+  histoChartLegend: boolean = true;
 
   // Stacked bar chart parameters:
   public stackedChartData: ChartDataSets[] = [
@@ -104,7 +155,7 @@ export class Charts {
       label: 'low',
       stack: 'a',
       backgroundColor: this.configService.green,
-      hoverBackgroundColor: this.configService.green,
+      hoverBackgroundColor: this.configService.darkGreen,
       pointRadius: 1
     },
     {
@@ -112,7 +163,7 @@ export class Charts {
       label: 'medium',
       stack: 'a',
       backgroundColor: this.configService.yellow,
-      hoverBackgroundColor: this.configService.yellow,
+      hoverBackgroundColor: this.configService.darkYellow,
       pointRadius: 1
     },
     {
@@ -120,7 +171,7 @@ export class Charts {
       label: 'high',
       stack: 'a',
       backgroundColor: this.configService.orange,
-      hoverBackgroundColor: this.configService.orange,
+      hoverBackgroundColor: this.configService.darkOrange,
       pointRadius: 1
     },
     {
@@ -128,16 +179,28 @@ export class Charts {
       label: 'veryHigh',
       stack: 'a',
       backgroundColor: this.configService.red,
-      hoverBackgroundColor: this.configService.red,
+      hoverBackgroundColor: this.configService.darkRed,
       pointRadius: 1
     }
   ];
   public stackedChartOptions: ChartOptions = {
-    responsive: true
+    responsive: true,
+    plugins: {
+      datalabels: {
+        display: false,
+        backgroundColor: (context): any => {
+          console.log("backgroundColor context: ", context);
+        }
+      }
+    },
+    tooltips: {
+      mode: 'index'
+    }
   };
   public stackedChartColors: Array<any> = [];
   public stackedChartType: ChartType = 'bar';
   public stackedChartLabels: Label[] = [];
+  public stackedChartLegend: boolean = true;
 
   // Line chart parameters:
   public lineChartData: ChartDataSets[] = [
@@ -176,11 +239,27 @@ export class Charts {
         tension: 0,
         fill: false
       }
+    },
+    plugins: {
+      datalabels: {
+        display: false,
+        color: 'black',
+        borderColor: 'white',
+        font: {
+          weight: 'bold'
+        }
+      },
+    },
+    tooltips: {
+      mode: 'index',
+      bodyAlign: 'right',
+      position: 'nearest'
     }
   };
   public lineChartColors: Array<any> = [];
   public lineChartType: ChartType = 'line';
   public lineChartLabels: Label[] = [];
+  public lineChartLegend: boolean = true;
 
   constructor(
     private configService: ConfigService,

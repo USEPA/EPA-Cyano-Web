@@ -36,6 +36,11 @@
     .location_block_0 {
     	width: 50vw;
     }
+    #selected-dates-div {
+        padding-left: 15%;
+        padding-top: 5%;
+        text-align: center;
+    }
 }
 @media screen and (max-width: 979px) and (min-width: 401px) {
 	.locations-block {
@@ -94,6 +99,7 @@ mat-card {
 	display: inline-block;
     border-radius: 0;
     width: 48%;
+    /*width: 45%;*/
     height: 100%;
     padding: 0 2% 0 2%;
     margin: 0;
@@ -234,17 +240,13 @@ h2.label {
   padding-left: 2%;
 }
 
-#selected-dates-div {
-
-}
-
 #selected-dates-list {
 	overflow-y: auto;
 	max-height: 10vh;
-	width: 50%;
+	/*width: 50%;*/
 }
 
-.hightlight-date {
+.highlight-date {
 	background-color: rgba(0,0,0,0.12);
 }
 
