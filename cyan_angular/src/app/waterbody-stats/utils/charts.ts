@@ -117,9 +117,9 @@ export class Charts {
         this.configService.yellow,
         this.configService.orange,
         this.configService.red,
-        'rgba(148,148,148,255)',  // below detection
-        'rgba(160,82,45,255)',  // land
-        'rgba(0,0,0,255)'  // no data
+        this.configService.belowDetection,
+        this.configService.land,
+        this.configService.noData
       ]
     }
   ];
