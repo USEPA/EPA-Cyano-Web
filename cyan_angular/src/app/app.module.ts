@@ -86,6 +86,7 @@ import { Charts } from './waterbody-stats/utils/charts';
 
 import 'hammerjs';
 import 'chartjs-plugin-zoom';
+import 'chartjs-plugin-datalabels';
 import { ReportsComponent } from './waterbody-stats/reports/reports.component';
 
 @NgModule({
