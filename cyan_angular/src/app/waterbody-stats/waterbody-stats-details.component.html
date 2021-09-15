@@ -3,7 +3,7 @@
 	<div class="locations-block">
 
 		<button mat-button [routerLink]="['']" class="locations-exit">X</button>
-		<!-- <br> -->
+
 		<div class="wbstats-content">
 			<h4>Waterbody Information</h4>
 			<br>
@@ -18,7 +18,6 @@
 			<br><br>
 			<div class="details_tab">
 				<!-- User selections for WB stats -->
-				<!-- <div class="data-item"> -->
 				<div class="wbstats-inputs">
 					<mat-form-field>
 						<mat-label>Data Type</mat-label>
@@ -27,7 +26,6 @@
 							<mat-option value="weekly">Weekly</mat-option>
 						</mat-select>
 					</mat-form-field>
-					<!-- <br> -->
 					<mat-form-field>
 						<mat-label>Available Dates</mat-label>
 							<mat-select [(value)]="selectedAvailableDate" (selectionChange)="updateDate($event.value);">
@@ -36,7 +34,6 @@
 							</mat-option>
 						</mat-select>
 					</mat-form-field>
-					<!-- <br> -->
 					<mat-form-field>
 						<mat-label>Date Range</mat-label>
 						<mat-select [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
@@ -47,7 +44,6 @@
 					</mat-form-field>
 				</div>
 				<!-- Shows list of dates within selected range -->
-				<!-- <div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div" class="data-item"> -->
 				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
 					<div style="float:left;">
 						<b>Selected dates</b>
@@ -181,6 +177,7 @@
 
 </div>
 
+<!-- Map legends -->
 <div class="legends">
 	<!-- OCLI color map legend -->
 	<div class="leaflet-container leaflet-bottom leaflet-right">
@@ -189,7 +186,6 @@
 	<div class="map-legend leaflet-container leaflet-bottom leaflet-right" *ngIf="showLegend">
 	  <img src="assets/images/legend.png" />
 	</div>
-
 	<!-- User color settings legend -->
 	<div class="user-legend leaflet-container leaflet-bottom leaflet-right">
 	  <span class="leaflet-control leaflet-control-attribution map-legend-toggle" (click)="toggleUserLegend()">Toggle User Ranges</span>

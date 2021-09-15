@@ -306,9 +306,6 @@ export class WaterBodyStatsDetails {
       let landCounts = this.waterbodyData[dataType].data[date][254];
       let noDataCounts = this.waterbodyData[dataType].data[date][255];
 
-      // this.curatedData[dataType][date].data.percentBelowDetection = 0.09 * belowDetectionCounts;
-      // this.curatedData[dataType][date].data.percentLand = 0.09 * landCounts;
-      // this.curatedData[dataType][date].data.percentNoData = 0.09 * noDataCounts;
       this.curatedData[dataType][date].data.countsBelowDetection = belowDetectionCounts;
       this.curatedData[dataType][date].data.countsLand = landCounts;
       this.curatedData[dataType][date].data.countsNoData = noDataCounts;

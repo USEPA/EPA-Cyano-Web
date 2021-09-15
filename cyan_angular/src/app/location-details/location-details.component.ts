@@ -101,6 +101,9 @@ export class LocationDetailsComponent implements OnInit {
           enabled: true,
           mode: 'xy'
         }
+      },
+      datalabels: {
+        display: false
       }
     }
   };

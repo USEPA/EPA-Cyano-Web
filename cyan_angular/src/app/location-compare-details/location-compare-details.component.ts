@@ -90,6 +90,9 @@ export class LocationCompareDetailsComponent implements OnInit {
           enabled: true,
           mode: 'xy'
         }
+      },
+      datalabels: {
+        display: false
       }
     }
   };
