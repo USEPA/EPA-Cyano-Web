@@ -18,6 +18,7 @@ import { CyanMap } from '../utils/cyan-map';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { LoaderService } from '../services/loader.service';
 import { CoordinatesComponent } from '../coordinates/coordinates.component';
+import { ReportsComponent } from './reports/reports.component';
 
 
 @Component({
