@@ -57,15 +57,18 @@ def check_headers(f):
         origin = request.environ.get("HTTP_ORIGIN", "")
         app_header = request.headers.get("App-Name", "")
 
-        logging.info(
-            "Origin: {}\nDomain: {}\nApp: {}".format(
-                origin, os.getenv("HOST_DOMAIN"), app_header
+        host_domain = os.getenv("HOST_DOMAIN")
+        app_name = os.getenv("APP_NAME")
+
+        logging.warning(
+            "HTTP Origin: {}\nHOST_DOMAIN: {} \
+            \nApp-Name: {}\nAPP_NAME: {}".format(
+                origin, host_domain,
+                app_header, app_name
             )
         )
 
-        if not origin in os.getenv("HOST_DOMAIN") or app_header != os.getenv(
-            "APP_NAME"
-        ):
+        if not origin in host_domain or app_header != app_name:
             logging.warning("Request Origin or App does not match. Skipping request.")
             return (
                 {"error": "Not a valid request"},
