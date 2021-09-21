@@ -54,12 +54,8 @@ export class AccountComponent implements OnInit {
   resetEmail: string = "";
   allowReset: boolean = true;
 
-  minPasswordLength: number = 8;
-  maxPasswordLength: number = 32;
-  passwordStrength: RegExp = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&]).{8,}/;
+  usernameMinLength: number = 4;
 
-  loginAttemptLimit: number = 5;
-  logingAttemptTimeout: number = 120;  // units: seconds
 
   constructor(
     private router: Router,
@@ -271,24 +267,17 @@ export class AccountComponent implements OnInit {
 
   validateForm(): void {
     let self = this;
-    if (this.registerUsername == '' || this.registerUsername == undefined || this.registerUsername.length < 4) {
-      self.dialog.handleError('Username must be 4 characters or more.');
-    }
-    else if (this.registerPassword != this.registerPasswordCheck) {
-      self.dialog.handleError('Passwords do not match.');
-    }
-    else if (
-      this.registerPassword.length < this.minPasswordLength
-      || this.registerPassword.length > this.maxPasswordLength
+    let validPass = this.authService.validatePassword(this.registerPassword, this.registerPasswordCheck);
+
+    if (
+      this.registerUsername == '' ||
+      this.registerUsername == undefined ||
+      this.registerUsername.length < this.usernameMinLength
     ) {
-      self.dialog.handleError(
-        'Password must contain between ' + this.minPasswordLength + ' and ' + this.maxPasswordLength + ' characters.'
-      );
+      self.dialog.handleError('Username must be ' + this.usernameMinLength + ' characters or more.');
     }
-    else if (this.passwordStrength.test(this.registerPassword) !== true) {
-      self.dialog.handleError(
-        'Password must contain at least one special character, an uppercase character, and a number'
-      );
+    else if (validPass['valid'] !== true) {
+      self.dialog.handleError(validPass['message'])
     }
     else if (!this.authService.emailIsValid(this.registerEmail)) {
       self.dialog.handleError('Email is invalid');
