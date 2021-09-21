@@ -311,12 +311,12 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
    }
 
-   getCounties() {
+   getCounties(state: string) {
     /*
     Gets counties with available waterbodies.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.waterbodyUrl + 'report_form/counties/';
+    let url = this.envService.config.waterbodyUrl + 'report_form/counties/?state=' + state;
     return this.executeAuthorizedGetRequest(url);
    }
 
@@ -342,7 +342,6 @@ export class DownloaderService {
   ajaxRequest(ln: Location, username: string, url: string) {
     let self = this;
     self.loaderService.show();
-    // console.log("Tracker: " + this.requestsTracker);
     self.requestsTracker += 1;
     ajax({
       url: url,
@@ -350,6 +349,8 @@ export class DownloaderService {
     }).subscribe(data => {
       let d = data.response;
       let loc = self.createLocation(ln, username, d);
+      loc.latitude = ln.latitude;
+      loc.longitude = ln.longitude;
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
       if (index > -1) {

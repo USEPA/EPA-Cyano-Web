@@ -155,8 +155,6 @@ export class LocationService {
             self.locations.push(l);
             self.downloadLocation(l);
 
-            self.addWaterbodyInfo(l);
-
           }
         });
         self.addMarkers();
@@ -229,6 +227,7 @@ export class LocationService {
           this.mapService.updateMarker(loc);
           this.updateCompareLocation(loc);
           this.downloader.updateProgressBar();
+          this.addWaterbodyInfo(loc);
         }
       }
     );
@@ -292,15 +291,11 @@ export class LocationService {
     l.notes = [];
     l.marked = false;
     l.compare = false;
-    // l.objectid = null;
     l.waterbody = new WaterBody();
     l.waterbody.objectid = null;
 
     this.downloader.addUserLocation(this.user.getUserName(), l);
     this.locations.push(l);
-
-    // this.addObjectId(l);
-    this.addWaterbodyInfo(l);
 
     return l;
   }
