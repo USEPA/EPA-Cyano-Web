@@ -41,12 +41,12 @@
   </div>
   <div class="location_buttons">
     <input id="note-input" type="text" aria-label="Add Note" placeholder="Add Note" (keyup.enter)="saveNoteToLocation(location)">
-    <span *ngIf=" marked == 'Unmark'; then unmark else mark"></span>
+    <span *ngIf=" marked == 'Uncheck'; then unmark else mark"></span>
     <ng-template #unmark>
-      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="mark"></span><span id="marked-label">Mark</span> Location</button>
+      <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="mark"></span><span id="marked-label">Check</span> Location</button>
     </ng-template>
     <ng-template #mark>
-        <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="unmark"></span><span id="marked-label">Unmark</span> Location</button>
+        <button type="button" class="popup-unmark-btn popup-btn" (click)="toggleMarkedLocation(location)"><span id="marked-icon" class="unmark"></span><span id="marked-label">Uncheck</span> Location</button>
     </ng-template>
     <span *ngIf="compareSelected; then selected else select"></span>
     <ng-template #select>

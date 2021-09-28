@@ -239,7 +239,7 @@ describe('MapPopupComponent', () => {
   });
 
   it('should test toggleMarkedLocation', () => {
-    let expectedVal = 'Mark';
+    let expectedVal = 'Check';
     spyOn<any>(component['authService'], 'checkUserAuthentication')
       .and.returnValue(true);
     spyOn<any>(component['mapService'], 'updateMarker');
