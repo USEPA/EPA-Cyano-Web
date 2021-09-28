@@ -165,7 +165,7 @@ export class Calculations {
 
     });
 
-    let sortedDates = numDates.sort((a, b) => a - b);
+    let sortedDates = numDates.sort((a, b) => a - b).reverse();
     let sortedDateKeys = sortedDates.map(item => {
       return item.toString().slice(0, 4) + " " + item.toString().slice(4);
     });
