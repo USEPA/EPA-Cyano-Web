@@ -8,6 +8,7 @@ import datetime
 import json
 import logging
 from sqlalchemy import desc
+import os
 
 # Local imports:
 from auth import PasswordHandler, JwtHandler
@@ -388,7 +389,11 @@ def reset_password(request):
     if "error" in response:
         return response, 500
 
-    return {"status": "Email sent to {}".format(user_email)}, 200
+    return {
+        "status": "An email has been sent to: {} from {}.\n\n \
+                    Follow the link in the email to verify the password reset. This link \
+                    will expire in {} minutes.\n\nThere is a chance the email will show up in \
+                    your spam folder.".format(user_email, os.getenv("EMAIL"), int(os.getenv("SESSION_EXPIRE_SECONDS"))/60)}, 200
 
 
 def set_new_password(request):

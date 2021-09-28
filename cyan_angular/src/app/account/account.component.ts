@@ -148,6 +148,7 @@ export class AccountComponent implements OnInit {
         this.resetMessage = response['status'];
         this.allowReset = false;
       }
+      this.resetEmail = '';
     });
   }
 

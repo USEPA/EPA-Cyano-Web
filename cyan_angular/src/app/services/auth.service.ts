@@ -138,7 +138,7 @@ export class AuthService {
     else if (this.passwordStrength.test(password) !== true) {
       return {
         'valid': false,
-        'message': 'Password must contain at least one special character, an uppercase character, and a number'
+        'message': 'Password must contain at least 1 digit (0-9), at least 1 symbol (e.g., ~, !, @, #, $, %, =, +, <, >, /, ?, ^, &, *), at least 1 UPPERCASE English letter (A-Z), and at least 1 lowercase English letter (a-z)'
       }
     }
     else {

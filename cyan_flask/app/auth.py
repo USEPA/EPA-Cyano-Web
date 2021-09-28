@@ -27,7 +27,7 @@ class PasswordHandler:
         pass
 
     def _create_reset_email_message(self, server_email, user_email, username):
-        subject = "Password reset for Cyano Web"
+        subject = "Password reset for Cyanweb at {}".format(os.getenv("HOST_DOMAIN"))
         user_link = self._create_reset_link(user_email)
         msg = "\r\n".join(
             [
@@ -35,7 +35,7 @@ class PasswordHandler:
                 "To: {}".format(user_email),
                 "Subject: {}".format(subject),
                 "",
-                "Follow link to reset password for {}: {}".format(username, user_link),
+                "Follow link to reset password for {}: {}.\n\nThis link will expire in {} minutes from the time this email was sent.".format(username, user_link, int(os.getenv("SESSION_EXPIRE_SECONDS")) / 60),
             ]
         )
         return msg

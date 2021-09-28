@@ -174,3 +174,8 @@
 #account-form .mat-form-field-invalid span {
     color: #ef0000;
 }
+
+#reset-form {
+    height:  100%;
+    margin-top: 4%;
+}

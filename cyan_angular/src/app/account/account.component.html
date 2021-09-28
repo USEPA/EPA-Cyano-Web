@@ -52,9 +52,9 @@
             Disclaimer: User name should not contain any personally identifiable information and is only used for retrieving saved locations and custom settings of the CyAN web application.
           </div>
         </div>
-        <div *ngIf="resetForm">
+        <div id="reset-form" *ngIf="resetForm">
           <div *ngIf="allowReset">
-            <br>Provide an email address for resetting password:<br><br>
+            <br>Provide the email address used for your account for resetting the password:<br><br>
             <mat-form-field class="register-input email">
               <input matInput email placeholder="Email" [(ngModel)]="resetEmail" required>
             </mat-form-field>
