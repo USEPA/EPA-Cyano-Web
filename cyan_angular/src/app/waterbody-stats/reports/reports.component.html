@@ -24,12 +24,12 @@
 		<div class="wb-name-div" *ngIf="selectedReportType == 'locations'">
 			<mat-checkbox [(ngModel)]="selectAll" (change)="selectAllCheckbox($event)" color="primary">Select all</mat-checkbox>
 			<dl id="selected-dates-list">
-				<dt class="selected-dates-item" *ngFor="let location of myLocations">
-				<!-- <dt class="selected-dates-item" *ngFor="let location of userLocations"> -->
+				<!-- <dt class="selected-dates-item" *ngFor="let location of myLocations"> -->
+				<dt class="selected-dates-item" *ngFor="let location of userLocations">
 					<!-- <mat-checkbox [(ngModel)]="location.checked" color="primary"> -->
-					<mat-checkbox [(ngModel)]="location.checked" color="primary">
-						{{location.name}}
-						(Waterbody: {{location.waterbody.name}})
+					<mat-checkbox (change)="locationSelect(location, $event)" [(ngModel)]="location.checked" color="primary">
+						{{location.location.name}}
+						(Waterbody: {{location.location.waterbody.name}})
 					</mat-checkbox>
 				</dt>
 			</dl>
@@ -62,7 +62,7 @@
 		</div>
 
 		<!-- Search by county -->
-		<div class="wb-name-div" *ngIf="selectedState">
+		<div class="wb-name-div" *ngIf="selectedState && selectedReportType == 'county'">
 			<mat-form-field>
 				<label>Select a county:</label>
 				<br><br>
@@ -77,33 +77,23 @@
 		<br><br>
 
 		<!-- Date selection -->
-		<mat-form-field *ngIf="wbCounties.length > 0 || selectedTribe.length > 0">
+		<mat-form-field *ngIf="selectedCounty.length > 0 || selectedTribe.length > 0 || selectedLocations.length > 0">
+			<mat-label>Select a date:</mat-label>
+			<input matInput [matDatepicker]="picker">
+			<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+			<mat-datepicker #picker></mat-datepicker>
+		</mat-form-field>
+		<!-- <mat-form-field *ngIf="selectedCounty.length > 0 || selectedTribe.length > 0 || selectedLocations.length > 0">
 			<mat-label>Select a date:</mat-label>
 				<mat-select (selectionChange)="updateDate($event.value);">
 				<mat-option *ngFor="let date of dates" [value]="date">
 					{{date}}
 				</mat-option>
 			</mat-select>
-		</mat-form-field>
+		</mat-form-field> -->
 
-		<!-- Results list -->
-		<!-- <h4 class="results-title" *ngIf="waterbodyResults?.length > 0">Results: {{waterbodyResults.length}}</h4>
-		<div *ngIf="waterbodyResults?.length > 0" class="user-locations">
-			<br>
-			<ul>
-				<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="handleWaterbodySelect(waterbody);">
-					<div class="location-item-left">
-						<p>
-							<b>{{waterbody.name}}</b><br>
-							<b>COMID:</b> {{waterbody.objectid}}<br>
-							<b>Coordinates:</b> {{waterbody.centroid_lat}}, {{waterbody.centroid_lng}}<br>
-							<b>Area:</b> {{waterbody.areasqkm}}km<sup>2</sup><br>
-							<b>State:</b> {{waterbody.state_abbr}}
-						</p>
-					</div>
-				</li>
-			</ul>
-		</div> -->
+		<!-- Request report button -->
+		<button mat-button color="primary">Generate Report</button>
 		
 	</div>
 
