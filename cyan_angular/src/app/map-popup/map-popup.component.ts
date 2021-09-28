@@ -16,7 +16,7 @@ import { ConfigService } from "../services/config.service";
   styleUrls: ["./map-popup.component.css"],
 })
 export class MapPopupComponent implements OnInit {
-  marked: string = "Mark";
+  marked: string = "Check";
   @Input() location: Location;
   @Input() locationData: Location;
 
@@ -48,7 +48,7 @@ export class MapPopupComponent implements OnInit {
       this.location = loc[0];
     } else {
       self.getLocation();
-      self.marked = self.location.marked ? "Mark" : "Unmark";
+      self.marked = self.location.marked ? "Check" : "Uncheck";
       self.locationService.downloadLocation(self.location);
     }
     this.compareSelected = this.locationInCompareArray(
@@ -214,7 +214,7 @@ export class MapPopupComponent implements OnInit {
     } else {
       icon.className = "mark";
     }
-    this.marked = m ? "Unmark" : "Mark";
+    this.marked = m ? "Uncheck" : "Check";
     this.mapService.updateMarker(ln);
     this.locationService.updateLocation(ln.name, ln);
   }

@@ -21,7 +21,7 @@ export class CoordinatesComponent implements OnInit {
 
 	cyan_ranges: ConcentrationRanges;
 
-	marked: string = 'Mark';
+	marked: string = 'Check';
 
 	selectedLat: string = 'N';
 	selectedLon: string = 'W';
