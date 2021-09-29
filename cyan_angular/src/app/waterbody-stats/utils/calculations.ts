@@ -147,6 +147,26 @@ export class Calculations {
     return dateObj.toLocaleDateString();
   }
 
+  getDayOfYearFromDateObject(date: Date) {
+    /*
+    Returns day number and year from a JS Date object.
+    */
+    let day = date.getDate().toString().slice(-2);
+    let month = (date.getMonth() + '1').slice(-2);
+    let year = date.getFullYear();
+
+    console.log("day: ", day)
+    console.log("month: ", month)
+    console.log("year: ", year)
+
+    let dateString = month + '/' + day + '/' + year;
+
+    console.log("dateString: ", dateString)
+
+    return this.getDayOfYear(dateString);
+
+  }
+
   sortByDate(dataByType: any) {
 
     let dateKeys = Object.keys(dataByType);

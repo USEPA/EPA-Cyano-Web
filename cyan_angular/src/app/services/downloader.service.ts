@@ -302,32 +302,47 @@ export class DownloaderService {
     });
   }
 
-   getTribes() {
+  getTribes() {
     /*
     Gets tribes with available waterbodies.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.envService.config.waterbodyUrl + 'report_form/tribes/';
     return this.executeAuthorizedGetRequest(url);
-   }
+  }
 
-   getCounties(state: string) {
+  getCounties(state: string) {
     /*
     Gets counties with available waterbodies.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.envService.config.waterbodyUrl + 'report_form/counties/?state=' + state;
     return this.executeAuthorizedGetRequest(url);
-   }
+  }
 
-   getStates() {
+  getStates() {
     /*
     Gets states with available waterbodies.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.envService.config.waterbodyUrl + 'report_form/states/';
     return this.executeAuthorizedGetRequest(url);
-   }
+  }
+
+  generateReport(reportType: string, reportId: number, year: number, day: number) {
+    /*
+    Starts report generation.
+      * reportType - objectids, county, or tribe
+      * reportId - ID number for the reportType
+      * year, day - year and day-of-year for report
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/?'
+      + reportType + '=' + reportId
+      + '&year=' + year
+      + '&day=' + day;
+    return this.executeAuthorizedGetRequest(url);
+  }
 
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }

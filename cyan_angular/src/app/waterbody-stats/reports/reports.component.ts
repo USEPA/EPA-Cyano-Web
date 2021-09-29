@@ -5,6 +5,7 @@ import { DownloaderService } from '../../services/downloader.service';
 import { LocationService } from '../../services/location.service';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { LoaderService } from '../../services/loader.service';
+import { Calculations } from '../utils/calculations';
 
 
 @Component({
@@ -20,7 +21,7 @@ export class ReportsComponent implements OnInit {
  //  	'state': 'State'
  //  }
  	reportTypeOptions: any = {
-  	'locations': 'User Locations',
+  	'objectids': 'User Locations',
   	'tribe': 'Tribe',
   	'county': 'County',
   }
@@ -47,14 +48,25 @@ export class ReportsComponent implements OnInit {
 	selectedTribe: string = '';
 	selectedLocations = [];
 
+	currentReportId: number = null;  // objectid, tribe id, or county id
+
 	requestsTracker: number = 0;
   totalRequests: number = 0;
+
+  minDay: number = 0;  // min allowed day
+  maxDay: number = 366; // max allowed day
+
+  minYear: number = 1900;
+  maxYear: number = 9999;
+
+  selectedCalendarDate: Date = null;
 
   constructor(
   	private downloader: DownloaderService,
   	private locationService: LocationService,
   	private dialog: DialogComponent,
-  	private loaderService: LoaderService
+  	private loaderService: LoaderService,
+  	private calcs: Calculations
   ) { }
 
   ngOnInit(): void {
@@ -87,6 +99,8 @@ export class ReportsComponent implements OnInit {
   onTribeSelect(event): void {
   	console.log("onTribeSelect() called: ", event)
   	this.selectedTribe = event.value;
+  	let tribeId = this.findIdByName(event.value, this.wbTribes);
+  	this.currentReportId = parseInt(tribeId);
   }
 
 	onStateSelect(event): void {
@@ -99,9 +113,10 @@ export class ReportsComponent implements OnInit {
 	onCountySelect(event): void {
 		console.log("onCountySelect() called: ", event)
 		// Ready to generate report for the county after selected a date
-		let countyId = this.findCountyId(event.value);
+		let countyId = this.findIdByName(event.value, this.wbCounties);
 		console.log("County ID: ", countyId);
 		this.selectedCounty = event.value;
+		this.currentReportId = parseInt(countyId);
 	}
 
 	getTribes() {
@@ -176,15 +191,12 @@ export class ReportsComponent implements OnInit {
 		}
 	}
 
-	findCountyId(countyName) {
-		/*
-		Gets county ID from wbCounties list.
-		*/
-		let countyArray = this.wbCounties.filter(county => county[1] === countyName);
-		if (countyArray.length < 1) {
-			this.dialog.handleError("Couldn't find county ID. Try a different county.");
+	findIdByName(name: string, wbData) {
+		let dataArray = wbData.filter(item => item[1] === name);
+		if (dataArray.length < 1) {
+			this.dialog.handleError("Couldn't find ID for " + name);
 		}
-		return countyArray[0];
+		return dataArray[0];
 	}
 
 	removeLocation(userLocation) {
@@ -221,7 +233,39 @@ export class ReportsComponent implements OnInit {
   	Makes request to /report endpoint to try and
   	generate a report based on county, tribe, or "my location".
   	*/
+  	console.log("generateReport() called.")
+
+  	let day = this.selectedCalendarDate.getDay();
+  	let year = this.selectedCalendarDate.getFullYear();
+
+  	this.validateReportRequest(year, day);
+
+  	// TODO: Set currentReportID for User Locations report type
   	
+  	this.downloader.generateReport(this.selectedReportType, this.currentReportId, year, day).subscribe(response => {
+  		console.log("generateReport response: ", response)
+  	});
+
+
+  }
+
+  validateReportRequest(year: number, day: number): void {
+  	if (!Object.keys(this.reportTypeOptions).includes(this.selectedReportType)) {
+      this.dialog.handleError('Report type is not valid.');
+    }
+    else if ((year > this.maxYear || year < this.minYear)) {
+    	this.dialog.handleError('Year is out of range.');
+    }
+    else if (day > this.maxDay || day < this.minDay) {
+    	this.dialog.handleError('Day is out of range. Must be between 1 - 366.');
+    }
+    else if (year.toString().length != 4) {
+    	this.dialog.handleError('Year is wrong size. Must be 4 digits (e.g., 2021).');
+    }
+    else if (day.toString().length > 3 || day.toString().length < 1) {
+    	this.dialog.handleError('Day is wrong size. Must be between 1 and 3 (e.g., 1 - 366).');
+    }
+    // TODO: Set limits on report ID array
   }
 
 }
