@@ -19,6 +19,8 @@ export class BottomMenuComponent implements OnInit {
   public data_type: LocationType;
 
   hideUpload: boolean = false;
+  hideWaterbodyStats: boolean = false;
+
   configSetSub: Subscription;
 
   constructor(
@@ -29,10 +31,12 @@ export class BottomMenuComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
     this.data_type = this.locationService.getDataType();
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
       this.hideUpload = this.envService.config.disableUpload;
+      this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
     });
 
   }

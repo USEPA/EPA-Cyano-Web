@@ -21,6 +21,10 @@ export class AuthService {
 
   private jwtHelper = new JwtHelperService();
 
+  minPasswordLength: number = 8;
+  maxPasswordLength: number = 32;
+  passwordStrength: RegExp = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&]).{8,}/;
+
   constructor(
     private http: HttpClient,
     private envService: EnvService
@@ -115,7 +119,35 @@ export class AuthService {
   }
 
   emailIsValid (email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  validatePassword(password, confirmPassword) {
+    if (password != confirmPassword) {
+      return {'valid': false, 'message': 'Passwords do not match.'}
+    }
+    else if (
+      password.length < this.minPasswordLength ||
+      password.length > this.maxPasswordLength
+    ) {
+      return {
+        'valid': false,
+        'message': 'Password must contain between ' + this.minPasswordLength + ' and ' + this.maxPasswordLength + ' characters.'
+      }
+    }
+    else if (this.passwordStrength.test(password) !== true) {
+      return {
+        'valid': false,
+        'message': 'Password must contain at least 1 digit (0-9), at least 1 symbol (e.g., ~, !, @, #, $, %, =, +, <, >, /, ?, ^, &, *), at least 1 UPPERCASE English letter (A-Z), and at least 1 lowercase English letter (a-z)'
+      }
+    }
+    else {
+      return {
+        'valid': true,
+        'message': ''
+      }
+    }
+
   }
   
 }

@@ -8,6 +8,7 @@ import { LocationType } from '../models/location';
 import { UserSettings } from '../models/settings';
 import { Comment, Reply } from '../models/comment';
 import { BatchJob, BatchStatus } from '../models/batch';
+import { WaterBody } from '../models/waterbody';
 
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
@@ -224,6 +225,125 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
+  getAllWaterbodies() {
+    /*
+    Makes request to cyan-waterbody for all available waterbodies.
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?name=';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  searchForWaterbodyByCoords(latitude: number, longitude: number) {
+    /*
+    Searches for available waterbody using lat/lon.
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?lat=' + latitude + '&lng=' + longitude;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  searchForWaterbodyByName(name: string) {
+    /*
+    Searches for available waterbody using name. 
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?name=' + name;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getWaterbodyData(
+    objectid: number,
+    daily: string = 'True',
+    startYear: number = null,
+    startDay: number = null,
+    endYear: number = null,
+    endDay: number = null,
+    ranges: Array<any> = null
+  ) {
+    /*
+    Gets waterbody data.
+    */
+    let url = this.envService.config.waterbodyUrl + 
+              'data/?OBJECTID=' + objectid +
+              '&daily=' + daily;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyProperties(objectid: number) {
+    /*
+    Gets waterbody properties.
+    */
+    let url = this.envService.config.waterbodyUrl + 'properties/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyGeometry(objectid: number) {
+    /*
+    Gets waterbody geometry.
+    */
+    let url = this.envService.config.waterbodyUrl + 'geometry/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyImage(objectid: number, year: number, day: number) {
+    /*
+    Gets waterbody image for a given date (year and day-of-year).
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'image/?OBJECTID=' + objectid + 
+      '&year=' + year + 
+      '&day=' + day;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/png',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  getTribes() {
+    /*
+    Gets tribes with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/tribes/';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getCounties(state: string) {
+    /*
+    Gets counties with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/counties/?state=' + state;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getStates() {
+    /*
+    Gets states with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/states/';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  generateReport(reportType: string, reportId: number, year: number, day: number) {
+    /*
+    Starts report generation.
+      * reportType - objectids, county, or tribe
+      * reportId - ID number for the reportType
+      * year, day - year and day-of-year for report
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/?'
+      + reportType + '=' + reportId
+      + '&year=' + year
+      + '&day=' + day;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
@@ -237,7 +357,6 @@ export class DownloaderService {
   ajaxRequest(ln: Location, username: string, url: string) {
     let self = this;
     self.loaderService.show();
-    console.log("Tracker: " + this.requestsTracker);
     self.requestsTracker += 1;
     ajax({
       url: url,
@@ -245,6 +364,8 @@ export class DownloaderService {
     }).subscribe(data => {
       let d = data.response;
       let loc = self.createLocation(ln, username, d);
+      loc.latitude = ln.latitude;
+      loc.longitude = ln.longitude;
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
       if (index > -1) {
@@ -350,6 +471,9 @@ export class DownloaderService {
       ln.marked = false;
     }
     ln.compare = loc.compare;
+
+    ln.waterbody = new WaterBody();
+    ln.waterbody.objectid = null;
 
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {

@@ -1,4 +1,6 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
+import { WaterBody } from './waterbody';
+
 @Injectable()
 export class Location {
   id: number;
@@ -26,9 +28,13 @@ export class Location {
   marked: boolean;
   compare: boolean;
 
+  waterbody: WaterBody;
+
+
   get hasData(): boolean {
-    return !this.name.startsWith("Unknown Location");
+    return !this.name.startsWith('Unknown Location');
   }
+
 }
 
 export enum LocationType {

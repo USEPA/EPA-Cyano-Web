@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Validators, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { UserIdleService } from 'angular-user-idle';
@@ -7,6 +8,7 @@ import { User, Account, UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { LocationService } from '../services/location.service';
 import {environment} from "../../environments/environment";
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 @Component({
   selector: 'app-account',
@@ -52,13 +54,17 @@ export class AccountComponent implements OnInit {
   resetEmail: string = "";
   allowReset: boolean = true;
 
+  usernameMinLength: number = 4;
+
+
   constructor(
     private router: Router,
     private activeRoute: ActivatedRoute,
     private userService: UserService,
     private authService: AuthService,
     private userIdle: UserIdleService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private dialog: DialogComponent
   ) {
   }
 
@@ -142,6 +148,7 @@ export class AccountComponent implements OnInit {
         this.resetMessage = response['status'];
         this.allowReset = false;
       }
+      this.resetEmail = '';
     });
   }
 
@@ -221,25 +228,26 @@ export class AccountComponent implements OnInit {
 
   registerUser(): void {
     let self = this;
-    if (this.validateForm()) {
-      this.userService.registerUser(this.registerUsername, this.registerEmail, this.registerPassword).subscribe(
-        response => {
-          // user successfully registered, log the user in
-          self.registerForm = false;
-          self.username = self.registerUsername;
-          self.password = self.registerPassword;
-          self.loginUser();
-        },
-        errorResponse => {
-          // error happened, show error in page
-          if (errorResponse.error) {
-            self.setRegisterMessage(errorResponse.error.error);
-          } else {
-            self.setRegisterMessage("Registration failed")
-          }
+    this.validateForm();
+    // if (this.validateForm()) {
+    this.userService.registerUser(this.registerUsername, this.registerEmail, this.registerPassword).subscribe(
+      response => {
+        // user successfully registered, log the user in
+        self.registerForm = false;
+        self.username = self.registerUsername;
+        self.password = self.registerPassword;
+        self.loginUser();
+      },
+      errorResponse => {
+        // error happened, show error in page
+        if (errorResponse.error) {
+          self.setRegisterMessage(errorResponse.error.error);
+        } else {
+          self.setRegisterMessage("Registration failed")
         }
-      );
-    }
+      }
+    );
+    // }
   }
 
   exitAccount() {
@@ -258,20 +266,22 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  validateForm(): Boolean {
+  validateForm(): void {
     let self = this;
-    if (this.registerUsername == '' || this.registerUsername == undefined || this.registerUsername.length < 4) {
-      self.setRegisterMessage('Username must be 4 character or more.');
-      return false;
+    let validPass = this.authService.validatePassword(this.registerPassword, this.registerPasswordCheck);
+
+    if (
+      this.registerUsername == '' ||
+      this.registerUsername == undefined ||
+      this.registerUsername.length < this.usernameMinLength
+    ) {
+      self.dialog.handleError('Username must be ' + this.usernameMinLength + ' characters or more.');
     }
-    if (this.registerPassword != this.registerPasswordCheck) {
-      self.setRegisterMessage('Passwords do not match.');
-      return false;
+    else if (validPass['valid'] !== true) {
+      self.dialog.handleError(validPass['message'])
     }
-    if (this.registerPassword.length < 6 || this.registerPassword.length > 24) {
-      self.setRegisterMessage('Password must contain between 6 and 24 characters.');
-      return false
+    else if (!this.authService.emailIsValid(this.registerEmail)) {
+      self.dialog.handleError('Email is invalid');
     }
-    return true;
   }
 }

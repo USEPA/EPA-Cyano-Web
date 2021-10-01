@@ -1,0 +1,21 @@
+<br><p>List of {{username}}'s jobs</p><br>
+<div class="table-responsive">
+	<mat-table #table [dataSource]="dataSource" matSort>
+		<ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">
+			<mat-header-cell *matHeaderCellDef mat-sort-header>{{column.value}}</mat-header-cell>
+			<mat-cell *matCellDef="let element">
+				<!-- Displays "X" next to job to cancel if in an active state -->
+				<mat-icon
+					class="cancel-icon"
+					*ngIf="column.id == 'jobStatus' && inProgressStates.includes(element[column.id])"
+					(click)="cancelJob(element)"
+				>
+					clear
+				</mat-icon>
+				{{element[column.id]}}
+			</mat-cell>
+		</ng-container>
+		<mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+		<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+	</mat-table>
+</div>

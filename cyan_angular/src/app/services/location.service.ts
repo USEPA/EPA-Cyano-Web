@@ -8,6 +8,7 @@ import { UserService, UserLocations, User } from "../services/user.service";
 import { DownloaderService, DataPoint } from "../services/downloader.service";
 import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
+import { WaterBody } from "../models/waterbody";
 
 // @Directive()
 @Injectable({
@@ -153,6 +154,7 @@ export class LocationService {
 
             self.locations.push(l);
             self.downloadLocation(l);
+
           }
         });
         self.addMarkers();
@@ -225,6 +227,7 @@ export class LocationService {
           this.mapService.updateMarker(loc);
           this.updateCompareLocation(loc);
           this.downloader.updateProgressBar();
+          this.addWaterbodyInfo(loc);
         }
       }
     );
@@ -259,6 +262,9 @@ export class LocationService {
     dataDate: string,
     source: string
   ): Location {
+
+    console.log("LocationService createLocation() called.")
+
     let l = new Location();
     let c = this.convertCoordinates(latitude, longitude);
     l.id = this.getLastID() + 1;
@@ -285,6 +291,8 @@ export class LocationService {
     l.notes = [];
     l.marked = false;
     l.compare = false;
+    l.waterbody = new WaterBody();
+    l.waterbody.objectid = null;
 
     this.downloader.addUserLocation(this.user.getUserName(), l);
     this.locations.push(l);
@@ -518,6 +526,33 @@ export class LocationService {
       }
     });
   }
+
+  addWaterbodyInfo(ln: Location): void {
+    /*
+    Adds objectid to locations with available waterbody data.
+    */
+    this.downloader.searchForWaterbodyByCoords(ln.latitude, ln.longitude).subscribe(wbInfoResult => {
+      if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
+        return;
+      }
+      const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
+      // const tolerance = 0.1;
+      wbInfoResult['waterbodies'].forEach(wbData => {
+        // if (
+        //   Math.abs(ln.latitude - wbData['centroid_lat']) < tolerance &&
+        //   Math.abs(ln.longitude - wbData['centroid_lng']) < tolerance
+        // ) {
+        // Adds WB to nearest location based on tolerance
+        this.locations[index].waterbody.objectid = wbData['objectid'];
+        this.locations[index].waterbody.name = wbData['name'];
+        this.locations[index].waterbody.centroid_lat = wbData['centroid_lat'];
+        this.locations[index].waterbody.centroid_lng = wbData['centroid_lng'];
+        return;
+        // }
+      });
+    });
+  }
+
 }
 
 class Coordinate {

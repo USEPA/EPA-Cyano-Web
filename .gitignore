@@ -17,3 +17,6 @@ cyan_flask/user_jobs/*
 .env*
 docker/angular/package.json*
 docker/flask/requirements.*
+
+# VSCode settings
+.vscode/

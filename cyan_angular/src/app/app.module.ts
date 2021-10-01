@@ -27,6 +27,8 @@ import { MatTableModule } from '@angular/material/table';
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatListModule } from '@angular/material/list';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -77,9 +79,15 @@ import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
+import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
+import { WaterBodyStatsDetails } from './waterbody-stats/waterbody-stats-details.component';
+import { Calculations } from './waterbody-stats/utils/calculations';
+import { Charts } from './waterbody-stats/utils/charts';
 
 import 'hammerjs';
 import 'chartjs-plugin-zoom';
+import 'chartjs-plugin-datalabels';
+import { ReportsComponent } from './waterbody-stats/reports/reports.component';
 
 @NgModule({
   declarations: [
@@ -113,7 +121,10 @@ import 'chartjs-plugin-zoom';
     DialogComponent,
     SessionTimeoutComponent,
     LocationSearchComponent,
-    BatchComponent
+    BatchComponent,
+    WaterbodyStatsComponent,
+    WaterBodyStatsDetails,
+    ReportsComponent
   ],
   imports: [
     BrowserModule,
@@ -152,6 +163,8 @@ import 'chartjs-plugin-zoom';
     MatTableModule,
     MatSidenavModule,
     MatSortModule,
+    MatGridListModule,
+    MatListModule,
     Ng5SliderModule,
     BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
@@ -170,7 +183,11 @@ import 'chartjs-plugin-zoom';
     AddComment,
     DialogComponent,
     CoordinatesComponent,
+    WaterBodyStatsDetails,
     MarkerMapComponent,
+    WaterbodyStatsComponent,
+    Calculations,
+    Charts,
     { provide: MatDialogRef, useValue: {} },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

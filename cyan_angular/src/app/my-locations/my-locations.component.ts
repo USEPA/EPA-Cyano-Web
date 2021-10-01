@@ -1,13 +1,16 @@
-import { Component, OnInit } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
-import { Router } from "@angular/router";
-import { Subscription } from "rxjs";
+import { Component, OnInit } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
-import { Location } from "../models/location";
-import { LocationService } from "../services/location.service";
-import { MapService } from "../services/map.service";
-import { AuthService } from "../services/auth.service";
-import { ConfigService } from "../services/config.service";
+import { Location } from '../models/location';
+import { LocationService } from '../services/location.service';
+import { MapService } from '../services/map.service';
+import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
+import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
+import { WaterBodyStatsDetails } from '../waterbody-stats/waterbody-stats-details.component';
 
 export interface Sort {
   value: string;
@@ -15,17 +18,17 @@ export interface Sort {
 }
 
 @Component({
-  selector: "app-my-locations",
-  templateUrl: "./my-locations.component.html",
-  styleUrls: ["./my-locations.component.css"],
+  selector: 'app-my-locations',
+  templateUrl: './my-locations.component.html',
+  styleUrls: ['./my-locations.component.css'],
 })
 export class MyLocationsComponent implements OnInit {
   locations: Location[];
   sorted_locations: Location[];
-  selected_value: string = "name";
+  selected_value: string = 'name';
   sort_selection: Sort[] = [
-    { value: "name", viewValue: "Location Name" },
-    { value: "cellcount", viewValue: "Cell Count" },
+    { value: 'name', viewValue: 'Location Name' },
+    { value: 'cellcount', viewValue: 'Cell Count' },
   ];
   show_checked: boolean = false;
   locSub: Subscription;
@@ -37,7 +40,9 @@ export class MyLocationsComponent implements OnInit {
     private locationService: LocationService,
     private mapService: MapService,
     private authService: AuthService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private messageDialog: MatDialog,
+    private waterbodyStats: WaterbodyStatsComponent
   ) {}
 
   ngOnInit() {
@@ -48,27 +53,33 @@ export class MyLocationsComponent implements OnInit {
     this.sortLocations();
   }
 
+  ngOnDestroy() {
+    this.waterbodyStats.ngOnDestroy();
+  }
+
   getSource(): string {
     return this.mapService.getSource();
   }
 
   getLocations(): void {
     this.locSub = this.locationService
-      .getLocations("")
-      .subscribe((locations) => (this.locations = locations));
+      .getLocations('')
+      .subscribe((locations) => {
+        this.locations = locations
+    });
   }
 
   sortLocations(): void {
     if (this.show_checked) {
       this.sorted_locations =
-        this.selected_value.localeCompare("name") == 0
+        this.selected_value.localeCompare('name') == 0
           ? this.sorted_locations.sort((a, b) => a.name.localeCompare(b.name))
           : this.sorted_locations.sort(
               (a, b) => b.cellConcentration - a.cellConcentration
             );
     } else {
       this.sorted_locations =
-        this.selected_value.localeCompare("name") == 0
+        this.selected_value.localeCompare('name') == 0
           ? this.locations.sort((a, b) => a.name.localeCompare(b.name))
           : this.locations.sort(
               (a, b) => b.cellConcentration - a.cellConcentration
@@ -88,7 +99,7 @@ export class MyLocationsComponent implements OnInit {
       });
     } else {
       this.sorted_locations =
-        this.selected_value.localeCompare("name") == 0
+        this.selected_value.localeCompare('name') == 0
           ? this.locations.sort((a, b) => a.name.localeCompare(b.name))
           : this.locations.sort(
               (a, b) => b.cellConcentration - a.cellConcentration
@@ -139,11 +150,12 @@ export class MyLocationsComponent implements OnInit {
       return;
     }
     this.router.navigate([
-      "/locationdetails",
+      '/locationdetails',
       {
         location: l.id,
         locations: this.sorted_locations.map((ln: Location) => ln.id),
       },
     ]);
   }
+  
 }

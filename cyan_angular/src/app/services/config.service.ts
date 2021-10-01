@@ -17,6 +17,15 @@ export class ConfigService {
   orange: string = 'rgb(255, 165, 0)';
   red: string = 'rgb(255, 0, 0)';
 
+  darkGreen: string = 'rgb(0, 102, 0)';
+  darkYellow: string = 'rgb(170, 173, 0)';
+  darkOrange: string = 'rgb(223, 139, 0)';
+  darkRed: string = 'rgb(221, 0, 0)';
+
+  belowDetection: string = 'rgba(148,148,148,255)';
+  land: string = 'rgba(160,82,45,255)';
+  noData: string = 'rgba(0,0,0,255)';
+
   constructor() {}
 
   resetLevels(): void {

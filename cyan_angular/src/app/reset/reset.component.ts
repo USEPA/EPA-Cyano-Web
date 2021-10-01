@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { LocationService } from '../services/location.service';
 import { AuthService } from '../services/auth.service';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 
 @Component({
 	selector: 'app-reset',
@@ -28,7 +29,8 @@ export class ResetComponent implements OnInit {
 		private activatedRoute: ActivatedRoute,
 		private userService: UserService,
 		private locationService: LocationService,
-		private router: Router
+		private router: Router,
+		private dialog: DialogComponent
 	) { }
 
 	ngOnInit() {
@@ -78,16 +80,17 @@ export class ResetComponent implements OnInit {
 	}
 
 	isValidForm(): boolean {
-		if (this.newPassword != this.confirmPassword) {
-			this.messageColor = "red";
-			this.resetMessage = "Passwords do not match.";
+
+		let validPass = this.authService.validatePassword(this.newPassword, this.confirmPassword);
+
+		if (validPass['valid'] !== true) {
+			console.log("Invalid pass: ", validPass)
+			this.confirmPassword = "";
+			this.newPassword;
+			this.dialog.handleError(validPass['message']);
 			return false;
 		}
-		if (this.newPassword.length < 6 || this.newPassword.length > 24) {
-			this.messageColor = "red";			
-			this.resetMessage = "Password must contain between 6 and 24 characters.";
-			return false;
-		}
+
 		this.resetMessage = "";
 		return true;
 	}

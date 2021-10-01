@@ -11,13 +11,18 @@
           <button mat-menu-item class="bottom-menu-link" [ngClass]="{'selected': data_type == 2}" (click)="dataTypeClick(2)" [routerLink]="['']">OLCI - Daily</button>
         </mat-menu>
         <button mat-menu-item mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">
-            <div class="menu-div" aria-label="Settings">
+            <div class="menu-div" aria-label="Reload data button">
                 <span class="tab-title">Reload Data</span>
              </div>
         </button>
         <button *ngIf="!hideUpload" mat-menu-item mat-button (click)="openCsvDialog()" [routerLink]="['']" class="bottom-menu-title">
           <div class="menu-div" aria-label="User guide">
             <span class="tab-title">Upload CSV</span>
+          </div>
+        </button>
+        <button *ngIf="!hideWaterbodyStats" mat-menu-item mat-button [routerLink]="['/wbsearch']" class="bottom-menu-title">
+          <div class="menu-div" aria-label="Waterbody statistics button">
+            <span class="tab-title">Waterbody Stats</span>
           </div>
         </button>
     </mat-menu>
@@ -38,6 +43,10 @@
     <div *ngIf="!hideUpload" class="bottom-menu-title-block">
       <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
     </div>
+    <!-- Waterbody Stats -->
+    <div *ngIf="!hideWaterbodyStats" class="bottom-menu-title-block">
+      <button mat-button class="bottom-menu-title" [routerLink]="['/wbsearch']">Waterbody Stats</button>
+    </div>  
   </div>
 
 </div>
