@@ -20,7 +20,7 @@
             <span class="tab-title">Upload CSV</span>
           </div>
         </button>
-        <button mat-menu-item mat-button [routerLink]="['/wbsearch']" class="bottom-menu-title">
+        <button *ngIf="!hideWaterbodyStats" mat-menu-item mat-button [routerLink]="['/wbsearch']" class="bottom-menu-title">
           <div class="menu-div" aria-label="Waterbody statistics button">
             <span class="tab-title">Waterbody Stats</span>
           </div>
@@ -44,7 +44,7 @@
       <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
     </div>
     <!-- Waterbody Stats -->
-    <div class="bottom-menu-title-block">
+    <div *ngIf="!hideWaterbodyStats" class="bottom-menu-title-block">
       <button mat-button class="bottom-menu-title" [routerLink]="['/wbsearch']">Waterbody Stats</button>
     </div>  
   </div>
