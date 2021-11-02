@@ -658,7 +658,10 @@ export class LocationDetailsComponent implements OnInit {
         return;
       }
       let chartData = this.curateChartData(this.chartData);
-      this.downloadFile(chartData);
+      const filename = 'CellConcentration' +
+      this.current_location.name.replace(/\s/g, '').replace('--', '') +
+      '.csv';
+      this.downloader.downloadFile(filename, chartData);
     });
 
   }
@@ -678,34 +681,6 @@ export class LocationDetailsComponent implements OnInit {
     }
     // Returns data array by earliest date first
     return csvArray.reverse();
-  }
-
-  downloadFile(data: any) {
-    /*
-    Creates CSV link and clicks it for downloading.
-    */
-    const filename = 'CellConcentration' +
-      this.current_location.name.replace(/\s/g, '').replace('--', '') +
-      '.csv';
-    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
-    const header = Object.keys(data[0]);
-    const csv = data.map((row) =>
-      header
-        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
-        .join(',')
-    );
-    csv.unshift(header.join(','));
-    const csvArray = csv.join('\r\n');
-
-    const a = document.createElement('a');
-    const blob = new Blob([csvArray], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
   }
 
   displayMessageDialog(message: string) {

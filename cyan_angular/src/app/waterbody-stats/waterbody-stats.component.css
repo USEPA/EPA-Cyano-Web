@@ -331,3 +331,10 @@ h2.label {
 .red {
     background: red;
 }
+#download-histo-btn {
+	float: right;
+}
+#download-histo-btn:hover {
+	cursor: pointer;
+    opacity: 0.8;
+}

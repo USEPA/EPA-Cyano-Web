@@ -908,9 +908,9 @@ export class WaterBodyStatsDetails {
     // TODO: Remove hover highlighting if slideshow is stopped.
     // TODO: Go back to original "available date" if slideshow is stopped.
 
-    console.log("triggerHover called.")
-    console.log("Chart: ", chart)
-    console.log("Selected state index: ", this.selectedDateIndex)
+    // console.log("triggerHover called.")
+    // console.log("Chart: ", chart)
+    // console.log("Selected state index: ", this.selectedDateIndex)
 
     let meta = chart.getDatasetMeta(0);
     let rect = chart.canvas.getBoundingClientRect();
@@ -929,6 +929,46 @@ export class WaterBodyStatsDetails {
     */
     let selectedDateElement = document.getElementById('selected-dates-list');
     selectedDateElement.children[this.selectedDateIndex].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
+  }
+
+  downloadHistoCSV() {
+    /*
+    Downloads histogram data as CSV.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    let dialogRef = this.dialog.displayMessageDialog('Download chart data?');
+    dialogRef.afterClosed().subscribe(response => {
+      if (response !== true) {
+        return;
+      }
+      let chartData = this.curateHistoData(this.histoChartData);
+      let dateArray = this.selectedAvailableDate.split('/');  // e.g., 5_31_2021
+      let date = dateArray[2] + dateArray[0] + dateArray[1];
+      let filename = 'Histogram' +
+        this.selectedWaterbody.name.replace(/\s/g, '') + 
+        date + this.selectedRange.toUpperCase() + '.csv';
+
+      this.downloader.downloadFile(filename, chartData);
+
+    });
+
+  }
+
+  curateHistoData(chartData: Array<any>): Array<any> {
+    /*
+    Gets data from chart data for CSV download.
+    */
+    let csvArray = [];
+
+    if (chartData.length > 0) {
+      // use only first dataset in array
+      let dataSet = chartData[0]['data'];
+      dataSet.forEach((item, index) => {
+        csvArray.push({'concentration': this.histoChartLabels[index], 'count': item})
+      });
+    }
+    return csvArray;
   }
 
 }
