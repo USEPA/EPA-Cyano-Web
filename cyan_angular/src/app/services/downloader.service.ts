@@ -344,6 +344,47 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
+  getReportStatus(reportId: string) {
+    /*
+    Gets status of report based on report ID.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/status/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  cancelReportRequest(reportId: string) {
+    /*
+    Cancels a requested report.
+    NOTE: Must be user that started report as well.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/cancel/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  downloadReport(reportId: string) {
+    /*
+    Downloads report based on report ID.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/download/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+
+    // NOTE: May need request like below:
+    // return this.http.get(url, {
+    //   headers: {
+    //     'Content-Type': 'application/pdf',
+    //     'App-Name': this.envService.config.appName,
+    //   },
+    //   responseType: 'blob',
+    //   observe: 'response'
+    // });
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
@@ -537,6 +578,32 @@ export class DownloaderService {
       this.loaderService.hide();
       this.loaderService.progressValue.next(0);
     }
+  }
+
+  downloadFile(filename: string, data: any) {
+    /*
+    Creates CSV link and clicks it for downloading.
+      * data - array of arrays, where first array are headers.
+    */
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = Object.keys(data[0]);
+    const csv = data.map((row) =>
+      header
+        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+        .join(',')
+    );
+    csv.unshift(header.join(','));
+    const csvArray = csv.join('\r\n');
+
+    const a = document.createElement('a');
+    const blob = new Blob([csvArray], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
   }
 
 }
