@@ -108,8 +108,10 @@
 				<!-- Cell Concentration Histogram -->
 				<div class="data-item">
 					<div *ngIf="!showStacked" class="chart_header">
-					  <div class="chart_title">Cell Concentration Histogram</div>
-					  <div class="chart_source_selection"></div>
+					  <div class="chart_title">Cell Concentration Histogram
+					  	<mat-icon id="download-histo-btn" (click)="downloadHistoCSV()" class="mat_icon">file_download</mat-icon>
+					  </div>
+					  <!-- <div class="chart_source_selection"></div> -->
 					</div>
 					<div *ngIf="showStacked" class="chart_header">
 					  <div class="chart_title">Total Cell Counts by Range</div>
