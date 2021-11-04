@@ -385,6 +385,24 @@ export class DownloaderService {
     // });
   }
 
+  downloadHistoData(objectid: number) {
+    /*
+    Gets histogram data for a waterbody. Returns a CSV.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'data_download/?OBJECTID=' + objectid;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'text/csv',
+        'App-Name': this.envService.config.appName,
+      },
+      // responseType: 'blob',
+      responseType: 'text',
+      observe: 'response'
+    });
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
@@ -594,11 +612,9 @@ export class DownloaderService {
     );
     csv.unshift(header.join(','));
     const csvArray = csv.join('\r\n');
-
     const a = document.createElement('a');
     const blob = new Blob([csvArray], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-
     a.href = url;
     a.download = filename;
     a.click();

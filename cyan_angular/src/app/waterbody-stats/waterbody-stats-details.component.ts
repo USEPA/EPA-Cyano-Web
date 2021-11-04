@@ -942,33 +942,20 @@ export class WaterBodyStatsDetails {
       if (response !== true) {
         return;
       }
-      let chartData = this.curateHistoData(this.histoChartData);
-      let dateArray = this.selectedAvailableDate.split('/');  // e.g., 5_31_2021
-      let date = dateArray[2] + dateArray[0] + dateArray[1];
-      let filename = 'Histogram' +
-        this.selectedWaterbody.name.replace(/\s/g, '') + 
-        date + this.selectedRange.toUpperCase() + '.csv';
-
-      this.downloader.downloadFile(filename, chartData);
+      this.loaderService.show();
+      this.downloader.downloadHistoData(this.selectedWaterbody.objectid).subscribe(response => {
+        this.loaderService.hide();
+        let histoCsvData = response.body;
+        let dataRows = histoCsvData.split('\n');
+        let dataArray = dataRows.map(item => item.split(','));
+        let filename = 'WaterbodyHistogram' + this.selectedWaterbody.objectid + 
+                        this.selectedWaterbody.name.replace(/\s/g, '') + '.csv';
+        this.downloader.downloadFile(filename, dataArray);
+      });
 
     });
 
   }
 
-  curateHistoData(chartData: Array<any>): Array<any> {
-    /*
-    Gets data from chart data for CSV download.
-    */
-    let csvArray = [];
-
-    if (chartData.length > 0) {
-      // use only first dataset in array
-      let dataSet = chartData[0]['data'];
-      dataSet.forEach((item, index) => {
-        csvArray.push({'concentration': this.histoChartLabels[index], 'count': item})
-      });
-    }
-    return csvArray;
-  }
 
 }
