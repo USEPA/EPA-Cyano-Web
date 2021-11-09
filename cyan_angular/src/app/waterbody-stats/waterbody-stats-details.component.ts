@@ -936,8 +936,7 @@ export class WaterBodyStatsDetails {
     Downloads histogram data as CSV.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-
-    let dialogRef = this.dialog.displayMessageDialog('Download chart data?');
+    let dialogRef = this.dialog.displayMessageDialog('Download histogram data for ' + this.selectedWaterbody.name + '?');
     dialogRef.afterClosed().subscribe(response => {
       if (response !== true) {
         return;
@@ -947,14 +946,13 @@ export class WaterBodyStatsDetails {
         this.loaderService.hide();
         let histoCsvData = response.body;
         let dataRows = histoCsvData.split('\n');
+        dataRows.splice(-1);  // removes trailing '' array item
         let dataArray = dataRows.map(item => item.split(','));
         let filename = 'WaterbodyHistogram' + this.selectedWaterbody.objectid + 
                         this.selectedWaterbody.name.replace(/\s/g, '') + '.csv';
-        this.downloader.downloadFile(filename, dataArray);
+        this.downloader.downloadFile(filename, histoCsvData);
       });
-
     });
-
   }
 
 
