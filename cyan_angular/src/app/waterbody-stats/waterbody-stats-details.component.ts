@@ -399,7 +399,7 @@ export class WaterBodyStatsDetails {
 
     if (['7day', '30day'].includes(dateRangeValue)) {
       // Multi-day range
-      this.selectedDate = this.selectedAvailableDate;  // initializes selectedDate for slideshow
+      // this.selectedDate = this.selectedAvailableDate;  // initializes selectedDate for slideshow
       this.selectedPlotType = this.plotTypes[0];  // sets title for stacked bars
       let range = parseInt(dateRangeValue.split('day')[0]);
       let d = new Date(this.selectedAvailableDate);
@@ -410,7 +410,10 @@ export class WaterBodyStatsDetails {
         if (d <= endDate && d > startDate) {
           return true;
         }
-      });
+      }).reverse();  // orders dates earliest to latest
+
+      this.selectedDate = this.datesWithinRange[0];  // starts multi-day with earliest date
+
       this.plotRangeOfTotalCounts(this.datesWithinRange);
       this.plotLineData(this.datesWithinRange);
       this.scrollToSelectedDate();
