@@ -651,7 +651,6 @@ export class LocationDetailsComponent implements OnInit {
     Initiates bloom chart CSV download.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-
     let dialogRef = this.displayMessageDialog('Download chart data?');
     dialogRef.afterClosed().subscribe(response => {
       if (response !== true) {
@@ -663,24 +662,30 @@ export class LocationDetailsComponent implements OnInit {
       '.csv';
       this.downloader.downloadFile(filename, chartData);
     });
-
   }
 
-  curateChartData(chartData: Array<any>): Array<any> {
+  curateChartData(chartData: Array<any>): string {
     /*
     Gets data from chart data for CSV download.
     */
     let csvArray = [];
-
     if (chartData.length > 0) {
-      // use only first dataset in array
+      // use only first dataset in array (default)
       let dataSet = chartData[0]['data'];
       dataSet.forEach((item, index) => {
         csvArray.push({'date': item.x, 'concentration': item.y})
       });
     }
-    // Returns data array by earliest date first
-    return csvArray.reverse();
+    csvArray = csvArray.reverse();  // earliest date first
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = ['date', 'concentration'];
+    const csv = csvArray.map((row) =>
+      header
+        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+        .join(',')
+    );
+    csv.unshift(header.join(','));
+    return csv.join('\r\n');
   }
 
   displayMessageDialog(message: string) {

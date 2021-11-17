@@ -15,6 +15,7 @@
 				<b>Centroid Longitude:</b> {{selectedWaterbody.centroid_lng}}<br>
 				<b>Area:</b> {{wbProps.areasqkm}} km<sup>2</sup><br>
 			</div>
+			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download histogram</button>
 			<br><br>
 			<div class="details_tab">
 				<!-- User selections for WB stats -->
@@ -109,7 +110,7 @@
 				<div class="data-item">
 					<div *ngIf="!showStacked" class="chart_header">
 					  <div class="chart_title">Cell Concentration Histogram
-					  	<mat-icon id="download-histo-btn" (click)="downloadHistoCSV()" class="mat_icon">file_download</mat-icon>
+					  	<!-- <mat-icon id="download-histo-btn" (click)="downloadHistoCSV()" class="mat_icon">file_download</mat-icon> -->
 					  </div>
 					  <!-- <div class="chart_source_selection"></div> -->
 					</div>
