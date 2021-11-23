@@ -24,6 +24,8 @@ export class AuthService {
   minPasswordLength: number = 8;
   maxPasswordLength: number = 32;
   passwordStrength: RegExp = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&]).{8,}/;
+  usernameMinLength: number = 4;
+  usernameMaxLength: number = 36;
 
   constructor(
     private http: HttpClient,
@@ -99,7 +101,7 @@ export class AuthService {
     return this.http.get(url, this.envService.getHeaders()).subscribe();
   }
 
-  sendResetEmail(resetEmail) {
+  sendResetEmail(resetEmail: string) {
     /*
     Makes request to send email for password reset.
     */
@@ -108,7 +110,7 @@ export class AuthService {
     return this.http.post(url, body, this.envService.getHeaders());
   }
 
-  resetPassword(newPassword) {
+  resetPassword(newPassword: string) {
     /*
     Makes request to reset user's password.
     */
@@ -118,11 +120,11 @@ export class AuthService {
     return this.http.put(url, body, this.envService.getHeaders());
   }
 
-  emailIsValid (email) {
+  emailIsValid (email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  validatePassword(password, confirmPassword) {
+  validatePassword(password: string, confirmPassword: string): any {
     if (password != confirmPassword) {
       return {'valid': false, 'message': 'Passwords do not match.'}
     }
@@ -148,6 +150,48 @@ export class AuthService {
       }
     }
 
+  }
+
+  validateUsername(username: string): any {
+    if (
+      username == '' ||
+      username == undefined ||
+      username.length < this.usernameMinLength ||
+      username.length > this.usernameMaxLength
+    ) {
+        return {
+          'valid': false,
+          'message': 'Username must be ' + this.usernameMinLength + ' and ' + this.usernameMaxLength + ' characters.'
+        }
+    }
+    else if (this.isAlphaNumeric(username) !== true) {
+      return {
+          'valid': false,
+          'message': 'Username must only contain alphanumeric characters (i.e., a-z/A-Z/0-9)'
+        }
+    }
+    else {
+      return {
+        'valid': true,
+        'message': ''
+      }
+    }
+  }
+
+  isAlphaNumeric(str: string): boolean {
+    let code, i, len;
+    if (str.length < 1) {
+      return false;
+    }
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 91) && // upper alpha (A-Z)
+          !(code > 96 && code < 123)) { // lower alpha (a-z)
+        return false;
+      }
+    }
+    return true;
   }
   
 }
