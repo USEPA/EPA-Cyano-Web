@@ -76,3 +76,7 @@
 	word-break: break-all;
 	padding: 0 2% 0 2%;
 }
+
+.batch-instruction-list li {
+	padding-bottom: 2%;
+}

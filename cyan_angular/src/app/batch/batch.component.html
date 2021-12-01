@@ -5,9 +5,24 @@
 		<!-- Run tab -->
 		<mat-tab label="Run">
 		<div class="">
+			<br><br>
+			<p>
+				Gets the latest cyano concentrations for multiple locations of interest by uploading a CSV file of location coordinates.
+			</p>
 			<br>
-			<p>Get the latest cyano concentrations for multiple locations of interest by uploading a CSV file of location coordinates (decimal format within CONUS) and location datatype (daily or weekly) here in the "Run" tab (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download an example CSV input file</a>).</p>
-			<p>Once the job is complete, a spreadsheet of cyano concentrations for each location will be sent to your email. A history of your jobs can be viewed in the "Jobs" tab.</p>
+			<ol class="batch-instruction-list">
+				<li>
+					Create a CSV file containing location coordinates datatypes. The CSV must contain the following headers: latitude, longitude, and type, where "latitude" and "longitude" must be in decimal format within CONUS and "type" is either "daily" or "weekly" (<a download="batch_template.csv" target="_blank" href="assets/batch_template.csv">Click to download an example CSV input file</a>).</li>
+				<li>
+					Click the "Upload" button here in the "Run" tab and select the created CSV file. This will start the process of getting cyano concentrations for the locations in the uploaded CSV.
+				</li>
+				<li>
+					Check the current job status and previous jobs in the "Jobs" tab.
+				</li>
+				<li>
+					Once the job is complete, a spreadsheet of cyano concentrations for each location will be sent to your email.
+				</li>
+			</ol>
 			<br>
 			<input hidden #uploader type="file" accept=".csv" (change)="uploadFile($event)" />
 			<button mat-raised-button color="primary" (click)="uploader.click()">Upload</button>
