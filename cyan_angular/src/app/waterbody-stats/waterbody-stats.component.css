@@ -37,7 +37,7 @@
     	width: 50vw;
     }
     #selected-dates-div {
-        padding-left: 15%;
+        /*padding-left: 15%;*/
         padding-top: 5%;
         text-align: center;
     }
@@ -340,4 +340,28 @@ h2.label {
 #download-histo-btn:hover {
 	cursor: pointer;
     opacity: 0.8;
+}
+
+/* Slider */
+::ng-deep .ng5-slider {
+	width:  90% !important;
+}
+::ng-deep .ng5-slider-tick-legend {
+	font-size: small !important;
+}
+::ng-deep .tick-legend-30-day .ng5-slider-tick-legend {
+	transform: translate(-100%, 50%) rotate(-45deg) !important;
+}
+::ng-deep .ng5-slider-tick-value {
+	display: none !important;
+}
+::ng-deep .ng5-slider-pointer {
+    width: 16px !important;
+    height: 16px !important;
+    margin-top:  8px !important;
+    margin-left:  8px !important;
+    background-color: #205493 !important;
+}
+::ng-deep .ng5-slider .ng5-slider-pointer:after {
+    display: none !important;
 }
