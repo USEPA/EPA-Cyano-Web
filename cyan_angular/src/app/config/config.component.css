@@ -106,3 +106,16 @@
 .config-placeholder {
     color: white;
 }
+
+/* Slider */
+.ng5-slider .ng5-slider-pointer {
+    background-color: white !important;
+    width: 16px !important;
+    height: 16px !important;
+}
+.ng5-slider .ng5-slider-bar-wrapper {
+    margin-top: -24px !important;
+}
+.ng5-slider .ng5-slider-pointer:after {
+    display: none !important;
+}
