@@ -10,7 +10,6 @@ import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 import { WaterBody } from "../models/waterbody";
 import { WaterBodyStatsDetails } from "../waterbody-stats/waterbody-stats-details.component";
-import { WaterBodyService } from "../services/waterbody.service";
 
 // @Directive()
 @Injectable({
@@ -35,8 +34,7 @@ export class LocationService {
     private user: UserService,
     private downloader: DownloaderService,
     private mapService: MapService,
-    private loaderService: LoaderService,
-    private waterbodyService: WaterBodyService
+    private loaderService: LoaderService
   ) {
     this.getData();
     this.loadUser();
