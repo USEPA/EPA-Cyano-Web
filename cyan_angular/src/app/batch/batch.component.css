@@ -37,10 +37,14 @@
 }
 
 .table-responsive {
-	/*overflow-y: scroll;*/
 	overflow: auto;
 	height: 80%;
 	width: 100%;
+}
+
+.request-data-div {
+	overflow: auto;
+	height: 100%;
 }
 
 .exit-button {
