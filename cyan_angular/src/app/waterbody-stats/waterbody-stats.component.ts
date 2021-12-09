@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ajax } from 'rxjs/ajax';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { tileLayer, geoJSON, latLng, LatLng, latLngBounds, LatLngBounds, Map, icon, marker, canvas, circleMarker, DomEvent } from 'leaflet';
+import { tileLayer, TileLayer, geoJSON, latLng, LatLng, latLngBounds, LatLngBounds, Map, icon, marker, canvas, circleMarker, DomEvent } from 'leaflet';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelect } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field'
@@ -40,6 +40,9 @@ export class WaterbodyStatsComponent implements OnInit {
   searchCharMax: number = 256;  // max allowed characters for WB searching
 
   wbLayer = null;
+  nhdLayer = null;  // https://hydro.nationalmap.gov/arcgis/services/NHDPlus_HR/MapServer/WMSServer?request=GetCapabilities&service=WMS
+
+  nhdUrl: string = 'https://hydro.nationalmap.gov/arcgis/services/NHDPlus_HR/MapServer/WMSServer?';
 
   searchSelect: any = {
   	'name': 'Name',
@@ -88,6 +91,31 @@ export class WaterbodyStatsComponent implements OnInit {
   	Handles selection change for search type.
   	*/
   	this.selectedKey = selectedValue.value;
+  }
+
+  toggleLayer(value) {
+    let isChecked = value.checked;
+    if (isChecked === true) {
+      // Shows WMS layer
+      console.log("Adding NHDPlus_HR layer")
+      // this.nhdLayer = tileLayer.wms(this.nhdUrl, {}).addTo(this.cyanMap.map);
+      // this.nhdLayer = tileLayer.wms(this.nhdUrl, {
+      //   layers: 'NHDWaterbody'
+      // });
+      this.nhdLayer = new TileLayer.WMS(this.nhdUrl, {
+        layers: 'NHDWaterbody',
+        format: 'image/png',
+        transparent: false
+      });
+      console.log("NHD layer: ", this.nhdLayer)
+      this.cyanMap.map.addLayer(this.nhdLayer);
+    }
+    else {
+      // Removes WMS layer
+      console.log("Removing NHDPlus_HR layer")
+      this.cyanMap.map.removeLayer(this.nhdLayer);  // TODO: Just hide/show instead of add/remove?
+    }
+
   }
 
   getAllWaterbodies(): void {
