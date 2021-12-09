@@ -29,6 +29,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatRadioModule } from '@angular/material/radio';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -88,6 +90,7 @@ import 'hammerjs';
 import 'chartjs-plugin-zoom';
 import 'chartjs-plugin-datalabels';
 import { ReportsComponent } from './waterbody-stats/reports/reports.component';
+import { ReportsResultsComponent } from './waterbody-stats/reports/reports-results.component';
 
 @NgModule({
   declarations: [
@@ -124,7 +127,8 @@ import { ReportsComponent } from './waterbody-stats/reports/reports.component';
     BatchComponent,
     WaterbodyStatsComponent,
     WaterBodyStatsDetails,
-    ReportsComponent
+    ReportsComponent,
+    ReportsResultsComponent
   ],
   imports: [
     BrowserModule,
@@ -165,6 +169,8 @@ import { ReportsComponent } from './waterbody-stats/reports/reports.component';
     MatSortModule,
     MatGridListModule,
     MatListModule,
+    MatSlideToggleModule,
+    MatRadioModule,
     Ng5SliderModule,
     BrowserAnimationsModule
     // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
