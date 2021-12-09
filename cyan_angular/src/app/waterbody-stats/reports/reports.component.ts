@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatRadioChange } from '@angular/material/radio';
 
 import { Location } from '../../models/location';
 import { DownloaderService } from '../../services/downloader.service';
@@ -6,6 +8,9 @@ import { LocationService } from '../../services/location.service';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { LoaderService } from '../../services/loader.service';
 import { Calculations } from '../utils/calculations';
+import { AuthService } from '../../services/auth.service';
+import { ReportsResultsComponent } from './reports-results.component';
+import { UserService } from '../../services/user.service';
 
 
 @Component({
@@ -15,11 +20,6 @@ import { Calculations } from '../utils/calculations';
 })
 export class ReportsComponent implements OnInit {
 
-	// reportTypeOptions: any = {
- //  	'tribe': 'Tribe',
- //  	'county': 'County',
- //  	'state': 'State'
- //  }
  	reportTypeOptions: any = {
   	'objectids': 'User Locations',
   	'tribe': 'Tribe',
@@ -36,7 +36,8 @@ export class ReportsComponent implements OnInit {
 	locationObj: any = {
 		location: null,
 		checked: false,
-	}
+		availableDates: []
+	};
 
 	userLocations = [];  // list of user locations with checkbox status and location
 
@@ -46,9 +47,13 @@ export class ReportsComponent implements OnInit {
 	selectedState: string = '';
 	selectedCounty: string = '';
 	selectedTribe: string = '';
-	selectedLocations = [];
 
-	currentReportId: number = null;  // objectid, tribe id, or county id
+	currentWaterbodyId: number = null;  // objectid, tribe id, or county id
+	currentWaterbodyIds: number[] = [];
+
+	waterbodyIds: any = {
+		objectids: [],
+	}
 
 	requestsTracker: number = 0;
   totalRequests: number = 0;
@@ -60,47 +65,69 @@ export class ReportsComponent implements OnInit {
   maxYear: number = 9999;
 
   selectedCalendarDate: Date = null;
+  selectedDate: string;
 
   constructor(
   	private downloader: DownloaderService,
   	private locationService: LocationService,
   	private dialog: DialogComponent,
   	private loaderService: LoaderService,
-  	private calcs: Calculations
+  	private calcs: Calculations,
+  	private authService: AuthService,
+  	private matDialog: MatDialog,
+  	public dialogRef: MatDialogRef<ReportsResultsComponent>,
+  	@Inject(MAT_DIALOG_DATA) public data: any,
+  	private userService: UserService
   ) { }
 
   ngOnInit(): void {
-  	this.loaderService.showProgressBar();
-    this.loaderService.show();
-  	this.getTribes();
-		this.getStates();
-		this.getMyLocations();
+  	// this.loaderService.showProgressBar();
+    // this.loaderService.show();
+  // 	this.getTribes();
+		// this.getStates();
+  }
+
+  ngOnDestroy(): void {
+    this.stopJobPolling();
+  }
+
+	exit(): void {
+    this.ngOnDestroy();
+  }
+
+	stopJobPolling(): void {
+    console.log("Stopping job status polling.")
   }
 
   resetSelectedInputs() {
   	this.selectedTribe = '';
 		this.selectedState = '';
 		this.selectedCounty = '';
-		this.selectedLocations = [];
+		this.currentWaterbodyIds = [];
 		this.selectAllCheckbox({checked: false});  // unchecks all locations
 		this.selectAll = false;  // unchecks select all box
   }
 
   onReportSelect(event): void {
-  	console.log("onReportSelect() called: ", event)
   	this.selectedReportType = event.value;
   	this.resetSelectedInputs();
-
-  	// TODO: Make requests for the report type when selected instead
-  	// of at ngOnInit().
-
+  	if (this.selectedReportType === 'objectids') {
+  		this.getMyLocations();
+  	}
+  	else if (this.selectedReportType === 'tribe') {
+  		this.getTribes();
+  	}
+  	else if (this.selectedReportType === 'county') {
+  		this.getStates();
+  	}
   }
 
   onTribeSelect(event): void {
   	console.log("onTribeSelect() called: ", event)
   	this.selectedTribe = event.value;
   	let tribeId = this.findIdByName(event.value, this.wbTribes);
-  	this.currentReportId = parseInt(tribeId);
+  	this.currentWaterbodyId = parseInt(tribeId);
+  	this.currentWaterbodyIds.push(parseInt(tribeId));
   }
 
 	onStateSelect(event): void {
@@ -111,20 +138,21 @@ export class ReportsComponent implements OnInit {
 	}
 
 	onCountySelect(event): void {
-		console.log("onCountySelect() called: ", event)
 		// Ready to generate report for the county after selected a date
 		let countyId = this.findIdByName(event.value, this.wbCounties);
-		console.log("County ID: ", countyId);
 		this.selectedCounty = event.value;
-		this.currentReportId = parseInt(countyId);
+		this.currentWaterbodyId = parseInt(countyId);
+		this.currentWaterbodyIds.push(parseInt(countyId));
 	}
 
 	getTribes() {
-		this.incrementRequest();
+		if (this.wbTribes.length > 1) {
+			return;
+		}
+		this.loaderService.show();
 		this.downloader.getTribes().subscribe(response => {
-			this.updateProgressBar();
-			console.log("getTribes() response: ", response)
-			this.wbTribes = response['tribes'];
+			this.loaderService.hide();
+			this.wbTribes = this.alphabetize(response['tribes']);
 		});
 	}
 
@@ -132,22 +160,23 @@ export class ReportsComponent implements OnInit {
 		this.loaderService.show();
 		this.downloader.getCounties(state).subscribe(response => {
 			this.loaderService.hide();
-			console.log("getCounties() response: ", response)
-			this.wbCounties = response['counties'];
+			this.wbCounties = this.alphabetize(response['counties']);
 		});
 	}
 
 	getStates() {
-		this.incrementRequest();
+		if (this.wbStates.length > 1) {
+			return;
+		}
+		this.loaderService.show();
 		this.downloader.getStates().subscribe(response => {
-			this.updateProgressBar();
-			console.log("getStates() response: ", response)
-			this.wbStates = response['states'];
+			this.loaderService.hide();
+			this.wbStates = this.alphabetize(response['states']);
 		});
 	}
 
 	getMyLocations() {
-		this.incrementRequest();
+		this.loaderService.show();
 		this.myLocations = this.locationService.getStaticLocations();
 		this.myLocations.forEach(location => {
 			let locationObj = {};
@@ -155,11 +184,12 @@ export class ReportsComponent implements OnInit {
 			locationObj['checked'] = false;
 			this.userLocations.push(locationObj);
 		});
-		this.updateProgressBar();
+		this.loaderService.hide();
 	}
 
 	updateDate(event) {
 		console.log("updateDate() called: ", event)
+		this.selectedDate = event;
 	}
 
 	selectAllCheckbox(event) {
@@ -170,23 +200,22 @@ export class ReportsComponent implements OnInit {
 		this.userLocations.forEach(userLocation => {
 				userLocation.checked = event.checked;
 				if (event.checked === true) {
-					this.selectedLocations.push(userLocation);	
+					this.currentWaterbodyIds.push(userLocation.location.objectid);
 				}
 				else {
 					this.removeLocation(userLocation);
 				}
 		});
-		console.log("selected locations: ", this.selectedLocations)
 	}
 
 	locationSelect(userLocation, event) {
 		/*
 		Event hanlder for checking a location in User Locations list.
 		*/
-		if (event.checked === true) {
-			this.selectedLocations.push(userLocation);
+		if (event.checked === true && this.currentWaterbodyIds.indexOf(userLocation.location.waterbody.objectid) === -1) {
+			this.currentWaterbodyIds.push(userLocation.location.waterbody.objectid)
 		}
-		else {
+		else if (event.checked === false) {
 			this.removeLocation(userLocation);
 		}
 	}
@@ -204,46 +233,46 @@ export class ReportsComponent implements OnInit {
 		Removes location from selectionLocations.
 		*/
 		this.userLocations.find((o, i) => {
-			if (o.location.name == userLocation.location.name) {
-				this.selectedLocations.splice(i);
+			if (o.location.objectid == userLocation.location.objectid) {
+				this.currentWaterbodyIds.splice(i);
 				return;
 			}
 		});
 	}
-
-	incrementRequest() {
-		console.log("incrementRequest called")
-    this.requestsTracker++;
-    this.totalRequests++;
-  }
-
-  updateProgressBar(): void {
-  	console.log("updateProgressBar called")
-    this.requestsTracker--;
-    let progressValue = 100 * (1 - (this.requestsTracker / this.totalRequests));
-    this.loaderService.progressValue.next(progressValue);
-    if (this.requestsTracker <= 0) {
-      this.loaderService.hide();
-      this.loaderService.progressValue.next(0);
-    }
-  }
 
   generateReport(): void {
   	/*
   	Makes request to /report endpoint to try and
   	generate a report based on county, tribe, or "my location".
   	*/
-  	console.log("generateReport() called.")
-
-  	let day = this.selectedCalendarDate.getDay();
-  	let year = this.selectedCalendarDate.getFullYear();
+  	let dayOfYear = this.calcs.getDayOfYearFromDateObject(this.selectedCalendarDate);
+  	let year = parseInt(dayOfYear.split(' ')[0]);
+  	let day = parseInt(dayOfYear.split(' ')[1]);
 
   	this.validateReportRequest(year, day);
 
-  	// TODO: Set currentReportID for User Locations report type
+  	let ranges = [
+	  	this.userService.currentAccount.settings.level_low,
+	  	this.userService.currentAccount.settings.level_medium,
+	  	this.userService.currentAccount.settings.level_high
+	  ];
   	
-  	this.downloader.generateReport(this.selectedReportType, this.currentReportId, year, day).subscribe(response => {
-  		console.log("generateReport response: ", response)
+  	this.downloader.generateReport(this.selectedReportType, this.currentWaterbodyIds, dayOfYear, ranges).subscribe(response => {
+  		if (response['status'] !== true) {
+  			this.dialog.displayMessageDialog(response['status']);
+  			return;
+  		}
+  		this.dialog.displayMessageDialog("Report is being generated. Select 'view reports' for more information.")
+  	},
+  	error => {
+  		let errorMessage = error.error.status;
+  		let reportId = error.error.report_id;
+  		let reportStatus = error.error.report_status;
+  		console.log("Error generating report : ", errorMessage, reportId, reportStatus);
+  		if (errorMessage.length < 1) {
+  			errorMessage = 'An unknown error occurred. Please try again.';
+  		}
+  		this.dialog.handleError(errorMessage);
   	});
 
 
@@ -266,6 +295,27 @@ export class ReportsComponent implements OnInit {
     	this.dialog.handleError('Day is wrong size. Must be between 1 and 3 (e.g., 1 - 366).');
     }
     // TODO: Set limits on report ID array
+  }
+
+  viewReports() {
+  	/*
+  	Shows table of user's reports.
+  	*/
+  	if (!this.authService.checkUserAuthentication()) { return; }
+    this.dialogRef = this.matDialog.open(ReportsResultsComponent, {
+      maxWidth: '100%',
+      data: {
+      	username: this.userService.currentAccount.user.username
+      }
+      // panelClass: 'csv-dialog'
+    });
+  }
+
+  alphabetize(stringArray) {
+  	/*
+  	Sorts lists alphabetically.
+  	*/
+  	return stringArray.sort((a, b) => a[1].localeCompare(b[1]))
   }
 
 }

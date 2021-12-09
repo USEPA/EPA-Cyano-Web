@@ -89,3 +89,15 @@ h2.label {
   background: white;
   padding-left: 2%;
 }
+
+.download-report-btn:hover {
+    color: gray;
+    cursor: pointer;
+}
+
+.table-responsive {
+    /*overflow-y: scroll;*/
+    overflow: auto;
+    height: 80%;
+    width: 100%;
+}
