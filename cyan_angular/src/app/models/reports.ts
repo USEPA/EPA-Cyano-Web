@@ -30,7 +30,10 @@ export interface ReportsTableParams {
   report_objectids: string;
   report_tribes: string;
   report_counties: string;
-  report_ranges: string;
+  // report_ranges: string;
+  report_range_low: string;
+  report_range_medium: string;
+  report_range_high: string;
 }
 
 // "Reports" table columns
@@ -76,8 +79,24 @@ export const columnNames = [
     id: 'report_counties',
     value: 'Counties'
   },
+  // {
+  //   id: 'report_ranges',
+  //   value: 'Ranges'
+  // }
   {
-    id: 'report_ranges',
-    value: 'Ranges'
+    id: 'report_range_low',
+    value: 'Range (low)'
+  },
+  {
+    id: 'report_range_medium',
+    value: 'Range (medium)'
+  },
+  {
+    id: 'report_range_high',
+    value: 'Range (high)'
+  },
+  {
+    id: 'download_report',
+    value: 'Download Report'
   }
 ];
