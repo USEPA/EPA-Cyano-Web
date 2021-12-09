@@ -329,18 +329,42 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
-  generateReport(reportType: string, reportId: number, year: number, day: number) {
+  // generateReport(reportType: string, reportTypeId: number, dayOfYear: string, ranges: Array<number>) {
+  generateReport(reportType: string, reportTypeIds: number[], dayOfYear: string, ranges: Array<number>) {
     /*
     Starts report generation.
       * reportType - objectids, county, or tribe
-      * reportId - ID number for the reportType
-      * year, day - year and day-of-year for report
+      * reportTypeId - ID number for the reportType (objectids, county or tribe IDs)
+      * dayOfYear - year and day-of-year for report (e.g., "2021 300")
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.waterbodyUrl + 'report/?'
-      + reportType + '=' + reportId
-      + '&year=' + year
-      + '&day=' + day;
+    let url = this.envService.config.baseServerUrl + 'report';
+    let postData = {
+      date: dayOfYear,
+      ranges: ranges
+    }
+    if (reportType === 'objectids') {
+      postData['objectids'] = reportTypeIds;
+    }
+    else if (reportType === 'tribe') {
+     postData['tribes'] = reportTypeIds;
+    }
+    else if (reportType === 'county') {
+      postData['counties'] = reportTypeIds;
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
+  }
+
+  getUserReports(reportId: string = '') {
+    /*
+    Gets user reports based on redport ID, or returns all of them if
+    no report ID is provided.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report';
+    if (reportId.length > 0) {
+      url += '/?' + reportId;
+    }
     return this.executeAuthorizedGetRequest(url);
   }
 
@@ -349,7 +373,7 @@ export class DownloaderService {
     Gets status of report based on report ID.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.waterbodyUrl + 'report/status/?'
+    let url = this.envService.config.baseServerUrl + 'report/status/?'
       + 'report_id=' + reportId;
     return this.executeAuthorizedGetRequest(url);
   }
@@ -360,7 +384,7 @@ export class DownloaderService {
     NOTE: Must be user that started report as well.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.waterbodyUrl + 'report/cancel/?'
+    let url = this.envService.config.baseServerUrl + 'report/cancel/?'
       + 'report_id=' + reportId;
     return this.executeAuthorizedGetRequest(url);
   }
@@ -372,17 +396,18 @@ export class DownloaderService {
     if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.envService.config.waterbodyUrl + 'report/download/?'
       + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    // return this.executeAuthorizedGetRequest(url);
 
     // NOTE: May need request like below:
-    // return this.http.get(url, {
-    //   headers: {
-    //     'Content-Type': 'application/pdf',
-    //     'App-Name': this.envService.config.appName,
-    //   },
-    //   responseType: 'blob',
-    //   observe: 'response'
-    // });
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'App-Name': this.envService.config.appName,
+      },
+      // responseType: 'blob',
+      responseType: 'blob',
+      observe: 'response'
+    });
   }
 
   downloadHistoData(objectid: number) {
