@@ -1,8 +1,8 @@
 """reports table
 
-Revision ID: 7f0146f3bfce
+Revision ID: a061d1f3c5c4
 Revises: 970621e83c6c
-Create Date: 2021-10-12 13:33:10.728504
+Create Date: 2021-11-30 20:51:51.712487
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7f0146f3bfce'
+revision = 'a061d1f3c5c4'
 down_revision = '970621e83c6c'
 branch_labels = None
 depends_on = None
@@ -24,17 +24,15 @@ def upgrade():
     sa.Column('report_num', sa.Integer(), nullable=False),
     sa.Column('report_id', sa.String(length=256), nullable=False),
     sa.Column('report_status', sa.String(length=32), nullable=False),
-    sa.Column('report_file', sa.String(length=128), nullable=False),
     sa.Column('report_date', sa.String(length=10), nullable=False),
-    sa.Column('report_objectids', sa.Text(), nullable=False),
-    sa.Column('report_tribes', sa.Text(), nullable=False),
-    sa.Column('report_counties', sa.Text(), nullable=False),
-    sa.Column('report_ranges', sa.String(length=256), nullable=False),
+    sa.Column('report_objectids', sa.Text(), nullable=True),
+    sa.Column('report_tribes', sa.Text(), nullable=True),
+    sa.Column('report_counties', sa.Text(), nullable=True),
+    sa.Column('report_range_low', sa.Integer(), nullable=False),
+    sa.Column('report_range_medium', sa.Integer(), nullable=False),
+    sa.Column('report_range_high', sa.Integer(), nullable=False),
     sa.Column('received_datetime', sa.DateTime(), nullable=False),
-    sa.Column('started_datetime', sa.DateTime(), nullable=True),
     sa.Column('finished_datetime', sa.DateTime(), nullable=True),
-    sa.Column('queue_time', sa.Integer(), nullable=True),
-    sa.Column('exec_time', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

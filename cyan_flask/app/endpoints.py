@@ -2,6 +2,7 @@ import os
 import simplejson
 from flask import request, g
 from flask_restful import Api, Resource, reqparse
+import logging
 
 # Local imports:
 from auth import JwtHandler
@@ -388,6 +389,111 @@ class BatchJobCancel(Resource):
         return results, status_code, headers
 
 
+class Report(Resource):
+    """
+    Batch processing of CSV-uploaded location data requests
+    that are processed with a background celery worker.
+    """
+
+    @login_required
+    @check_headers
+    def get(self, report_id=""):
+        """
+        Gets batch job from db for user.
+        """
+        user = JwtHandler().get_user_from_token(request)
+        # user = "nick"
+        headers = get_auth_headers()
+        if not report_id:
+            results, status_code = web_app_api.get_all_reports({"username": user})
+        else:
+            results, status_code = web_app_api.get_report(user, report_id)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+    @login_required
+    @check_headers
+    def post(self):
+        """
+        Starts a user's report request.
+        POST: location list, username (from token),
+        """
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        args["token"] = headers.get("Authorization")
+        args["origin"] = request.environ.get("HTTP_ORIGIN")
+        args["app_name"] = os.getenv("APP_NAME")
+        results, status_code = web_app_api.start_report(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+class ReportStatus(Resource):
+    """
+    Endpoint for getting report status.
+    """
+
+    @login_required
+    @check_headers
+    def post(self):
+        """
+        Gets status of a given job ID.
+        Could use username or other info from validated token
+        to check job status in User DB table.
+        """
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        results, status_code = web_app_api.get_report_status(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+class ReportCancel(Resource):
+    """
+    Endpoint for canceling a user's report.
+    """
+
+    @login_required
+    @check_headers
+    def post(self):
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        results, status_code = web_app_api.cancel_report(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+class ReportUpdate(Resource):
+    """
+    Endpoint for updating a user's report.
+    """
+    @login_required
+    @check_headers
+    def post(self):
+        """
+        Updates report table object.
+        Ex: Request from WB when report is finished.
+        """
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        # TODO: Additional request handling.
+        results, status_code = web_app_api.update_report(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+
 # Test endpoint:
 api.add_resource(StatusTest, "/test")
 
@@ -425,5 +531,11 @@ api.add_resource(Reply, api_url + "reply")
 api.add_resource(Batch, api_url + "batch")
 api.add_resource(BatchJobStatus, api_url + "batch/status")
 api.add_resource(BatchJobCancel, api_url + "batch/cancel")
+
+# Report endpoints:
+api.add_resource(Report, api_url + "report")
+api.add_resource(ReportStatus, api_url + "report/status")
+api.add_resource(ReportCancel, api_url + "report/cancel")
+api.add_resource(ReportUpdate, api_url + "report/update")
 
 print("CyAN Flask app started.")
