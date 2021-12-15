@@ -52,7 +52,7 @@
                     <mat-icon class="header-icon mat_icon">settings</mat-icon>
                 </div>
                 <div class="comments config-item" aria-label="User guide">
-                    <a href="assets/CYANWEB USERS GUIDE APRIL 2021-FINAL-MGFINAL_TAGGED.PDF" target="_blank">
+                    <a href="assets/CYANWEB USERS GUIDE APRIL 2021-FINAL-MGFINAL_TAGGED.PDF" target="_blank" aria-label="user guide">
                         <mat-icon class="header-icon mat_icon">help_outline</mat-icon>
                     </a>
                 </div>
@@ -65,21 +65,21 @@
     <div class="menu-block-icon">
         <button mat-button [matMenuTriggerFor]="linksLeft" class="menu-block-button">&#9776;</button>
         <mat-menu #linksLeft="matMenu" class="menu-link-block" panelClass="links-left-menu">
-            <button mat-menu-item class="my-locations menu-link" [routerLink]="['/mylocations']">
+            <button mat-menu-item class="my-locations menu-link" [routerLink]="['/mylocations']" aria-label="My locations">
                 <div class="menu-div">
                     <span class="tab-title">My Locations</span>
                 </div></button>
-            <button mat-menu-item class=" compare menu-link" [routerLink]="['/comparelocations']">
+            <button mat-menu-item class=" compare menu-link" [routerLink]="['/comparelocations']" aria-label="Compare locations">
                 <div class="menu-div">
                     <span class="tab-title">Compare</span>
                  </div>
             </button>
-            <button mat-menu-item class="notifications menu-link" [routerLink]="['/notifications']">
+            <button mat-menu-item class="notifications menu-link" [routerLink]="['/notifications']" aria-label="Notifications">
                 <div class="menu-div">
                     <span class="tab-title">Notifications</span>
                 </div>
             </button>
-            <button mat-menu-item class="coordiantes menu-link" [routerLink]="['/coordinates']">
+            <button mat-menu-item class="coordiantes menu-link" [routerLink]="['/coordinates']" aria-label="Geographic coordiantes">
                 <div class="menu-div">
                     <span class="tab-title">Geographic Coordinates</span>
                 </div>
@@ -89,25 +89,25 @@
     <nav class="menu-block">
         <button mat-button class="my-locations menu-item" [routerLink]="['/mylocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" alt="" src="assets/images/tab_my_location_icon.png"/>
+                <img class="tab-icon" alt="my location icon" src="assets/images/tab_my_location_icon.png"/>
                 <span class="tab-title">My Locations</span>
             </div>
         </button>
         <button mat-button class="compare menu-item" [routerLink]="['/comparelocations']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" alt="" src="assets/images/tab_compare_icon.png"/>
+                <img class="tab-icon" alt="compare locations icon" src="assets/images/tab_compare_icon.png"/>
                 <span matBadge="{{compare_locations.length || ''}}" class="tab-title" matBadgeDescription="Number of locations to compare">Compare</span>
             </div>
         </button>
         <button mat-button class="notifications menu-item" [routerLink]="['/notifications']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" alt="" src="assets/images/tab_notifications_icon.png"/>
+                <img class="tab-icon" alt="notifications icon" src="assets/images/tab_notifications_icon.png"/>
                 <span matBadge="{{new_notifications.length || ''}}" class="tab-title" matBadgeDescription="Number of new notifications">Notifications</span>
             </div>
         </button>
         <button mat-button class="coordinates menu-item" [routerLink]="['/coordinates']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" alt="" src="assets/images/tab_geo_coord_icon.png"/>
+                <img class="tab-icon" alt="Geographic coordiantes icon" src="assets/images/tab_geo_coord_icon.png"/>
                 <span class="tab-title">Geographic Coordinates</span>
             </div>
         </button>
