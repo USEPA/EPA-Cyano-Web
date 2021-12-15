@@ -6,6 +6,7 @@ import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, geoJSON, im
 import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
 import { Label, BaseChartDirective } from 'ng2-charts';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Options, ChangeContext } from 'ng5-slider';
 
 import {
   WaterBody,
@@ -37,11 +38,6 @@ export class WaterBodyStatsDetails {
   /*
   Dialog for viewing waterbody stats.
   */
-
-  // @ViewChild(BaseChartDirective) private stackedChart: BaseChartDirective;
-  // @ViewChild(BaseChartDirective) private barChart: BaseChartDirective;
-  // @ViewChild(BaseChartDirective) private pieChart: BaseChartDirective;
-  // @ViewChild(BaseChartDirective) private lineChart: BaseChartDirective;
 
   @ViewChildren(BaseChartDirective) private chartObjs: Array<BaseChartDirective>;
 
@@ -94,6 +90,14 @@ export class WaterBodyStatsDetails {
   selectedDateIndex: number = 0;
   slideshowDelay: number = 4000;  // units of seconds
   slideshowStatus: string = this.slidershow ? "Slideshow started" : "Start slideshow";
+
+  // Selected date slider options:
+  sliderValue: number = 0;
+  sliderOptions: Options = {
+    showTicksValues: true,
+    stepsArray: []
+  };
+
 
   // Bar chart parameters:
   public chartLabels: Label[] = this.ranges;
@@ -399,7 +403,7 @@ export class WaterBodyStatsDetails {
 
     if (['7day', '30day'].includes(dateRangeValue)) {
       // Multi-day range
-      this.selectedDate = this.selectedAvailableDate;  // initializes selectedDate for slideshow
+      // this.selectedDate = this.selectedAvailableDate;  // initializes selectedDate for slideshow
       this.selectedPlotType = this.plotTypes[0];  // sets title for stacked bars
       let range = parseInt(dateRangeValue.split('day')[0]);
       let d = new Date(this.selectedAvailableDate);
@@ -410,10 +414,13 @@ export class WaterBodyStatsDetails {
         if (d <= endDate && d > startDate) {
           return true;
         }
-      });
+      }).reverse();  // orders dates earliest to latest
+
+      this.updateSlider();
+
       this.plotRangeOfTotalCounts(this.datesWithinRange);
       this.plotLineData(this.datesWithinRange);
-      this.scrollToSelectedDate();
+      // this.scrollToSelectedDate();
     }
     else {
       // Single-day range
@@ -423,6 +430,23 @@ export class WaterBodyStatsDetails {
       this.calculateWaterbodyStats(this.selectedAvailableDate);
     }
 
+  }
+
+  updateSlider() {
+    this.selectedDate = this.datesWithinRange[this.datesWithinRange.length - 1];  // sets date to cycle to first date in range
+    this.sliderValue = 0;  // sets slider to earliest date
+    this.slidershow = false;  // ensures slideshow stops
+    this.cycleSelectedDates();  // selects initial date (runs slideshow once)
+    const newSliderOptions: Options = Object.assign({}, this.sliderOptions);
+    newSliderOptions.stepsArray = [];
+    this.datesWithinRange.forEach(date => {
+      newSliderOptions.stepsArray.push({
+        value: this.datesWithinRange.indexOf(date),
+        legend: date
+      });
+    });
+    newSliderOptions.showTicksValues = true;
+    this.sliderOptions = newSliderOptions;
   }
 
   updateHistoChart() {
@@ -772,14 +796,6 @@ export class WaterBodyStatsDetails {
     return this.dataByRange;
   }
 
-  // addImageLayer(imageUrl: string, bounds: any): any {
-  //   let topLeft = latLng(bounds[1][0], bounds[1][1]);
-  //   let bottomRight = latLng(bounds[0][0], bounds[0][1]);
-  //   let imageBounds = latLngBounds(bottomRight, topLeft);
-  //   this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
-  //   this.cyanMap.map.addLayer(this.wbImageLayer);
-  // }
-
   addImageLayer(image: Blob, bounds: any): any {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
@@ -835,12 +851,9 @@ export class WaterBodyStatsDetails {
       this.selectedDate = this.selectedAvailableDate;
     }
 
-    // let selectedDate = this.selectedDate;
-    // this.selectedDateIndex = selectedDates.indexOf(selectedDate);
     this.selectedDateIndex = selectedDates.indexOf(this.selectedDate);
 
     // Cycle back to beginning if at last index
-    // this.selectedDateIndex = this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1 ? 0 : this.selectedDateIndex++;
     if (this.selectedDateIndex < 0 || this.selectedDateIndex >= selectedDates.length - 1) {
       this.selectedDateIndex = 0;
     }
@@ -848,57 +861,21 @@ export class WaterBodyStatsDetails {
       this.selectedDateIndex++;
     }
 
-    // TODO: Highlight new date in list.
     this.selectedDate = this.datesWithinRange[this.selectedDateIndex];
 
-    // let selectedDateElement = document.getElementById('selected-dates-list');
-    // selectedDateElement.children[this.selectedDateIndex].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
-    this.scrollToSelectedDate();
+    // Updates slider to new selected date:
+    this.sliderValue = this.selectedDateIndex;
 
 
     let date = this.calcs.getDayOfYear(this.selectedDate);
     let year = parseInt(date.split(' ')[0]);
     let day = parseInt(date.split(' ')[1]);
 
-    // TODO: Cycle image.
     this.getWaterbodyImage(this.wbProps.objectid, year, day);
 
-    console.log("stackedChartData: ", this.stackedChartData)
-
-    // // TODO: Highlight points in line chart for date.
-    // this.lineChartLabels.forEach(dateLabel => {
-    //   console.log("line chart label: ")
-    //   console.log(dateLabel)
-    //   if (dateLabel == this.selectedDate) {
-    //     // increase point size to highlight
-    //     this.lineChartData[labelIndex].pointRadius = 5;
-    //   }
-    //   else {
-    //     this.lineChartData[labelIndex].pointRadius = 1; 
-    //   }
-    //   labelIndex++;
-    // });
-
-    // console.log("Stacked Chart: ", this.stackedChart);
-    // console.log("Bar Chart: ", this.barChart);
-    // console.log("Pie Chart: ", this.pieChart)
-    // console.log("Line chart: ", this.lineChart)
-
-    console.log("charts: ", this.chartObjs);
-
     this.chartObjs.forEach((chart) => {
-      console.log("Chart: ", chart)
       this.triggerHover(chart.chart);
     });
-
-    // TODO: Highlight points in line chart for selected slideshow date:
-
-    // TODO: If x-labels can also correspond to a bar, highlight the date label during slideshow?
-
-    // let chartObj = this.chartObjs['_results'];
-    // let chartObj = this.stackedChart.chart;
-    // this.triggerHover(this.stackedChart.chart);
-    // this.triggerHover(chartObj);
 
     this.toggleSlideShow();
 
@@ -907,10 +884,6 @@ export class WaterBodyStatsDetails {
   triggerHover(chart) {
     // TODO: Remove hover highlighting if slideshow is stopped.
     // TODO: Go back to original "available date" if slideshow is stopped.
-
-    console.log("triggerHover called.")
-    console.log("Chart: ", chart)
-    console.log("Selected state index: ", this.selectedDateIndex)
 
     let meta = chart.getDatasetMeta(0);
     let rect = chart.canvas.getBoundingClientRect();
@@ -923,12 +896,47 @@ export class WaterBodyStatsDetails {
     node.dispatchEvent(evt);
   }
 
-  scrollToSelectedDate() {
+  downloadHistoCSV() {
     /*
-    Scrolls to selected date in the "Selected dates" selection list.
+    Downloads histogram data as CSV.
     */
-    let selectedDateElement = document.getElementById('selected-dates-list');
-    selectedDateElement.children[this.selectedDateIndex].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let dialogRef = this.dialog.displayMessageDialog('Download histogram data for ' + this.selectedWaterbody.name + '?');
+    dialogRef.afterClosed().subscribe(response => {
+      if (response !== true) {
+        return;
+      }
+      this.loaderService.show();
+      this.downloader.downloadHistoData(this.selectedWaterbody.objectid).subscribe(response => {
+        this.loaderService.hide();
+        let histoCsvData = response.body;
+        let dataRows = histoCsvData.split('\n');
+        dataRows.splice(-1);  // removes trailing '' array item
+        let dataArray = dataRows.map(item => item.split(','));
+        let filename = 'WaterbodyHistogram' + this.selectedWaterbody.objectid + 
+                        this.selectedWaterbody.name.replace(/\s/g, '') + '.csv';
+        this.downloader.downloadFile(filename, histoCsvData);
+      });
+    });
   }
+
+  sliderEvent() {
+    
+    if (this.slidershow === true) {
+      this.selectedDate = this.datesWithinRange[this.sliderValue];
+      return;  // skip cycle call if already playing slideshow
+    }
+    else {
+      if (this.sliderValue === 0) {
+      this.selectedDate = this.datesWithinRange[this.datesWithinRange.length - 1];
+      }
+      else {
+        this.selectedDate = this.datesWithinRange[this.sliderValue - 1];
+      }
+      this.cycleSelectedDates();
+    }
+    
+  }
+
 
 }

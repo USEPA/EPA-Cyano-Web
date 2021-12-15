@@ -22,7 +22,6 @@ import { ConfigService } from '../services/config.service';
 })
 export class LocationCompareDetailsComponent implements OnInit {
 
-  currentLocaitonData: RawData;
   imageCollection: ImageDetails[];
   locationThumbs: ImageDetails[];
   locationTIFFs: ImageDetails[];

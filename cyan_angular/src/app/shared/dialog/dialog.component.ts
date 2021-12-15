@@ -38,11 +38,11 @@ export class DialogComponent {
     this.dialogRef.close(response);
   }
 
-  displayMessageDialog(message: string): void {
+  displayMessageDialog(message: string): any {
     /*
     Displays dialog messages to user.
     */
-    this.messageDialog.open(DialogComponent, {
+    return this.messageDialog.open(DialogComponent, {
       data: {
         dialogMessage: message
       }

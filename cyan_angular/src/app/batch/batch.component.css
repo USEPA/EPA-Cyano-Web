@@ -37,10 +37,14 @@
 }
 
 .table-responsive {
-	/*overflow-y: scroll;*/
 	overflow: auto;
 	height: 80%;
 	width: 100%;
+}
+
+.request-data-div {
+	overflow: auto;
+	height: 100%;
 }
 
 .exit-button {
@@ -75,4 +79,8 @@
 	max-width: 40%;
 	word-break: break-all;
 	padding: 0 2% 0 2%;
+}
+
+.batch-instruction-list li {
+	padding-bottom: 2%;
 }

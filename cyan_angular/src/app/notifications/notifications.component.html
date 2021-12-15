@@ -6,17 +6,17 @@
     <span *ngIf="new_notifications_counter > 0; then has_locations else no_locations"></span>
     <ng-template #no_locations>
       <div class="location_sort">
-        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked($event);" color="primary">Only show new notifications</mat-checkbox>
+        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked($event);" color="primary">Only show unread notifications</mat-checkbox>
       </div>
-      <div class="no_locations locations_count">0 new notifications.</div>
+      <div class="no_locations locations_count">0 unread notifications.</div>
       <button class="mat-button clear-btn" (click)="clearNotifications();">Clear</button>
       <hr>
     </ng-template>
     <ng-template #has_locations>
       <div class="location_sort">
-        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked($event);" color="primary">Only show new notifications</mat-checkbox>
+        <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked($event);" color="primary">Only show unread notifications</mat-checkbox>
       </div>
-      <div class="locations_count">{{ new_notifications_counter }} new notifications</div>
+      <div class="locations_count">{{ new_notifications_counter }} unread notifications</div>
       <button class="mat-button clear-btn" (click)="clearNotifications();">Clear</button>
       <hr>
     </ng-template>

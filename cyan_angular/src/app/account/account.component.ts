@@ -55,7 +55,7 @@ export class AccountComponent implements OnInit {
   allowReset: boolean = true;
 
   usernameMinLength: number = 4;
-
+  usernameMaxLength: number = 36;
 
   constructor(
     private router: Router,
@@ -229,7 +229,6 @@ export class AccountComponent implements OnInit {
   registerUser(): void {
     let self = this;
     this.validateForm();
-    // if (this.validateForm()) {
     this.userService.registerUser(this.registerUsername, this.registerEmail, this.registerPassword).subscribe(
       response => {
         // user successfully registered, log the user in
@@ -247,7 +246,6 @@ export class AccountComponent implements OnInit {
         }
       }
     );
-    // }
   }
 
   exitAccount() {
@@ -268,20 +266,17 @@ export class AccountComponent implements OnInit {
 
   validateForm(): void {
     let self = this;
+    let validUsername = this.authService.validateUsername(this.registerUsername);
     let validPass = this.authService.validatePassword(this.registerPassword, this.registerPasswordCheck);
-
-    if (
-      this.registerUsername == '' ||
-      this.registerUsername == undefined ||
-      this.registerUsername.length < this.usernameMinLength
-    ) {
-      self.dialog.handleError('Username must be ' + this.usernameMinLength + ' characters or more.');
+    if (validUsername['valid'] !== true) {
+      self.dialog.handleError(validUsername['message']);
     }
     else if (validPass['valid'] !== true) {
-      self.dialog.handleError(validPass['message'])
+      self.dialog.handleError(validPass['message']);
     }
     else if (!this.authService.emailIsValid(this.registerEmail)) {
       self.dialog.handleError('Email is invalid');
     }
   }
+
 }

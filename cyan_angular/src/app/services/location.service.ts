@@ -9,6 +9,7 @@ import { DownloaderService, DataPoint } from "../services/downloader.service";
 import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 import { WaterBody } from "../models/waterbody";
+import { WaterBodyStatsDetails } from "../waterbody-stats/waterbody-stats-details.component";
 
 // @Directive()
 @Injectable({
@@ -531,7 +532,13 @@ export class LocationService {
     /*
     Adds objectid to locations with available waterbody data.
     */
+
+    this.loaderService.show();
+
     this.downloader.searchForWaterbodyByCoords(ln.latitude, ln.longitude).subscribe(wbInfoResult => {
+
+      this.loaderService.hide();
+
       if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
         return;
       }
@@ -551,6 +558,7 @@ export class LocationService {
         // }
       });
     });
+
   }
 
 }

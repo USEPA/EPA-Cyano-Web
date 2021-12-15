@@ -17,7 +17,7 @@
         </button>
         <button *ngIf="!hideUpload" mat-menu-item mat-button (click)="openCsvDialog()" [routerLink]="['']" class="bottom-menu-title">
           <div class="menu-div" aria-label="User guide">
-            <span class="tab-title">Upload CSV</span>
+            <span class="tab-title">Request Location Data</span>
           </div>
         </button>
         <button *ngIf="!hideWaterbodyStats" mat-menu-item mat-button [routerLink]="['/wbsearch']" class="bottom-menu-title">
@@ -39,9 +39,9 @@
     <div class="bottom-menu-title-block">
       <button mat-button class="bottom-menu-title" (click)="reloadClick()" [routerLink]="['']">Reload Data</button>
     </div>
-    <!-- Upload CSV / batch feature -->
+    <!-- Request Location Data / batch feature -->
     <div *ngIf="!hideUpload" class="bottom-menu-title-block">
-      <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Upload CSV</button>
+      <button mat-button class="bottom-menu-title" (click)="openCsvDialog()" [routerLink]="['']">Request Location Data</button>
     </div>
     <!-- Waterbody Stats -->
     <div *ngIf="!hideWaterbodyStats" class="bottom-menu-title-block">

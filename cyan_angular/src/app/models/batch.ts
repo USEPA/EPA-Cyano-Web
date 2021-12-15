@@ -37,7 +37,7 @@ export interface JobsTableParams {
 export const columnNames = [
   {
     id: 'jobNum',
-    value: 'Job'
+    value: 'Request'
     
   },
   {

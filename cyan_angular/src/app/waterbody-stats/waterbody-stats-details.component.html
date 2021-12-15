@@ -15,6 +15,7 @@
 				<b>Centroid Longitude:</b> {{selectedWaterbody.centroid_lng}}<br>
 				<b>Area:</b> {{wbProps.areasqkm}} km<sup>2</sup><br>
 			</div>
+			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download histogram</button>
 			<br><br>
 			<div class="details_tab">
 				<!-- User selections for WB stats -->
@@ -38,27 +39,27 @@
 						<mat-label>Date Range</mat-label>
 						<mat-select [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
 							<mat-option value="single">Single</mat-option>
-							<mat-option value="7day">7 Day</mat-option>
-							<mat-option value="30day">30 Day</mat-option>
+							<mat-option value="7day">7 Day History</mat-option>
+							<mat-option value="30day">30 Day History</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<!-- Shows list of dates within selected range -->
 				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
-					<div style="float:left;">
-						<b>Selected dates</b>
-						<dl id="selected-dates-list">
-							<dt [class.highlight-date]="date == selectedDate" class="selected-dates-item" *ngFor="let date of datesWithinRange">
-								{{date}}
-							</dt>
-						</dl>
-					</div>
 					<div>
 						<div class="details_slideshow">
 	            			<mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">{{slidershow ? "Slideshow started" : "Start slideshow"}}</mat-checkbox>
 	          			</div>
 	          			<br>
 	          			<p>Current date: {{selectedDate || selectedAvailableDate}}</p>
+	          		</div>
+	          		<div>
+          				<ng5-slider
+          					[(value)]="sliderValue"
+          					[options]="sliderOptions"
+          					(mouseup)="sliderEvent()"
+          					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day'}">
+          				</ng5-slider>
 	          		</div>
 				</div>
 			</div>
@@ -108,8 +109,10 @@
 				<!-- Cell Concentration Histogram -->
 				<div class="data-item">
 					<div *ngIf="!showStacked" class="chart_header">
-					  <div class="chart_title">Cell Concentration Histogram</div>
-					  <div class="chart_source_selection"></div>
+					  <div class="chart_title">Cell Concentration Histogram
+					  	<!-- <mat-icon id="download-histo-btn" (click)="downloadHistoCSV()" class="mat_icon">file_download</mat-icon> -->
+					  </div>
+					  <!-- <div class="chart_source_selection"></div> -->
 					</div>
 					<div *ngIf="showStacked" class="chart_header">
 					  <div class="chart_title">Total Cell Counts by Range</div>

@@ -9,6 +9,7 @@ import json
 import logging
 from sqlalchemy import desc
 import os
+import requests
 
 # Local imports:
 from auth import PasswordHandler, JwtHandler
@@ -21,6 +22,7 @@ from models import (
     CommentImages,
     Reply,
     Job,
+    Report,
     db,
 )
 import utils
@@ -676,4 +678,267 @@ def get_batch_job(request_obj):
     response_obj["status"] = "success"
     response_obj["jobs"] = Job.create_jobs_json([user_jobs])
 
+    return response_obj, 200
+
+
+def get_all_reports(request_obj):
+    """
+    Gets all reports from a user.
+    """
+    username = request_obj["username"]
+
+    user = User.query.filter_by(username=username).first()
+    user_reports = Report.query.filter_by(user_id=user.id).all()
+
+    reports = list(
+        reversed(Report.create_reports_json(user_reports))
+    )  # sorts in desc (latest report first)
+
+    response_obj = dict(Report.user_reports_response())
+    response_obj["status"] = "success"
+    response_obj["reports"] = reports
+
+    return response_obj, 200
+
+
+def get_report(request_obj):
+    """
+    Gets a specific report.
+    """
+    report_id = request_obj["report_id"]
+    username = request_obj["username"]
+
+    # TODO: Error handling
+
+    # user_reports = celery_handler.get_report_from_db(username, report_id)
+    user = User.query.filter_by(username=username).first()  # gets user from db
+    user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
+
+    response_obj = dict(report.user_reports_response())
+    response_obj["status"] = "success"
+    response_obj["reports"] = Report.create_reports_json([user_reports])
+
+    return response_obj, 200
+
+
+def start_report(request_obj):
+    """
+    Starts a user's report generation.
+    """
+    try:
+        username = request_obj["username"]
+        date = request_obj["date"]
+        tribes = ",".join(map(str, request_obj.get("tribes", [])))
+        objectids = ",".join(map(str, request_obj.get("objectids", [])))
+        counties = ",".join(map(str, request_obj.get("counties", [])))
+        token = request_obj["token"]
+        origin = request_obj["origin"]
+        app_name = request_obj["app_name"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+
+    user = User.query.filter_by(username=username).first()  # gets user from db
+    user_report = (
+        Report.query.filter_by(user_id=user.id)
+        .filter(
+            (Report.report_status == "PENDING")
+            | (Report.report_status == "RECEIVED")
+            | (Report.report_status == "RETRY")
+            | (Report.report_status == "STARTED")
+        )
+        .first()
+    )
+
+    user_settings = Settings.query.filter_by(user_id=user.id).first()
+
+    response_obj = dict(Report.report_response())
+    report_obj = None
+
+    # Checks if user already has a report in progress:
+    if user_report and user_report.report_status in celery_handler.pending_states:
+        response_obj["status"] = "Failed - user already has a report in progress"
+        response_obj["report_status"] = user_report.report_status
+        response_obj["report_id"] = user_report.report_id
+        return response_obj, 200
+
+    try:
+        request_params = {
+            "year": date.split(" ")[0],
+            "day": date.split(" ")[1],
+        }
+        if counties and len(counties) > 0:
+            request_params["county"] = counties
+        if tribes and len(tribes) > 0:
+            request_params["tribe"] = tribes
+        if objectids and len(objectids) > 0:
+            request_params["objectids"] = objectids
+
+        request_params["low"] = user_settings.level_low
+        request_params["med"] = user_settings.level_medium
+        request_params["high"] = user_settings.level_high
+
+        request_params["username"] = username
+        request_params["token"] = token
+        request_params["origin"] = origin
+        request_params["app_name"] = app_name
+
+        # Makes request to wb-flask to start report generation:
+        url = os.getenv("WATERBODY_URL") + "/waterbody/report"
+        response = requests.get(url, params=request_params, timeout=15)
+        if response.status_code != 200:
+            raise
+        request_obj["report_id"] = json.loads(response.content)["report_id"]
+
+        user = User.query.filter_by(username=username).first()  # gets user from db
+        user_reports = Report.query.filter_by(user_id=user.id).all()  # gets user jobs
+
+        # Creates initial report entry:
+        report_obj = Report(
+            user_id=user.id,
+            report_num=len(user_reports) + 1,
+            report_id=request_obj["report_id"],
+            report_status="RECEIVED",
+            report_date=date,
+            report_objectids=objectids,
+            report_tribes=tribes,
+            report_counties=counties,
+            report_range_low=user_settings.level_low,
+            report_range_medium=user_settings.level_medium,
+            report_range_high=user_settings.level_high,
+            received_datetime=datetime.datetime.utcnow(),
+        )
+        db.session.add(report_obj)
+        db.session.commit()
+
+        if not report_obj:
+            logging.error(
+                "No user report found for username '{}', report id '{}'".format(username, report_id)
+            )
+            # TODO: How to handle this in a way that user can be notified?
+            return
+
+        received_datetime = report_obj.received_datetime
+
+
+    except Exception as e:
+        logging.error("start_report exception: {}".format(e))
+        response_obj["status"] = "Failed - error starting report"
+        response_obj["report_status"] = report_obj.report_status
+        response_obj["report_id"] = report_obj.report_id
+        return response_obj, 500
+
+    # Checks for report starting errors:
+    if report_obj.report_status in celery_handler.fail_states:
+        logging.warning("web_app_api start_report() - Report has failed")
+        response_obj["status"] = "Failed - error starting report"
+        response_obj["report_status"] = report_obj.report_status
+        response_obj["report_id"] = report_obj.report_id
+        return response_obj, 500
+
+    response_obj["report"] = Report.create_reports_json([report_obj])[0]
+    response_obj["report_status"] = report_obj.report_status
+    response_obj["report_id"] = report_obj.report_id
+    response_obj["status"] = True
+
+    return response_obj, 202
+
+
+def get_report_status(request_obj):
+    try:
+        report_id = response_obj["report_id"]
+        username = response_obj["username"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+
+    user = User.query.filter_by(username=username).first()  # gets user from db
+    user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
+
+    # NOTE: If same celery instance, could directly make request to worker and not an api request
+    url = os.getenv("WATERBODY_URL") + "/waterbody/report/status"
+    user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+
+    if not user_report:
+        response_obj["status"] = "Failed - report not found."
+    elif user_report.report_status in celery_handler.fail_states:
+        response_obj["status"] = "Failed - error processing report."
+    else:
+        response_obj["status"] = ""
+
+    response_obj["report_id"] = user_report.report_id
+    response_obj["report_status"] = user_report.report_status
+    response_obj["report"] = Report.create_reports_json([user_report])[0]
+    return response_obj, 200
+
+
+def cancel_report(request_obj):
+    """
+    Cancels a user's report.
+    """
+    try:
+        report_id = request_obj["report_id"]
+        username = request_obj["username"]
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+
+    # user_report = celery_handler.get_report_from_db(username, report_id)
+    user = User.query.filter_by(username=username).first()  # gets user from db
+    user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
+
+    if not user_report:
+        # No report to cancel, user doesn't have this report, skip revoking.
+        return {"error": "User report not found"}, 200
+
+    # cancel_response = celery_handler.revoke_report(report_id)
+
+    # TODO: Make request to WB API to cancel report from user
+    # NOTE: If same celery instance, could directly make request to worker and not an api request
+    url = os.getenv("WATERBODY_URL") + "/waterbody/report/cancel"
+    user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+
+    # Updates report status in DB.
+    user_report.report_status = "REVOKED"
+    db.session.commit()
+
+    response_obj = dict(Report.user_reports_response())
+    response_obj["status"] = cancel_response["status"]
+    response_obj["report_status"] = "REVOKED"
+
+    return response_obj, 200
+
+def update_report(request_obj):
+    """
+    Updates report table. Items that would be updateable: report_status,
+    finished_datetime, queue_time, exec_time.
+
+    NOTE: Possibly just needed for updating report status. 
+    """
+    # expected_params = ["report_status", "finished_datetime", "exec_time"]
+    try:
+        report_id = request_obj["report_id"]
+        username = request_obj["username"]
+        report_status = request_obj["report_status"]
+        finished_datetime = request_obj.get("finished_datetime")
+    except KeyError:
+        return {"error": "Invalid key in request"}, 400
+    
+    # Checks that request contains at least one of the expected params
+    if set(request_obj).isdisjoint(list(request_obj.keys())):
+        return {"error": "Missing keys in request"}, 400
+
+    # Updates row in report table:
+    user = User.query.filter_by(username=username).first()  # gets user from db
+    user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
+
+    if not user_report:
+        return {"error": "User report not found"}, 200
+
+    user_report.report_status = report_status
+    user_report.finished_datetime = finished_datetime
+
+    db.session.commit()
+
+    response_obj = dict(Report.user_reports_response())
+    response_obj["report_id"] = user_report.report_id
+    response_obj["report_status"] = user_report.report_status
+    response_obj["report"] = Report.create_reports_json([user_report])[0]
     return response_obj, 200

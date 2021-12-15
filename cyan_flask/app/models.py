@@ -161,3 +161,71 @@ class Job(db.Model):
             )
             jobs_json.append(job_obj)
         return jobs_json
+
+
+class Report(db.Model):
+    __tablename__ = "report"
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    report_num = db.Column(db.Integer, nullable=False)
+    report_id = db.Column(db.String(256), nullable=False)  # report ID
+    report_status = db.Column(db.String(32), nullable=False)  # report status
+    report_date = db.Column(db.String(10), nullable=False)  # date report is for (format ex: "2020 299")
+    report_objectids = db.Column(db.Text, nullable=True)  # objectids for report (format: "123456, 789123, 456789")
+    report_tribes = db.Column(db.Text, nullable=True)  # tribes for report (TODO)
+    report_counties = db.Column(db.Text, nullable=True)  # counties for report (TODO)
+    report_range_low = db.Column(db.Integer, nullable=False)
+    report_range_medium = db.Column(db.Integer, nullable=False)
+    report_range_high = db.Column(db.Integer, nullable=False)
+    received_datetime = db.Column(
+        db.DateTime, nullable=False
+    )  # init time report was received
+    finished_datetime = db.Column(db.DateTime, nullable=True)  # time report is complete
+
+    @staticmethod
+    def report_response():
+        return {"status": None, "report_id": None, "report_status": None}
+
+    @staticmethod
+    def report_response_obj():
+        return {
+            "report_num": None,
+            "report_id": None,
+            "report_status": None,
+            "report_date": None,
+            "report_objectids": None,
+            "report_tribes": None,
+            "report_counties": None,
+            "report_range_low": None,
+            "report_range_medium": None,
+            "report_range_high": None,
+            "received_datetime": None,
+            "finished_datetime": None,
+        }
+
+    @staticmethod
+    def user_reports_response():
+        return {"status": None, "reports": []}
+
+    @classmethod
+    def create_reports_json(cls, user_reports):
+        """
+        Creates json object of user reports for frontend table.
+        """
+        reports_json = []
+        for report in user_reports:
+            report_obj = dict(cls.report_response_obj())
+            report_obj["report_num"] = report.report_num
+            report_obj["report_id"] = report.report_id
+            report_obj["report_status"] = report.report_status
+            report_obj["report_date"] = report.report_date
+            report_obj["report_objectids"] = report.report_objectids
+            report_obj["report_tribes"] = report.report_tribes
+            report_obj["report_counties"] = report.report_counties
+            report_obj["report_range_low"] = report.report_range_low
+            report_obj["report_range_medium"] = report.report_range_medium
+            report_obj["report_range_high"] = report.report_range_high
+            report_obj["received_datetime"] = utils.get_datetime_string(report.received_datetime)
+            report_obj["finished_datetime"] = utils.get_datetime_string(report.finished_datetime)
+            reports_json.append(report_obj)
+        return reports_json

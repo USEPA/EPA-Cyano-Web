@@ -329,19 +329,103 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
-  generateReport(reportType: string, reportId: number, year: number, day: number) {
+  // generateReport(reportType: string, reportTypeId: number, dayOfYear: string, ranges: Array<number>) {
+  generateReport(reportType: string, reportTypeIds: number[], dayOfYear: string, ranges: Array<number>) {
     /*
     Starts report generation.
       * reportType - objectids, county, or tribe
-      * reportId - ID number for the reportType
-      * year, day - year and day-of-year for report
+      * reportTypeId - ID number for the reportType (objectids, county or tribe IDs)
+      * dayOfYear - year and day-of-year for report (e.g., "2021 300")
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.waterbodyUrl + 'report/?'
-      + reportType + '=' + reportId
-      + '&year=' + year
-      + '&day=' + day;
+    let url = this.envService.config.baseServerUrl + 'report';
+    let postData = {
+      date: dayOfYear,
+      ranges: ranges
+    }
+    if (reportType === 'objectids') {
+      postData['objectids'] = reportTypeIds;
+    }
+    else if (reportType === 'tribe') {
+     postData['tribes'] = reportTypeIds;
+    }
+    else if (reportType === 'county') {
+      postData['counties'] = reportTypeIds;
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
+  }
+
+  getUserReports(reportId: string = '') {
+    /*
+    Gets user reports based on redport ID, or returns all of them if
+    no report ID is provided.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report';
+    if (reportId.length > 0) {
+      url += '/?' + reportId;
+    }
     return this.executeAuthorizedGetRequest(url);
+  }
+
+  getReportStatus(reportId: string) {
+    /*
+    Gets status of report based on report ID.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report/status/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  cancelReportRequest(reportId: string) {
+    /*
+    Cancels a requested report.
+    NOTE: Must be user that started report as well.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report/cancel/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  downloadReport(reportId: string) {
+    /*
+    Downloads report based on report ID.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/download/?'
+      + 'report_id=' + reportId;
+    // return this.executeAuthorizedGetRequest(url);
+
+    // NOTE: May need request like below:
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'App-Name': this.envService.config.appName,
+      },
+      // responseType: 'blob',
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  downloadHistoData(objectid: number) {
+    /*
+    Gets histogram data for a waterbody. Returns a CSV.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'data_download/?OBJECTID=' + objectid;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'text/csv',
+        'App-Name': this.envService.config.appName,
+      },
+      // responseType: 'blob',
+      responseType: 'text',
+      observe: 'response'
+    });
   }
 
   executeAuthorizedPostRequest(url: string, body: any) {
@@ -537,6 +621,20 @@ export class DownloaderService {
       this.loaderService.hide();
       this.loaderService.progressValue.next(0);
     }
+  }
+
+  downloadFile(filename: string, data: any) {
+    /*
+    Creates CSV link and clicks it for downloading.
+    */
+    const a = document.createElement('a');
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
   }
 
 }

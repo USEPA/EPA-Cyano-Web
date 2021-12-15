@@ -651,61 +651,41 @@ export class LocationDetailsComponent implements OnInit {
     Initiates bloom chart CSV download.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-
     let dialogRef = this.displayMessageDialog('Download chart data?');
     dialogRef.afterClosed().subscribe(response => {
       if (response !== true) {
         return;
       }
       let chartData = this.curateChartData(this.chartData);
-      this.downloadFile(chartData);
+      const filename = 'CellConcentration' +
+      this.current_location.name.replace(/\s/g, '').replace('--', '') +
+      '.csv';
+      this.downloader.downloadFile(filename, chartData);
     });
-
   }
 
-  curateChartData(chartData: Array<any>): Array<any> {
+  curateChartData(chartData: Array<any>): string {
     /*
     Gets data from chart data for CSV download.
     */
     let csvArray = [];
-
     if (chartData.length > 0) {
-      // use only first dataset in array
+      // use only first dataset in array (default)
       let dataSet = chartData[0]['data'];
       dataSet.forEach((item, index) => {
         csvArray.push({'date': item.x, 'concentration': item.y})
       });
     }
-    // Returns data array by earliest date first
-    return csvArray.reverse();
-  }
-
-  downloadFile(data: any) {
-    /*
-    Creates CSV link and clicks it for downloading.
-    */
-    const filename = 'CellConcentration' +
-      this.current_location.name.replace(/\s/g, '').replace('--', '') +
-      '.csv';
+    csvArray = csvArray.reverse();  // earliest date first
     const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
-    const header = Object.keys(data[0]);
-    const csv = data.map((row) =>
+    const header = ['date', 'concentration'];
+    const csv = csvArray.map((row) =>
       header
         .map((fieldName) => JSON.stringify(row[fieldName], replacer))
         .join(',')
     );
     csv.unshift(header.join(','));
-    const csvArray = csv.join('\r\n');
-
-    const a = document.createElement('a');
-    const blob = new Blob([csvArray], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
+    return csv.join('\r\n');
   }
 
   displayMessageDialog(message: string) {
