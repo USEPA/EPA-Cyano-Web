@@ -952,3 +952,7 @@ mat-card-content {
     color: gray;
     cursor: pointer;
 }
+
+.notes-exit-btn {
+    color:  black;
+}
