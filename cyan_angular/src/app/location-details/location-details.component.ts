@@ -711,20 +711,27 @@ export class LocationDetailsComponent implements OnInit {
 
 @Component({
   selector: 'location-details-notes',
-  templateUrl: 'location-details-notes.html'
+  templateUrl: 'location-details-notes.html',
+  styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsNotes {
 
   addingNote: boolean = false;
   preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
 
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
-              private datePipe: DatePipe,
-              private locationService: LocationService) {
+  constructor(
+    private bottomSheet: MatBottomSheet,
+    @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
+    private datePipe: DatePipe,
+    private locationService: LocationService) {
   }
 
   ngOnInit() {
     // Loads selected location's notes upon component initialization
+  }
+
+  exit() {
+    this.bottomSheet.dismiss();
   }
 
   openLink(event: MouseEvent): void {
