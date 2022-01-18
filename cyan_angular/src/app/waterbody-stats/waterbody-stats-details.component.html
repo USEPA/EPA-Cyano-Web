@@ -183,17 +183,17 @@
 <!-- Map legends -->
 <div class="legends">
 	<!-- OCLI color map legend -->
-	<div class="leaflet-container leaflet-bottom leaflet-right">
+	<div class="leaflet-container leaflet-bottom leaflet-right map-legend-toggle">
 	  <span class="leaflet-control leaflet-control-attribution map-legend-toggle" (click)="toggleLegend()">Toggle Map Legend</span>
 	</div>
 	<div class="map-legend leaflet-container leaflet-bottom leaflet-right" *ngIf="showLegend">
 	  <img src="assets/images/legend.png" />
 	</div>
 	<!-- User color settings legend -->
-	<div class="user-legend leaflet-container leaflet-bottom leaflet-right">
-	  <span class="leaflet-control leaflet-control-attribution map-legend-toggle" (click)="toggleUserLegend()">Toggle User Ranges</span>
+	<div class="user-legend leaflet-container leaflet-bottom leaflet-left">
+	  <span class="leaflet-control leaflet-control-attribution user-legend-toggle" (click)="toggleUserLegend()">Toggle User Ranges</span>
 	</div>
-	<div class="leaflet-container leaflet-bottom leaflet-right" *ngIf="showUserLegend">
+	<div class="leaflet-container leaflet-bottom leaflet-left user-ranges" *ngIf="showUserLegend">
 	  	<div class="cyan-level low-block">
 		    Low
 		    <div class="circle green"></div>

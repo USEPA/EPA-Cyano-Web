@@ -1,7 +1,6 @@
 
 @media screen and (min-width: 980px) {
 	.locations-block {
-		/*width: 40vw;*/
 		height: 100%;
 		background: white;
 		padding-top: 4%;
@@ -18,29 +17,16 @@
 		padding-right: 2%;
 		padding-bottom: 2%;
 	}
-	.map-legend {
-        width: 40%;
-        max-width: 168px;
-        margin-left: auto;
-        margin-right: auto;
-        z-index: 900;
-    }
-    .user-legend {
-        width: 40%;
-        max-width: 168px;
-        margin-left: auto;
-        margin-right: auto;
-        z-index: 900;
-        right: 20%;
-    }
     .location_block_0 {
     	width: 50vw;
     }
     #selected-dates-div {
-        /*padding-left: 15%;*/
         padding-top: 5%;
         text-align: center;
     }
+    .user-ranges {
+		bottom: 2%
+	}
 }
 @media screen and (max-width: 979px) and (min-width: 401px) {
 	.locations-block {
@@ -48,13 +34,9 @@
 		height: 100%;
 		background: white;
 	}
-	.map-legend {
-        width: 25%;
-        margin-left: 75%;
-        margin-right: auto;
-        z-index: 1050;
-        top: 11%;
-    }
+    .user-ranges {
+		bottom: 2%
+	}
 }
 @media screen and (max-width: 400px) {
 	.locations-block {
@@ -62,13 +44,13 @@
 		height: 100%;
 		background: white;
 	}
-	.map-legend {
-	    width: 35%;
-	    margin-left: 65%;
-	    margin-right: auto;
-	    z-index: 1050;
-	    top: 11%;
-	}
+	.user-ranges {
+    	bottom: 3%;
+    }
+    .map-legend {
+    	bottom: 2%;
+    }
+
 }
 
 .details_block_0 {
@@ -99,17 +81,13 @@ mat-card {
 	display: inline-block;
     border-radius: 0;
     width: 48%;
-    /*width: 45%;*/
     height: 100%;
     padding: 0 2% 0 2%;
     margin: 0;
     top: 0;
-    /*float: left;*/
 }
 
 .details_tab {
-    /*display: grid;*/
-    /*display: inline-block;*/
     height: 100%;
     width: 100%;
     padding-bottom: 4%;
@@ -255,8 +233,12 @@ h2.label {
 	font-weight: normal;
 }
 
-.map-legend-toggle:hover {
+.map-legend-toggle:hover, .user-legend-toggle:hover {
     cursor: pointer;
+}
+
+.map-legend-toggle {
+	right: 2%;
 }
 
 .map-legend img {
@@ -267,6 +249,14 @@ h2.label {
     max-width: 100%;
 }
 
+.map-legend {
+    width: 40%;
+    max-width: 168px;
+    margin-left: auto;
+    margin-right: 2%;
+    z-index: 900;
+}
+
 .wbstats-content {
 	margin-top: 4%;
 }
@@ -274,14 +264,6 @@ h2.label {
 .wbstats-content h4 {
 	text-align: center;
 }
-
-/*.left-chart {
-	padding-right: 2%;
-}
-
-.right-chart {
-	padding-left: 2%;
-}*/
 
 .wbstats-main-info {
 	text-align: center;
@@ -364,4 +346,14 @@ h2.label {
 }
 ::ng-deep .ng5-slider .ng5-slider-pointer:after {
     display: none !important;
+}
+
+.user-legend {
+	margin-left: 1%;
+	z-index: 1001;
+	max-width: 168px;
+}
+
+.user-ranges {
+	margin-left: 1%;
 }
