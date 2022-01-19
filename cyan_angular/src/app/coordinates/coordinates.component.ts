@@ -26,10 +26,10 @@ export class CoordinatesComponent implements OnInit {
 	selectedLat: string = 'N';
 	selectedLon: string = 'W';
 
-	conusTop: number = 53; // north lat
-	conusLeft: number = -130; // west long
-	conusRight: number = -65; // east long
-	conusBottom: number =  24; // south lat
+	northLat: number = 53; // north lat
+	westLon: number = -130; // west long
+	eastLon: number = -65; // east long
+	southLat: number =  24; // south lat
 
 	latDeg: number;
 	latMin: number;
@@ -69,7 +69,8 @@ export class CoordinatesComponent implements OnInit {
 		if (!this.authService.checkUserAuthentication()) {
 			return;
 		}
-		if (!this.validateCoords()) {
+		if (!this.validateCoords(this.selectedKey)) {
+			this.displayError("Coordinates are not within CONUS");
 			return;
 		}
 		this.location = this.getLocationData();
@@ -83,7 +84,8 @@ export class CoordinatesComponent implements OnInit {
 		if (!this.authService.checkUserAuthentication()) {
 			return;
 		}
-		if (!this.validateCoords()) {
+		if (!this.validateCoords(this.selectedKey)) {
+			this.displayError("Coordinates are not within CONUS");
 			return;
 		}
 		this.location = this.getLocationData();
@@ -132,24 +134,46 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	onSelect(selectedValue: any): void {
-		this.selectedKey = selectedValue.value;
+
+		let validCoords = this.validateCoords(this.selectedKey);  // check if existing coords to convert
+
+		this.selectedKey = selectedValue.value;  // sets active coord type (dd or dms)
+
+		if (validCoords !== true) {
+			return;
+		}
+
+		if (this.selectedKey === 'dms') {
+			let dmsCoords = this.mapService.convertDdToDms(this.latDec, this.lonDec);
+			this.latDeg = dmsCoords[0][0];
+			this.latMin = dmsCoords[0][1];
+			this.latSec = dmsCoords[0][2];
+			this.lonDeg = dmsCoords[1][0];
+			this.lonMin = dmsCoords[1][1];
+			this.lonSec = dmsCoords[1][2];
+		}
+		else if (this.selectedKey === 'dd') {
+			let ddCoords = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.selectedLat, this.lonDeg, this.lonMin, this.lonSec, this.selectedLon);
+			this.latDec = ddCoords[0];
+			this.lonDec = ddCoords[1];
+		}
+
 	}
 
-	validateCoords(): boolean {
+	validateCoords(coordType: string): boolean {
 		/*
 		Checks whether coordinates are within CONUS.
 		*/
 		let latLon = [];
 		let latLonDms = [];
-		if (this.selectedKey == "dms") {
-			latLon = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.lonDeg, this.lonMin, this.lonSec);
+		if (coordType == "dms") {
+			latLon = this.mapService.convertDmsToDd(this.latDeg, this.latMin, this.latSec, this.selectedLat, this.lonDeg, this.lonMin, this.lonSec, this.selectedLon);
 		}
-		else if (this.selectedKey == "dd") {
+		else if (coordType == "dd") {
 			latLon = [this.latDec, this.lonDec];
 		}
 
 		if (!this.withinConus(latLon[0], latLon[1])) {
-			this.displayError("Coordinates are not within CONUS");
 			return false;
 		}
 		else {
@@ -159,13 +183,10 @@ export class CoordinatesComponent implements OnInit {
 	}
 
 	withinConus(lat: number, lon: number): boolean {
-		if (!(this.conusBottom <= lat && lat <= this.conusTop)) {
+		if (!(this.southLat <= lat && lat <= this.northLat)) {
 			return false;
 		}
-		else if (this.selectedKey == "dms" && (Math.abs(this.conusLeft) >= lon && lon >= Math.abs(this.conusRight))) {
-			return true;
-		}
-		else if (this.selectedKey == "dd" && (this.conusLeft <= lon && lon <= this.conusRight)) {
+		else if (this.westLon <= lon && lon <= this.eastLon) {
 			return true;
 		}
 		else {

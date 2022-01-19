@@ -20,6 +20,8 @@ export class MapService {
 
   public mainTileLayer: string = '';
 
+  degSecRounding: number = 6;  // rounding for dms seconds
+
   constructor(private cyanMap: CyanMap, private userService: UserService) {}
 
   setMap(map: Map): void {
@@ -233,13 +235,27 @@ export class MapService {
     }
   }
 
-  convertDmsToDd(latDeg: number, latMin: number, latSec: number, lonDeg: number, lonMin: number, lonSec: number) {
+  convertDmsToDd(latDeg: number, latMin: number, latSec: number, latDir: string, lonDeg: number, lonMin: number, lonSec: number, lonDir: string) {
     /*
     Converts lat/lon from DMS to decimal degrees.
     */
     let lat = latDeg + (latMin / 60.0) + (latSec / 3600.0);
     let lon = lonDeg + (lonMin / 60.0) + (lonSec / 3600.0);
+    lat = latDir == "S" ? lat * -1 : lat;
+    lon = lonDir == "W" ? lon * -1 : lon;
     return [lat, lon];
+  }
+
+  convertDdToDms(lat: number, lon: number) {
+    let dmsCoords = [];
+    [lat, lon].forEach(coord => {
+      coord = Math.abs(coord);
+      let coordDeg = Math.trunc(coord);
+      let coordMin = 60.0 * (coord - coordDeg);
+      let coordSec = 60.0 * (coordMin - Math.trunc(coordMin));
+      dmsCoords.push([coordDeg, Math.round(coordMin), +coordSec.toFixed(this.degSecRounding)]);
+    });
+    return dmsCoords;
   }
 
 }
