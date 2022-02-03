@@ -1,5 +1,6 @@
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from django.shortcuts import redirect
 import importlib
 import os
 
@@ -13,3 +14,7 @@ def cyan_access_view(request, exception=None):
 	response = HttpResponse()
 	response.write(html)
 	return response
+
+
+def redirect_view(request, exception=None):
+	return redirect('/cyanweb')
