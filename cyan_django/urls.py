@@ -8,14 +8,8 @@ from .views import cyan_access_view, redirect_view
 
 urlpatterns = [
 	
-	# Endpoints for Cyan Web App (regex used to serve up Angular static files)
-	# re_path(r'^([A-Za-z]*)$', cyan_access_view),
-	# # re_path(r'^(?P<path>.*)$', serve),
-	# # re_path(r'^assets/(?P<path>.*)$', serve),
-	# # re_path(r'^leaflet/(?P<path>.*)$', serve),
-
+	# Endpoints for Cyan Web App
 	path('', cyan_access_view),
-	# re_path(r'^/.*$', redirect_view)
-	re_path(r'^([A-Za-z]*)$', redirect_view)
+	re_path(r'^.*/$', redirect_view)
 
 ]
