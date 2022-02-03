@@ -126,8 +126,7 @@ export class ReportsComponent implements OnInit {
   	console.log("onTribeSelect() called: ", event)
   	this.selectedTribe = event.value;
   	let tribeId = this.findIdByName(event.value, this.wbTribes);
-  	this.currentWaterbodyId = parseInt(tribeId);
-  	this.currentWaterbodyIds.push(parseInt(tribeId));
+  	this.currentWaterbodyIds = [parseInt(tribeId)];
   }
 
 	onStateSelect(event): void {
@@ -141,8 +140,7 @@ export class ReportsComponent implements OnInit {
 		// Ready to generate report for the county after selected a date
 		let countyId = this.findIdByName(event.value, this.wbCounties);
 		this.selectedCounty = event.value;
-		this.currentWaterbodyId = parseInt(countyId);
-		this.currentWaterbodyIds.push(parseInt(countyId));
+		this.currentWaterbodyIds = [parseInt(countyId)];
 	}
 
 	getTribes() {
