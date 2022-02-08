@@ -28,6 +28,10 @@ export class Charts {
       yAxes: [{
         ticks: {
           beginAtZero: true
+        },
+        scaleLabel: {
+          display: true,
+          labelString: "Counts"
         }
       }],
       // xAxes: [{

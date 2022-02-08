@@ -584,27 +584,24 @@ export class WaterBodyStatsDetails {
     this.pieChartLabels = this.chartLabels2;
     this.pieChartColors = this.charts.pieChartColors2;
 
-    let noCyanoPercent = 100.0 - chartData.percentOfTotalArea;
-
-    let noCyanoArea = chartData.totalPixelArea * (noCyanoPercent / chartData.percentOfTotalArea);  // method A
-
-    let noCyanoTotalCounts = chartData.countsBelowDetection + chartData.countsLand + chartData.countsNoData;
-
-
-    let belowDetectionPercent = chartData.countsBelowDetection / noCyanoTotalCounts;  // decimal percent
-    let landPercent = chartData.countsLand / noCyanoTotalCounts;  // decimal percent
-    let noDataPercent = chartData.countsNoData / noCyanoTotalCounts;  // decimal percent
-
+    let allCounts = chartData.low.countSum
+     + chartData.medium.countSum
+     + chartData.high.countSum
+     + chartData.veryHigh.countSum
+     + chartData.countsBelowDetection
+     + chartData.countsLand
+     + chartData.countsNoData;
 
     let percentAreaData = [
-      this.calcs.roundValue((chartData.low.percentOfArea * chartData.percentOfTotalArea) / 100.0),
-      this.calcs.roundValue((chartData.medium.percentOfArea * chartData.percentOfTotalArea) / 100.0),
-      this.calcs.roundValue((chartData.high.percentOfArea * chartData.percentOfTotalArea) / 100.0),
-      this.calcs.roundValue((chartData.veryHigh.percentOfArea * chartData.percentOfTotalArea) / 100.0),
-      this.calcs.roundValue(100.0 * belowDetectionPercent),
-      this.calcs.roundValue(100.0 * landPercent),
-      this.calcs.roundValue(100.0 * noDataPercent)
+      this.calcs.roundValue(100.0 * (chartData.low.countSum / allCounts)),
+      this.calcs.roundValue(100.0 * (chartData.medium.countSum / allCounts)),
+      this.calcs.roundValue(100.0 * (chartData.high.countSum / allCounts)),
+      this.calcs.roundValue(100.0 * (chartData.veryHigh.countSum / allCounts)),
+      this.calcs.roundValue(100.0 * (chartData.countsBelowDetection / allCounts)),
+      this.calcs.roundValue(100.0 * (chartData.countsLand / allCounts)),
+      this.calcs.roundValue(100.0 * (chartData.countsNoData / allCounts))
     ];
+
     this.pieChartData[0].data = percentAreaData;
   }
 
