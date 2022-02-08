@@ -92,6 +92,10 @@ def run_batch_job(self, request_obj):
         for location in locations:
             time.sleep(0.1)  # little delay b/w calls
             response = celery_handler.make_cyano_request(location)
+            response.update({
+                "user_latitude": location["latitude"],
+                "user_longitude": location["longitude"]
+            })
             location_responses.append(response)
     except Exception as e:
         logging.error("run_batch_job error getting location data: {}".format(e))
