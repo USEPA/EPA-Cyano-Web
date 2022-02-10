@@ -2,6 +2,14 @@ version: '3.1'
 
 services:
 
+  node-updater:
+    image: node:lts-alpine
+    container_name: node-updater
+    volumes:
+      - ../config:/config
+      - ../docker:/docker
+      - ../cyan_angular:/app
+
   node-builder:
     build:
       context: ../
@@ -39,7 +47,7 @@ services:
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
     env_file:
-      - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
+      - ${CYAN_CONFIG:-../config/.env}
 
   cyan-celery:
     build:
@@ -57,7 +65,7 @@ services:
     environment:
       - DOCKER_HOSTNAME=${HOSTNAME}
     env_file:
-      - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
+      - ${CYAN_CONFIG:-../config/.env}
 
   cyan-db:
     build:
@@ -71,7 +79,7 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
     env_file:
-      - ${CYAN_CONFIG:-../config/environments/local_docker_dev.env}
+      - ${CYAN_CONFIG:-../config/.env}
 
   redis:
     image: redis:latest

@@ -935,3 +935,24 @@ mat-card-content {
 .map-legend-toggle:hover {
     cursor: pointer;
 }
+
+.mat_icon {
+    float: right;
+    margin-right: 5%;
+    margin-top: 4px;
+}
+
+.reset-button {
+    float: right;
+    margin-right: 5%;
+    margin-top: 2px;
+}
+
+.mat_icon:hover {
+    color: gray;
+    cursor: pointer;
+}
+
+.notes-exit-btn {
+    color:  black;
+}

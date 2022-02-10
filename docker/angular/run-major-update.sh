@@ -15,6 +15,10 @@ npm audit fix
 # Performs linting for Angular code:
 # npx ng lint
 
+# Compiles angular app:
 npm run build:${env:-standalone}
+
+# Runs unit tests:
+npx ng test
 
 cp package.json /docker/angular/package.json.major

@@ -269,9 +269,6 @@
 .config-item {
   float: right;
 }
-.coordinates:hover {
-  background-color: #01bf37;
-}
 .tab-icon {
   height: inherit;
   padding: 1px;

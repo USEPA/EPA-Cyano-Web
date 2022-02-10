@@ -327,3 +327,9 @@
 .alert {
   color: #ef0000;
 }
+.wb-icon {
+  padding-left: 4px;
+}
+.wb-icon:hover {
+  color: gray;
+}

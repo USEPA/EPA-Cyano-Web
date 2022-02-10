@@ -1,10 +1,8 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import sys
 import os
 import datetime
-import inspect
-import requests
 
 # Loads environment based on deployment location:
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -21,7 +19,6 @@ from cyan_flask.app.models import (
     Notifications,
     Settings,
     Comment,
-    CommentImages,
     Reply,
 )
 
@@ -162,7 +159,7 @@ class TestWebAppApi(unittest.TestCase):
         """
         login_user invalid user credentials.
         """
-        test_request = {"user": "test", "password": "test", "dataType": 1}
+        test_request = {"user": "test", "password": "test"}
         # query_database_mock.return_value = []
         user_query_mock.return_value.filter_by.return_value.first.return_value = None
 
@@ -184,7 +181,7 @@ class TestWebAppApi(unittest.TestCase):
             created=datetime.date.today().isoformat(),
             last_visit=datetime.date.today().isoformat(),
         )
-        test_request = {"user": "test", "password": "test", "dataType": 1}
+        test_request = {"user": "test", "password": "test"}
 
         user_query_mock.return_value.filter_by.return_value.first.return_value = (
             example_db_result
@@ -224,7 +221,7 @@ class TestWebAppApi(unittest.TestCase):
             created=datetime.date.today(),
             last_visit=datetime.date.today(),
         )
-        test_request = {"user": "test", "password": "test", "dataType": 1}
+        test_request = {"user": "test", "password": "test"}
         user_data = {
             "username": example_db_result.username,
             "email": example_db_result.email,
@@ -284,7 +281,7 @@ class TestWebAppApi(unittest.TestCase):
             created=datetime.date.today(),
             last_visit=datetime.date.today(),
         )
-        test_request = {"user": "test", "password": "test", "dataType": 1}
+        test_request = {"user": "test", "password": "test"}
         user_data = {
             "username": example_db_result.username,
             "email": example_db_result.email,
@@ -343,7 +340,7 @@ class TestWebAppApi(unittest.TestCase):
             created=datetime.date.today(),
             last_visit=datetime.date.today(),
         )
-        test_request = {"user": "test", "password": "test", "dataType": 1}
+        test_request = {"user": "test", "password": "test"}
         user_data = {
             "username": example_db_result.username,
             "email": example_db_result.email,
@@ -382,7 +379,6 @@ class TestWebAppApi(unittest.TestCase):
         request_obj = {
             # 'owner': "test",  # missing key
             "id": None,
-            "type": 1,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -405,7 +401,6 @@ class TestWebAppApi(unittest.TestCase):
         request_obj = {
             "owner": "test",
             "id": 1,
-            "type": 1,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -416,7 +411,6 @@ class TestWebAppApi(unittest.TestCase):
         example_db_result = Location(
             owner=request_obj["owner"],
             id=request_obj["id"],
-            type=request_obj["type"],
             name=request_obj["name"],
             latitude=request_obj["latitude"],
             longitude=request_obj["longitude"],
@@ -443,7 +437,6 @@ class TestWebAppApi(unittest.TestCase):
         request_obj = {
             "owner": "test",
             "id": 1,
-            "type": 1,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -469,10 +462,9 @@ class TestWebAppApi(unittest.TestCase):
         """
         user = "test"
         _id = 1
-        data_type = 1
 
         expected_result = {"status": "success"}, 200
-        actual_result = web_app_api.delete_location(user, _id, data_type)
+        actual_result = web_app_api.delete_location(user, _id)
 
         self.assertEqual(actual_result, expected_result)
 
@@ -483,7 +475,6 @@ class TestWebAppApi(unittest.TestCase):
         request_obj = {
             # 'owner': "test",  # missing key
             "id": None,
-            "type": 1,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -506,7 +497,6 @@ class TestWebAppApi(unittest.TestCase):
         request_obj = {
             "owner": "test",
             "id": None,
-            "type": 1,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -527,11 +517,9 @@ class TestWebAppApi(unittest.TestCase):
         get_user_locations.
         """
         user = "test"
-        data_type = 1
         location_json = {
             "owner": user,
             "id": None,
-            "type": data_type,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -542,7 +530,6 @@ class TestWebAppApi(unittest.TestCase):
         example_db_result = Location(
             owner=location_json["owner"],
             id=location_json["id"],
-            type=location_json["type"],
             name=location_json["name"],
             latitude=location_json["latitude"],
             longitude=location_json["longitude"],
@@ -558,7 +545,7 @@ class TestWebAppApi(unittest.TestCase):
         read_location_row_mock.return_value = location_json
 
         expected_result = [location_json]
-        actual_result = web_app_api.get_user_locations(user, data_type)
+        actual_result = web_app_api.get_user_locations(user)
 
         self.assertEqual(actual_result, expected_result)
 
@@ -569,7 +556,6 @@ class TestWebAppApi(unittest.TestCase):
         location_json = {
             "owner": "test",
             "id": None,
-            "type": 1,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -580,7 +566,6 @@ class TestWebAppApi(unittest.TestCase):
         example_db_result = Location(
             owner=location_json["owner"],
             id=location_json["id"],
-            type=location_json["type"],
             name=location_json["name"],
             latitude=location_json["latitude"],
             longitude=location_json["longitude"],
@@ -602,14 +587,13 @@ class TestWebAppApi(unittest.TestCase):
         """
         user = "test"
         _id = 1
-        data_type = 1
 
         location_query_mock.return_value.filter_by.return_value.first.return_value = (
             None
         )
 
         expected_result = {"error": "Location not found"}, 404
-        actual_result = web_app_api.get_location(user, _id, data_type)
+        actual_result = web_app_api.get_location(user, _id)
 
         self.assertEqual(actual_result, expected_result)
 
@@ -621,11 +605,9 @@ class TestWebAppApi(unittest.TestCase):
         """
         user = "test"
         _id = 1
-        data_type = 1
         location_json = {
             "owner": user,
             "id": _id,
-            "type": data_type,
             "name": "location name",
             "latitude": 80.00,
             "longitude": -80.00,
@@ -636,7 +618,6 @@ class TestWebAppApi(unittest.TestCase):
         example_db_result = Location(
             owner=location_json["owner"],
             id=location_json["id"],
-            type=location_json["type"],
             name=location_json["name"],
             latitude=location_json["latitude"],
             longitude=location_json["longitude"],
@@ -652,7 +633,7 @@ class TestWebAppApi(unittest.TestCase):
         read_location_row_mock.return_value = location_json
 
         expected_result = location_json, 200
-        actual_result = web_app_api.get_location(user, _id, data_type)
+        actual_result = web_app_api.get_location(user, _id)
 
         self.assertEqual(actual_result, expected_result)
 
@@ -807,7 +788,9 @@ class TestWebAppApi(unittest.TestCase):
                 "thumb": False,
             },
         }
-        converted_timestamp = "2015-11-05 20:08:53"  # example notification dateSent converted to timestamp
+        converted_timestamp = (
+            "2015-11-05 20:08:53"
+        )  # example notification dateSent converted to timestamp
         example_db_result = Notifications(
             owner=user,
             id=example_notification["id"],

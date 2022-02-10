@@ -27,6 +27,10 @@ import { MatTableModule } from '@angular/material/table';
 import {MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatListModule } from '@angular/material/list';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatRadioModule } from '@angular/material/radio';
 import { Ng5SliderModule } from 'ng5-slider';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -49,7 +53,6 @@ import { LocationService } from './services/location.service';
 import { MapService } from './services/map.service';
 import { AuthService } from './services/auth.service';
 import { EnvService } from './services/env.service';
-
 
 import { CyanMap } from './utils/cyan-map';
 import { MapPopupComponent } from './map-popup/map-popup.component';
@@ -78,118 +81,131 @@ import { MeterComponent } from './meter/meter.component';
 import { SessionTimeoutComponent } from './session-timeout/session-timeout.component';
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
+import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
+import { WaterBodyStatsDetails } from './waterbody-stats/waterbody-stats-details.component';
+import { Calculations } from './waterbody-stats/utils/calculations';
+import { Charts } from './waterbody-stats/utils/charts';
+
+import 'hammerjs';
+import 'chartjs-plugin-zoom';
+import 'chartjs-plugin-datalabels';
+import { ReportsComponent } from './waterbody-stats/reports/reports.component';
+import { ReportsResultsComponent } from './waterbody-stats/reports/reports-results.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    MarkerMapComponent,
-    MyLocationsComponent,
-    HeaderComponent,
-    LinksLeftComponent,
-    FooterComponent,
-    LocationCompareComponent,
-    LocationCompareAlert,
-    NotificationsComponent,
-    NotificationDetails,
-    MapPopupComponent,
-    ConfigComponent,
-    SaveDialogComponent,
-    LocationDetailsComponent,
-    LocationDetailsNotes,
-    AccountComponent,
-    LocationCompareDetailsComponent,
-    CoordinatesComponent,
-    LatestImageComponent,
-    BottomMenuComponent,
-    ResetComponent,
-    LoaderComponent,
-    CommentsComponent,
-    ViewComment,
-    AddComment,
-    ViewImage,
-    MeterComponent,
-    DialogComponent,
-    SessionTimeoutComponent,
-    LocationSearchComponent,
-    BatchComponent
-  ],
-  imports: [
-    BrowserModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    LeafletModule,
-    // Optionally you can set time for `idle`, `timeout` and `ping` in seconds.
-    // Default values: `idle` is 600 (10 minutes), `timeout` is 300 (5 minutes)
-    // and `ping` is 120 (2 minutes).
-    UserIdleModule.forRoot({
-      idle: (environment.userIdleSeconds - environment.userIdleCountDownSeconds),
-      timeout: environment.userIdleCountDownSeconds,
-      ping: environment.userIdlePingSeconds
-    }),
-    AppRoutingModule,
-    ChartsModule,
-    MatMenuModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatButtonModule,
-    MatSliderModule,
-    MatInputModule,
-    MatNativeDateModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
-    MatDatepickerModule,
-    MatTabsModule,
-    MatIconModule,
-    MatBottomSheetModule,
-    MatBadgeModule,
-    MatCardModule,
-    MatBadgeModule,
-    MatDialogModule,
-    MatToolbarModule,
-    MatTableModule,
-    MatSidenavModule,
-    MatSortModule,
-    Ng5SliderModule,
-    BrowserAnimationsModule
-    // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
-  ],
-  providers: [
-    LoaderService,
-    // { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
-    LocationService,
-    MapService,
-    AuthService,
-    CyanMap,
-    Location,
-    DatePipe,
-    JwtHelperService,
-    AuthGuard,
-    AddComment,
-    DialogComponent,
-    CoordinatesComponent,
-    { provide: MatDialogRef, useValue: {} },
-    { provide: MAT_DIALOG_DATA, useValue: {} },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { 
-        provide: APP_INITIALIZER, 
-        useFactory: (envService: EnvService) => () => envService.loadConfig(),
-        deps: [EnvService],
-        multi: true
-    }
-  ],
-  bootstrap: [AppComponent],
-  entryComponents: [
-    MapPopupComponent,
-    LocationDetailsNotes,
-    NotificationDetails,
-    LocationCompareAlert,
-    ViewComment,
-    AddComment,
-    ViewImage,
-    DialogComponent
-  ]
+    declarations: [
+        AppComponent,
+        MarkerMapComponent,
+        MyLocationsComponent,
+        HeaderComponent,
+        LinksLeftComponent,
+        FooterComponent,
+        LocationCompareComponent,
+        LocationCompareAlert,
+        NotificationsComponent,
+        NotificationDetails,
+        MapPopupComponent,
+        ConfigComponent,
+        SaveDialogComponent,
+        LocationDetailsComponent,
+        LocationDetailsNotes,
+        AccountComponent,
+        LocationCompareDetailsComponent,
+        CoordinatesComponent,
+        LatestImageComponent,
+        BottomMenuComponent,
+        ResetComponent,
+        LoaderComponent,
+        CommentsComponent,
+        ViewComment,
+        AddComment,
+        ViewImage,
+        MeterComponent,
+        DialogComponent,
+        SessionTimeoutComponent,
+        LocationSearchComponent,
+        BatchComponent,
+        WaterbodyStatsComponent,
+        WaterBodyStatsDetails,
+        ReportsComponent,
+        ReportsResultsComponent
+    ],
+    imports: [
+        BrowserModule,
+        CommonModule,
+        HttpClientModule,
+        FormsModule,
+        LeafletModule,
+        // Optionally you can set time for `idle`, `timeout` and `ping` in seconds.
+        // Default values: `idle` is 600 (10 minutes), `timeout` is 300 (5 minutes)
+        // and `ping` is 120 (2 minutes).
+        UserIdleModule.forRoot({
+            idle: (environment.userIdleSeconds - environment.userIdleCountDownSeconds),
+            timeout: environment.userIdleCountDownSeconds,
+            ping: environment.userIdlePingSeconds
+        }),
+        AppRoutingModule,
+        ChartsModule,
+        MatMenuModule,
+        MatSelectModule,
+        MatCheckboxModule,
+        MatButtonModule,
+        MatSliderModule,
+        MatInputModule,
+        MatNativeDateModule,
+        MatProgressBarModule,
+        MatProgressSpinnerModule,
+        MatDatepickerModule,
+        MatTabsModule,
+        MatIconModule,
+        MatBottomSheetModule,
+        MatBadgeModule,
+        MatCardModule,
+        MatBadgeModule,
+        MatDialogModule,
+        MatToolbarModule,
+        MatTableModule,
+        MatSidenavModule,
+        MatSortModule,
+        MatGridListModule,
+        MatListModule,
+        MatSlideToggleModule,
+        MatRadioModule,
+        Ng5SliderModule,
+        BrowserAnimationsModule
+        // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ],
+    providers: [
+        LoaderService,
+        // { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
+        LocationService,
+        MapService,
+        AuthService,
+        CyanMap,
+        Location,
+        DatePipe,
+        JwtHelperService,
+        AuthGuard,
+        AddComment,
+        DialogComponent,
+        CoordinatesComponent,
+        WaterBodyStatsDetails,
+        MarkerMapComponent,
+        WaterbodyStatsComponent,
+        Calculations,
+        Charts,
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (envService: EnvService) => () => envService.loadConfig(),
+            deps: [EnvService],
+            multi: true
+        }
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(private injector: Injector) {

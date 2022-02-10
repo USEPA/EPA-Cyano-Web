@@ -49,12 +49,15 @@
             </div>
           </div>
           <div class="register-details">
-            Disclaimer: User name should not contain any personally identifiable information and is only used for retrieving saved locations and custom settings of the CyAN web application.
+            <p>
+            <!-- <p style="float:left; margin-right: 4px;">Disclaimer:</p> -->
+            <p>Disclaimer: User name must contain only alphanumeric characters (i.e., a-z/A-Z/0-9) and is used only for retrieving saved locations, location notes, and custom settings of the CyAN web application. It should not contain any personally identifiable information.
+            </p>
           </div>
         </div>
-        <div *ngIf="resetForm">
+        <div id="reset-form" *ngIf="resetForm">
           <div *ngIf="allowReset">
-            <br>Provide an email address for resetting password:<br><br>
+            <br>Provide the email address used for your account for resetting the password:<br><br>
             <mat-form-field class="register-input email">
               <input matInput email placeholder="Email" [(ngModel)]="resetEmail" required>
             </mat-form-field>
@@ -67,8 +70,8 @@
       <ng-template #userDetailsBlock>
         <div class="app-state-block">
           <div class="app-state-title">Application Details</div>
-          <div class="app-state">Phase: <div class="dev-state">{{ devState }}</div></div>
           <div class="app-state">Version: {{ version }}</div>
+          <div class="app-state"><div class="dev-state"></div></div>
         </div>
         <div class="user-details">
           <div class="user-details-title">Account Details</div>
@@ -100,10 +103,10 @@
         This experimental web application provides provisional satellite derived measures of cyanobacteria,
         which may contain errors and should be considered a research tool. Users should refer to the app
         help menu for more details. The focus of this application is to provide cyanobacteria measures for
-        larger lakes and reservoirs within the continental US.
+        larger lakes and reservoirs within the contiguous United States.
         Data products are 7-day maximum cyanobacteria measures updated weekly and, beginning late July 2020,
         daily snapshots of cyanobacteria measures updated every day.<br><br>
-        Learn more: <a href="https://www.epa.gov/water-research/cyanobacteria-assessment-network-mobile-application-cyan-app">
+        Learn more: <a href="https://www.epa.gov/water-research/cyanobacteria-assessment-network-mobile-application-cyan-app" target="_blank">
         https://www.epa.gov/water-research/cyanobacteria-assessment-network-mobile-application-cyan-app</a>
       </div>
     </div>

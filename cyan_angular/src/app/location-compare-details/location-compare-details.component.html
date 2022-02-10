@@ -50,11 +50,13 @@
 
     <mat-tab label="Blooming Chart">
       <div class="chart_header">
-        <div class="chart_title">Blooming Chart</div>
-        <div class="chart_source_selection"></div>
+        <div class="chart_title">
+          Blooming Chart
+          <button class="reset-button" mat-raised-button color="primary" (click)="resetZoom();">Reset zoom</button>
+        </div>
       </div>
       <div class="chart_graph" *ngIf="dataDownloaded">
-        <canvas aria-label="Location compare bloom chart" baseChart class="cyan_chart" width="1" height="1"
+        <canvas aria-label="Location compare bloom chart" baseChart #cyanChart="base-chart" class="cyan_chart" width="1" height="1"
           [datasets]="chartData"
           [labels]="chartDataLabels"
           [options]="chartOptions"
@@ -67,7 +69,12 @@
 
     <mat-tab label="Map">
       <div *ngIf="showMap" class="mini_map_block">
-        <div class="mini_map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
+        <div class="mini_map"
+          leaflet
+          [leafletOptions]="options"
+          [leafletLayersControl]="layersControl"
+          (leafletMapReady)="onMapReady($event)">
+        </div>
       </div>
     </mat-tab>
 

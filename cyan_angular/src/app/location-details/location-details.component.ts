@@ -2,13 +2,11 @@ import {Component, OnInit, Input, Inject, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { DatePipe } from '@angular/common';
-
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
-
-import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, ImageOverlay } from 'leaflet';
+import { latLng, latLngBounds, tileLayer, Map, ImageOverlay } from 'leaflet';
 import { Subscription } from 'rxjs';
+import { BaseChartDirective } from 'ng2-charts';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MapService } from '../services/map.service';
 import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -19,6 +17,9 @@ import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { EnvService } from '../services/env.service';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
 
 
 @Component({
@@ -61,6 +62,7 @@ export class LocationDetailsComponent implements OnInit {
   showLegend = false;
 
   // Variables for chart
+  @ViewChild('cyanChart') cyanChart: BaseChartDirective;
   dataDownloaded: boolean = false;
   @Input() chartData: Array<any> = [
     {
@@ -82,6 +84,27 @@ export class LocationDetailsComponent implements OnInit {
           }
         }
       }]
+    },
+    plugins: {
+      zoom: {
+        zoom: {
+          enabled: true,
+          wheel: {
+            enabled: true
+          },
+          pinch: {
+            enabled: true
+          },
+          mode: 'xy'
+        },
+        pan: {
+          enabled: true,
+          mode: 'xy'
+        }
+      },
+      datalabels: {
+        display: false
+      }
     }
   };
   public chartColors: Array<any> = [
@@ -134,7 +157,7 @@ export class LocationDetailsComponent implements OnInit {
 
   options = {
     layers: [this.mapLayer],
-    zoomControl: false,
+    zoomControl: true,
     zoom: 6,
     center: latLng([this.lat_0, this.lng_0])
   };
@@ -150,7 +173,9 @@ export class LocationDetailsComponent implements OnInit {
     private user: UserService,
     private authService: AuthService,
     private configService: ConfigService,
-    private envService: EnvService
+    private envService: EnvService,
+    private messageDialog: MatDialog,
+    private markerMap: MarkerMapComponent
   ) { }
 
   ngOnInit() {
@@ -610,54 +635,7 @@ export class LocationDetailsComponent implements OnInit {
     Adds marker to the location-details miniMap
     (and the main map as well).
     */
-    if (!this.authService.checkUserAuthentication()) { return; }
-
-    // NOTE: Ignores click event based on deployed environment.
-    if(this.envService.config.disableMarkers === true) {
-      return;
-    }
-
-    let lat = e.latlng.lat;
-    let lng = e.latlng.lng;
-
-    let name = 'To Be Updated...';
-    let cellCon = 0;
-    let maxCellCon = 0;
-    let cellChange = 0;
-    let dataDate = '01/01/2018';
-    let source = 'OLCI';
-
-    let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
-
-    let miniMap = this.mapService.getMinimap();
-    miniMap.setView(e.latlng, 12);
-
-    let m = this.mapService.addMarker(location);  // adds marker to main map
-    m.fireEvent('click');
-    this.mapService.getMap().closePopup();  // closes popup on main map
-
-    let miniMarker = this.mapService.addMiniMarker(location);  // adds blank marker to minimap
-
-    this.setMiniMarkerEvents(miniMarker, location);
-
-  }
-
-  setMiniMarkerEvents(miniMarker: Marker, location: Location): void {
-    /*
-    Adds marker events to marker on the mini map.
-    */
-    let self = this;
-    miniMarker.on('click', function(e) {
-      self.mapService.deleteMiniMarker(location);  // remove from miniMap
-      self.mapService.deleteMarker(location);  // remove from main map
-      self.locationService.deleteLocation(location);  // remove location from user db
-    });
-    miniMarker.on('mouseover', function(e) {
-      miniMarker.setIcon(self.mapService.createIcon(null, 'remove'));
-    });
-    miniMarker.on('mouseout', function(e) {
-      miniMarker.setIcon(self.mapService.createIcon(null));
-    });
+    this.markerMap.addMiniMarkerOnClick(e);
   }
 
   openNotes(l: Location): void {
@@ -668,25 +646,92 @@ export class LocationDetailsComponent implements OnInit {
     });
   }
 
+  downloadChartCSV(): void {
+    /*
+    Initiates bloom chart CSV download.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let dialogRef = this.displayMessageDialog('Download chart data?');
+    dialogRef.afterClosed().subscribe(response => {
+      if (response !== true) {
+        return;
+      }
+      let chartData = this.curateChartData(this.chartData);
+      const filename = 'CellConcentration' +
+      this.current_location.name.replace(/\s/g, '').replace('--', '') +
+      '.csv';
+      this.downloader.downloadFile(filename, chartData);
+    });
+  }
+
+  curateChartData(chartData: Array<any>): string {
+    /*
+    Gets data from chart data for CSV download.
+    */
+    let csvArray = [];
+    if (chartData.length > 0) {
+      // use only first dataset in array (default)
+      let dataSet = chartData[0]['data'];
+      dataSet.forEach((item, index) => {
+        csvArray.push({'date': item.x, 'concentration': item.y})
+      });
+    }
+    csvArray = csvArray.reverse();  // earliest date first
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = ['date', 'concentration'];
+    const csv = csvArray.map((row) =>
+      header
+        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+        .join(',')
+    );
+    csv.unshift(header.join(','));
+    return csv.join('\r\n');
+  }
+
+  displayMessageDialog(message: string) {
+    /*
+    Displays dialog messages to user.
+    */
+    return this.messageDialog.open(DialogComponent, {
+      data: {
+        dialogMessage: message
+      }
+    });
+  }
+
+  resetZoom(event) {
+    /*
+    Resets plot to its default position and zoom.
+    */
+    this.cyanChart.chart['resetZoom']();
+  }
+
 }
 
 
 @Component({
   selector: 'location-details-notes',
-  templateUrl: 'location-details-notes.html'
+  templateUrl: 'location-details-notes.html',
+  styleUrls: ['./location-details.component.css']
 })
 export class LocationDetailsNotes {
 
   addingNote: boolean = false;
   preAddNote: boolean = true;  // Add btn before loading Add/Cancel/Textbox content
 
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
-              private datePipe: DatePipe,
-              private locationService: LocationService) {
+  constructor(
+    private bottomSheet: MatBottomSheet,
+    @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
+    private datePipe: DatePipe,
+    private locationService: LocationService) {
   }
 
   ngOnInit() {
     // Loads selected location's notes upon component initialization
+  }
+
+  exit() {
+    this.bottomSheet.dismiss();
   }
 
   openLink(event: MouseEvent): void {

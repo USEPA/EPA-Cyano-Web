@@ -1,8 +1,8 @@
 import os
-import logging
 import simplejson
-from flask import Blueprint, request, jsonify, g
+from flask import request, g
 from flask_restful import Api, Resource, reqparse
+import logging
 
 # Local imports:
 from auth import JwtHandler
@@ -64,10 +64,10 @@ class Login(Resource):
     Endpoint for logging user in.
     URL: /app/api/user
     """
+
     parser = parser_base.copy()
     parser.add_argument("user", type=str)
     parser.add_argument("password", type=str)
-    parser.add_argument("dataType", type=int, choices=(1, 2))
 
     @check_headers
     def post(self):
@@ -85,6 +85,7 @@ class AddLocation(Resource):
     Endpoint for adding user location.
     URL: /app/api/location/add
     """
+
     @login_required
     @check_headers
     def post(self, id=None):
@@ -101,6 +102,7 @@ class EditLocation(Resource):
     Endpoint for editing user location.
     URL: /app/api/location/edit
     """
+
     @login_required
     @check_headers
     def post(self):
@@ -119,10 +121,10 @@ class DeleteLocation(Resource):
 
     @login_required
     @check_headers
-    def get(self, _id="", type=""):
+    def get(self, _id=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        results, status_code = web_app_api.delete_location(user, _id, type)
+        results, status_code = web_app_api.delete_location(user, _id)
         return results, status_code, headers
 
 
@@ -133,10 +135,10 @@ class GetUserLocations(Resource):
 
     @login_required
     @check_headers
-    def get(self, type=""):
+    def get(self):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        results = web_app_api.get_user_locations(user, type)
+        results = web_app_api.get_user_locations(user)
         results = simplejson.loads(simplejson.dumps(results))
         return results, 200, headers
 
@@ -148,10 +150,10 @@ class GetLocation(Resource):
 
     @login_required
     @check_headers
-    def get(self, _id="", type=""):
+    def get(self, _id=""):
         user = JwtHandler().get_user_from_token(request)
         headers = get_auth_headers()
-        results, status_code = web_app_api.get_location(user, _id, type)
+        results, status_code = web_app_api.get_location(user, _id)
         results = simplejson.loads(simplejson.dumps(results))
         return results, status_code, headers
 
@@ -387,6 +389,111 @@ class BatchJobCancel(Resource):
         return results, status_code, headers
 
 
+class Report(Resource):
+    """
+    Batch processing of CSV-uploaded location data requests
+    that are processed with a background celery worker.
+    """
+
+    @login_required
+    @check_headers
+    def get(self, report_id=""):
+        """
+        Gets batch job from db for user.
+        """
+        user = JwtHandler().get_user_from_token(request)
+        # user = "nick"
+        headers = get_auth_headers()
+        if not report_id:
+            results, status_code = web_app_api.get_all_reports({"username": user})
+        else:
+            results, status_code = web_app_api.get_report(user, report_id)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+    @login_required
+    @check_headers
+    def post(self):
+        """
+        Starts a user's report request.
+        POST: location list, username (from token),
+        """
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        args["token"] = headers.get("Authorization")
+        args["origin"] = request.environ.get("HTTP_ORIGIN")
+        args["app_name"] = os.getenv("APP_NAME")
+        results, status_code = web_app_api.start_report(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+class ReportStatus(Resource):
+    """
+    Endpoint for getting report status.
+    """
+
+    @login_required
+    @check_headers
+    def post(self):
+        """
+        Gets status of a given job ID.
+        Could use username or other info from validated token
+        to check job status in User DB table.
+        """
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        results, status_code = web_app_api.get_report_status(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+class ReportCancel(Resource):
+    """
+    Endpoint for canceling a user's report.
+    """
+
+    @login_required
+    @check_headers
+    def post(self):
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        results, status_code = web_app_api.cancel_report(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+class ReportUpdate(Resource):
+    """
+    Endpoint for updating a user's report.
+    """
+    @login_required
+    @check_headers
+    def post(self):
+        """
+        Updates report table object.
+        Ex: Request from WB when report is finished.
+        """
+        args = request.get_json()
+        args["username"] = JwtHandler().get_user_from_token(
+            request
+        )  # gets username from token
+        headers = get_auth_headers()
+        # TODO: Additional request handling.
+        results, status_code = web_app_api.update_report(args)
+        results = simplejson.loads(simplejson.dumps(results))
+        return results, status_code, headers
+
+
+
 # Test endpoint:
 api.add_resource(StatusTest, "/test")
 
@@ -397,9 +504,9 @@ api.add_resource(Register, api_url + "user/register")
 # Location endpoints:
 api.add_resource(AddLocation, api_url + "location/add")
 api.add_resource(EditLocation, api_url + "location/edit")
-api.add_resource(DeleteLocation, api_url + "location/delete/<string:_id>/<string:type>")
-api.add_resource(GetLocation, api_url + "location/<string:_id>/<string:type>")
-api.add_resource(GetUserLocations, api_url + "locations/<string:type>")
+api.add_resource(DeleteLocation, api_url + "location/delete/<string:_id>")
+api.add_resource(GetLocation, api_url + "location/<string:_id>")
+api.add_resource(GetUserLocations, api_url + "locations")
 
 # Notifications endpoints:
 api.add_resource(EditNotification, api_url + "notification/edit/<string:_id>")
@@ -424,5 +531,11 @@ api.add_resource(Reply, api_url + "reply")
 api.add_resource(Batch, api_url + "batch")
 api.add_resource(BatchJobStatus, api_url + "batch/status")
 api.add_resource(BatchJobCancel, api_url + "batch/cancel")
+
+# Report endpoints:
+api.add_resource(Report, api_url + "report")
+api.add_resource(ReportStatus, api_url + "report/status")
+api.add_resource(ReportCancel, api_url + "report/cancel")
+api.add_resource(ReportUpdate, api_url + "report/update")
 
 print("CyAN Flask app started.")

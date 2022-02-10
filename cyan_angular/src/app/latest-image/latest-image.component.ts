@@ -13,6 +13,8 @@ import { environment } from '../../environments/environment';
 import { Location } from '../models/location';
 import { ImageDetails } from '../models/image-details';
 
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
+
 @Component({
 	selector: 'app-latest-image',
 	templateUrl: './latest-image.component.html',
@@ -47,7 +49,7 @@ export class LatestImageComponent implements OnInit {
 
 	options = {
 		layers: [this.topoMap],
-		zoomControl: false,
+		zoomControl: true,
 		zoom: 6,
 		center: latLng([this.lat_0, this.lng_0])
 	};
@@ -73,7 +75,8 @@ export class LatestImageComponent implements OnInit {
 		private images: LocationImagesService,
 		private mapService: MapService,
 		private authService: AuthService,
-		private envService: EnvService
+		private envService: EnvService,
+		private markerMap: MarkerMapComponent
 	) { }
 
 	ngOnInit() {
@@ -249,6 +252,14 @@ export class LatestImageComponent implements OnInit {
 			map.invalidateSize();
 			map.flyTo(this.mapService.getLatLng(this.location));
 		}, 200);
+	}
+
+	addMarkerOnClick(e: any): void {
+	    /*
+	    Adds marker to the location-details miniMap
+	    (and the main map as well).
+	    */
+	    this.markerMap.addMiniMarkerOnClick(e);
 	}
 
 }

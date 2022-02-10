@@ -133,7 +133,6 @@ export class UserLocations {
   owner: string;
   id: number;
   name: string;
-  type: number;
   latitude: number;
   longitude: number;
   marked: boolean;

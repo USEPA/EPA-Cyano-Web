@@ -26,8 +26,10 @@ class CSVHandler:
                 "validCellsCount",
             ],
         }
+        self.user_headers = ["user_latitude", "user_longitude"]
         self.csv_headers = (
-            self.location_data_headers["metaInfo"]
+            self.user_headers
+            + self.location_data_headers["metaInfo"]
             + self.location_data_headers["outputs"]
         )  # headers for output csv
 
@@ -51,6 +53,8 @@ class CSVHandler:
         """
         row_data = []
         meta_info = []
+        for header in self.user_headers:
+            meta_info.extend([location["user_latitude"], location["user_longitude"]])
         for header in self.location_data_headers["metaInfo"]:
             meta_info.append(location["metaInfo"][header])
         row_data = self.add_location_data(

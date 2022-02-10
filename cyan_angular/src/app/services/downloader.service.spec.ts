@@ -11,8 +11,7 @@ import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { CyanMap } from '../utils/cyan-map';
 import { DownloaderService, RawData, LocationDataAll } from './downloader.service';
-
-let rawDataResponse = require('../../testing/mocks/raw-data-response.json');
+import { MockEnvService } from '../../testing/mocks/env-service-mock';
 
 describe('DownloaderService', () => {
 
@@ -20,14 +19,8 @@ describe('DownloaderService', () => {
 	const testEmail = 'testemail';
 	const testPass = 'testpass';
 	const testId = 1;
-	const testType = 1;
 	const testUrl = 'http://testurl/';
 	let service: DownloaderService;
-	let mockEnvService = {
-		config: {
-			baseServerUrl: testUrl
-		}
-	};
 	let testLocation: MockLocation = new MockLocation();
 	let testSettings: UserSettings = {
     level_low: 0,
@@ -106,7 +99,7 @@ describe('DownloaderService', () => {
 				CyanMap,
 				{
 					provide: EnvService,
-					useValue: mockEnvService
+					useClass: MockEnvService
 				}
 			]
 		});
@@ -155,7 +148,7 @@ describe('DownloaderService', () => {
 		let httpSpy = spyOn(service, 'executeDeleteUserLocation')
 			.and.returnValue(of(null));
 
-		service.deleteUserLocation(testUser, testId, testType);
+		service.deleteUserLocation(testUser, testId);
 
 		expect(httpSpy).toHaveBeenCalled();
 	});
@@ -179,7 +172,7 @@ describe('DownloaderService', () => {
 	it('should test getUserLocations', () => {
 		let httpSpy = spyOn(service, 'executeAuthorizedGetRequest');
 
-		service.getUserLocations(testUser, testType);
+		service.getUserLocations(testUser);
 
 		expect(httpSpy).toHaveBeenCalled();
 	});
@@ -362,7 +355,7 @@ describe('DownloaderService', () => {
 	});
 
 	it('should test addUniqueId', () => {
-		const expectedResult = testLocation.name + ' -- 1'; 
+		const expectedResult = testLocation.name + ' -- 1';
 
 		let result = service.addUniqueId(testLocation);
 

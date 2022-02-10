@@ -16,6 +16,7 @@ import {
   columnNames,
   csvKeys
 } from '../models/batch';
+import { UserService } from '../services/user.service';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { CoordinatesComponent } from '../coordinates/coordinates.component';
 
@@ -46,6 +47,9 @@ export class BatchComponent {
   displayedColumns: string[] = [];
   columnNames: any[] = columnNames;
 
+  username: string = '';
+  email: string = '';
+
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('uploader') uploader;  // input file uploader
 
@@ -57,13 +61,16 @@ export class BatchComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private messageDialog: MatDialog,
     private datePipe: DatePipe,
-    private coords: CoordinatesComponent
+    private coords: CoordinatesComponent,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
     this.currentJobStatus = new BatchStatus();
     this.displayedColumns = this.columnNames.map(x => x.id);
     this.coords.selectedKey = 'dd';  // uses decimal degrees for all lat/lon in batch feature
+    this.username = this.userService.currentAccount.user.username;
+    this.email = this.userService.currentAccount.user.email;
   }
 
   ngOnDestroy(): void {

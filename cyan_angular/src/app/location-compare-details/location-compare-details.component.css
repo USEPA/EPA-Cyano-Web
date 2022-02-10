@@ -822,3 +822,9 @@
 .chart_title {
     padding-left: 5%;
 }
+
+.reset-button {
+    float: right;
+    margin-right: 5%;
+    margin-top: 2px;
+}

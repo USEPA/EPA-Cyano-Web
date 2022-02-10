@@ -1,0 +1,83 @@
+<div class="details_block_0">
+
+	<div class="wbstats-block">
+
+		<button mat-button class="exit-button" [routerLink]="['']">X</button>
+
+		<mat-tab-group mat-stretch-tabs class="details_tab_group" #tabGroup>
+
+		    <!-- WB Search Tab -->
+		  <mat-tab label="Waterbody Search" >
+				
+				<div class="locations-title">
+					<h2>Waterbody Search</h2>
+				</div>
+
+				<!-- <mat-slide-toggle (change)="toggleLayer($event)">NHDWaterbody Layer</mat-slide-toggle> -->
+
+				<!-- Search type selection -->
+				<div class="wb-name-div" style="width:100%;display: inline-block;">
+					<mat-form-field>
+						<label style="float:left;">Search for waterbody by:</label>
+						<mat-select style="float:right;" [value]="defaultSelected" (selectionChange)="onSelect($event);">
+							<mat-option *ngFor="let searchType of searchSelect | keyvalue" [value]="searchType.key">
+								{{searchType.value}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				
+				<!-- Search by name -->
+				<div class="wb-name-div" *ngIf="selectedKey == 'name'">
+					<mat-form-field id="wb-name-form">
+						<mat-label>Enter a waterbody name to search</mat-label>
+						<input matInput id="wb-name-input" [(ngModel)]="waterbodyName" (keyup.enter)="searchForWaterbodyByName();">
+					</mat-form-field>
+					<br>
+					<button id="wb-name-search-btn" mat-raised-button color="primary" (click)="searchForWaterbodyByName();">Search</button>
+				</div>
+
+				<!-- Search by coords -->
+				<div class="wb-name-div" *ngIf="selectedKey == 'coords'">
+					<h1 class="label">Latitude:</h1>
+					<input type="number" placeholder="Enter latitude" [(ngModel)]="waterbodyLat" style="width:50%;">
+					<br><br>
+					<h1 class="label">Longitude: </h1>
+					<input type="number" placeholder="Enter longitude" [(ngModel)]="waterbodyLon" style="width:50%;">
+					<br><br>
+					<button id="wb-name-search-btn" mat-raised-button color="primary" (click)="searchForWaterbodyByCoords();">Search</button>
+				</div>	
+
+				<!-- Results list -->
+				<h4 class="results-title" *ngIf="waterbodyResults?.length > 0">Results: {{waterbodyResults.length}}</h4>
+				<div *ngIf="waterbodyResults?.length > 0" class="user-locations">
+					<br>
+					<ul>
+						<li *ngFor="let waterbody of waterbodyResults" class="location-li" (click)="handleWaterbodySelect(waterbody);">
+							<div class="location-item-left">
+								<p>
+									<b>{{waterbody.name}}</b><br>
+									<b>COMID:</b> {{waterbody.objectid}}<br>
+									<b>Coordinates:</b> {{waterbody.centroid_lat}}, {{waterbody.centroid_lng}}<br>
+									<b>Area:</b> {{waterbody.areasqkm}}km<sup>2</sup><br>
+									<b>State:</b> {{waterbody.state_abbr}}
+								</p>
+							</div>
+						</li>
+					</ul>
+				</div>
+
+			</mat-tab>
+
+			<mat-tab label="Waterbody Reports">
+				<!-- <div class="locations-title">
+					<h2>Waterbody Report Generation</h2>
+				</div> -->
+				<app-reports></app-reports>
+			</mat-tab>
+
+		</mat-tab-group>
+				
+	</div>
+
+</div>

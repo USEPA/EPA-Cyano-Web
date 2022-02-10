@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, Subscription, BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
@@ -8,8 +8,8 @@ import { LocationType } from '../models/location';
 import { UserSettings } from '../models/settings';
 import { Comment, Reply } from '../models/comment';
 import { BatchJob, BatchStatus } from '../models/batch';
+import { WaterBody } from '../models/waterbody';
 
-import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
 import { LoaderService } from '../services/loader.service';
 import { EnvService } from '../services/env.service';
@@ -85,7 +85,7 @@ export class DownloaderService {
 
   userLogin(username: string, password: string) {
     let url = this.envService.config.baseServerUrl + 'user';
-    let body = { user: username, password: password, dataType: LocationType.OLCI_WEEKLY };
+    let body = { user: username, password: password };
     return this.http.post(url, body, this.envService.getHeaders());
   }
 
@@ -95,7 +95,6 @@ export class DownloaderService {
       owner: username,
       id: ln.id,
       name: ln.name,
-      type: ln.type,
       latitude: ln.latitude,
       longitude: ln.longitude,
       marked: ln.marked,
@@ -110,7 +109,6 @@ export class DownloaderService {
     let body = {
       owner: username,
       id: ln.id,
-      type: ln.type,
       name: ln.name,
       marked: ln.marked,
       compare: ln.compare,
@@ -119,9 +117,9 @@ export class DownloaderService {
     this.executeAuthorizedPostRequest(url, body).subscribe();
   }
 
-  deleteUserLocation(username: string, id: number, type: number) {
+  deleteUserLocation(username: string, id: number) {
     delete this.locationsData[id];
-    let url = this.envService.config.baseServerUrl + 'location/delete/' + id + '/' + type;
+    let url = this.envService.config.baseServerUrl + 'location/delete/' + id;
     this.executeDeleteUserLocation(url).subscribe();
   }
 
@@ -134,8 +132,8 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
-  getUserLocations(username: string, type: number) {
-    let url = this.envService.config.baseServerUrl + 'locations/' + type;
+  getUserLocations(username: string) {
+    let url = this.envService.config.baseServerUrl + 'locations';
     return this.executeAuthorizedGetRequest(url);
   }
 
@@ -227,6 +225,209 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url);
   }
 
+  getAllWaterbodies() {
+    /*
+    Makes request to cyan-waterbody for all available waterbodies.
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?name=';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  searchForWaterbodyByCoords(latitude: number, longitude: number) {
+    /*
+    Searches for available waterbody using lat/lon.
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?lat=' + latitude + '&lng=' + longitude;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  searchForWaterbodyByName(name: string) {
+    /*
+    Searches for available waterbody using name. 
+    */
+    let url = this.envService.config.waterbodyUrl + 'search/?name=' + name;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getWaterbodyData(
+    objectid: number,
+    daily: string = 'True',
+    startYear: number = null,
+    startDay: number = null,
+    endYear: number = null,
+    endDay: number = null,
+    ranges: Array<any> = null
+  ) {
+    /*
+    Gets waterbody data.
+    */
+    let url = this.envService.config.waterbodyUrl + 
+              'data/?OBJECTID=' + objectid +
+              '&daily=' + daily;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyProperties(objectid: number) {
+    /*
+    Gets waterbody properties.
+    */
+    let url = this.envService.config.waterbodyUrl + 'properties/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyGeometry(objectid: number) {
+    /*
+    Gets waterbody geometry.
+    */
+    let url = this.envService.config.waterbodyUrl + 'geometry/?OBJECTID=' + objectid;
+    return this.executeAuthorizedGetRequest(url); 
+  }
+
+  getWaterbodyImage(objectid: number, year: number, day: number) {
+    /*
+    Gets waterbody image for a given date (year and day-of-year).
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'image/?OBJECTID=' + objectid + 
+      '&year=' + year + 
+      '&day=' + day;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/png',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  getTribes() {
+    /*
+    Gets tribes with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/tribes/';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getCounties(state: string) {
+    /*
+    Gets counties with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/counties/?state=' + state;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getStates() {
+    /*
+    Gets states with available waterbodies.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report_form/states/';
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  // generateReport(reportType: string, reportTypeId: number, dayOfYear: string, ranges: Array<number>) {
+  generateReport(reportType: string, reportTypeIds: number[], dayOfYear: string, ranges: Array<number>) {
+    /*
+    Starts report generation.
+      * reportType - objectids, county, or tribe
+      * reportTypeId - ID number for the reportType (objectids, county or tribe IDs)
+      * dayOfYear - year and day-of-year for report (e.g., "2021 300")
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report';
+    let postData = {
+      date: dayOfYear,
+      ranges: ranges
+    }
+    if (reportType === 'objectids') {
+      postData['objectids'] = reportTypeIds;
+    }
+    else if (reportType === 'tribe') {
+     postData['tribes'] = reportTypeIds;
+    }
+    else if (reportType === 'county') {
+      postData['counties'] = reportTypeIds;
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
+  }
+
+  getUserReports(reportId: string = '') {
+    /*
+    Gets user reports based on redport ID, or returns all of them if
+    no report ID is provided.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report';
+    if (reportId.length > 0) {
+      url += '/?' + reportId;
+    }
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  getReportStatus(reportId: string) {
+    /*
+    Gets status of report based on report ID.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report/status/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  cancelReportRequest(reportId: string) {
+    /*
+    Cancels a requested report.
+    NOTE: Must be user that started report as well.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.baseServerUrl + 'report/cancel/?'
+      + 'report_id=' + reportId;
+    return this.executeAuthorizedGetRequest(url);
+  }
+
+  downloadReport(reportId: string) {
+    /*
+    Downloads report based on report ID.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 'report/download/?'
+      + 'report_id=' + reportId;
+    // return this.executeAuthorizedGetRequest(url);
+
+    // NOTE: May need request like below:
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'App-Name': this.envService.config.appName,
+      },
+      // responseType: 'blob',
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  downloadHistoData(objectid: number) {
+    /*
+    Gets histogram data for a waterbody. Returns a CSV.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'data_download/?OBJECTID=' + objectid;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'text/csv',
+        'App-Name': this.envService.config.appName,
+      },
+      // responseType: 'blob',
+      responseType: 'text',
+      observe: 'response'
+    });
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());
@@ -240,11 +441,15 @@ export class DownloaderService {
   ajaxRequest(ln: Location, username: string, url: string) {
     let self = this;
     self.loaderService.show();
-    console.log("Tracker: " + this.requestsTracker);
     self.requestsTracker += 1;
-    ajax(url).subscribe(data => {
-      let d: LocationDataAll = data.response;
+    ajax({
+      url: url,
+      crossDomain: true
+    }).subscribe(data => {
+      let d = data.response;
       let loc = self.createLocation(ln, username, d);
+      loc.latitude = ln.latitude;
+      loc.longitude = ln.longitude;
       let index = this.getLocationIndex(loc);
       // if index not found, location has been deleted by user
       if (index > -1) {
@@ -260,19 +465,19 @@ export class DownloaderService {
     });
   }
 
-  getAjaxData(username: string, ln: Location) {
+  getAjaxData(username: string, ln: Location, datatype: LocationType = 1) {
     // Checks if token is valid before making requests:
     if (!this.authService.checkUserAuthentication()) { return; }
     let hasData: boolean = this.locationsData.hasOwnProperty(ln.id);
     if (!hasData) {
       let url = this.envService.config.tomcatApiUrl + "location/data/" + ln.latitude.toString() + '/' + ln.longitude.toString() + '/all';
-      switch (ln.type) {
+      switch (datatype) {
         case LocationType.OLCI_WEEKLY:
-              url += '?type=olci&frequency=weekly';
-              break;
+          url += '?type=olci&frequency=weekly';
+          break;
         case LocationType.OLCI_DAILY:
-              url += '?type=olci&frequency=daily';
-              break;
+          url += '?type=olci&frequency=daily';
+          break;
       }
       this.ajaxRequest(ln, username, url);
     }
@@ -294,7 +499,7 @@ export class DownloaderService {
     return of(this.locationsData);
   }
 
-  createLocation(loc: Location, username: string, data: LocationDataAll): Location {
+  createLocation(loc: Location, username: string, data): Location {
 
     let coordinates = this.convertCoordinates(data.metaInfo.locationLat, data.metaInfo.locationLng);
     let name = loc.name;
@@ -351,6 +556,9 @@ export class DownloaderService {
     }
     ln.compare = loc.compare;
 
+    ln.waterbody = new WaterBody();
+    ln.waterbody.objectid = null;
+
     // update only if name changed and user did not remove location before API returns
     if (ln.name != loc.name && this.locationNotDeleted(ln)) {
       ln.name = this.addUniqueId(ln);
@@ -395,10 +603,10 @@ export class DownloaderService {
       }
     });
     if (matchedLocations.length == 0) {
-      ln.name = ln.name + " -- 1";  
+      ln.name = ln.name + " -- 1";
     }
     else if (matchedLocations.length > 0) {
-      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();  
+      ln.name = ln.name + " -- " + (Math.max.apply(null, matchedLocations) + 1).toString();
     }
     else {
       ln.name = ln.name;
@@ -413,6 +621,20 @@ export class DownloaderService {
       this.loaderService.hide();
       this.loaderService.progressValue.next(0);
     }
+  }
+
+  downloadFile(filename: string, data: any) {
+    /*
+    Creates CSV link and clicks it for downloading.
+    */
+    const a = document.createElement('a');
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
   }
 
 }
