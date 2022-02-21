@@ -1,0 +1,181 @@
+@media screen and (min-width:980px)
+{
+    .login-window {
+        padding: 0 3%;
+        width: 50%;
+        min-width: 300px;
+        height: 50%;
+        top: 25%;
+        left: 25%;
+        border-radius: 5px;
+    }
+    .login-block {
+        height: 40%;
+    }
+    .login-exit {
+        display: block;
+    }
+    .login-input {
+        margin: 10px;
+    }
+    .app-information-block {
+        margin-top: 10px;
+        height: 60%;
+    }
+    .user-details {
+        font-size: normal;
+    }
+}
+@media screen and (max-width: 979px) and (min-width: 600px)
+{
+    .login-window {
+        padding: 0 3%;
+        width: 80%;
+        min-width: 300px;
+        height: 50%;
+        top: 25%;
+        left: 10%;
+        border-radius: 5px;
+    }
+    .login-block {
+        height: 40%;
+    }
+    .login-exit {
+        display: none;
+    }
+    .login-input {
+        margin: 10px;
+    }
+    .app-information-block {
+        margin-top: 10px;
+        height: 60%;
+    }
+    .user-details {
+        font-size: normal;
+    }
+}
+@media screen and (max-width: 599px)
+{
+    .login-window {
+        padding: 0;
+        width: 100vw;
+        min-height: 80vh;
+        top: 10%;
+    }
+    .login-exit {
+        display: none;
+    }
+    .login-block {
+        height: 40%;
+    }
+    .login-input {
+        margin:  0 10px;
+        width: 75%;
+    }
+    .app-information-block {
+        height: 60%;
+        padding: 0 15px;
+    }
+    .app-state-block {
+        float: left;
+        width: 50%;
+        font-size: smaller;
+    }
+    .user-details {
+        font-size:smaller;
+    }
+}
+
+.full-display {
+    min-width: 100vw;
+    min-height: 100vh;
+    position: fixed;
+    background:rgba(255,255,255,0.4);
+    left: 0;
+    top: 0;
+}
+.background-click {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background: transparent;
+}
+.login-window {
+    background: white;
+    display: inline-block;
+    position: fixed;
+    opacity: 1;
+    text-align: center;
+}
+.login-information-block {
+    margin: 10px 5px 5px 5px;
+}
+.login-message {
+    font-size: smaller;
+    color: #ef0000;
+}
+.login-button {
+    margin-left: 25px;
+}
+.login-notification-block {
+    margin-top: 10px;
+}
+.app-title {
+    font-weight: 500;
+}
+.app-title-abrv {
+    font-weight: 500;
+}
+
+.login-exit {
+    right: 0;
+    top: 0;
+    position: absolute;
+    margin: 10px;
+}
+.register-user {
+    margin-left: 10px;
+}
+.register-input {
+    margin: 0 10px;
+}
+.register-details {
+    margin: 20px 10px;
+}
+.register-button {
+    margin: 0 5px;
+}
+.register-notification-block {
+    margin-top: 5px;
+}
+.register-message {
+    font-size: smaller;
+    color: #ef0000;
+}
+.start-app {
+    margin-top: 10px;
+    font-weight: bolder;
+    min-width: 20%;
+}
+.log-out {
+  margin-left: 10px;
+}
+.app-state-block {
+    float: left;
+    width: 50%;
+}
+.dev-state {
+    display: inline-block;
+    color: #ef0000;
+}
+.app-description {
+    font-size: smaller;
+}
+#account-form .mat-form-field-invalid span {
+    color: #ef0000;
+}
+
+#reset-form {
+    height:  100%;
+    margin-top: 4%;
+}

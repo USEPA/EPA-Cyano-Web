@@ -1,0 +1,46 @@
+<button mat-button (click)="exit();" class="comments-exit">X</button>
+
+<div class="view-comments">
+
+	<div class="view-comments-box">
+		
+		<h4>{{comment.title}}</h4>
+		
+		<p>
+			{{comment.date}} <i>by {{comment.username}}</i>
+			<br>
+			{{comment.replies.length}} replies
+			<br><br>
+			<b>Device:</b> {{comment.device}}
+			<br>
+			<b>Browser:</b> {{comment.browser}}
+		</p>
+		
+		<div class="comment-content">
+			<p class="comment-body">{{comment.comment_text}}</p>
+			<div *ngFor="let imageSource of comment.comment_images">
+				<img class="view-uploaded-image" *ngIf="comment.comment_images?.length > 0" src="{{imageSource}}" (click)="enlargeImage(imageSource)" />
+			</div>
+		</div>
+
+	</div>
+
+	<div *ngIf="comment.replies?.length > 0" class="comment-replies">
+		<ul>
+			<li *ngFor="let reply of comment.replies" class="reply-li">
+				<div class="comment-item-left">
+					{{reply.body}} -- <i>{{reply.username}} on {{reply.date}}</i>
+				</div>
+			</li>
+		</ul>
+	</div>
+
+	<div class="reply-controls">
+		<mat-form-field class="comment-textarea" appearance="outline">
+			<textarea matInput [(ngModel)]="body" placeholder="Enter reply (max {{replySizeLimit}} characters)" required></textarea>
+		</mat-form-field>
+		<br>
+		<button class="add-reply-btn" mat-raised-button color="primary" (click)="addReplyToComment();">Reply</button>
+	</div>
+
+</div>

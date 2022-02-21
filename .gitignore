@@ -1,0 +1,22 @@
+# Angular settings
+dist/
+cyan_angular/dist/
+env.json
+
+# Python settings
+__pycache__/
+
+# Pycharm settings
+.idea
+
+# Flask settings
+cyan_flask/user_images/*
+cyan_flask/user_jobs/*
+
+# Docker settings
+.env*
+docker/angular/package.json*
+docker/flask/requirements.*
+
+# VSCode settings
+.vscode/

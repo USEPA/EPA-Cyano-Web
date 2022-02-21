@@ -1,0 +1,41 @@
+<div class="details_block_0">
+  <div class="details_loader hide"></div>
+
+  <div *ngIf="loading; else loaded">
+    <div class="details_image_thumbs_loader">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  </div>
+
+  <ng-template #loaded>
+	  <!-- Location Title and Date -->
+	  <div class="details_title_block_0">
+	    <div class="details_title_block_1">
+	        <div class="details_title">
+	        	<div style="float:left;padding-left:30%">{{location.name || ""}}</div>
+	        	<div style="float:right;padding-right:30%;">{{latestImageDate || ""}}</div>
+	    	</div>
+	      <button mat-button (click)="exit();" class="details_exit">x</button>
+	    </div>
+	  </div>
+
+	  <!-- Transparency Slider -->
+	  <div *ngIf="selectedLayer">
+	    <div class="details_slider">
+	      <div class="slider_title">Transparency</div>
+	      <mat-slider class="opacity_slider" [thumbLabel]="showSliderValue" [(ngModel)]="opacityValue" min="0" max="1" value="0.7" step="0.01" color="primary" (change)="changeOpacity($event);"></mat-slider>
+	    </div>
+	  </div>
+	</ng-template>
+
+  <!-- Leaflet Map -->
+  <div class="mini_map_block">
+		<div class="mini_map"
+			leaflet
+			[leafletOptions]="options"
+			(leafletMapReady)="onMapReady($event)"
+			(leafletClick)="addMarkerOnClick($event)"
+		>
+	</div>
+
+</div>

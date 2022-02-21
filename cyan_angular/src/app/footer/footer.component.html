@@ -1,0 +1,52 @@
+<div id="footer-banner">
+  <div class="footer-block">
+    <a href="https://www.epa.gov" class="footer-epa-logo-link" target="_blank" aria-label="EPA homepage link"><span class="footer-epa-logo"></span></a>
+  </div>
+  <div class="footer-title-block">
+    <button mat-button [matMenuTriggerFor]="discover" class="footer-title">Discover.</button>
+    <mat-menu #discover="matMenu" class="footer-link-block">
+      <button mat-menu-item class="footer-link" (click)="linksClick('accessibility')">Accessibility</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('administrator')">EPA Administrator</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('budget')">Budget & Performance</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('contracting')">Contracting</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('grants')">Grants</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('snapshot')">January 19, 2017 Web Snapshot</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('nofear')">No FEAR Act Data</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('privacy')">Privacy</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('privacynotice')">Privacy and Security Notice</button>
+    </mat-menu>
+  </div>
+  <div class="footer-title-block">
+    <button mat-button [matMenuTriggerFor]="connect" class="footer-title">Connect.</button>
+    <mat-menu #connect="matMenu" class="footer-link-block">
+      <button mat-menu-item class="footer-link" (click)="linksClick('data')">Data.gov</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('inspectorgeneral')">Inspector General</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('jobs')">Jobs</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('news')">Newsroom</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('opengov')">Open Government</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('regulations')">Regulations.gov</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('subscribe')">Subscribe</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('usagov')">USA.gov</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('whitehouse')">White House</button>
+    </mat-menu>
+  </div>
+  <div class="footer-title-block">
+    <button mat-button [matMenuTriggerFor]="ask" class="footer-title">Ask.</button>
+    <mat-menu #ask="matMenu" class="footer-link-block">
+      <button mat-menu-item class="footer-link" (click)="linksClick('contactus')">Contact Us</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('hotlines')">Hotlines</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('fioa')">FIOA Requests</button>
+      <button mat-menu-item class="footer-link" (click)="linksClick('faq')">Frequent Questions</button>
+    </mat-menu>
+  </div>
+  <div class="footer-title-block follow-button">
+    <button mat-button [matMenuTriggerFor]="follow" class="footer-title">Follow.</button>
+    <mat-menu #follow="matMenu" class="footer-link-block">
+      <button mat-menu-item class="social-link social-facebook" (click)="linksClick('facebook')"></button>
+      <button mat-menu-item class="social-link social-twitter" (click)="linksClick('twitter')"></button>
+      <button mat-menu-item class="social-link social-youtube" (click)="linksClick('youtube')"></button>
+      <button mat-menu-item class="social-link social-flickr" (click)="linksClick('flickr')"></button>
+      <button mat-menu-item class="social-link social-instagram" (click)="linksClick('instagram')"></button>
+    </mat-menu>
+  </div>
+</div>

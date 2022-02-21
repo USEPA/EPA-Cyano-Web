@@ -1,0 +1,110 @@
+<div class="details_block_0">
+
+	<div class="main-block">
+		
+		<button mat-button class="exit-button" [routerLink]="['']">X</button>
+		<div class="locations-title">
+			<h2>Waterbody Reports</h2>
+		</div>
+
+		<!-- Report type selection -->
+		<div>
+			<mat-form-field>
+				<label>Generate report using:</label>
+				<br><br>
+				<mat-select (selectionChange)="onReportSelect($event);">
+				<mat-option *ngFor="let reportType of reportTypeOptions | keyvalue" [value]="reportType.key">
+					{{reportType.value}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Search by "My Locations" -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'objectids'">
+			<!-- <mat-checkbox [(ngModel)]="selectAll" (change)="selectAllCheckbox($event)" color="primary">Select all</mat-checkbox> -->
+			<dl id="selected-dates-list">
+				<dt class="selected-dates-item" *ngFor="let location of userLocations">
+					<mat-checkbox (change)="locationSelect(location, $event)" [(ngModel)]="location.checked" color="primary">
+						{{location.location.name}}
+						(Waterbody: {{location.location.waterbody.name}})
+					</mat-checkbox>
+				</dt>
+			</dl>
+		</div>
+		
+		<!-- Search by tribe -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'tribe'">
+			<mat-form-field>
+				<label>Select a tribe</label>
+				<br><br>
+				<mat-select (selectionChange)="onTribeSelect($event);">
+				<mat-option *ngFor="let tribe of wbTribes" [value]="tribe[1]">
+					{{tribe[1]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Search by state -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'county'">
+			<mat-form-field>
+				<label>Select a state</label>
+				<br><br>
+				<mat-select (selectionChange)="onStateSelect($event);">
+				<mat-option *ngFor="let state of wbStates" [value]="state[1]">
+					{{state[1]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Search by county -->
+		<div class="wb-name-div" *ngIf="selectedState && selectedReportType == 'county'">
+			<mat-form-field>
+				<label>Select a county:</label>
+				<br><br>
+				<mat-select (selectionChange)="onCountySelect($event);">
+				<mat-option *ngFor="let county of wbCounties" [value]="county[1]">
+					{{county[1]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<br><br>
+
+		<!-- Date selection -->
+		<!-- <mat-form-field *ngIf="selectedCounty.length > 0 || selectedTribe.length > 0 || selectedLocations.length > 0"> -->
+		<mat-form-field *ngIf="currentWaterbodyIds.length > 0">
+			<mat-label>Select a date:</mat-label>
+			<input matInput [matDatepicker]="picker" [(ngModel)]="selectedCalendarDate">
+			<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+			<mat-datepicker #picker></mat-datepicker>
+		</mat-form-field>
+
+		<!-- <mat-form-field *ngIf="selectedCounty.length > 0 || selectedTribe.length > 0 || selectedLocations.length > 0">
+			<mat-label>Available Dates:</mat-label>
+				<mat-select [(value)]="selectedAvailableDate" (selectionChange)="updateDate($event.value);">
+				<mat-option *ngFor="let date of userLocations[0].availableDates" [value]="date">
+					{{date}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field> -->
+
+		<br><br>
+
+		<!-- Request report button -->
+		<!-- <div *ngIf="selectedDate"> -->
+		<div *ngIf="selectedCalendarDate">
+			<button mat-raised-button color="primary" (click)="generateReport()">Generate Report</button>
+		</div>
+
+		<br>
+
+		<!-- View reports button -->
+		<button mat-raised-button color="primary" (click)="viewReports()">View Reports</button>
+		
+	</div>
+
+</div>

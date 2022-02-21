@@ -1,0 +1,51 @@
+<div class="location_block_0">
+  <div class="location_exit_block">
+    <button mat-button class="location_exit" [routerLink]="['']">X</button>
+  </div>
+  <div class="location_top_bar">
+      <div id="select-text" class="no_locations location_count"><span class="no_location_title">Select locations to compare ({{selected_locations.length}} locations)</span></div>
+  </div>
+  <ul class="location_list">
+    <li *ngFor="let location of selected_locations" class="location_li">
+      <div class="location_name">{{location.name}}</div>
+      <div class="left_block">
+        <div class="location_block_1">
+          <div class="location_coord">
+            {{location.latitude_deg}}&deg;{{location.latitude_min}}'{{location.latitude_sec}}"{{location.latitude_dir}},
+            {{location.longitude_deg}}&deg;{{location.longitude_min}}'{{location.longitude_sec}}"{{location.longitude_dir}}
+          </div>
+          <div class="location_max">(Max adjacent cells: {{formatNumber(location.maxCellConcentration)}})</div>
+      </div>
+      <div class="location_block_1">
+        <div class="location_cell">
+          <app-meter [location]="location"></app-meter>
+          </div>
+        </div>
+      </div>
+      <div class="right_block">
+        <div class="location_block_1">
+          <div class="location_trend">
+            <div class="arrow_block">
+              <div *ngIf="getArrow(location); then location_up else location_down"></div>
+              <ng-template #location_up>
+                <div [ngClass]="['location_arrow_img', 'arrow_up', getArrowColor(location, true)]"></div>
+              </ng-template>
+              <ng-template #location_down>
+                <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(location, true)]"></div>
+              </ng-template>         
+              <!-- <div class="location_cellChange" [style.color]="getColor(location, true)">{{formatNumber(location.concentrationChange)}}</div> -->
+              <div class="location_cellChange">{{formatNumber(location.concentrationChange)}}</div>
+            </div>
+            <div class="location_cellDescript">cells/mL</div>
+            <div class="location_date_since">since {{location.changeDate}}</div>
+            <div class="location_date">Date: {{location.dataDate}}</div>
+          </div>
+        </div>
+      </div>
+      <button style="float:right;" mat-button (click)="removeLocation(location);">X</button>
+    </li>
+  </ul>
+  <div class="compare-btn-div">
+    <button class="compare-btn mat-button" (click)="compareLocations();">Compare Locations</button>
+  </div>
+</div>

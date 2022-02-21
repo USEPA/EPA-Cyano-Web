@@ -1,0 +1,218 @@
+<div class="location_block_0">
+
+	<div class="locations-block">
+
+		<button mat-button [routerLink]="['']" class="locations-exit">X</button>
+
+		<div class="wbstats-content">
+			<h4>Waterbody Information</h4>
+			<br>
+			<div class="wbstats-main-info">
+				<b>Name:</b> {{selectedWaterbody.name}}<br>
+				<b>State:</b> {{wbProps.state_abbr}}<br>
+				<b>Object ID:</b> {{selectedWaterbody.objectid}}<br>
+				<b>Centroid Latitude:</b> {{selectedWaterbody.centroid_lat}}<br>
+				<b>Centroid Longitude:</b> {{selectedWaterbody.centroid_lng}}<br>
+				<b>Area:</b> {{wbProps.areasqkm}} km<sup>2</sup><br>
+			</div>
+			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download histogram</button>
+			<br><br>
+			<div class="details_tab">
+				<!-- User selections for WB stats -->
+				<div class="wbstats-inputs">
+					<mat-form-field>
+						<mat-label>Data Type</mat-label>
+						<mat-select [(value)]="selectedDataType" (selectionChange)="updateDataType($event.value);">
+							<mat-option value="daily">Daily</mat-option>
+							<mat-option value="weekly">Weekly</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<mat-form-field>
+						<mat-label>Available Dates</mat-label>
+							<mat-select [(value)]="selectedAvailableDate" (selectionChange)="updateDate($event.value);">
+							<mat-option *ngFor="let date of wbStats.dates" [value]="date">
+								{{date}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<mat-form-field>
+						<mat-label>Date Range</mat-label>
+						<mat-select [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
+							<mat-option value="single">Single</mat-option>
+							<mat-option value="7day">7 Day History</mat-option>
+							<mat-option value="30day">30 Day History</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<!-- Shows list of dates within selected range -->
+				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
+					<div>
+						<div class="details_slideshow">
+	            			<mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">{{slidershow ? "Slideshow started" : "Start slideshow"}}</mat-checkbox>
+	          			</div>
+	          			<br>
+	          			<p>Current date: {{selectedDate || selectedAvailableDate}}</p>
+	          		</div>
+	          		<div>
+          				<ng5-slider
+          					[(value)]="sliderValue"
+          					[options]="sliderOptions"
+          					(mouseup)="sliderEvent()"
+          					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day'}">
+          				</ng5-slider>
+	          		</div>
+				</div>
+			</div>
+
+			<br>
+
+			<div class="details_tab" *ngIf="plotStats">
+
+				<!-- Total Cell Counts Plot -->
+				<div class="data-item">
+				  <div class="chart_header">
+				    <div class="chart_title" class="chart-toggle" (click)="togglePlotType();">
+							<mat-icon *ngIf="selectedDateRange=='single'">unfold_more</mat-icon>
+							{{selectedPlotType}}
+						</div>
+				    <div class="chart_source_selection"></div>
+				  </div>
+					<div class="chart_graph">
+						<canvas *ngIf="!showStacked && !showPie" aria-label="Total cell counts" baseChart #barChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
+						  [datasets]="chartData"
+						  [options]="chartOptions"
+						  [colors]="chartColors"
+						  [legend]="chartLegend"
+						  [chartType]="chartType"
+						  [labels]="chartLabels"
+						  (chartClick)="chartClick($event)">
+						</canvas>
+						<canvas *ngIf="!showStacked && !showBars" aria-label="Total cell counts" #stackedChart="base-chart" baseChart class="cyan_chart left-chart" width="1" height="1"
+						  [datasets]="pieChartData"
+						  [options]="pieChartOptions"
+						  [colors]="pieChartColors"
+						  [legend]="pieChartLegend"
+						  [chartType]="pieChartType"
+						  [labels]="pieChartLabels"
+						  (chartClick)="chartClick($event)">
+						</canvas>
+						<canvas *ngIf="!showPie && !showBars" aria-label="Total cell counts" baseChart #pieChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
+						  [datasets]="stackedChartData"
+						  [options]="stackedChartOptions"
+						  [colors]="stackedChartColors"
+						  [legend]="stackedChartLegend"
+						  [chartType]="stackedChartType"
+						  [labels]="stackedChartLabels">
+						</canvas>
+					</div>
+				</div>
+				<!-- Cell Concentration Histogram -->
+				<div class="data-item">
+					<div *ngIf="!showStacked" class="chart_header">
+					  <div class="chart_title">Cell Concentration Histogram
+					  	<!-- <mat-icon id="download-histo-btn" (click)="downloadHistoCSV()" class="mat_icon">file_download</mat-icon> -->
+					  </div>
+					  <!-- <div class="chart_source_selection"></div> -->
+					</div>
+					<div *ngIf="showStacked" class="chart_header">
+					  <div class="chart_title">Total Cell Counts by Range</div>
+					  <div class="chart_source_selection"></div>
+					</div>
+					<div class="chart_graph">
+						<canvas *ngIf="!showStacked" aria-label="Concentration histogram" baseChart class="cyan_chart right-chart" width="1" height="1"
+						  [datasets]="histoChartData"
+						  [options]="histoChartOptions"
+						  [legend]="histoChartLegend"
+						  [chartType]="histoChartType"
+						  [labels]="histoChartLabels">
+						</canvas>
+						<canvas *ngIf="showStacked" aria-label="Total cell counts by range" baseChart class="cyan_chart right-chart" #stackedChart="base-chart" width="1" height="1"
+						  [datasets]="lineChartData"
+						  [options]="lineChartOptions"
+						  [colors]="lineChartColors"
+						  [legend]="lineChartLegend"
+						  [chartType]="lineChartType"
+						  [labels]="lineChartLabels">
+						</canvas>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="details_tab" *ngIf="calculatingStats">
+
+				<!-- Displays WB stats for a selected date -->
+				<div class="data-item">
+					<b>Date:</b> {{wbStats.date}}<br>
+					<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
+					<b>Min:</b> {{wbStats.min}} cells/mL<br>
+					<b>Max:</b> {{wbStats.max}} cells/mL<br>
+					<b>Average:</b> {{wbStats.average}} cells/mL<br>
+					<b>Standard Deviation:</b> {{wbStats.stddev}} cells/mL
+				</div>
+
+				<div *ngIf="!showStacked" class="data-item">
+					<!-- Range selection -->
+					<mat-form-field>
+						<mat-label>Select range</mat-label>
+						<mat-select [(value)]="selectedRange" (selectionChange)="updateHistoChart();">
+							<mat-option value="low">Low</mat-option>
+							<mat-option value="medium">Medium</mat-option>
+							<mat-option value="high">High</mat-option>
+							<mat-option value="veryHigh">Very High</mat-option>
+							<mat-option value="all">All</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<!-- Stats -->
+					<div>
+						<b>Min:</b> {{rangeStats.min || "N/A"}} cells/mL<br>
+						<b>Max:</b> {{rangeStats.max || "N/A"}} cells/mL<br>
+						<b>Average:</b> {{rangeStats.average}} cells/mL<br>
+						<b>Standard Deviation:</b> {{rangeStats.stddev}} cells/mL
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+<!-- Map legends -->
+<div class="legends">
+	<!-- OCLI color map legend -->
+	<div class="leaflet-container leaflet-bottom leaflet-right map-legend-toggle">
+	  <span class="leaflet-control leaflet-control-attribution map-legend-toggle" (click)="toggleLegend()">Toggle Map Legend</span>
+	</div>
+	<div class="map-legend leaflet-container leaflet-bottom leaflet-right" *ngIf="showLegend">
+	  <img src="assets/images/legend.png" />
+	</div>
+	<!-- User color settings legend -->
+	<div class="user-legend leaflet-container leaflet-bottom leaflet-left">
+	  <span class="leaflet-control leaflet-control-attribution user-legend-toggle" (click)="toggleUserLegend()">Toggle User Ranges</span>
+	</div>
+	<div class="leaflet-container leaflet-bottom leaflet-left user-ranges" *ngIf="showUserLegend">
+	  	<div class="cyan-level low-block">
+		    Low
+		    <div class="circle green"></div>
+		    0 to {{userService.currentAccount.settings.level_low}}
+		</div>
+		<div class="cyan-level medium-block">
+		    Medium
+		    <div class="circle yellow"></div>
+		    {{userService.currentAccount.settings.level_low}} to {{userService.currentAccount.settings.level_medium}}
+		</div>
+		<div class="cyan-level high-block">
+		    High
+		    <div class="circle orange"></div>
+		    {{userService.currentAccount.settings.level_medium}} to {{userService.currentAccount.settings.level_high}}
+		</div>
+		<div class="cyan-level veryhigh-block">
+		    Very High
+		    <div class="circle red"></div>
+		    {{userService.currentAccount.settings.level_high}}
+		</div>
+	</div>
+</div>

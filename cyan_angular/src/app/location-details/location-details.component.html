@@ -1,0 +1,196 @@
+<div class="details_block_0">
+  <div class="details_loader hide"></div>
+  <div class="details_title_block_0">
+    <div class="details_title_block_1">
+      <button mat-button (click)="previousLocation();" class="details_prev_location">&#8249;</button>
+      <div class="details_title_block_2">
+        <div class="details_title">{{current_location.name}}</div>
+        <div class="details_location_counter">{{current_location_index}} of {{locations.length}}</div>
+      </div>
+      <button mat-button (click)="nextLocation();" class="details_next_location">&#8250;</button>
+      <button mat-button (click)="exit();" class="details_exit">X</button>
+    </div>
+  </div>
+  <mat-tab-group mat-stretch-tabs class="details_tab_group" #tabGroup>
+
+    <!-- Overview-tab -->
+    <mat-tab label="Overview" >
+
+      <div class="details_tab">
+
+        <!-- map-card -->
+        <mat-card>
+          <div class="product-header">
+            <div class="product-title">
+              Satellite: {{current_location.source}}
+            </div>
+          </div>
+          <mat-card-content>
+            <div class="mini_map_block">
+              <div class="leaflet-container leaflet-bottom leaflet-left">
+                <span class="leaflet-control leaflet-control-attribution map-legend-toggle" (click)="toggleLegend()">Toggle Map Legend</span>
+              </div>
+              <div class="map-legend leaflet-top leaflet-left" *ngIf="showLegend">
+                <img src="assets/images/legend.png" />
+              </div>
+              <div class="mini_map"
+                leaflet
+                [leafletOptions]="options"
+                [leafletLayersControl]="layersControl"
+                (leafletMapReady)="onMapReady($event)"
+                (leafletClick)="addMarkerOnClick($event)"
+              >
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- details-card -->
+        <mat-card>
+          <div class="product-header">
+            <div class="product-title">
+              Product: {{ current_location.sourceFrequency }}
+            </div>
+          </div>
+          <mat-card-content>
+            <div class="location_details_center">
+              <div class="left_block">
+                <div class="location_block_1">
+                  <div class="location_coord">
+                    {{current_location.latitude_deg}}&deg;{{current_location.latitude_min}}'{{current_location.latitude_sec}}"{{current_location.latitude_dir}},
+                    {{current_location.longitude_deg}}&deg;{{current_location.longitude_min}}'{{current_location.longitude_sec}}"{{current_location.longitude_dir}}
+                  </div>
+                  <div class="location_max">(Max adjacent cells: {{formatNumber(current_location.maxCellConcentration)}})</div>
+                </div>
+              <div class="location_block_1">
+                <div class="location_cell">
+                  <app-meter [location]="current_location" [cells]="current_location.cellConcentration"></app-meter>
+                  </div>
+                </div>
+              </div>
+              <div class="right_block">
+                <div class="location_block_1">
+                  <div class="location_trend">
+                    <div *ngIf="current_location.concentrationChange" class="arrow_block">
+                      <div *ngIf="getArrow(current_location); then location_up else location_down"></div>
+                      <ng-template #location_up>
+                        <div [ngClass]="['location_arrow_img', 'arrow_up', getArrowColor(current_location, true)]"></div>
+                      </ng-template>
+                      <ng-template #location_down>
+                        <div [ngClass]="['location_arrow_img', 'arrow_down', getArrowColor(current_location, true)]"></div>
+                      </ng-template>
+                      <!-- <div class="location_cellChange" [style.color]="getColor(current_location, true)">{{formatNumber(current_location.concentrationChange)}}</div> -->
+                      <div class="location_cellChange">{{formatNumber(current_location.concentrationChange)}}</div>
+                    </div>
+                    <div *ngIf="current_location.concentrationChange" class="location_cellDescript">cells/mL</div>
+                    <div *ngIf="current_location.concentrationChange" class="location_date_since">since {{current_location.changeDate}}</div>
+                    <div class="location_date">Date: {{current_location.dataDate}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="image-carousel">
+              <div *ngIf="selectedLayer">
+                <div class="details_slider">
+                  <div class="slider_title">Image Opacity</div>
+                  <mat-slider class="opacity_slider" [thumbLabel]="showSliderValue" [(ngModel)]="opacityValue" min="0" max="1" value="0.7" step="0.01" color="primary" (change)="changeOpacity($event);"></mat-slider>
+                </div>
+                <div class="details_image_name">
+                  <div class="details_name">Satellite {{ getImageName() }}</div>
+                  <div class="details_date">{{ getImageDate() }}</div>
+                </div>
+                <div class="details_slideshow">
+                  <mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">Slideshow</mat-checkbox>
+                </div>
+              </div>
+              <div class="details_image_thumbs">
+                <div *ngIf="loading; else loaded">
+                  <div class="details_image_thumbs_loader">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                  </div>
+                </div>
+                <ng-template #loaded>
+                  <div class="details_image_info">
+                  </div>
+                  <div class="details_block">
+                    <div class="details_thumbs_block">
+                      <div class="details_thumb_parent" *ngFor="let thumb of locationThumbs">
+                        <div class="details_thumb" #thumbDiv (click)="toggleImage(thumbDiv, thumb)">
+                          <img alt="Satellite image for {{getImageDate2(thumb)}}" src="{{ getImageUrl(thumb.name) }}">
+                          <div class="details_thumb_title">{{ getImageTitle(thumb) }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+
+            <!-- Notes-button -->
+            <div class="details_notes">
+                <div class="details_note_title" (click)="openNotes(current_location)">
+                  <img class="tab-icon" alt="View location notes" src="assets/images/details_notes.png"/>
+                  <span class="tab-title">Notes ({{current_location.notes ? current_location.notes.length : '0'}})</span>
+                </div>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Imagry-tab -->
+    <mat-tab label="Imagery" class="imagery_tab">
+      <div class="imagery_dates">
+        <div class="imagery_date_title">Date Range:</div>
+        <mat-form-field class="date_input">
+          <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="startpicker" placeholder="From" [(ngModel)]="startDate" (dateChange)="updateFilter()">
+          <mat-datepicker-toggle matSuffix [for]="startpicker"></mat-datepicker-toggle>
+          <mat-datepicker #startpicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="date_input">
+          <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="endpicker" placeholder="To" [(ngModel)]="endDate" (dateChange)="updateFilter()">
+          <mat-datepicker-toggle matSuffix [for]="endpicker"></mat-datepicker-toggle>
+          <mat-datepicker #endpicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div *ngIf="loading; else imagesLoaded">
+        <div class="imagery_loader">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      </div>
+      <ng-template #imagesLoaded>
+        <div class="imagery_gallery">
+          <div *ngFor="let thumb of filteredPNGs">
+            <div class="image_thumb" (click)="downloadImage($event, thumb)">
+              <img class="png_image" title="Download image for {{ getImageDate2(thumb) }}" src="{{ getImageUrl(thumb.name) }}">
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Chart-tab -->
+    <mat-tab label="Chart">
+      <div class="chart_header">
+        <div class="chart_title">
+          Blooming Chart
+          <button class="reset-button" mat-raised-button color="primary" (click)="resetZoom($event);">Reset zoom</button>
+          <mat-icon id="download-btn" (click)="downloadChartCSV()" class="mat_icon">file_download</mat-icon>
+        </div>
+        <div class="chart_source_selection"></div>
+      </div>
+      <div class="chart_graph" *ngIf="dataDownloaded">
+        <canvas aria-label="Location bloom chart" baseChart #cyanChart="base-chart" class="cyan_chart" width="1" height="1"
+          [datasets]="chartData"
+          [labels]="chartDataLabels"
+          [options]="chartOptions"
+          [colors]="chartColors"
+          [legend]="chartLegend"
+          [chartType]="chartType"
+          (chartHover)="chartHover($event)"></canvas>
+      </div>
+
+    </mat-tab>
+  </mat-tab-group>
+</div>

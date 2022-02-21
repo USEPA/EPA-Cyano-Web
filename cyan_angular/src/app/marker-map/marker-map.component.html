@@ -1,0 +1,9 @@
+<div class="map" 
+    leaflet 
+    [leafletOptions]="options"
+    [leafletLayersControl]="layersControl"
+    (leafletMapReady)="onMapReady($event)"
+    (leafletClick)="addMarkerOnClick($event)"
+    (leafletMapMoveStart)="mapPanEvent($event)"
+    >
+</div>

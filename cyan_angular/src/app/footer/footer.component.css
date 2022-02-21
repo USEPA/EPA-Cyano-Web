@@ -1,0 +1,168 @@
+@media screen and (min-width:980px)
+{
+    .footer-banner {
+        padding: 0 10%;   
+    }
+    .footer-block {
+        padding-left: 5%;
+        width: 10%;
+    }
+    .footer-title {
+        font-size: 117.6471%;
+    }
+    .follow-button {
+        margin-left: 0;
+    }
+    .footer-epa-logo-link {
+        width: 60px;
+        height: 60px;
+    }
+}
+@media screen and (max-width: 979px) and (min-width: 500px)
+{
+    .footer-banner {
+        padding: 0 10%;   
+    }
+    .footer-block {
+        padding-left: 5%;
+        margin-right: 5%;
+        width: 15%;
+    }
+    .footer-title {
+        font-size: 117.6471%;
+    }
+    .follow-button {
+        margin-left: 0;
+    }
+    .footer-epa-logo-link {
+        width: 50px;
+        height: 50px;
+    }
+}
+@media screen and (max-width: 499px)
+{
+    .footer-banner {
+        padding: 0;
+    }
+    .footer-block {
+        padding-left: 0;
+        margin-right: 5%;
+        width: 15%;
+    }
+    .footer-title {
+        font-size: small;
+        display: flex;
+    }
+    .footer-epa-logo-link {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+#footer-banner {
+    text-align: center;
+    width: 100vw;
+    position: fixed;
+    background: #323a45;
+    height: 10vh;
+    display: flex;
+    justify-content: center; 
+}
+.footer-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+}
+.footer-epa-logo {
+    background: url(src/assets/images/epa-seal.svg) no-repeat;
+    background-size: contain;
+    color: transparent;
+    display: inline-block;
+    position: relative;
+    font: 0/0 a;
+    height: 85%;
+    width: 90%;
+    text-shadow: none;
+    margin: 5px;
+}
+.footer-epa-logo-link {
+    text-decoration: none;
+    
+}
+.footer-epa-logo-link:active {
+    border: none;
+    text-decoration: none;
+}
+.footer-title-block {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.footer-title-block button:focus {
+    outline: none;
+}
+.footer-title {
+    color: white;
+    font-weight: 700;
+    position: absolute;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-family: Merriweather,Georgia,Cambria,"Times New Roman",Times,serif;
+}
+.footer-title:active {
+    box-shadow: none;
+    border: none;
+}
+.footer-title:target {
+    box-shadow: none;
+    border: none;
+}
+.footer-title:hover {
+    cursor: pointer;
+}
+.footer-link-block {
+    background: #323a45;
+}
+.footer-link {
+    color: white;
+    text-decoration: none;
+    font-size: 88.2353%;
+    font-weight: 700;
+    line-height: 1.2;
+    font-family: Merriweather,Georgia,Cambria,"Times New Roman",Times,serif;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+.footer-link:hover {
+    text-decoration: underline;
+}
+.social-link {
+    width: fit-content;
+    text-align: center;
+    margin: 0 auto;
+}
+.social-link:hover {
+    color: #323a45 !important;
+    opacity: 0.7;
+}
+.social-facebook, .social-facebook:hover {
+    background: url('src/assets/images/epa_icons_Facebook.svg') no-repeat;
+}
+.social-flickr, .social-flickr:hover {
+    background: url('src/assets/images/epa_icons_Flickr.svg') no-repeat;
+}
+.social-instagram, .social-instagram:hover {
+    background: url('src/assets/images/epa_icons_Instagram.svg') no-repeat;
+}
+.social-twitter, .social-twitter:hover {
+    background: url('src/assets/images/epa_icons_Twitter.svg') no-repeat;
+}
+.social-youtube, .social-youtube:hover {
+    background: url('src/assets/images/epa_icons_YouTube.svg') no-repeat;
+}

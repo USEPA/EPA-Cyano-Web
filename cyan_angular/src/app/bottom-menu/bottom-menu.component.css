@@ -1,0 +1,106 @@
+@media screen and (min-width: 500px) {
+  .menu-block {
+    display: inline-block;
+    width: 100%;
+  }
+  .menu-block-icon {
+    display: none;
+  }
+
+  ::ng-deep.csv-dialog {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 499px), screen and (max-height: 700px) {
+  .menu-block {
+    display: none;
+  }
+  .menu-block-icon {
+    display: inline-block;
+  }
+
+  ::ng-deep.csv-dialog {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+#bottom-menu-bar {
+  padding: 0 5%;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  height: 100%;
+  background: #205493;
+}
+
+.bottom-menu-title-block {
+  float: left;
+  width: 25%;
+  height: 100%;
+  display: block;
+  align-items: center;
+  transition: background-color 0.4s ease;
+  text-decoration: none;
+  color: white;
+  margin: auto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+}
+.bottom-menu-title-block:hover {
+  cursor: pointer;
+}
+.bottom-menu-title-block:focus {
+  outline: none;
+}
+.bottom-menu-title {
+  color: white;
+  font-weight: 500;
+  text-align: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  width: 100%;
+}
+.bottom-menu-title:active {
+  box-shadow: none;
+  border: none;
+}
+.bottom-menu-title:target {
+  box-shadow: none;
+  border: none;
+}
+.bottom-menu-title:hover {
+  cursor: pointer;
+  background-color: #0071bc;
+}
+.bottom-menu-link-block {
+  /*background: #323a45;*/
+  width: 100%;
+}
+.bottom-menu-link {
+  color: white;
+  text-decoration: none;
+  width: 100%;
+  font-weight: 400;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  align-items: stretch;
+}
+
+.bottom-menu-link:hover {
+  text-decoration: underline;
+}
+
+.menu-block-icon {
+  color: white;
+  font-weight: 700;
+  width: 100%;
+  height: 40%;
+  position: relative;
+  margin: -5px 0 0 0;
+  padding: 0;
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "L20210102021016.L3m_7D_CYAN_CI_cyano_CYAN_CONUS_300m_7_5_web.png",
+    "width": 2243,
+    "height": 2274,
+    "format": "PNG",
+    "thumb": false,
+    "thumbDependencyImageName": null,
+    "coordinates": {
+      "topLeftX": 30.776972,
+      "topLeftY": -85.814355,
+      "topRightX": 30.776972,
+      "topRightY": -78.953441,
+      "bottomLeftX": 24.623,
+      "bottomLeftY": -85.814355,
+      "bottomRightX": 24.623,
+      "bottomRightY": -78.953441
+    },
+    "satelliteImageType": "OLCI",
+    "satelliteImageFrequency": "Weekly"
+  },
+  {
+    "name": "L20210032021009.L3m_7D_CYAN_CI_cyano_CYAN_CONUS_300m_7_5_web.png",
+    "width": 2243,
+    "height": 2274,
+    "format": "PNG",
+    "thumb": false,
+    "thumbDependencyImageName": null,
+    "coordinates": {
+      "topLeftX": 30.776972,
+      "topLeftY": -85.814355,
+      "topRightX": 30.776972,
+      "topRightY": -78.953441,
+      "bottomLeftX": 24.623,
+      "bottomLeftY": -85.814355,
+      "bottomRightX": 24.623,
+      "bottomRightY": -78.953441
+    },
+    "satelliteImageType": "OLCI",
+    "satelliteImageFrequency": "Weekly"
+  }
+]

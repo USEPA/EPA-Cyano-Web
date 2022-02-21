@@ -1,0 +1,114 @@
+<div class="full-display">
+  <div class="background-click" (click)="exitAccount()"></div>
+  <div class="login-window">
+    <div class="login-information-block">
+      <div class="information-text"></div>
+    </div>
+    <div id="account-form" class="login-block">
+      <div *ngIf="!userLoggedIn; else userDetailsBlock">
+        <div *ngIf="loginForm">
+          <div (keyup.enter)="loginUser();">
+            <mat-form-field class="login-input username">
+              <input matInput placeholder="User Name" [(ngModel)]="username" required>
+            </mat-form-field>
+            <mat-form-field class="login-input password">
+              <input matInput placeholder="Password" [(ngModel)]="password" [type]="hidePassword ? 'password' : 'text'" required>
+              <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </mat-form-field>
+            <div class="login-create_block">
+              <button mat-raised-button color="primary" (click)="loginUser()" class="login-button">Login</button>
+              <button mat-button class="register-user" (click)="loginForm=false;registerForm=true;resetForm=false;">Create New User</button>
+              <button mat-button class="reset-password" (click)="showResetView()">Reset Password</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="registerForm">
+          <div class="user-register-block">
+            <div (keyup.enter)="registerUser()">
+              <mat-form-field class="register-input username">
+                <input matInput placeholder="User Name" required [(ngModel)]="registerUsername">
+              </mat-form-field>
+              <mat-form-field class="register-input email">
+                <input matInput email placeholder="Email" [(ngModel)]="registerEmail" required>
+              </mat-form-field>
+              <div class="register-password-block">
+                <mat-form-field class="register-input password">
+                  <input matInput placeholder="Password" [(ngModel)]="registerPassword" [type]="hideRegisterPassword ? 'password' : 'text'" required>
+                  <mat-icon matSuffix (click)="hideRegisterPassword = !hideRegisterPassword">{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+                <mat-form-field class="register-input password">
+                  <input matInput placeholder="Confirm Password" [(ngModel)]="registerPasswordCheck" [type]="hideRegisterPasswordCheck ? 'password' : 'text'" required>
+                  <mat-icon matSuffix (click)="hideRegisterPasswordCheck = !hideRegisterPasswordCheck">{{hideRegisterPasswordCheck ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+            <button mat-raised-button color="primary" (click)="registerUser()" class="register-button">Register</button>
+            <button mat-button class="register-button"(click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
+            <div class="register-notification-block">
+              <div class="register-message"></div>
+            </div>
+          </div>
+          <div class="register-details">
+            <p>
+            <!-- <p style="float:left; margin-right: 4px;">Disclaimer:</p> -->
+            <p>Disclaimer: User name must contain only alphanumeric characters (i.e., a-z/A-Z/0-9) and is used only for retrieving saved locations, location notes, and custom settings of the CyAN web application. It should not contain any personally identifiable information.
+            </p>
+          </div>
+        </div>
+        <div id="reset-form" *ngIf="resetForm">
+          <div *ngIf="allowReset">
+            <br>Provide the email address used for your account for resetting the password:<br><br>
+            <mat-form-field class="register-input email">
+              <input matInput email placeholder="Email" [(ngModel)]="resetEmail" required>
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="start-app" (click)="sendResetEmail()">Send Email</button>
+          </div>
+          <div class="reset-message">{{ resetMessage }}</div>
+          <button mat-button class="start-app" (click)="loginForm=true;registerForm=false;resetForm=false;errorMessage=''">Login Existing User</button>
+        </div>
+      </div>
+      <ng-template #userDetailsBlock>
+        <div class="app-state-block">
+          <div class="app-state-title">Application Details</div>
+          <div class="app-state">Version: {{ version }}</div>
+          <div class="app-state"><div class="dev-state"></div></div>
+        </div>
+        <div class="user-details">
+          <div class="user-details-title">Account Details</div>
+          <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
+          <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
+        </div>
+        <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
+        <div *ngIf="loggingOut">
+          <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
+          <!-- <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button> -->
+          <button mat-raised-button color="primary" class="start-app log-out" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
+        </div>
+      </ng-template>
+      <div class="login-notification-block" *ngIf="!registerForm">
+        <div class="login-message">{{ errorMessage }}</div>
+      </div>
+      <div class="register-notification-block" *ngIf="registerForm">
+        <div class="register-message"></div>
+      </div>
+    </div>
+    <div *ngIf="loginForm" class="app-information-block">
+      <div class="app-title">
+        Cyanobacteria Assessment Network
+      </div>
+      <div class="app-title-abrv">
+        (CyAN)
+      </div>
+      <div class="app-description">
+        This experimental web application provides provisional satellite derived measures of cyanobacteria,
+        which may contain errors and should be considered a research tool. Users should refer to the app
+        help menu for more details. The focus of this application is to provide cyanobacteria measures for
+        larger lakes and reservoirs within the contiguous United States.
+        Data products are 7-day maximum cyanobacteria measures updated weekly and, beginning late July 2020,
+        daily snapshots of cyanobacteria measures updated every day.<br><br>
+        Learn more: <a href="https://www.epa.gov/water-research/cyanobacteria-assessment-network-mobile-application-cyan-app" target="_blank">
+        https://www.epa.gov/water-research/cyanobacteria-assessment-network-mobile-application-cyan-app</a>
+      </div>
+    </div>
+  </div>
+</div>

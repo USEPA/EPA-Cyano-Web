@@ -1,0 +1,32 @@
+<button mat-button class="exit-button" (click)="exit()">X</button>
+
+<br><p>List of {{username}}'s generated reports</p><br>
+<div class="table-responsive">
+	<mat-table #table [dataSource]="dataSource" matSort>
+		<ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">
+			<mat-header-cell *matHeaderCellDef mat-sort-header>{{column.value}}</mat-header-cell>
+			<mat-cell *matCellDef="let element">
+				<!-- <mat-icon
+					class="cancel-icon"
+					*ngIf="column.id == 'reportStatus' && inProgressStates.includes(element[column.id])"
+					(click)="cancelReport(element)"
+				>
+					clear
+				</mat-icon> -->
+				<mat-icon 
+					class="download-report-btn"
+					(click)="downloadReport(element);"
+					*ngIf="column.id == 'download_report' &&
+						element.report_status == 'SUCCESS';
+						else showDefault">
+					file_download
+				</mat-icon>
+				<ng-template #showDefault>
+					{{element[column.id]}}
+				</ng-template>
+			</mat-cell>
+		</ng-container>
+		<mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+		<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+	</mat-table>
+</div>

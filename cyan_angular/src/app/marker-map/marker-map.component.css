@@ -1,0 +1,15 @@
+.map {
+    height: 100%;
+    padding: 0;
+}
+
+.location_popup {
+    background: red;
+}
+
+.location_popup_name {
+    font-weight: bold;
+    color: #0071bc;
+    border: none;
+}
+

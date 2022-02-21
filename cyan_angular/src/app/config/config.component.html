@@ -1,0 +1,103 @@
+<div class="config-background">
+  <div class="config-background-click" [routerLink]="['']" aria-label="config background"></div>
+<div class="config-block">
+  <div class="top-block">
+    <div class="app-version"></div>
+    <div class="config-title">
+      <span>Modify Marker Color Configuration</span>
+      <button mat-button class="config-control" aria-label="Close">
+        <mat-icon aria-label="Close" (click)="exitConfig()">close</mat-icon>
+      </button>
+      <button mat-button class="config-control" aria-label="Save">
+        <mat-icon aria-label="Save" (click)="saveConfig()">save</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="cyan-level low-block">
+    <div class="cyan-icon low">
+      Low
+      <div class="circle green"></div>
+    </div>
+    <div class="cyan-inputs">
+      <div class="to-inputs inputs">
+        <mat-form-field class="mat-number-input">
+          <input matInput type="number" [(ngModel)]="user_inputs.level_low" max="1000000" (blur)="validateInputValue($event)">
+          <mat-placeholder class="config-placeholder">To</mat-placeholder>
+        </mat-form-field>
+      </div>
+      <ng5-slider class="low-level-slider" [(value)]="user_settings.level_low" [options]="slider_options" (userChangeEnd)="validateValue($event, 'low')"></ng5-slider>
+    </div>
+  </div>
+  <div class="cyan-level medium-block">
+    <div class="cyan-icon medium">
+      Medium
+      <div class="circle yellow"></div>
+    </div>
+    <div class="cyan-inputs">
+      <div class="from-inputs inputs">
+          <mat-form-field class="mat-number-input">
+            <input matInput class="number-input" type="number" [(ngModel)]="user_inputs.level_low" max="1000000" (blur)="validateInputValue($event)">
+            <mat-placeholder class="config-placeholder">From</mat-placeholder>
+          </mat-form-field>
+      </div>
+      <div class="to-inputs inputs">
+          <mat-form-field class="mat-number-input">
+            <input matInput class="number-input" type="number" [(ngModel)]="user_inputs.level_medium" max="1000000" (blur)="validateInputValue($event)">
+            <mat-placeholder class="config-placeholder">To</mat-placeholder>
+          </mat-form-field>
+      </div>
+      <ng5-slider class="med-level-slider" [(value)]="user_settings.level_low" [(highValue)]="user_settings.level_medium" [options]="slider_options" (userChangeEnd)="validateValue($event, 'med')"></ng5-slider>
+    </div>
+  </div>
+  <div class="cyan-level high-block">
+    <div class="cyan-icon high">
+      High
+      <div class="circle orange"></div>
+    </div>
+    <div class="cyan-inputs">
+      <div class="from-inputs inputs">
+          <mat-form-field class="mat-number-input">
+            <input matInput class="number-input" type="number" [(ngModel)]="user_inputs.level_medium" max="1000000" (blur)="validateInputValue($event)">
+            <mat-placeholder class="config-placeholder">From</mat-placeholder>
+          </mat-form-field>
+      </div>
+      <div class="to-inputs inputs">
+          <mat-form-field class="mat-number-input">
+            <input matInput class="number-input" type="number" [(ngModel)]="user_inputs.level_high" max="1000000" (blur)="validateInputValue($event)">
+            <mat-placeholder class="config-placeholder">To</mat-placeholder>
+          </mat-form-field>
+      </div>
+      <ng5-slider class="hi-level-slider" [(value)]="user_settings.level_medium" [(highValue)]="user_settings.level_high" [options]="slider_options" (userChangeEnd)="validateValue($event, 'hi')"></ng5-slider>
+    </div>
+  </div>
+  <div class="cyan-level veryhigh-block">
+    <div class="cyan-icon veryhigh">
+      Very High
+      <div class="circle red"></div>
+    </div>
+    <div class="cyan-inputs">
+      <div class="from-inputs inputs">
+          <mat-form-field class="mat-number-input">
+            <input matInput type="number" [(ngModel)]="user_inputs.level_high" max="1000000" (blur)="validateInputValue($event)">
+            <mat-placeholder class="config-placeholder">Higher than</mat-placeholder>
+          </mat-form-field>
+      </div>
+      <ng5-slider class="vhi-level-slider" [(value)]="user_settings.level_high" [options]="slider_options_end" (userChangeEnd)="validateValue($event, 'vhi')"></ng5-slider>
+    </div>
+  </div>
+  <div class="cyan-level alert">
+    <div class="cyan-icon veryhigh">
+      <input aria-label="enable alert" type="checkbox" [(ngModel)]="user_settings.enable_alert" (ngModelChange)="settingChanged()">
+    </div>
+    <div class="cyan-inputs">
+      <div class="alert-inputs">
+          <mat-form-field class="mat-number-input">
+            <input matInput type="number" [(ngModel)]="user_inputs.alert_value" max="5000000" (blur)="validateInputValue($event)">
+            <mat-placeholder class="config-placeholder">Alert when higher than</mat-placeholder>
+          </mat-form-field>
+      </div>
+      <ng5-slider class="alert-level-slider" [(value)]="user_settings.alert_value" [options]="slider_options_alert" (userChangeEnd)="validateValue($event, 'alert')"></ng5-slider>
+    </div>
+  </div>
+</div>
+</div>

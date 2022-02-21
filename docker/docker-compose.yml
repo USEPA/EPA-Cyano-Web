@@ -1,0 +1,87 @@
+version: '3.1'
+
+services:
+
+  node-updater:
+    image: node:lts-alpine
+    container_name: node-updater
+    volumes:
+      - ../config:/config
+      - ../docker:/docker
+      - ../cyan_angular:/app
+
+  node-builder:
+    build:
+      context: ../
+      dockerfile: ./docker/angular/Dockerfile
+    image: node-builder
+    container_name: node-builder
+    volumes:
+      - ./angular:/docker/angular
+
+  cyan-webserver:
+    restart: always
+    build:
+      context: ../
+      dockerfile: ./docker/nginx/Dockerfile
+    image: cyan-webserver
+    container_name: cyan-webserver
+    ports:
+      - "80:80"
+    links:
+      - cyan-api:uwsgi_flask
+
+  cyan-api:
+    build:
+      context: ../
+      dockerfile: ./docker/flask/Dockerfile
+    image: cyan-api
+    container_name: cyan-api
+    expose:
+      - "5001"
+    depends_on:
+      - cyan-db
+    volumes:
+      - ../config/:/config
+      - ../cyan_flask/:/cyan_flask
+    environment:
+      - DOCKER_HOSTNAME=${HOSTNAME}
+    env_file:
+      - ${CYAN_CONFIG:-../config/.env}
+
+  cyan-celery:
+    build:
+      context: ../
+      dockerfile: ./docker/flask/Dockerfile
+    image: cyan-celery
+    container_name: cyan-celery
+    command: celery -A celery_worker.celery worker --loglevel=INFO -c 1
+    depends_on:
+      - cyan-db
+      - redis
+    volumes:
+      - ../config/:/config
+      - ../cyan_flask/:/cyan_flask
+    environment:
+      - DOCKER_HOSTNAME=${HOSTNAME}
+    env_file:
+      - ${CYAN_CONFIG:-../config/.env}
+
+  cyan-db:
+    build:
+      context: ../
+      dockerfile: ./docker/mysql/Dockerfile
+    image: cyan-db
+    container_name: cyan-db
+    volumes:
+      - ${SQL_DUMP:-../cyan_mysql/no_dump.txt}:/tmp/dump.sql  # use optional dump file to build container DB
+      - /var/www/app_data/cyano:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    env_file:
+      - ${CYAN_CONFIG:-../config/.env}
+
+  redis:
+    image: redis:latest
+    expose:
+      - "6379"

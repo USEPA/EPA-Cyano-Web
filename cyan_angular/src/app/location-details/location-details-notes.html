@@ -1,0 +1,21 @@
+<button mat-button (click)="exit();" class="details_exit notes-exit-btn">X</button>
+<h3 style="margin-top:2%;">Notes:</h3>
+<br>
+<!-- <div id="notes-div" *ngFor="let note of data.notes"> -->
+<div id="notes-div" *ngFor="let note of data.location.notes">
+	<h6>{{note.timestamp}}</h6>
+	<mat-card>
+		{{note.note}}
+	</mat-card>
+	<br>
+</div>
+<br>
+<br>
+<div *ngIf="preAddNote">
+	<button mat-raised-button id="add-note-btn" (click)="displayAddNote()" style="float:right;">Add</button>
+</div>
+<div *ngIf="addingNote">
+	<textarea id="note-textarea" placeholder="Note text" rows="2" (keyup.enter)="addNote(data.location)" style="width:100%;"></textarea>
+	<button mat-raised-button id="add-note-btn" (click)="addNote(data.location)" style="float:right;">Add</button>
+	<button mat-button class="add-note" id="cancel-note-tn" (click)="hideAddNote()" style="float:right;">Cancel</button>
+</div>
