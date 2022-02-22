@@ -40,7 +40,8 @@ jobs:
       - name: Build and push Cyanweb Flask API Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: docker/flask/
+          context: .
+          file: docker/flask/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -71,7 +72,8 @@ jobs:
       - name: Build and push Cyanweb MySQL Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: docker/mysql/
+          context: .
+          file: docker/mysql/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -102,7 +104,8 @@ jobs:
       - name: Build and push Cyanweb Angular/Node Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: docker/angular/
+          context: .
+          file: docker/angular/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -133,7 +136,8 @@ jobs:
       - name: Build and push Cyanweb Nginx Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: docker/mysql/
+          context: .
+          file: docker/nginx/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
