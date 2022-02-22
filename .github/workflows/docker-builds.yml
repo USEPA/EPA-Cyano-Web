@@ -7,10 +7,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  FLASK_IMAGE: USEPA/cyanweb-api:dev-kube
-  MYSQL_IMAGE: USEPA/cyanweb-db:dev-kube
-  ANGULAR_IMAGE: USEPA/cyanweb-angular:dev-kube
-  NGINX_IMAGE: USEPA/cyanweb-nginx:dev-kube
+  FLASK_IMAGE: USEPA/cyanweb-api
+  MYSQL_IMAGE: USEPA/cyanweb-db
+  ANGULAR_IMAGE: USEPA/cyanweb-angular
+  NGINX_IMAGE: USEPA/cyanweb-nginx
   # DJANGO_IMAGE: USEPA/cyanweb-django:dev-kube
 
 jobs:
