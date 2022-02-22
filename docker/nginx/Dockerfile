@@ -12,6 +12,6 @@ COPY ./cyan_nginx/$config /etc/nginx/conf.d
 
 # Uses "builder" image from docker/angular/Dockerfile
 # COPY --from=node-builder /app/dist /usr/share/nginx/html
-COPY --from=ghrc.io/USEPA/cyanweb-angular:dev-kube /app/dist /usr/share/nginx/html
+COPY --from=ghcr.io/usepa/cyanweb-angular:dev-kube /app/dist /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
