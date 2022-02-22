@@ -17,5 +17,4 @@ WORKDIR /app
 RUN apk update && \
 	apk add chromium && \
 	npm install && \
-	npm audit fix && \
 	npm run build:$env
