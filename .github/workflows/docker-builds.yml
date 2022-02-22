@@ -30,7 +30,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          # submodules: recursive
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
