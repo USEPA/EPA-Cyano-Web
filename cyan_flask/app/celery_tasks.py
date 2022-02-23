@@ -19,12 +19,12 @@ import uuid
 from csv_handler import CSVHandler
 from auth import PasswordHandler
 from models import User, Job, db
-from config.set_environment import DeployEnv
+# from config.set_environment import DeployEnv
 from cyan_flask.build_db import DBHandler
 from cyan_flask.crypt import CryptManager
 
-runtime_env = DeployEnv()
-runtime_env.load_deployment_environment()
+# runtime_env = DeployEnv()
+# runtime_env.load_deployment_environment()
 
 redis_hostname = os.environ.get("REDIS_HOSTNAME", "localhost")
 redis_port = os.environ.get("REDIS_PORT", 6379)

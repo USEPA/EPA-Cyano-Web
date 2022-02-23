@@ -23,7 +23,7 @@ sys.path.insert(1, PROJECT_ROOT)
 sys.path.insert(1, os.path.join(PROJECT_ROOT, "..", ".."))
 
 # Local imports:
-from config.set_environment import DeployEnv
+# from config.set_environment import DeployEnv
 from cyan_flask.build_db import DBHandler
 from cyan_flask.app.endpoints import Register
 from cyan_flask.app.auth import JwtHandler
