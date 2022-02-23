@@ -26,6 +26,9 @@ RUN mkdir /config && \
 
 WORKDIR /cyan_flask
 
+ENV PYTHONPATH /cyan_flask:$PYTHONPATH
+ENV PATH /cyan_flask:$PATH
+
 # Runs unit tests (needs secret file to run)
 # RUN python -m unittest
 
