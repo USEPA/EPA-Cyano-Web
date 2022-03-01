@@ -20,3 +20,5 @@ docker/flask/requirements.*
 
 # VSCode settings
 .vscode/
+
+sk_*.txt

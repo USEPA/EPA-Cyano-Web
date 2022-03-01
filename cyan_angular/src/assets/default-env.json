@@ -4,7 +4,7 @@
   "waterbodyUrl": "http://127.0.0.1:8080/waterbody/",
   "disableUpload": false,
   "disableMarkers": false,
-  "disableWaterbodyStats": true,
+  "disableWaterbodyStats": false,
   "appName": "",
   "gtag": "",
 }
