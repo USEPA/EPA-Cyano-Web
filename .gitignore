@@ -1,7 +1,6 @@
 # Angular settings
 dist/
 cyan_angular/dist/
-env.json
 
 # Python settings
 __pycache__/
