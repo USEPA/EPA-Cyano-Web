@@ -39,14 +39,14 @@ celery_instance = Celery(
 )
 
 celery_instance.conf.update(
-    CELERY_BROKER_URL="redis://{}:{}/0".format(redis_hostname, redis_port),
-    CELERY_RESULT_BACKEND="redis://{}:{}/0".format(redis_hostname, redis_port),
-    CELERY_ACCEPT_CONTENT=["json"],
-    CELERY_TASK_SERIALIZER="json",
-    CELERY_RESULT_SERIALIZER="json",
-    CELERY_IGNORE_RESULT=False,
-    CELERY_TRACK_STARTED=True,
-    CELERYD_MAX_MEMORY_PER_CHILD=50000000,
+    broker_url="redis://{}:{}/0".format(redis_hostname, redis_port),
+    result_backend="redis://{}:{}/0".format(redis_hostname, redis_port),
+    accept_content=["json"],
+    task_serializer="json",
+    result_serializer="json",
+    task_ignore_result=False,
+    task_track_started=True,
+    worker_max_memory_per_child=50000000,
 )
 
 crypt_manager = CryptManager()
