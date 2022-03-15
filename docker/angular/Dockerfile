@@ -17,6 +17,7 @@ COPY docker/ /docker
 WORKDIR /app
 
 RUN apk update && \
+	apk upgrade && \
 	apk add chromium && \
 	npm install && \
 	npm run build:$env
