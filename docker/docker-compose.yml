@@ -29,7 +29,7 @@ services:
     ports:
       - "80:80"
     links:
-      - cyan-api:uwsgi_flask
+      - cyan-api:cyanweb-flask
 
   cyan-api:
     build:
