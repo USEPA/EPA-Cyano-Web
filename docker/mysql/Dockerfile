@@ -1,5 +1,5 @@
 # FROM mysql:8.0
-FROM mysql:8.0.28-oracle
+FROM mysql:8.0.28-debian
 
 ENV APP_USER=mysql
 
