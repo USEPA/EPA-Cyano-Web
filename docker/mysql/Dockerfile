@@ -17,4 +17,4 @@ ENV APP_USER=mysql
 # 	/docker-entrypoint-initdb.d/mysql-setup.sh \
 # 	/etc/mysql/my.cnf
 
-# USER $APP_USER
+USER $APP_USER
