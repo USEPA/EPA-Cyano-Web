@@ -10,6 +10,6 @@ mysqlclient==2.0.3
 mysql-connector-python==8.0.22
 PyJWT==2.0.0
 python-dotenv==0.15.0
-redis==3.5.3
+redis==4.1.4
 requests==2.25.1
 simplejson==3.17.2
