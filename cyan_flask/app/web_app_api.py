@@ -58,6 +58,21 @@ def register_user(post_data):
         )
         db.session.add(new_user)
         db.session.commit()
+
+        user_id = User.query.filter_by(username=user).first().id
+
+        default_settings = Settings.get_default_settings()
+        new_user_settings = Settings(
+            user_id=user_id,
+            level_low=default_settings["level_low"],
+            level_medium=default_settings["level_medium"],
+            level_high=default_settings["level_high"],
+            enable_alert=default_settings["enable_alert"],
+            alert_value=default_settings["alert_value"],
+        )
+        db.session.add(new_user_settings)
+        db.session.commit()
+        
         if not new_user:
             return {"error": "Failed to register user"}, 500
         return {"status": "success", "username": user, "email": email}, 200
@@ -322,13 +337,7 @@ def get_user_settings(user_id):
     settings = Settings.query.filter_by(user_id=user_id).first()
     if not settings:
         # user does not have custom settings yet, use default one
-        return {
-            "level_low": 100000,
-            "level_medium": 300000,
-            "level_high": 1000000,
-            "enable_alert": False,
-            "alert_value": 1000000,
-        }
+        return Settings.get_default_settings()
     else:
         return {
             "level_low": settings.level_low,

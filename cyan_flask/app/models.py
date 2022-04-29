@@ -70,6 +70,16 @@ class Settings(db.Model):
     enable_alert = db.Column(db.Boolean, nullable=False)
     alert_value = db.Column(db.Integer)
 
+    @staticmethod
+    def get_default_settings():
+        return {
+            "level_low": 100000,
+            "level_medium": 300000,
+            "level_high": 1000000,
+            "enable_alert": False,
+            "alert_value": 1000000
+        }
+
 
 class Comment(db.Model):
     __tablename__ = "comment"
