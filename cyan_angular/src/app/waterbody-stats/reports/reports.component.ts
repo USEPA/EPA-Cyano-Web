@@ -177,6 +177,13 @@ export class ReportsComponent implements OnInit {
 		this.loaderService.show();
 		this.myLocations = this.locationService.getStaticLocations();
 		this.myLocations.forEach(location => {
+			if (
+				!('waterbody' in location) ||
+				!('objectid' in location['waterbody']) ||
+				location['waterbody']['objectid'] == null
+			) {
+				return;
+			}
 			let locationObj = {};
 			locationObj['location'] = location;
 			locationObj['checked'] = false;
