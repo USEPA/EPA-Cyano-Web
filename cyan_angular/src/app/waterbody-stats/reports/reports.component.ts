@@ -232,7 +232,6 @@ export class ReportsComponent implements OnInit {
 				&& loc.location.name != userLocation.location.name
 				&& loc.location.waterbody.objectid === userLocation.location.waterbody.objectid
 			) {
-				console.log("Matching WB with different name: ", loc);
 				loc.disabled = true;
 			}
 			else if (
