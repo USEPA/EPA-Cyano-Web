@@ -101,3 +101,8 @@ h2.label {
     height: 80%;
     width: 100%;
 }
+
+::ng-deep.mat-dialog-container {
+    overflow: unset;
+    height: unset;
+}
