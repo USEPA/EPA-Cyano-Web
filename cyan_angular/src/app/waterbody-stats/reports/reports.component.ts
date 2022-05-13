@@ -177,9 +177,17 @@ export class ReportsComponent implements OnInit {
 		this.loaderService.show();
 		this.myLocations = this.locationService.getStaticLocations();
 		this.myLocations.forEach(location => {
+			if (
+				!('waterbody' in location) ||
+				!('objectid' in location['waterbody']) ||
+				location['waterbody']['objectid'] == null
+			) {
+				return;
+			}
 			let locationObj = {};
 			locationObj['location'] = location;
 			locationObj['checked'] = false;
+			locationObj['disabled'] = false;
 			this.userLocations.push(locationObj);
 		});
 		this.loaderService.hide();
@@ -216,6 +224,25 @@ export class ReportsComponent implements OnInit {
 		else if (event.checked === false) {
 			this.removeLocation(userLocation);
 		}
+
+		this.userLocations.forEach(loc => {
+			// Disables all locations with same WB as currentWaterbodyIds:
+			if (
+				userLocation.checked === true
+				&& loc.location.name != userLocation.location.name
+				&& loc.location.waterbody.objectid === userLocation.location.waterbody.objectid
+			) {
+				loc.disabled = true;
+			}
+			else if (
+				userLocation.checked === false
+				&& loc.location.waterbody.objectid === userLocation.location.waterbody.objectid
+			) {
+				loc.disabled = false;
+			}
+
+		});
+
 	}
 
 	findIdByName(name: string, wbData) {
@@ -231,7 +258,7 @@ export class ReportsComponent implements OnInit {
 		Removes location from selectionLocations.
 		*/
 		this.userLocations.find((o, i) => {
-			if (o.location.objectid == userLocation.location.objectid) {
+			if (o.location.waterbody.objectid == userLocation.location.waterbody.objectid) {
 				this.currentWaterbodyIds.splice(i);
 				return;
 			}
