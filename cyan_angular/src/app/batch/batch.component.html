@@ -32,7 +32,9 @@
 				<p><b>Input Filename:</b> {{currentInputFilename}}</p>
 				<p><b>Request Number:</b> {{currentJobStatus.job_num}}</p>
 				<p><b>Request Status:</b> {{currentJobStatus.job_status}}</p>
-				<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Request</button>
+				<div *ngIf="currentJobStatus.job_status != 'SUCCESS'">
+					<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Request</button>
+				</div>
 			</div>
 		</div>
 	</mat-tab>
