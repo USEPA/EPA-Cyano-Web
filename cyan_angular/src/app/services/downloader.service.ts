@@ -384,9 +384,11 @@ export class DownloaderService {
     NOTE: Must be user that started report as well.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.baseServerUrl + 'report/cancel/?'
-      + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    let url = this.envService.config.baseServerUrl + 'report/cancel';
+    let postData = {
+      report_id: reportId
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
   }
 
   downloadReport(reportId: string) {
