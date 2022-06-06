@@ -20,7 +20,7 @@
 					Check the current request status and previous requests in the "Request History" tab.
 				</li>
 				<li>
-					Once the request is complete, a spreadsheet of cyano concentrations for each location will be sent to your email.
+					Once the request is complete, a spreadsheet of cyano concentrations for each location will be sent to your email. NOTE: Email may end up in your spam/junk folder.
 				</li>
 			</ol>
 			<br>
@@ -32,7 +32,9 @@
 				<p><b>Input Filename:</b> {{currentInputFilename}}</p>
 				<p><b>Request Number:</b> {{currentJobStatus.job_num}}</p>
 				<p><b>Request Status:</b> {{currentJobStatus.job_status}}</p>
-				<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Request</button>
+				<div *ngIf="currentJobStatus.job_status != 'SUCCESS'">
+					<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Request</button>
+				</div>
 			</div>
 		</div>
 	</mat-tab>

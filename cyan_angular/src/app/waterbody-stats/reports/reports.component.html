@@ -25,7 +25,12 @@
 			<!-- <mat-checkbox [(ngModel)]="selectAll" (change)="selectAllCheckbox($event)" color="primary">Select all</mat-checkbox> -->
 			<dl id="selected-dates-list">
 				<dt class="selected-dates-item" *ngFor="let location of userLocations">
-					<mat-checkbox (change)="locationSelect(location, $event)" [(ngModel)]="location.checked" color="primary">
+					<mat-checkbox
+						(change)="locationSelect(location, $event)"
+						[(ngModel)]="location.checked"
+						[disabled]="location.disabled"
+						color="primary"
+					>
 						{{location.location.name}}
 						(Waterbody: {{location.location.waterbody.name}})
 					</mat-checkbox>
