@@ -32,7 +32,7 @@
 				<p><b>Input Filename:</b> {{currentInputFilename}}</p>
 				<p><b>Request Number:</b> {{currentJobStatus.job_num}}</p>
 				<p><b>Request Status:</b> {{currentJobStatus.job_status}}</p>
-				<div *ngIf="currentJobStatus.job_status != 'SUCCESS'">
+				<div *ngIf="inProgressStates.includes(currentJobStatus.job_status)">
 					<button mat-raised-button color="warn" (click)="cancelJob()">Cancel Request</button>
 				</div>
 			</div>
