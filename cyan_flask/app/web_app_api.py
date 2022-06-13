@@ -854,8 +854,8 @@ def start_report(request_obj):
 
 def get_report_status(request_obj):
     try:
-        report_id = response_obj["report_id"]
-        username = response_obj["username"]
+        report_id = request_obj["report_id"]
+        username = request_obj["username"]
     except KeyError:
         return {"error": "Invalid key in request"}, 400
 
@@ -863,15 +863,23 @@ def get_report_status(request_obj):
     user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
 
     # NOTE: If same celery instance, could directly make request to worker and not an api request
-    url = os.getenv("WATERBODY_URL") + "/waterbody/report/status"
-    user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+
+    # NOTE: Since wb celery updates cyanweb flask table with report status, a call to the wb report/status
+    # endpoint seems unneccessary.
+    # url = os.getenv("WATERBODY_URL") + "/waterbody/report/status"
+    # user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+    # logging.warning("User report status: {}".format(user_report_status.content))
+
+    response_obj = dict(Report.report_response())
+
+    # response_obj["job"] = Job.create_jobs_json([user_job])[0]
 
     if not user_report:
         response_obj["status"] = "Failed - report not found."
     elif user_report.report_status in celery_handler.fail_states:
         response_obj["status"] = "Failed - error processing report."
     else:
-        response_obj["status"] = ""
+        response_obj["status"] = "success"
 
     response_obj["report_id"] = user_report.report_id
     response_obj["report_status"] = user_report.report_status
@@ -902,15 +910,20 @@ def cancel_report(request_obj):
     # TODO: Make request to WB API to cancel report from user
     # NOTE: If same celery instance, could directly make request to worker and not an api request
     url = os.getenv("WATERBODY_URL") + "/waterbody/report/cancel"
-    user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+    cancel_response = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+
+    # TODO: Add error handling to json and above request
+
+    cancel_response_obj = json.loads(cancel_response.content)
 
     # Updates report status in DB.
     user_report.report_status = "REVOKED"
     db.session.commit()
 
-    response_obj = dict(Report.user_reports_response())
-    response_obj["status"] = cancel_response["status"]
+    response_obj = dict(Report.report_response())
+    response_obj["status"] = cancel_response_obj["status"]
     response_obj["report_status"] = "REVOKED"
+    response_obj["report_id"] = report_id
 
     return response_obj, 200
 

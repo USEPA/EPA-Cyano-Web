@@ -373,9 +373,11 @@ export class DownloaderService {
     Gets status of report based on report ID.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.baseServerUrl + 'report/status/?'
-      + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    let url = this.envService.config.baseServerUrl + 'report/status';
+    let postData = {
+      report_id: reportId
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
   }
 
   cancelReportRequest(reportId: string) {
@@ -384,9 +386,11 @@ export class DownloaderService {
     NOTE: Must be user that started report as well.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.baseServerUrl + 'report/cancel/?'
-      + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    let url = this.envService.config.baseServerUrl + 'report/cancel';
+    let postData = {
+      report_id: reportId
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
   }
 
   downloadReport(reportId: string) {
