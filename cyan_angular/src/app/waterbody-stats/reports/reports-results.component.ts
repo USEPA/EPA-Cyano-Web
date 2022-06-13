@@ -17,6 +17,7 @@ import {
 } from '../../models/reports';
 import { LoaderService } from '../../services/loader.service';
 import { Calculations } from '../utils/calculations';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
@@ -32,6 +33,10 @@ export class ReportsResultsComponent implements OnInit {
   inProgressStates: string[] = ['RETRY', 'PENDING', 'RECEIVED', 'STARTED'];
   displayedColumns: string[] = [];
   columnNames: any[] = columnNames;
+  status: string = '';  // job status
+  pollStatusDelay: number = 2000;  // milliseconds
+  intervalProcess: ReturnType<typeof setInterval>;  // keeps track of status polling
+  currentJobStatus: ReportStatus;
 
   @ViewChild(MatSort) sort: MatSort;
   
@@ -42,12 +47,15 @@ export class ReportsResultsComponent implements OnInit {
     private downloaderService: DownloaderService,
     private datePipe: DatePipe,
     private loaderService: LoaderService,
-    private calcs: Calculations
+    private calcs: Calculations,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
 
     console.log("reports-results ngOnInit()")
+
+    this.currentJobStatus = new ReportStatus();
 
     this.username = this.data.username;
 
@@ -59,7 +67,7 @@ export class ReportsResultsComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-
+    this.stopJobPolling();
   }
 
   exit(): void {
@@ -68,16 +76,40 @@ export class ReportsResultsComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  stopJobPolling(): void {
+    console.log("Stopping job status polling.")
+    clearInterval(this.intervalProcess);
+  }
+
   getAllUserReports() {
     this.downloaderService.getUserReports().subscribe(response => {
 
       console.log("All user reports response: ", response)
 
-
       if (response['status'] == false) {
         this.dialog.displayMessageDialog("Cannot display user reports");
       }
+      
       this.createTable(response);
+
+      let inProgressReports = response['reports'].filter(item => {
+        console.log("Item and its status: ", item, item.report_status);
+        return this.inProgressStates.includes(item.report_status)
+      });
+      console.log("In progress reports from table: ", inProgressReports);
+
+      // NOTE: Should be only one item. If more than one, display error and cancel reports.
+      // Should also be the first item in the array that's "RECEIVED".
+      if (inProgressReports.length === 1) {
+        let reportStatus = new ReportStatus();
+        let inProgressReport = inProgressReports[0];
+        reportStatus.report_id = inProgressReport.report_id;
+        reportStatus.report_status = inProgressReport.report_status;
+        reportStatus.report_num = inProgressReport.report_num;
+        this.pollJobStatus(reportStatus);
+      }
+
+
     });
   }
 
@@ -95,6 +127,10 @@ export class ReportsResultsComponent implements OnInit {
     this.sortTable();
   }
 
+  createReportsTableParams(): void {
+
+  }
+
   sortTable() {
     /*
     Adds sorting feature to table columns.
@@ -110,14 +146,22 @@ export class ReportsResultsComponent implements OnInit {
       report.received_datetime = this.convertDatetime(report.received_datetime);
       report.finished_datetime = this.convertDatetime(report.finished_datetime);
       report.report_date = this.calcs.getDateFromDayOfYear(report.report_date)
-
-      if (report.report_status === 'SUCCESS') {
-        console.log("Successful report, adding download button.")
-        report['download_report'] = '<mat-icon>file_download</mat-icon>';
-      }
-
+      report = this.addDownloadButton(report);
     });
     return reportsData;
+  }
+
+  addDownloadButton(report) {
+    /*
+    Adds download button for successful reports.
+    */
+    if (report.report_status === 'SUCCESS') {
+      console.log("Successful report, adding download button.")
+      report['download_report'] = '<mat-icon>file_download</mat-icon>';
+    }
+
+    return report;
+
   }
 
   convertDatetime(datetime: string) {
@@ -160,52 +204,47 @@ export class ReportsResultsComponent implements OnInit {
     });
   }
 
-  // cancelJob(rowData: JobsTableParams = null) {
-  //   /*
-  //   Handles job cancel event from "Run" and "Jobs" tab.
-  //   */
+  cancelReport(rowData: ReportsTableParams = null) {
+    /*
+    Handles job cancel event from "Run" and "Jobs" tab.
+    */
 
-  //   let batchJobStatus = new BatchStatus(); 
 
-  //   if (rowData == null) {
-  //     // "Run" tab - uses current job.
-  //     batchJobStatus.job_id = this.currentJobStatus.job_id;
-  //     batchJobStatus.job_status = this.currentJobStatus.job_status;
-  //   }
-  //   else {
-  //     // "Jobs" tab - uses job from table.
-  //     batchJobStatus.job_id = rowData.jobId;
-  //     batchJobStatus.job_status = rowData.jobStatus;
-  //   }
+    console.log("cancelReport called: ", rowData)
 
-  //   if (this.finishedStates.includes(batchJobStatus.job_status)) {
-  //     // Skips cancel request if job already finished.
-  //     this.displayMessageDialog("Job is already complete");
-  //     this.stopJobPolling();
-  //     return;
-  //   }
 
-  //   this.makeCancelJobRequest(batchJobStatus, rowData);
+    let reportJobStatus = new ReportStatus(); 
+    reportJobStatus.report_id = rowData.report_id;
+    reportJobStatus.report_status = rowData.report_status;
 
-  // }
+    if (this.finishedStates.includes(reportJobStatus.report_status)) {
+      // Skips cancel request if job already finished.
+      this.dialog.displayMessageDialog("Job is already complete");
+      this.stopJobPolling();
+      return;
+    }
 
-  // makeCancelJobRequest(batchJobStatus: BatchStatus, rowData: JobsTableParams): void {
-  //   /*
-  //   Makes request to cancel user's active job.
-  //   */
-  //   this.loaderService.show();
-  //   this.downloaderService.cancelBatchJob(batchJobStatus).subscribe(response => {
-  //     this.loaderService.hide();
-  //     this.status = response['status'];
-  //     this.currentJobStatus.job_status = response['job_status'];
-  //     this.displayMessageDialog(response['status']);
-  //     this.stopJobPolling();
-  //     if (rowData != null) {
-  //       // Updates table job status if canceled from table.
-  //       rowData.jobStatus = response['job_status'];
-  //     }
-  //   });
-  // }
+    this.makeCancelJobRequest(reportJobStatus, rowData);
+
+  }
+
+  makeCancelJobRequest(reportJobStatus: ReportStatus, rowData: ReportsTableParams): void {
+    /*
+    Makes request to cancel user's active job.
+    */
+    // this.loaderService.show();
+    this.downloaderService.cancelReportRequest(reportJobStatus.report_id).subscribe(response => {
+      // this.loaderService.hide();
+      this.status = response['status'];
+      reportJobStatus.report_status = response['job_status'];
+      this.dialog.displayMessageDialog(response['status']);
+      this.stopJobPolling();
+      if (rowData != null) {
+        // Updates table job status if canceled from table.
+        rowData.report_status = response['report_status'];
+      }
+    });
+  }
 
   // makeJobStartRequest(batchJob: BatchJob) {
   //   /*
@@ -226,5 +265,68 @@ export class ReportsResultsComponent implements OnInit {
   //     }
   //   });
   // }
+
+  pollJobStatus(reportStatus: ReportStatus): void {
+    /*
+    Polling loop that checks on user's job status.
+    */
+    console.log("Starting job status polling.")
+    this.intervalProcess = setInterval(() => {
+      if (!this.authService.checkUserAuthentication()) { 
+        // Prevents polling forever from idle user
+        this.stopJobPolling();
+        return;
+      }
+      this.downloaderService.getReportStatus(reportStatus.report_id).subscribe(response => {
+
+        console.log("Report status from polling: ", response);
+
+        if (response['status'].length > 0) {
+          this.status = response['status'];
+        }
+
+        // Updates "Run" tab info
+        this.currentJobStatus.report_id = response['report_id'];
+        this.currentJobStatus.report_status = response['report_status'];
+
+        // Updates "Jobs" tab info
+        this.updateTableJob(response['report']);
+
+        if (
+          response['status'].includes("Failed")
+          || this.finishedStates.includes(response['report_status'])
+        ) {
+          // Stops if job failed or is in a finished state.
+          this.stopJobPolling();
+          return;
+        }
+
+      });
+    }, this.pollStatusDelay);
+  }
+
+  updateTableJob(reportData: ReportsTableParams) {
+    /*
+    Updates job info in "Jobs" table.
+    */
+    // Get row data from table using jobid:
+
+    console.log("Updating job in table: ", reportData)
+
+    if (this.dataSource == null) {
+      return;
+    }
+
+    this.dataSource.filteredData.some(rowData => {
+      console.log("rowData id: ", rowData.report_id);
+      console.log("reportData id: ", reportData.report_id);
+      if (rowData.report_id == reportData.report_id) {
+        // Updates job status and finished time of matching job id
+        rowData.report_status = reportData.report_status;
+        rowData.finished_datetime = this.convertDatetime(reportData.finished_datetime);
+        return true;  // breaks out of iteration
+      }
+    });
+  }
 
 }

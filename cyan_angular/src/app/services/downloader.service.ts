@@ -373,9 +373,11 @@ export class DownloaderService {
     Gets status of report based on report ID.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.baseServerUrl + 'report/status/?'
-      + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    let url = this.envService.config.baseServerUrl + 'report/status';
+    let postData = {
+      report_id: reportId
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
   }
 
   cancelReportRequest(reportId: string) {

@@ -6,13 +6,14 @@
 		<ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnNames">
 			<mat-header-cell *matHeaderCellDef mat-sort-header>{{column.value}}</mat-header-cell>
 			<mat-cell *matCellDef="let element">
-				<!-- <mat-icon
+				<!-- Displays "X" next to job to cancel if in an active state -->
+				<mat-icon
 					class="cancel-icon"
-					*ngIf="column.id == 'reportStatus' && inProgressStates.includes(element[column.id])"
+					*ngIf="column.id == 'report_status' && inProgressStates.includes(element[column.id])"
 					(click)="cancelReport(element)"
 				>
 					clear
-				</mat-icon> -->
+				</mat-icon>
 				<mat-icon 
 					class="download-report-btn"
 					(click)="downloadReport(element);"
