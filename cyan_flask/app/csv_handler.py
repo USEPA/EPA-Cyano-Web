@@ -54,7 +54,7 @@ class CSVHandler:
         row_data = []
         meta_info = []
         for header in self.user_headers:
-            meta_info.extend([location["user_latitude"], location["user_longitude"]])
+            meta_info.append(location[header])
         for header in self.location_data_headers["metaInfo"]:
             meta_info.append(location["metaInfo"][header])
         row_data = self.add_location_data(
