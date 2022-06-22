@@ -14,6 +14,7 @@
 				<b>Centroid Latitude:</b> {{selectedWaterbody.centroid_lat}}<br>
 				<b>Centroid Longitude:</b> {{selectedWaterbody.centroid_lng}}<br>
 				<b>Area:</b> {{wbProps.areasqkm}} km<sup>2</sup><br>
+				<div *ngIf="wbProps.elevation"><b>Elevation:</b> {{wbProps.elevation}} m<br></div>
 			</div>
 			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download histogram</button>
 			<br><br>
