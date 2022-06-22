@@ -251,19 +251,27 @@ export class DownloaderService {
 
   getWaterbodyData(
     objectid: number,
-    daily: string = 'True',
+    daily: string,
     startYear: number = null,
     startDay: number = null,
     endYear: number = null,
     endDay: number = null,
-    ranges: Array<any> = null
+    // ranges: Array<any> = null
   ) {
     /*
     Gets waterbody data.
     */
     let url = this.envService.config.waterbodyUrl + 
-              'data/?OBJECTID=' + objectid +
-              '&daily=' + daily;
+      'data/?OBJECTID=' + objectid +
+      '&daily=' + daily
+
+    if (startYear) { url += '&start_year=' + startYear; }
+    if (startDay) { url += '&start_day=' + startDay; }
+    if (endYear) { url += '&end_year=' + endYear; }
+    if (endDay) { url += '&end_day=' + endDay; }
+
+    console.log("Request to WB for data: ", url);
+
     return this.executeAuthorizedGetRequest(url); 
   }
 
