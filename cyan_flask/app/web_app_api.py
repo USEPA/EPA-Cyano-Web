@@ -859,20 +859,28 @@ def get_report_status(request_obj):
     except KeyError:
         return {"error": "Invalid key in request"}, 400
 
+    # Gets user report from table:
     user = User.query.filter_by(username=username).first()  # gets user from db
     user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
 
-    # NOTE: If same celery instance, could directly make request to worker and not an api request
+    # Gets report status from WB celery worker:
+    user_report_status = None
+    url = os.getenv("WATERBODY_URL") + "/waterbody/report/status"
+    try:
+        status_response = requests.get(url, params={"report_id": user_report.report_id}, timeout=5)
+        user_report_status = json.loads(status_response.content)
+    except Exception as e:
+        logging.error("Error making request to {}: {}".format(url, e))
+        logging.warning("Marking report {} as FAILED.".format(user_report.report_id))
+        user_report_status = {"report_id": user_report.report_id, "report_status": "FAILED"}
 
-    # NOTE: Since wb celery updates cyanweb flask table with report status, a call to the wb report/status
-    # endpoint seems unneccessary.
-    # url = os.getenv("WATERBODY_URL") + "/waterbody/report/status"
-    # user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
-    # logging.warning("User report status: {}".format(user_report_status.content))
+    logging.info("User report status (from WB celery worker): {}".format(user_report_status))
+
+    # Updates user report table with celery task status:
+    user_report.report_status = user_report_status["report_status"]
+    db.session.commit()
 
     response_obj = dict(Report.report_response())
-
-    # response_obj["job"] = Job.create_jobs_json([user_job])[0]
 
     if not user_report:
         response_obj["status"] = "Failed - report not found."
