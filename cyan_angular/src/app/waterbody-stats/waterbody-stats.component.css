@@ -365,3 +365,13 @@ h2.label {
 ::ng-deep .mat-tab-body-content {
 	height: auto !important;
 }
+
+::ng-deep .spinner {
+  margin: auto;
+  top: 5%;
+}
+
+.range-data-item {
+	vertical-align: top;
+	float:  right;
+}
