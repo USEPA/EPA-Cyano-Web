@@ -158,6 +158,13 @@ export class Calculations {
     return this.getDayOfYear(dateString);
   }
 
+  getFormattedDateFromDateObject(date: Date) {
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    return month + '/' + day + '/' + year;
+  }
+
   sortByDate(dataByType: any) {
 
     let dateKeys = Object.keys(dataByType);
