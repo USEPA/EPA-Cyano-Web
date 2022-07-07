@@ -14,6 +14,7 @@
 				<b>Centroid Latitude:</b> {{selectedWaterbody.centroid_lat}}<br>
 				<b>Centroid Longitude:</b> {{selectedWaterbody.centroid_lng}}<br>
 				<b>Area:</b> {{wbProps.areasqkm}} km<sup>2</sup><br>
+				<div *ngIf="wbProps.elevation"><b>Elevation:</b> {{wbProps.elevation}} m<br></div>
 			</div>
 			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download histogram</button>
 			<br><br>
@@ -27,22 +28,29 @@
 							<mat-option value="weekly">Weekly</mat-option>
 						</mat-select>
 					</mat-form-field>
+
 					<mat-form-field>
-						<mat-label>Available Dates</mat-label>
-							<mat-select [(value)]="selectedAvailableDate" (selectionChange)="updateDate($event.value);">
-							<mat-option *ngFor="let date of wbStats.dates" [value]="date">
-								{{date}}
-							</mat-option>
-						</mat-select>
+						<mat-label>Select a date:</mat-label>
+						<input matInput [matDatepicker]="picker" [(ngModel)]="selectedAvailableDateObj" (dateChange)="updateDate($event.value);">
+						<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+						<mat-datepicker #picker></mat-datepicker>
 					</mat-form-field>
+					
 					<mat-form-field>
 						<mat-label>Date Range</mat-label>
 						<mat-select [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
-							<mat-option value="single">Single</mat-option>
+							<mat-option value="1day">Single</mat-option>
 							<mat-option value="7day">7 Day History</mat-option>
 							<mat-option value="30day">30 Day History</mat-option>
 						</mat-select>
 					</mat-form-field>
+
+					<br>
+
+					<div *ngIf="isLoading">
+						<mat-progress-spinner class="spinner" color="primary" mode="indeterminate"></mat-progress-spinner>
+					</div>
+
 				</div>
 				<!-- Shows list of dates within selected range -->
 				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
@@ -145,13 +153,21 @@
 				<div class="data-item">
 					<b>Date:</b> {{wbStats.date}}<br>
 					<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
-					<b>Min:</b> {{wbStats.min}} cells/mL<br>
-					<b>Max:</b> {{wbStats.max}} cells/mL<br>
+					<b>Min:</b> {{wbStats.min || 'N/A'}} cells/mL<br>
+					<b>Max:</b> {{wbStats.max || 'N/A'}} cells/mL<br>
 					<b>Average:</b> {{wbStats.average}} cells/mL<br>
 					<b>Standard Deviation:</b> {{wbStats.stddev}} cells/mL
+					<br><br>
+					<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
+					<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br>
+					<b>Extent WB:</b> {{wbMetrics.extentWb}} {{wbMetrics.extentWbUnits}}<br>
+					<b>Frequency WB:</b> {{wbMetrics.frequencyWb}} {{wbMetrics.frequencyWbUnits}}<br>
+					<b>Magnitude WB:</b> {{wbMetrics.magnitudeWb}} {{wbMetrics.magnitudeWbUnits}}<br>
+					<b>Period:</b> {{wbMetrics.period}}<br>
+					<b>Timestep:</b> {{wbMetrics.timestep}} 
 				</div>
 
-				<div *ngIf="!showStacked" class="data-item">
+				<div *ngIf="!showStacked" class="data-item range-data-item">
 					<!-- Range selection -->
 					<mat-form-field>
 						<mat-label>Select range</mat-label>

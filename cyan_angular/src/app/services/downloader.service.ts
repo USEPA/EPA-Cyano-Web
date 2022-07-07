@@ -251,19 +251,27 @@ export class DownloaderService {
 
   getWaterbodyData(
     objectid: number,
-    daily: string = 'True',
+    daily: string,
     startYear: number = null,
     startDay: number = null,
     endYear: number = null,
     endDay: number = null,
-    ranges: Array<any> = null
+    // ranges: Array<any> = null
   ) {
     /*
     Gets waterbody data.
     */
     let url = this.envService.config.waterbodyUrl + 
-              'data/?OBJECTID=' + objectid +
-              '&daily=' + daily;
+      'data/?OBJECTID=' + objectid +
+      '&daily=' + daily
+
+    if (startYear) { url += '&start_year=' + startYear; }
+    if (startDay) { url += '&start_day=' + startDay; }
+    if (endYear) { url += '&end_year=' + endYear; }
+    if (endDay) { url += '&end_day=' + endDay; }
+
+    console.log("Request to WB for data: ", url);
+
     return this.executeAuthorizedGetRequest(url); 
   }
 
@@ -373,9 +381,11 @@ export class DownloaderService {
     Gets status of report based on report ID.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.baseServerUrl + 'report/status/?'
-      + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    let url = this.envService.config.baseServerUrl + 'report/status';
+    let postData = {
+      report_id: reportId
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
   }
 
   cancelReportRequest(reportId: string) {
@@ -384,9 +394,11 @@ export class DownloaderService {
     NOTE: Must be user that started report as well.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-    let url = this.envService.config.baseServerUrl + 'report/cancel/?'
-      + 'report_id=' + reportId;
-    return this.executeAuthorizedGetRequest(url);
+    let url = this.envService.config.baseServerUrl + 'report/cancel';
+    let postData = {
+      report_id: reportId
+    }
+    return this.executeAuthorizedPostRequest(url, postData);
   }
 
   downloadReport(reportId: string) {

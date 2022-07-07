@@ -448,6 +448,7 @@ class ReportStatus(Resource):
         args["username"] = JwtHandler().get_user_from_token(
             request
         )  # gets username from token
+        headers = get_auth_headers()
         results, status_code = web_app_api.get_report_status(args)
         results = simplejson.loads(simplejson.dumps(results))
         return results, status_code, headers

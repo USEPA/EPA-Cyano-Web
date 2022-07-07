@@ -64,3 +64,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: #616161;
     font-size: medium;
 }
+
+.cancel-icon:hover {
+    opacity: 1.0;
+    cursor: pointer;
+}
+
+.cancel-icon {
+    color: #EF0000;
+    opacity: 0.6;
+}

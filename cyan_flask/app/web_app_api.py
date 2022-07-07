@@ -854,24 +854,40 @@ def start_report(request_obj):
 
 def get_report_status(request_obj):
     try:
-        report_id = response_obj["report_id"]
-        username = response_obj["username"]
+        report_id = request_obj["report_id"]
+        username = request_obj["username"]
     except KeyError:
         return {"error": "Invalid key in request"}, 400
 
+    # Gets user report from table:
     user = User.query.filter_by(username=username).first()  # gets user from db
     user_report = Report.query.filter_by(user_id=user.id, report_id=report_id).first()
 
-    # NOTE: If same celery instance, could directly make request to worker and not an api request
+    # Gets report status from WB celery worker:
+    user_report_status = None
     url = os.getenv("WATERBODY_URL") + "/waterbody/report/status"
-    user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+    try:
+        status_response = requests.get(url, params={"report_id": user_report.report_id}, timeout=5)
+        user_report_status = json.loads(status_response.content)
+    except Exception as e:
+        logging.error("Error making request to {}: {}".format(url, e))
+        logging.warning("Marking report {} as FAILED.".format(user_report.report_id))
+        user_report_status = {"report_id": user_report.report_id, "report_status": "FAILED"}
+
+    logging.info("User report status (from WB celery worker): {}".format(user_report_status))
+
+    # Updates user report table with celery task status:
+    user_report.report_status = user_report_status["report_status"]
+    db.session.commit()
+
+    response_obj = dict(Report.report_response())
 
     if not user_report:
         response_obj["status"] = "Failed - report not found."
     elif user_report.report_status in celery_handler.fail_states:
         response_obj["status"] = "Failed - error processing report."
     else:
-        response_obj["status"] = ""
+        response_obj["status"] = "success"
 
     response_obj["report_id"] = user_report.report_id
     response_obj["report_status"] = user_report.report_status
@@ -902,15 +918,20 @@ def cancel_report(request_obj):
     # TODO: Make request to WB API to cancel report from user
     # NOTE: If same celery instance, could directly make request to worker and not an api request
     url = os.getenv("WATERBODY_URL") + "/waterbody/report/cancel"
-    user_report_status = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+    cancel_response = requests.get(url, params={"report_id": user_report.report_id}, timeout=10)
+
+    # TODO: Add error handling to json and above request
+
+    cancel_response_obj = json.loads(cancel_response.content)
 
     # Updates report status in DB.
     user_report.report_status = "REVOKED"
     db.session.commit()
 
-    response_obj = dict(Report.user_reports_response())
-    response_obj["status"] = cancel_response["status"]
+    response_obj = dict(Report.report_response())
+    response_obj["status"] = cancel_response_obj["status"]
     response_obj["report_status"] = "REVOKED"
+    response_obj["report_id"] = report_id
 
     return response_obj, 200
 

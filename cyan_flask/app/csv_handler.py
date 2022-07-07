@@ -9,9 +9,6 @@ class CSVHandler:
         self.location_data_headers = {
             "metaInfo": [
                 "locationName",
-                "locationLat",
-                "locationLng",
-                "status",
                 "requestTimestamp",
                 "queryDate",
             ],
@@ -26,12 +23,10 @@ class CSVHandler:
                 "validCellsCount",
             ],
         }
-        self.user_headers = ["user_latitude", "user_longitude"]
-        self.csv_headers = (
-            self.user_headers
-            + self.location_data_headers["metaInfo"]
-            + self.location_data_headers["outputs"]
-        )  # headers for output csv
+        self.user_headers = ["input_latitude", "input_longitude"]
+        self.csv_headers = ["input_latitude", "input_longitude", "locationName", "requestTimestamp", "queryDate",
+            "imageDate", "satelliteImageType", "satelliteImageFrequency", "cellConcentration_cells/mL", "maxCellConcentration_cells/mL",
+            "cell_latitude", "cell_longitude", "validCellsCount"]
 
     def create_csv(self, username, input_filename, locations_data):
         """
@@ -54,7 +49,7 @@ class CSVHandler:
         row_data = []
         meta_info = []
         for header in self.user_headers:
-            meta_info.extend([location["user_latitude"], location["user_longitude"]])
+            meta_info.append(location[header])
         for header in self.location_data_headers["metaInfo"]:
             meta_info.append(location["metaInfo"][header])
         row_data = self.add_location_data(
