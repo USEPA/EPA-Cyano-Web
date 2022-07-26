@@ -1,6 +1,6 @@
 # # Builds a small nginx image with static website
 # FROM nginx:stable-alpine
-FROM nginx:alpine
+FROM nginx:stable-alpine
 
 ARG config=nginx.conf
 
