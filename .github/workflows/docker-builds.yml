@@ -33,7 +33,7 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v1
         with:
           images: ${{ env.REGISTRY }}/${{ env.FLASK_IMAGE }}
 
@@ -67,7 +67,7 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v1
         with:
           images: ${{ env.REGISTRY }}/${{ env.MYSQL_IMAGE }}
 
@@ -102,7 +102,7 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v1
         with:
           images: ${{ env.REGISTRY }}/${{ env.ANGULAR_IMAGE }}
 
@@ -138,7 +138,7 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v1
         with:
           images: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}
 
