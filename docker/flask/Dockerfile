@@ -22,6 +22,8 @@ RUN mkdir /config && \
 	chmod -R 755 /config && \
 	chmod 755 /docker/flask/start_flask.sh
 
+COPY config/set_environment.py /config/set_environment.py
+
 WORKDIR /cyan_flask
 
 ENV PYTHONPATH /cyan_flask:$PYTHONPATH
