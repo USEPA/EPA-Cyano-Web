@@ -57,16 +57,6 @@
 	height: unset;
 }
 
-.cancel-icon:hover {
-	opacity: 1.0;
-	cursor: pointer;
-}
-
-.cancel-icon {
-	color: #EF0000;
-	opacity: 0.6;
-}
-
 .mat-column-numLocations, .mat-column-jobNum, .mat-column-jobStatus {
 	max-width: 10%;
 }

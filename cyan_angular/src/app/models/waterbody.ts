@@ -71,3 +71,18 @@ export class RangeItem {
   stddev: number = 0.0;
   data: Array<number> = [];
 }
+
+export class WaterBodyMetrics {
+	areaNormalizedMagnitude: number = 0.0;
+	areaNormalizedMagnitudeUnits: string = 'cells/km^2';
+	chiaNormalizedMagnitude: number = 0.0;
+	chiaNormalizedMagnitudeUnits: string = 'kg*km^-2';
+	extentWb: number = 0.0;
+	extentWbUnits: string = '%';
+	frequencyWb: number = 0.0;
+	frequencyWbUnits: string = '%';
+	magnitudeWb: number = 0.0;
+	magnitudeWbUnits: string = 'cell concentration';
+	period: string = '';  // "n days"
+	timestep: string = '';  // "daily", etc.
+}

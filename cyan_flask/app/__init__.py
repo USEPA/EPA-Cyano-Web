@@ -30,7 +30,7 @@ from cyan_flask.crypt import CryptManager
 crypt_manager = CryptManager()
 
 secret_key = os.urandom(24).hex()
-os.environ.setdefault("SECRET_KEY", secret_key)
+os.environ["SECRET_KEY"] = os.environ.get("SK", secret_key)
 
 
 db_host = os.environ.get("DB_HOST")

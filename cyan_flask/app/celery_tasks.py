@@ -46,7 +46,7 @@ celery_instance.conf.update(
     result_serializer="json",
     task_ignore_result=False,
     task_track_started=True,
-    worker_max_memory_per_child=50000000,
+    worker_max_tasks_per_child=50000000,
 )
 
 crypt_manager = CryptManager()
@@ -93,8 +93,8 @@ def run_batch_job(self, request_obj):
             time.sleep(0.1)  # little delay b/w calls
             response = celery_handler.make_cyano_request(location)
             response.update({
-                "user_latitude": location["latitude"],
-                "user_longitude": location["longitude"]
+                "input_latitude": location["latitude"],
+                "input_longitude": location["longitude"]
             })
             location_responses.append(response)
     except Exception as e:
