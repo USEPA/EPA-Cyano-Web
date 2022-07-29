@@ -878,6 +878,7 @@ def get_report_status(request_obj):
 
     # Updates user report table with celery task status:
     user_report.report_status = user_report_status["report_status"]
+    user_report.finished_datetime = datetime.datetime.strftime(datetime.datetime.utcnow(), "%Y-%m-%d %H:%M:%S")
     db.session.commit()
 
     response_obj = dict(Report.report_response())
@@ -926,6 +927,7 @@ def cancel_report(request_obj):
 
     # Updates report status in DB.
     user_report.report_status = "REVOKED"
+    user_report.finished_datetime = datetime.datetime.strftime(datetime.datetime.utcnow(), "%Y-%m-%d %H:%M:%S")
     db.session.commit()
 
     response_obj = dict(Report.report_response())
