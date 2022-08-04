@@ -15,10 +15,10 @@ sys.path.insert(1, PROJECT_ROOT)
 sys.path.insert(1, os.path.join(PROJECT_ROOT, "..", ".."))
 os.environ.update({"PROJECT_ROOT": PROJECT_ROOT})
 
-#from config.set_environment import DeployEnv
+from config.set_environment import DeployEnv
 
-#runtime_env = DeployEnv()
-#runtime_env.load_deployment_environment()
+runtime_env = DeployEnv()
+runtime_env.load_deployment_environment()
 
 from endpoints import api
 from models import db, migrate

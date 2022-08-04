@@ -21,3 +21,5 @@ docker/flask/requirements.*
 .vscode/
 
 sk_*.txt
+
+env.json
