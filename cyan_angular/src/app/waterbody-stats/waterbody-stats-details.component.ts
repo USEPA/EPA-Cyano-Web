@@ -3,8 +3,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatSelect } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { latLng, latLngBounds, tileLayer, marker, icon, Map, Marker, geoJSON, imageOverlay, ImageOverlay } from 'leaflet';
-import { ChartDataset, ChartOptions, ChartType, Color } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts';
+import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
+import { Label, BaseChartDirective } from 'ng2-charts';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Options, ChangeContext } from 'ng5-slider';
 
@@ -103,44 +103,37 @@ export class WaterBodyStatsDetails {
 
 
   // Bar chart parameters:
-  // public chartLabels: Label[] = this.ranges;
-  public chartLabels: string[] = this.ranges;
-  // public chartLabels1: Label[] = this.ranges;
-  public chartLabels1: string[] = this.ranges;
+  public chartLabels: Label[] = this.ranges;
+  public chartLabels1: Label[] = this.ranges;
   // public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'no data'];
-  // public string: Label[] = ['low', 'medium', 'high', 'veryHigh', 'no data'];
-  // public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'below detection', 'land', 'no data'];
-  public chartLabels2: string[] = ['low', 'medium', 'high', 'veryHigh', 'below detection', 'land', 'no data'];
-  @Input() chartData: ChartDataset[] = this.charts.chartData;
+  public chartLabels2: Label[] = ['low', 'medium', 'high', 'veryHigh', 'below detection', 'land', 'no data'];
+  @Input() chartData: ChartDataSets[] = this.charts.chartData;
   public chartOptions: ChartOptions = this.charts.chartOptions;
   public chartColors: Array<any> = this.charts.chartColors
   public chartLegend: boolean = this.charts.chartLegend;
   public chartType: ChartType = this.charts.chartType;
 
-  @Input() pieChartData: ChartDataset[] = this.charts.pieChartData;
+  @Input() pieChartData: ChartDataSets[] = this.charts.pieChartData;
   public pieChartOptions: ChartOptions = this.charts.pieChartOptions;
   public pieChartColors: Array<any> = this.charts.pieChartColors
   public pieChartLegend: boolean = this.charts.pieChartLegend;
   public pieChartType: ChartType = this.charts.pieChartType;
-  // public pieChartLabels: Label[] = this.charts.pieChartLabels;
-  public pieChartLabels: string[] = this.charts.pieChartLabels;
+  public pieChartLabels: Label[] = this.charts.pieChartLabels;
 
   // Stacked bar chart parameters:
-  public stackedChartData: ChartDataset[] = this.charts.stackedChartData;
+  public stackedChartData: ChartDataSets[] = this.charts.stackedChartData;
   public stackedChartOptions: ChartOptions = this.charts.stackedChartOptions;
   public stackedChartColors: Array<any> = this.charts.stackedChartColors;
   public stackedChartType: ChartType = this.charts.stackedChartType;
-  // public stackedChartLabels: Label[] = this.charts.stackedChartLabels;
-  public stackedChartLabels: string[] = this.charts.stackedChartLabels;
+  public stackedChartLabels: Label[] = this.charts.stackedChartLabels;
 
   showStacked: boolean = false;
   showPie: boolean = false;
   showBars: boolean = true;
 
   // Histo chart parameters:
-  // public histoChartLabels: Label[] = [];  // TODO: define dynamically
-  public histoChartLabels: string[] = [];  // TODO: define dynamically
-  @Input() histoChartData: ChartDataset[] = [
+  public histoChartLabels: Label[] = [];  // TODO: define dynamically
+  @Input() histoChartData: ChartDataSets[] = [
     {
       data: [],
       label: ''
@@ -151,12 +144,11 @@ export class WaterBodyStatsDetails {
   public histoChartLegend: boolean = this.charts.histoChartLegend;
 
   // Line chart parameters:
-  public lineChartData: ChartDataset[] = this.charts.lineChartData;
+  public lineChartData: ChartDataSets[] = this.charts.lineChartData;
   public lineChartOptions: ChartOptions = this.charts.lineChartOptions;
   public lineChartColors: Array<any> = this.charts.lineChartColors;
   public lineChartType: ChartType = this.charts.lineChartType;
-  // public lineChartLabels: Label[] = this.charts.lineChartLabels;
-  public lineChartLabels: string[] = this.charts.lineChartLabels;
+  public lineChartLabels: Label[] = this.charts.lineChartLabels;
 
   wbLayer = null;
   wbImageLayer = null;

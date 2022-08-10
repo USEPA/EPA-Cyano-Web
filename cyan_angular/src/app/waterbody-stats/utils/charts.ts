@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ChartDataset, ChartOptions, ChartType, Color } from 'chart.js';
-// import { Label } from 'ng2-charts';
+import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
+import { Label } from 'ng2-charts';
 
 import { ConfigService } from '../../services/config.service';
 
@@ -12,9 +12,8 @@ import { ConfigService } from '../../services/config.service';
 })
 export class Charts {
 
-  // chartLabels: Label[] = ['low', 'medium', 'high', 'veryHigh'];
-  chartLabels: string[] = ['low', 'medium', 'high', 'veryHigh'];
-  chartData: ChartDataset[] = [
+  chartLabels: Label[] = ['low', 'medium', 'high', 'veryHigh'];
+  chartData: ChartDataSets[] = [
     {
       data: [],
       label: ''
@@ -22,33 +21,24 @@ export class Charts {
   ];
   chartOptions: ChartOptions = {
     responsive: true,
-    // legend: {
-    //   display: false
-    // },
+    legend: {
+      display: false
+    },
     scales: {
-      yAxes: {
-        beginAtZero: true,
-        // ticks: {
-        //   beginAtZero: true
-        // },
-        // scaleLabel: {
-        //   display: true,
-        //   labelString: "Counts"
-        // }
-        title: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: true
+        },
+        scaleLabel: {
           display: true,
-          // labelString: "Counts"
-          text: "Counts"
+          labelString: "Counts"
         }
-      },
+      }],
       // xAxes: [{
       //   type: 'time'
       // }]
     },
     plugins: {
-      legend: {
-        display: false
-      },
       datalabels: {
         display: 'auto',
         color: 'black',
@@ -57,7 +47,20 @@ export class Charts {
           weight: 'bold'
         },
         backgroundColor: 'white',
-
+        // align: (context): any => {
+        //   console.log("Align called. Context: ", context)
+        //   let yTickSize = context.chart.options.scales.yAxes[0].ticks.stepSize;
+        //   let barData = context.dataset.data[barIndex];
+        //   console.log("Bar index: ", barIndex)
+        //   console.log("y tick size: ", yTickSize)
+        //   console.log("Bar data: ", barData)
+        //   if (barData <= yTickSize) {
+        //     return 'top';
+        //   }
+        //   else {
+        //     return 'center';
+        //   }
+        // }
       }
     }
   };
@@ -74,9 +77,8 @@ export class Charts {
   chartLegend: boolean = true;
   chartType: ChartType = 'bar';
 
-  // pieChartLabels: Label[] = ['low', 'medium', 'high', 'veryHigh'];
-  pieChartLabels: string[] = ['low', 'medium', 'high', 'veryHigh'];
-  pieChartData: ChartDataset[] = [
+  pieChartLabels: Label[] = ['low', 'medium', 'high', 'veryHigh'];
+  pieChartData: ChartDataSets[] = [
     {
       data: [],
       label: ''
@@ -84,13 +86,10 @@ export class Charts {
   ];
   pieChartOptions: ChartOptions = {
     responsive: true,
-    // legend: {
-    //   display: true
-    // },
+    legend: {
+      display: true
+    },
     plugins: {
-      legend: {
-        display: true
-      },
       datalabels: {
         display: 'auto',
         color: 'black',
@@ -132,9 +131,8 @@ export class Charts {
   pieChartType: ChartType = 'pie';
 
   // Histo chart parameters:
-  // public histoChartLabels: Label[] = [];  // TODO: define dynamically
-  public histoChartLabels: string[] = [];  // TODO: define dynamically
-  public histoChartData: ChartDataset[] = [
+  public histoChartLabels: Label[] = [];  // TODO: define dynamically
+  public histoChartData: ChartDataSets[] = [
     {
       data: [],
       label: ''
@@ -143,13 +141,10 @@ export class Charts {
   public histoChartType: ChartType = 'pie';
   public histoChartOptions: ChartOptions = {
     responsive: true,
-    // legend: {
-    //   display: false
-    // },
+    legend: {
+      display: false
+    },
     plugins: {
-      legend: {
-        display: false
-      },
       datalabels: {
         display: false
       }
@@ -158,7 +153,7 @@ export class Charts {
   histoChartLegend: boolean = true;
 
   // Stacked bar chart parameters:
-  public stackedChartData: ChartDataset[] = [
+  public stackedChartData: ChartDataSets[] = [
     {
       data: [],
       label: 'low',
@@ -200,23 +195,19 @@ export class Charts {
         backgroundColor: (context): any => {
           console.log("backgroundColor context: ", context);
         }
-      },
-      tooltip: {
-        mode: 'index'
       }
     },
-    // tooltips: {
-    //   mode: 'index'
-    // }
+    tooltips: {
+      mode: 'index'
+    }
   };
   public stackedChartColors: Array<any> = [];
   public stackedChartType: ChartType = 'bar';
-  // public stackedChartLabels: Label[] = [];
-  public stackedChartLabels: string[] = [];
+  public stackedChartLabels: Label[] = [];
   public stackedChartLegend: boolean = true;
 
   // Line chart parameters:
-  public lineChartData: ChartDataset[] = [
+  public lineChartData: ChartDataSets[] = [
     {
       data: [],
       label: 'low',
@@ -244,9 +235,9 @@ export class Charts {
   ];
   public lineChartOptions: ChartOptions = {
     responsive: true,
-    // legend: {
-    //   // display: false
-    // },
+    legend: {
+      // display: false
+    },
     elements: {
       line: {
         tension: 0,
@@ -254,9 +245,6 @@ export class Charts {
       }
     },
     plugins: {
-      legend: {
-        // display: false
-      },
       datalabels: {
         display: false,
         color: 'black',
@@ -265,22 +253,16 @@ export class Charts {
           weight: 'bold'
         }
       },
-      tooltip: {
-        mode: 'index',
-        bodyAlign: 'right',
-        position: 'nearest'
-      }
     },
-    // tooltips: {
-    //   mode: 'index',
-    //   bodyAlign: 'right',
-    //   position: 'nearest'
-    // }
+    tooltips: {
+      mode: 'index',
+      bodyAlign: 'right',
+      position: 'nearest'
+    }
   };
   public lineChartColors: Array<any> = [];
   public lineChartType: ChartType = 'line';
-  // public lineChartLabels: Label[] = [];
-  public lineChartLabels: string[] = [];
+  public lineChartLabels: Label[] = [];
   public lineChartLegend: boolean = true;
 
   constructor(

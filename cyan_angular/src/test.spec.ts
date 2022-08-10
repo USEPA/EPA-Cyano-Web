@@ -17,7 +17,7 @@ import { Ng5SliderModule } from 'ng5-slider';
 import { RouterTestingModule } from '@angular/router/testing';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MeterComponent } from './app/meter/meter.component';
-import { NgChartsModule } from 'ng2-charts';
+import { ChartsModule } from 'ng2-charts';
 
 beforeAll(() => {
 
@@ -45,7 +45,7 @@ beforeEach(() => {
 			MatDatepickerModule,
 			MatNativeDateModule,
 			RouterTestingModule,
-			NgChartsModule
+			ChartsModule
 		],
 		declarations: [
 			MeterComponent

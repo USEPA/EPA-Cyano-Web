@@ -44,7 +44,7 @@ import { LocationCompareComponent, LocationCompareAlert } from './location-compa
 import { NotificationsComponent, NotificationDetails } from './notifications/notifications.component';
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { NgChartsModule } from 'ng2-charts';
+import { ChartsModule } from 'ng2-charts';
 import { UserIdleModule } from 'angular-user-idle';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -145,7 +145,7 @@ import { ReportsResultsComponent } from './waterbody-stats/reports/reports-resul
             ping: environment.userIdlePingSeconds
         }),
         AppRoutingModule,
-        NgChartsModule,
+        ChartsModule,
         MatMenuModule,
         MatSelectModule,
         MatCheckboxModule,
