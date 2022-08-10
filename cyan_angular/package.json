@@ -10,6 +10,7 @@
     "build:docker": "ng build --configuration=docker --output-path=dist",
     "build:qed-docker": "ng build --configuration=docker --baseHref=/cyanweb --outputHashing=none --outputPath=../../static_qed/epa-cyano-web",
     "build:cyano": "ng build --prod --baseHref=/cyanweb --deployUrl=/cyanweb/ --outputHashing=none --outputPath=dist",
+    "build:kube": "ng build --prod --baseHref=/cyanweb/ --outputPath=dist/cyanweb --outputHashing=bundles",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
