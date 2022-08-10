@@ -18,9 +18,10 @@ WORKDIR /app
 
 RUN apk update && \
 	apk upgrade && \
-	apk add chromium && \
-	npm install && \
-	npm run build:$env
+	apk add chromium
+
+RUN	npm install
+RUN	npm run build:$env
 
 RUN adduser -S $APP_USER -G $APP_USER
 
