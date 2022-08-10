@@ -11,6 +11,7 @@ env:
   MYSQL_IMAGE: USEPA/cyanweb-db
   ANGULAR_IMAGE: USEPA/cyanweb-angular
   NGINX_IMAGE: USEPA/cyanweb-nginx
+  REDIS_IMAGE: USEPA/cyanweb-redis
 
 jobs:
   build-api:
@@ -138,6 +139,37 @@ jobs:
         with:
           context: .
           file: docker/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-redis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.REDIS_IMAGE }}
+
+      - name: Build and push Cyanweb Redis Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: docker/redis/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -87,6 +87,9 @@ services:
       - ${CYAN_CONFIG:-../config/.env}
 
   redis:
-    image: redis:latest
+    build:
+      context: ../
+      dockerfile: ./docker/redis/Dockerfile
+    image: cyan-redis
     expose:
       - "6379"
