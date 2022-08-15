@@ -86,3 +86,10 @@ export class WaterBodyMetrics {
 	period: string = '';  // "n days"
 	timestep: string = '';  // "daily", etc.
 }
+
+export class  ImageArrayObj {
+	year: number;
+	day: number;
+  blob: Blob = null;
+  bbox: Array<number[]> = [];
+};
