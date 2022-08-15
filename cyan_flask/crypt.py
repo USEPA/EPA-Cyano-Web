@@ -62,6 +62,7 @@ class CryptManager:
 		"""
 		Uses env var instead of file for key.
 		"""
+		logging.info("~~~ Using env var for key")
 		key = os.getenv("CYANWEB_CRYPT_KEY")
 		if not key:
 			logging.warning("No key found in environment for decryption.")
