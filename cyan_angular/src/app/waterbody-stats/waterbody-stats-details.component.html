@@ -53,10 +53,10 @@
 
 				</div>
 				<!-- Shows list of dates within selected range -->
-				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
+				<div *ngIf="!isLoading && (selectedDateRange=='7day' || selectedDateRange=='30day')" id="selected-dates-div">
 					<div>
 						<div class="details_slideshow">
-	            			<mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">{{slidershow ? "Slideshow started" : "Start slideshow"}}</mat-checkbox>
+							<button mat-raised-button [color]="slidershow ? 'warn' : 'primary'" (click)="startSlideshow()">{{slidershow ? "Stop slideshow" : "Start slideshow"}}</button>
 	          			</div>
 	          			<br>
 	          			<p>Current date: {{selectedDate || selectedAvailableDate}}</p>
