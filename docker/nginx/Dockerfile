@@ -12,7 +12,7 @@ RUN apk update && \
 RUN rm -rf /usr/share/nginx/html/* && \
 	rm /etc/nginx/conf.d/default.conf
 
-COPY ./cyan_nginx/$config /etc/nginx/conf.d
+COPY nginx.conf /etc/nginx/conf.d
 
 # Uses "node-builder" image from docker/angular/Dockerfile
 # COPY --from=node-builder /app/dist /usr/share/nginx/html
