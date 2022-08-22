@@ -37,4 +37,6 @@ ENV PATH /cyan_flask:$PATH
 
 # USER $APP_USER
 
+EXPOSE 5001
+
 CMD ["sh", "/docker/flask/start_flask.sh"]
