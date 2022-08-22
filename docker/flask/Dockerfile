@@ -29,12 +29,12 @@ WORKDIR /cyan_flask
 ENV PYTHONPATH /cyan_flask:$PYTHONPATH
 ENV PATH /cyan_flask:$PATH
 
-RUN apk update && \
-	apk upgrade
+# RUN apk update && \
+# 	apk upgrade
 
-RUN adduser -S $APP_USER -G $APP_USER
-RUN chown -R $APP_USER:$APP_USER /cyan_flask /docker /config
+# RUN adduser -S $APP_USER -G $APP_USER
+# RUN chown -R $APP_USER:$APP_USER /cyan_flask /docker /config
 
-USER $APP_USER
+# USER $APP_USER
 
 CMD ["sh", "/docker/flask/start_flask.sh"]
