@@ -10,6 +10,7 @@ import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 import { WaterBody } from "../models/waterbody";
 import { WaterBodyStatsDetails } from "../waterbody-stats/waterbody-stats-details.component";
+import { EnvService } from '../services/env.service';
 
 // @Directive()
 @Injectable({
@@ -28,16 +29,25 @@ export class LocationService {
   downloaderSub: Subscription;
   locationChangedSub: Subscription;
   userSub: Subscription;
+  configSetSub: Subscription;
+
+  hideWaterbodyStats: boolean = true;
 
   constructor(
     private _sanitizer: DomSanitizer,
     private user: UserService,
     private downloader: DownloaderService,
     private mapService: MapService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private envService: EnvService
   ) {
     this.getData();
     this.loadUser();
+
+    this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
+      this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
+    });
+
   }
 
   setDataType(dataType: number) {
@@ -228,7 +238,11 @@ export class LocationService {
           this.mapService.updateMarker(loc);
           this.updateCompareLocation(loc);
           this.downloader.updateProgressBar();
-          this.addWaterbodyInfo(loc);
+
+          if (this.hideWaterbodyStats === false) {
+            this.addWaterbodyInfo(loc);
+          }
+        
         }
       }
     );
