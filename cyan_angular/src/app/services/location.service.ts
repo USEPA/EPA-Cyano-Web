@@ -237,7 +237,6 @@ export class LocationService {
         if (loc != null) {
           this.mapService.updateMarker(loc);
           this.updateCompareLocation(loc);
-          this.downloader.updateProgressBar();
 
           if (this.hideWaterbodyStats === false) {
             this.addWaterbodyInfo(loc);
@@ -547,31 +546,40 @@ export class LocationService {
     Adds objectid to locations with available waterbody data.
     */
 
-    this.loaderService.show();
+    this.downloader.requestsTracker += 1;
 
-    this.downloader.searchForWaterbodyByCoords(ln.latitude, ln.longitude).subscribe(wbInfoResult => {
+    this.downloader.searchForWaterbodyByCoords(ln.latitude, ln.longitude).subscribe(
 
-      this.loaderService.hide();
+      wbInfoResult => {
 
-      if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
-        return;
+        this.downloader.requestsTracker -= 1;
+        this.downloader.updateProgressBar();
+
+        if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
+          return;
+        }
+        const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
+        // const tolerance = 0.1;
+        wbInfoResult['waterbodies'].forEach(wbData => {
+          // if (
+          //   Math.abs(ln.latitude - wbData['centroid_lat']) < tolerance &&
+          //   Math.abs(ln.longitude - wbData['centroid_lng']) < tolerance
+          // ) {
+          // Adds WB to nearest location based on tolerance
+          this.locations[index].waterbody.objectid = wbData['objectid'];
+          this.locations[index].waterbody.name = wbData['name'];
+          this.locations[index].waterbody.centroid_lat = wbData['centroid_lat'];
+          this.locations[index].waterbody.centroid_lng = wbData['centroid_lng'];
+          return;
+          // }
+        });
+      },
+      error => {
+        console.log("Cannot find waterbody info for location: ", ln);
+        this.downloader.requestsTracker -= 1;
+        this.downloader.updateProgressBar();
       }
-      const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
-      // const tolerance = 0.1;
-      wbInfoResult['waterbodies'].forEach(wbData => {
-        // if (
-        //   Math.abs(ln.latitude - wbData['centroid_lat']) < tolerance &&
-        //   Math.abs(ln.longitude - wbData['centroid_lng']) < tolerance
-        // ) {
-        // Adds WB to nearest location based on tolerance
-        this.locations[index].waterbody.objectid = wbData['objectid'];
-        this.locations[index].waterbody.name = wbData['name'];
-        this.locations[index].waterbody.centroid_lat = wbData['centroid_lat'];
-        this.locations[index].waterbody.centroid_lng = wbData['centroid_lng'];
-        return;
-        // }
-      });
-    });
+    );
 
   }
 
