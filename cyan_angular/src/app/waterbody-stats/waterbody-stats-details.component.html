@@ -38,10 +38,18 @@
 					
 					<mat-form-field>
 						<mat-label>Date Range</mat-label>
-						<mat-select [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
+						<mat-select *ngIf="selectedDataType=='daily'" [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
 							<mat-option value="1day">Single</mat-option>
 							<mat-option value="7day">7 Day History</mat-option>
 							<mat-option value="30day">30 Day History</mat-option>
+						</mat-select>
+						<mat-select *ngIf="selectedDataType=='weekly'" [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
+							<!-- <mat-option value="1week">1 Week History</mat-option>
+							<mat-option value="4week">4 Week History</mat-option>
+							<mat-option value="16week">16 Week History</mat-option> -->
+							<mat-option value="7day">1 Week History</mat-option>
+							<mat-option value="28day">4 Week History</mat-option>
+							<mat-option value="112day">16 Week History</mat-option>
 						</mat-select>
 					</mat-form-field>
 
@@ -158,13 +166,15 @@
 					<b>Average:</b> {{wbStats.average}} cells/mL<br>
 					<b>Standard Deviation:</b> {{wbStats.stddev}} cells/mL
 					<br><br>
-					<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
-					<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br>
-					<b>Extent WB:</b> {{wbMetrics.extentWb}} {{wbMetrics.extentWbUnits}}<br>
-					<b>Frequency WB:</b> {{wbMetrics.frequencyWb}} {{wbMetrics.frequencyWbUnits}}<br>
-					<b>Magnitude WB:</b> {{wbMetrics.magnitudeWb}} {{wbMetrics.magnitudeWbUnits}}<br>
-					<b>Period:</b> {{wbMetrics.period}}<br>
-					<b>Timestep:</b> {{wbMetrics.timestep}} 
+					<div *ngIf=!hideWaterbodyMetrics>
+						<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
+						<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br>
+						<b>Extent WB:</b> {{wbMetrics.extentWb}} {{wbMetrics.extentWbUnits}}<br>
+						<b>Frequency WB:</b> {{wbMetrics.frequencyWb}} {{wbMetrics.frequencyWbUnits}}<br>
+						<b>Magnitude WB:</b> {{wbMetrics.magnitudeWb}} {{wbMetrics.magnitudeWbUnits}}<br>
+						<b>Period:</b> {{wbMetrics.period}}<br>
+						<b>Timestep:</b> {{wbMetrics.timestep}}
+					</div>
 				</div>
 
 				<div *ngIf="!showStacked" class="data-item range-data-item">

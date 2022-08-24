@@ -7,6 +7,7 @@ import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
 import { Label, BaseChartDirective } from 'ng2-charts';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Options, ChangeContext } from 'ng5-slider';
+import { Subscription } from 'rxjs';
 
 import {
   WaterBody,
@@ -28,6 +29,7 @@ import { ConfigService } from '../services/config.service';
 import { LocationService } from '../services/location.service';
 import { Calculations } from './utils/calculations';
 import { Charts } from './utils/charts';
+import { EnvService } from '../services/env.service';
 
 
 
@@ -74,7 +76,9 @@ export class WaterBodyStatsDetails {
   ranges: string[] = ['low', 'medium', 'high', 'veryHigh'];
 
   selectedDateRange: string = '1day';  // single, 7day, or 30day
-  dateRanges: string[] = ['1day', '7day', '30day'];
+  // dateRanges: string[] = ['1day', '7day', '30day', '1week', '4week', '16week'];
+  dateRanges: string[] = ['1day', '7day', '30day', '28day', '112day'];
+  weeklyDateRanges: string[] = ['1week', '4week', '16week'];
   datesWithinRange: string[] = [];
 
   plotTypes: string[] = ['Total Cell Counts', 'Percentage of Detected Area', 'Percentage of Total Area'];
@@ -94,7 +98,6 @@ export class WaterBodyStatsDetails {
   slidershow: boolean = false;
   selectedDateIndex: number = 0;
   slideshowDelay: number = 4000;  // units of seconds
-  slideshowStatus: string = this.slidershow ? "Slideshow started" : "Start slideshow";
 
   // Selected date slider options:
   sliderValue: number = 0;
@@ -175,6 +178,10 @@ export class WaterBodyStatsDetails {
 
   isLoading: boolean = false;
 
+  configSetSub: Subscription;
+
+  hideWaterbodyMetrics: boolean = true;
+
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
     private authService: AuthService,
@@ -191,9 +198,15 @@ export class WaterBodyStatsDetails {
     private calcs: Calculations,
     private charts: Charts,
     private router: Router,
+    private envService: EnvService
   ) { }
 
   ngOnInit() {
+
+    this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
+      this.hideWaterbodyMetrics = this.envService.config.disableWaterbodyMetrics;
+    });
+
     this.activatedRoute.params.subscribe(params => {
       
       this.selectedWaterbody = JSON.parse(params.selectedWaterbody);
@@ -234,7 +247,8 @@ export class WaterBodyStatsDetails {
 
     this.downloader.getWaterbodyData(
       this.selectedWaterbody.objectid,
-      this.dataTypeRequestMap['daily'],
+      // this.dataTypeRequestMap['daily'],
+      this.dataTypeRequestMap[this.selectedDataType],
       startYear,
       startDay,
       startYear,
@@ -264,6 +278,7 @@ export class WaterBodyStatsDetails {
         this.plotStats = true;  // displays plot of cell counts
         this.isLoading = false;
         this.currentAttempts = 0;
+
 
         this.selectedAvailableDateObj = new Date(this.calcs.getDateFromDayOfYear(prevDate));
         this.selectedAvailableDate = this.calcs.getFormattedDateFromDateObject(this.selectedAvailableDateObj);
@@ -447,7 +462,8 @@ export class WaterBodyStatsDetails {
     });
 
 
-    if (['7day', '30day'].includes(this.selectedDateRange)) {
+    // if (['7day', '30day'].includes(this.selectedDateRange)) {
+    if (this.selectedDateRange != '1day') {
       // Multi-day plotting:
       let dateRange = parseInt(this.selectedDateRange.split('day')[0]);
       let d = new Date(this.selectedAvailableDate);
@@ -511,9 +527,15 @@ export class WaterBodyStatsDetails {
     Selection change for data type.
     */
 
+    // TODO: Needs to grab WB data for selected data type.
+    // Currently only working for daily data. Switching between these does nothing.
+
+
     this.selectedDataType = dataTypeValue;
 
-    this.wbStats.dates = this.curatedData[dataTypeValue].formattedDates;  // sets dates based on selected data type (daily/weekly)
+    // this.selectedDateRange = this.
+
+    // this.wbStats.dates = this.curatedData[dataTypeValue].formattedDates;  // sets dates based on selected data type (daily/weekly)
 
     if (!this.dataTypes.includes(dataTypeValue)) {
       this.dialog.handleError('Data type must be "daily" or "weekly"');
@@ -521,6 +543,15 @@ export class WaterBodyStatsDetails {
     else if(!this.selectedAvailableDate || !this.dateRanges.includes(this.selectedDateRange)) {
       return;
     }
+
+    // NOTE: Does weekly WB data request need to be on a specific day, e.g, Sunday of the selected week???
+
+    if (this.selectedDataType === 'weekly' && this.selectedDateRange.length < 1) {
+      this.selectedDateRange = '7day';
+    }
+
+    this.updateDateRange(this.selectedDateRange);
+
   }
 
   updateDate(dateValue: Date) {
@@ -556,9 +587,14 @@ export class WaterBodyStatsDetails {
     this.calculatingStats = false;  // displays stats for selected date
     this.plotStats = false;  // displays plot of cell counts
 
+    if (this.wbImageLayer) {
+      this.cyanMap.map.removeLayer(this.wbImageLayer);
+    }
+
     this.downloader.getWaterbodyData(
       this.selectedWaterbody.objectid,
-      this.dataTypeRequestMap['daily'],
+      // this.dataTypeRequestMap['daily'],
+      this.dataTypeRequestMap[this.selectedDataType],
       dateRangeArray[0],
       dateRangeArray[1],
       dateRangeArray[2],
@@ -628,7 +664,9 @@ export class WaterBodyStatsDetails {
     Toggles between plot types.
     */
 
-    if (['7day', '30day'].includes(this.selectedDateRange)) {
+    // if (['7day', '30day'].includes(this.selectedDateRange)) {
+    if (this.selectedDateRange != '1day') {
+      // Multi-day options don't use bar/histo toggle
       return;
     }
 
@@ -811,9 +849,30 @@ export class WaterBodyStatsDetails {
     this.histoChartData[0].data = histoData;
     this.histoChartData[0].backgroundColor = histoColors;
 
+    let filteredArray = [];
+    let i = 0;
+    histoLabels.forEach(concentration => {
+      if (histoData[i] > 0) {
+        filteredArray.push(concentration);
+      }
+      i++;
+    });
+
+    if (filteredArray.length < 1) {
+      this.rangeStats.min = null;
+      this.rangeStats.max = null;
+    }
+    else {
+
+      // NOTE: Should min/max be based on one with least or most counts?
+
+      this.rangeStats.min = Math.min(...filteredArray);  // min/max concentration values with at least one count
+      this.rangeStats.max = Math.max(...filteredArray); 
+    }
+
     // Full histo stats:
-    this.rangeStats.min = Math.min(...histoLabels);  // Min/max of all non-zero values??
-    this.rangeStats.max = Math.max(...histoLabels);  // Min/max of all non-zero values??
+    // this.rangeStats.min = Math.min(...histoLabels);  // Min/max of all non-zero values??
+    // this.rangeStats.max = Math.max(...histoLabels);  // Min/max of all non-zero values??
     // this.rangeStats.average = histoLabels.forEach(datum => {
 
     // });
@@ -986,9 +1045,7 @@ export class WaterBodyStatsDetails {
       }, this.slideshowDelay);
     }
     else {
-      this.slideshowStatus = ""
       this.selectedDateIndex = 0;
-      // this.selectedDate = this.selectedAvailableDate;  // NOTE: May be unneccessary
     }
   }
   cycleSelectedDates() {
