@@ -1,4 +1,4 @@
-bcrypt==3.2.0
+bcrypt==4.0.0
 celery==5.2.2
 cryptography==36.0.2
 Flask==2.0.3
