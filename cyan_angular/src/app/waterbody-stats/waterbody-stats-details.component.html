@@ -163,8 +163,8 @@
 					<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
 					<b>Min:</b> {{wbStats.min || 'N/A'}} cells/mL<br>
 					<b>Max:</b> {{wbStats.max || 'N/A'}} cells/mL<br>
-					<b>Average:</b> {{wbStats.average}} cells/mL<br>
-					<b>Standard Deviation:</b> {{wbStats.stddev}} cells/mL
+					<b>Average:</b> {{wbStats.average || 'N/A'}} cells/mL<br>
+					<b>Standard Deviation:</b> {{wbStats.stddev || 'N/A'}} cells/mL
 					<br><br>
 					<div *ngIf=!hideWaterbodyMetrics>
 						<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
@@ -193,8 +193,8 @@
 					<div>
 						<b>Min:</b> {{rangeStats.min || "N/A"}} cells/mL<br>
 						<b>Max:</b> {{rangeStats.max || "N/A"}} cells/mL<br>
-						<b>Average:</b> {{rangeStats.average}} cells/mL<br>
-						<b>Standard Deviation:</b> {{rangeStats.stddev}} cells/mL
+						<b>Average:</b> {{rangeStats.average || "N/A"}} cells/mL<br>
+						<b>Standard Deviation:</b> {{rangeStats.stddev || "N/A"}} cells/mL
 					</div>
 				</div>
 

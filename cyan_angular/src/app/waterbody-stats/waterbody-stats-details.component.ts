@@ -441,8 +441,8 @@ export class WaterBodyStatsDetails {
       this.wbStats.date = this.calcs.getDateFromDayOfYear(date);
       this.wbStats.min = (concentrationArray.length > 0) ? this.calcs.roundValue(Math.min(...concentrationArray)) : 0;  // min concentration with at least one count
       this.wbStats.max = (concentrationArray.length > 0) ? this.calcs.roundValue(Math.max(...concentrationArray)) : 0;  // max concentration with at least one count
-      this.wbStats.average = this.calcs.calculateAverage(concentrationData);
-      this.wbStats.stddev = this.calcs.calculateStdDev(concentrationData);
+      this.wbStats.average = (concentrationArray.length > 0) ? this.calcs.calculateAverage(concentrationData) : 0;
+      this.wbStats.stddev = (concentrationArray.length > 0) ? this.calcs.calculateStdDev(concentrationData) : 0;
 
       this.curatedData[this.selectedDataType][date].stats = this.wbStats;
       this.curatedData[this.selectedDataType][date].data = chartData;
@@ -861,25 +861,15 @@ export class WaterBodyStatsDetails {
     if (filteredArray.length < 1) {
       this.rangeStats.min = null;
       this.rangeStats.max = null;
+      this.rangeStats.average = null;
+      this.rangeStats.stddev = null;
     }
     else {
-
-      // NOTE: Should min/max be based on one with least or most counts?
-
-      this.rangeStats.min = Math.min(...filteredArray);  // min/max concentration values with at least one count
-      this.rangeStats.max = Math.max(...filteredArray); 
+      this.rangeStats.min = this.wbStats.min;
+      this.rangeStats.max = this.wbStats.max;
+      this.rangeStats.average = this.wbStats.average;
+      this.rangeStats.stddev = this.wbStats.stddev;
     }
-
-    // Full histo stats:
-    // this.rangeStats.min = Math.min(...histoLabels);  // Min/max of all non-zero values??
-    // this.rangeStats.max = Math.max(...histoLabels);  // Min/max of all non-zero values??
-    // this.rangeStats.average = histoLabels.forEach(datum => {
-
-    // });
-    // this.rangeStats.min = chartData[this.selectedRange].min;
-    // this.rangeStats.max = chartData[this.selectedRange].max;
-    // this.rangeStats.average = chartData[this.selectedRange].average;  // avg count? weighted avg?
-    // this.rangeStats.stddev = chartData[this.selectedRange].stddev;
 
   }
 
