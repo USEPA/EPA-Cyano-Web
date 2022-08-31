@@ -76,8 +76,8 @@ export class WaterBodyStatsDetails {
   ranges: string[] = ['low', 'medium', 'high', 'veryHigh'];
 
   selectedDateRange: string = '1day';  // single, 7day, or 30day
-  // dateRanges: string[] = ['1day', '7day', '30day', '1week', '4week', '16week'];
-  dateRanges: string[] = ['1day', '7day', '30day', '28day', '112day'];
+  dateRanges: string[] = ['1day', '7day', '30day', '1week', '4week', '16week'];
+  // dateRanges: string[] = ['1day', '7day', '30day', '28day', '112day'];
   weeklyDateRanges: string[] = ['1week', '4week', '16week'];
   datesWithinRange: string[] = [];
 
@@ -463,12 +463,18 @@ export class WaterBodyStatsDetails {
 
 
     // if (['7day', '30day'].includes(this.selectedDateRange)) {
-    if (this.selectedDateRange != '1day') {
+    if (this.selectedDateRange != '1day' && this.selectedDateRange != '1week') {
       // Multi-day plotting:
-      let dateRange = parseInt(this.selectedDateRange.split('day')[0]);
+      let dateRangeDays;
+      if (this.selectedDateRange.includes('day')) {
+        dateRangeDays = parseInt(this.selectedDateRange.split('day')[0]);
+      }
+      else if (this.selectedDateRange.includes('week')) {
+        dateRangeDays = 7 * parseInt(this.selectedDateRange.split('week')[0]);
+      }
       let d = new Date(this.selectedAvailableDate);
       let endDate = d.getTime();
-      let startDate = new Date(this.selectedAvailableDate).setDate(d.getDate() - dateRange);
+      let startDate = new Date(this.selectedAvailableDate).setDate(d.getDate() - dateRangeDays);
       this.datesWithinRange = this.curatedData[this.selectedDataType].formattedDates.filter(date => {
         let d = new Date(date).getTime();
         if (d <= endDate && d > startDate) {
@@ -529,13 +535,7 @@ export class WaterBodyStatsDetails {
 
     // TODO: Needs to grab WB data for selected data type.
     // Currently only working for daily data. Switching between these does nothing.
-
-
     this.selectedDataType = dataTypeValue;
-
-    // this.selectedDateRange = this.
-
-    // this.wbStats.dates = this.curatedData[dataTypeValue].formattedDates;  // sets dates based on selected data type (daily/weekly)
 
     if (!this.dataTypes.includes(dataTypeValue)) {
       this.dialog.handleError('Data type must be "daily" or "weekly"');
@@ -546,8 +546,11 @@ export class WaterBodyStatsDetails {
 
     // NOTE: Does weekly WB data request need to be on a specific day, e.g, Sunday of the selected week???
 
-    if (this.selectedDataType === 'weekly' && this.selectedDateRange.length < 1) {
-      this.selectedDateRange = '7day';
+    if (this.selectedDataType === 'weekly') {
+      this.selectedDateRange = '1week';  // defaults to 1week
+    }
+    else if (this.selectedDataType == 'daily') {
+      this.selectedDateRange = '1day';  // defaults to 1day
     }
 
     this.updateDateRange(this.selectedDateRange);
@@ -580,7 +583,14 @@ export class WaterBodyStatsDetails {
       this.dialog.handleError('Select a data type and/or date range first');
     }
 
-    let dateRangeNumber = parseInt(dateRangeValue.split('day')[0]) - 1;
+    let dateRangeNumber;
+    if (this.selectedDateRange.includes('day')) {
+      dateRangeNumber = parseInt(this.selectedDateRange.split('day')[0]) - 1;
+    }
+    else if (this.selectedDateRange.includes('week')) {
+      dateRangeNumber = 7 * parseInt(this.selectedDateRange.split('week')[0]) - 1;
+    }
+
     let dateRangeArray = this.determineDateRanges(new Date(this.selectedAvailableDate), dateRangeNumber);
 
     this.isLoading = true;
@@ -664,15 +674,14 @@ export class WaterBodyStatsDetails {
     Toggles between plot types.
     */
 
-    // if (['7day', '30day'].includes(this.selectedDateRange)) {
-    if (this.selectedDateRange != '1day') {
+    if (this.selectedDateRange != '1day' && this.selectedDateRange != '1week') {
       // Multi-day options don't use bar/histo toggle
       return;
     }
 
-    let dateIndex = this.curatedData[this.selectedDataType].formattedDates.indexOf(this.selectedAvailableDate);
-    let date = this.calcs.getDayOfYear(this.selectedAvailableDate);
+    let date = this.curatedData[this.selectedDataType]['dates'][0];  // should be just one date
     let chartData = this.curatedData[this.selectedDataType][date].data;
+
     const plotIndex = this.plotTypes.indexOf(this.selectedPlotType);  // currently selected plot type
     let nextPlotType = this.plotTypes[plotIndex + 1];
     if (!nextPlotType || nextPlotType == this.plotTypes[0]) {
@@ -1147,11 +1156,11 @@ export class WaterBodyStatsDetails {
     from the waterbody/data request.
     */
     let objectid = this.selectedWaterbody.objectid.toString();
-    this.wbMetrics.areaNormalizedMagnitude = wbData['metrics']['area_normalized_magnitude'][objectid];
-    this.wbMetrics.chiaNormalizedMagnitude = wbData['metrics']['chia_normalized_magnitude'][objectid];
+    // this.wbMetrics.areaNormalizedMagnitude = wbData['metrics']['area_normalized_magnitude'][objectid];
+    // this.wbMetrics.chiaNormalizedMagnitude = wbData['metrics']['chia_normalized_magnitude'][objectid];
     this.wbMetrics.extentWb = wbData['metrics']['extent_wb'][objectid];
     this.wbMetrics.frequencyWb = wbData['metrics']['frequency_wb'][objectid];
-    this.wbMetrics.magnitudeWb = wbData['metrics']['magnitude_wb'][objectid];
+    // this.wbMetrics.magnitudeWb = wbData['metrics']['magnitude_wb'][objectid];
     this.wbMetrics.period = wbData['metrics']['metadata']['period'];
     this.wbMetrics.timestep = wbData['metrics']['metadata']['timestep'];
   }

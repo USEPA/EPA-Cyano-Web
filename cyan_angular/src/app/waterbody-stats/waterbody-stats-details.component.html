@@ -44,12 +44,9 @@
 							<mat-option value="30day">30 Day History</mat-option>
 						</mat-select>
 						<mat-select *ngIf="selectedDataType=='weekly'" [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
-							<!-- <mat-option value="1week">1 Week History</mat-option>
+							<mat-option value="1week">1 Week History</mat-option>
 							<mat-option value="4week">4 Week History</mat-option>
-							<mat-option value="16week">16 Week History</mat-option> -->
-							<mat-option value="7day">1 Week History</mat-option>
-							<mat-option value="28day">4 Week History</mat-option>
-							<mat-option value="112day">16 Week History</mat-option>
+							<mat-option value="16week">16 Week History</mat-option>
 						</mat-select>
 					</mat-form-field>
 
@@ -61,7 +58,8 @@
 
 				</div>
 				<!-- Shows list of dates within selected range -->
-				<div *ngIf="!isLoading && (selectedDateRange=='7day' || selectedDateRange=='30day')" id="selected-dates-div">
+				<!-- <div *ngIf="!isLoading && (selectedDateRange=='7day' || selectedDateRange=='30day')" id="selected-dates-div"> -->
+				<div *ngIf="!isLoading && (selectedDateRange!='1day' && selectedDateRange!='1week')" id="selected-dates-div">
 					<div>
 						<div class="details_slideshow">
 							<button mat-raised-button [color]="slidershow ? 'warn' : 'primary'" (click)="startSlideshow()">{{slidershow ? "Stop slideshow" : "Start slideshow"}}</button>
@@ -74,7 +72,7 @@
           					[(value)]="sliderValue"
           					[options]="sliderOptions"
           					(mouseup)="sliderEvent()"
-          					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day'}">
+          					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day' || selectedDateRange == '16week'}">
           				</ng5-slider>
 	          		</div>
 				</div>
@@ -88,7 +86,7 @@
 				<div class="data-item">
 				  <div class="chart_header">
 				    <div class="chart_title" class="chart-toggle" (click)="togglePlotType();">
-							<mat-icon *ngIf="selectedDateRange=='single'">unfold_more</mat-icon>
+							<mat-icon *ngIf="selectedDateRange=='1day' || selectedDateRange == '1week'">unfold_more</mat-icon>
 							{{selectedPlotType}}
 						</div>
 				    <div class="chart_source_selection"></div>
