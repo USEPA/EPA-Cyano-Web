@@ -1128,6 +1128,7 @@ export class WaterBodyStatsDetails {
         let filename = 'WaterbodyHistogram' + this.selectedWaterbody.objectid + 
                         this.selectedWaterbody.name.replace(/\s/g, '') + '.csv';
         this.downloader.downloadFile(filename, histoCsvData);
+        this.dialog.displayMessageDialog('Histogram data downloaded. Data details and metadata are provided at the bottom of the CSV.');
       });
     });
   }
