@@ -2,19 +2,23 @@ export class Calculations {
 
   calculateAverage(wbData): number {
     let sum = 0.0;
+    let totalCounts = 0;
     wbData.forEach(datum => {
-      sum += datum['concentration'];
+      sum += datum['count'] * datum['concentration'];
+      totalCounts += datum['count'];
     });
-    return this.roundValue(sum / wbData.length);
+    return this.roundValue(sum / totalCounts);
   }
 
   calculateStdDev(wbData): number {
     let average = this.calculateAverage(wbData);
     let diffSum = 0.0;
+    let totalCounts = 0;
     wbData.forEach(datum => {
-      diffSum += Math.pow(datum['concentration'] - average, 2)
+      diffSum += Math.pow(datum['count'] * (datum['concentration'] - average), 2);
+      totalCounts += datum['count'];
     });
-    return this.roundValue(Math.sqrt(diffSum / wbData.length));
+    return this.roundValue(Math.sqrt(diffSum / (totalCounts - 1)));
   }
 
   calculateRangeArea(dataByRange, chartLabels) {

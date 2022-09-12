@@ -10,6 +10,7 @@ import { MapService } from "../services/map.service";
 import { LoaderService } from "../services/loader.service";
 import { WaterBody } from "../models/waterbody";
 import { WaterBodyStatsDetails } from "../waterbody-stats/waterbody-stats-details.component";
+import { EnvService } from '../services/env.service';
 
 // @Directive()
 @Injectable({
@@ -28,16 +29,25 @@ export class LocationService {
   downloaderSub: Subscription;
   locationChangedSub: Subscription;
   userSub: Subscription;
+  configSetSub: Subscription;
+
+  hideWaterbodyStats: boolean = true;
 
   constructor(
     private _sanitizer: DomSanitizer,
     private user: UserService,
     private downloader: DownloaderService,
     private mapService: MapService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private envService: EnvService
   ) {
     this.getData();
     this.loadUser();
+
+    this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
+      this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
+    });
+
   }
 
   setDataType(dataType: number) {
@@ -227,8 +237,11 @@ export class LocationService {
         if (loc != null) {
           this.mapService.updateMarker(loc);
           this.updateCompareLocation(loc);
-          this.downloader.updateProgressBar();
-          this.addWaterbodyInfo(loc);
+
+          if (this.hideWaterbodyStats === false) {
+            this.addWaterbodyInfo(loc);
+          }
+        
         }
       }
     );
@@ -533,31 +546,40 @@ export class LocationService {
     Adds objectid to locations with available waterbody data.
     */
 
-    this.loaderService.show();
+    this.downloader.requestsTracker += 1;
 
-    this.downloader.searchForWaterbodyByCoords(ln.latitude, ln.longitude).subscribe(wbInfoResult => {
+    this.downloader.searchForWaterbodyByCoords(ln.latitude, ln.longitude).subscribe(
 
-      this.loaderService.hide();
+      wbInfoResult => {
 
-      if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
-        return;
+        this.downloader.requestsTracker -= 1;
+        this.downloader.updateProgressBar();
+
+        if (!wbInfoResult.hasOwnProperty('waterbodies') || wbInfoResult['waterbodies'] == 'NA') {
+          return;
+        }
+        const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
+        // const tolerance = 0.1;
+        wbInfoResult['waterbodies'].forEach(wbData => {
+          // if (
+          //   Math.abs(ln.latitude - wbData['centroid_lat']) < tolerance &&
+          //   Math.abs(ln.longitude - wbData['centroid_lng']) < tolerance
+          // ) {
+          // Adds WB to nearest location based on tolerance
+          this.locations[index].waterbody.objectid = wbData['objectid'];
+          this.locations[index].waterbody.name = wbData['name'];
+          this.locations[index].waterbody.centroid_lat = wbData['centroid_lat'];
+          this.locations[index].waterbody.centroid_lng = wbData['centroid_lng'];
+          return;
+          // }
+        });
+      },
+      error => {
+        console.log("Cannot find waterbody info for location: ", ln);
+        this.downloader.requestsTracker -= 1;
+        this.downloader.updateProgressBar();
       }
-      const index = this.locations.map((loc) => loc.id).indexOf(ln.id);
-      // const tolerance = 0.1;
-      wbInfoResult['waterbodies'].forEach(wbData => {
-        // if (
-        //   Math.abs(ln.latitude - wbData['centroid_lat']) < tolerance &&
-        //   Math.abs(ln.longitude - wbData['centroid_lng']) < tolerance
-        // ) {
-        // Adds WB to nearest location based on tolerance
-        this.locations[index].waterbody.objectid = wbData['objectid'];
-        this.locations[index].waterbody.name = wbData['name'];
-        this.locations[index].waterbody.centroid_lat = wbData['centroid_lat'];
-        this.locations[index].waterbody.centroid_lng = wbData['centroid_lng'];
-        return;
-        // }
-      });
-    });
+    );
 
   }
 

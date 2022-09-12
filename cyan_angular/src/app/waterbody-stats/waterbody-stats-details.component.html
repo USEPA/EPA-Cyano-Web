@@ -16,7 +16,7 @@
 				<b>Area:</b> {{wbProps.areasqkm}} km<sup>2</sup><br>
 				<div *ngIf="wbProps.elevation"><b>Elevation:</b> {{wbProps.elevation}} m<br></div>
 			</div>
-			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download histogram</button>
+			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download Histogram</button>
 			<br><br>
 			<div class="details_tab">
 				<!-- User selections for WB stats -->
@@ -30,19 +30,25 @@
 					</mat-form-field>
 
 					<mat-form-field>
-						<mat-label>Select a date:</mat-label>
-						<input matInput [matDatepicker]="picker" [(ngModel)]="selectedAvailableDateObj" (dateChange)="updateDate($event.value);">
-						<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-						<mat-datepicker #picker></mat-datepicker>
-					</mat-form-field>
-					
-					<mat-form-field>
 						<mat-label>Date Range</mat-label>
-						<mat-select [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
-							<mat-option value="1day">Single</mat-option>
+						<mat-select *ngIf="selectedDataType=='daily'" [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
+							<mat-option value="1day">Single Date</mat-option>
 							<mat-option value="7day">7 Day History</mat-option>
 							<mat-option value="30day">30 Day History</mat-option>
 						</mat-select>
+						<mat-select *ngIf="selectedDataType=='weekly'" [(value)]="selectedDateRange" (selectionChange)="updateDateRange($event.value);">
+							<mat-option value="1week">1 Week History</mat-option>
+							<mat-option value="4week">4 Week History</mat-option>
+							<mat-option value="16week">16 Week History</mat-option>
+						</mat-select>
+					</mat-form-field>
+
+					<mat-form-field>
+						<mat-label *ngIf="selectedDateRange=='1day'">Date:</mat-label>
+						<mat-label *ngIf="selectedDateRange!='1day'">End Date:</mat-label>
+						<input matInput [matDatepicker]="picker" [(ngModel)]="selectedAvailableDateObj" (dateChange)="updateDate($event.value);">
+						<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+						<mat-datepicker #picker></mat-datepicker>
 					</mat-form-field>
 
 					<br>
@@ -53,10 +59,11 @@
 
 				</div>
 				<!-- Shows list of dates within selected range -->
-				<div *ngIf="selectedDateRange=='7day' || selectedDateRange=='30day'" id="selected-dates-div">
+				<!-- <div *ngIf="!isLoading && (selectedDateRange=='7day' || selectedDateRange=='30day')" id="selected-dates-div"> -->
+				<div *ngIf="!isLoading && (selectedDateRange!='1day' && selectedDateRange!='1week')" id="selected-dates-div">
 					<div>
 						<div class="details_slideshow">
-	            			<mat-checkbox color="primary" [(ngModel)]="slidershow" (change)="toggleSlideShow()">{{slidershow ? "Slideshow started" : "Start slideshow"}}</mat-checkbox>
+							<button mat-raised-button [color]="slidershow ? 'warn' : 'primary'" (click)="startSlideshow()">{{slidershow ? "Stop slideshow" : "Start slideshow"}}</button>
 	          			</div>
 	          			<br>
 	          			<p>Current date: {{selectedDate || selectedAvailableDate}}</p>
@@ -66,7 +73,7 @@
           					[(value)]="sliderValue"
           					[options]="sliderOptions"
           					(mouseup)="sliderEvent()"
-          					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day'}">
+          					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day' || selectedDateRange == '16week'}">
           				</ng5-slider>
 	          		</div>
 				</div>
@@ -80,7 +87,7 @@
 				<div class="data-item">
 				  <div class="chart_header">
 				    <div class="chart_title" class="chart-toggle" (click)="togglePlotType();">
-							<mat-icon *ngIf="selectedDateRange=='single'">unfold_more</mat-icon>
+							<mat-icon *ngIf="selectedDateRange=='1day' || selectedDateRange == '1week'">unfold_more</mat-icon>
 							{{selectedPlotType}}
 						</div>
 				    <div class="chart_source_selection"></div>
@@ -155,16 +162,18 @@
 					<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
 					<b>Min:</b> {{wbStats.min || 'N/A'}} cells/mL<br>
 					<b>Max:</b> {{wbStats.max || 'N/A'}} cells/mL<br>
-					<b>Average:</b> {{wbStats.average}} cells/mL<br>
-					<b>Standard Deviation:</b> {{wbStats.stddev}} cells/mL
+					<b>Average:</b> {{wbStats.average || 'N/A'}} cells/mL<br>
+					<b>Standard Deviation:</b> {{wbStats.stddev || 'N/A'}} cells/mL
 					<br><br>
-					<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
-					<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br>
-					<b>Extent WB:</b> {{wbMetrics.extentWb}} {{wbMetrics.extentWbUnits}}<br>
-					<b>Frequency WB:</b> {{wbMetrics.frequencyWb}} {{wbMetrics.frequencyWbUnits}}<br>
-					<b>Magnitude WB:</b> {{wbMetrics.magnitudeWb}} {{wbMetrics.magnitudeWbUnits}}<br>
-					<b>Period:</b> {{wbMetrics.period}}<br>
-					<b>Timestep:</b> {{wbMetrics.timestep}} 
+					<div *ngIf=!hideWaterbodyMetrics>
+						<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
+						<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br>
+						<b>Extent WB:</b> {{wbMetrics.extentWb}} {{wbMetrics.extentWbUnits}}<br>
+						<b>Frequency WB:</b> {{wbMetrics.frequencyWb}} {{wbMetrics.frequencyWbUnits}}<br>
+						<b>Magnitude WB:</b> {{wbMetrics.magnitudeWb}} {{wbMetrics.magnitudeWbUnits}}<br>
+						<b>Period:</b> {{wbMetrics.period}}<br>
+						<b>Timestep:</b> {{wbMetrics.timestep}}
+					</div>
 				</div>
 
 				<div *ngIf="!showStacked" class="data-item range-data-item">
@@ -183,8 +192,8 @@
 					<div>
 						<b>Min:</b> {{rangeStats.min || "N/A"}} cells/mL<br>
 						<b>Max:</b> {{rangeStats.max || "N/A"}} cells/mL<br>
-						<b>Average:</b> {{rangeStats.average}} cells/mL<br>
-						<b>Standard Deviation:</b> {{rangeStats.stddev}} cells/mL
+						<b>Average:</b> {{rangeStats.average || "N/A"}} cells/mL<br>
+						<b>Standard Deviation:</b> {{rangeStats.stddev || "N/A"}} cells/mL
 					</div>
 				</div>
 

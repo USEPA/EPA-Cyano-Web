@@ -5,6 +5,7 @@
   "disableUpload": false,
   "disableMarkers": false,
   "disableWaterbodyStats": true,
+  "disableWaterbodyMetrics": true,
   "appName": "",
   "gtag": ""
 }
