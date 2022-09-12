@@ -1,7 +1,7 @@
 """reports table
 
 Revision ID: a061d1f3c5c4
-Revises: 970621e83c6c
+Revises: 8be1c68ae581
 Create Date: 2021-11-30 20:51:51.712487
 
 """

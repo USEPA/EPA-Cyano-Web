@@ -92,8 +92,8 @@ def db_create():
     as_root(
         db_handler.create_database
     )  # creates database using DB_NAME, doesn't create tables.
-    print("Creating tables from models.")
-    as_root(db.create_all)
+    # print("Creating tables from models.")
+    # as_root(db.create_all)
 
 
 @app.cli.command("db-init")
