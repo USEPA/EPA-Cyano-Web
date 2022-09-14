@@ -1,0 +1,28 @@
+stages:
+  - Image Build
+
+include:
+  - project: 'DSO/DASTScanner'
+    file: '.gitlab-ci.yml'
+  - remote: 'https://gitlab.com/prismacloud-public/shift-left/extension/-/raw/master/.pcs.gitlab-ci.yml'
+CopyDevImages:
+  stage: Image Build
+  tags:
+    - qed-stg-runner
+  when: manual
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - mkdir -p /workspace
+    # Cyanweb Flask Image:
+    - echo "FROM ghcr.io/usepa/cyanweb-api:dev > /workspace/Dockerfile
+    - /kaniko/executor --context=/workspace --destination=$CI_REGISTRY_IMAGE/cyanweb-api:$CI_COMMIT_REF_NAME
+    # Cyanweb Angular Image:
+    - echo "FROM ghcr.io/usepa/cyanweb-angular:dev > /workspace/Dockerfile
+    - /kaniko/executor --context=/workspace --destination=$CI_REGISTRY_IMAGE/cyanweb-angular:$CI_COMMIT_REF_NAME
+    # Cyanweb MySQL Image:
+    - echo "FROM ghcr.io/usepa/cyanweb-db:dev > /workspace/Dockerfile
+    - /kaniko/executor --context=/workspace --destination=$CI_REGISTRY_IMAGE/cyanweb-db:$CI_COMMIT_REF_NAME
