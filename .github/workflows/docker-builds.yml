@@ -112,6 +112,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   build-nginx:
+    if: github.ref == 'refs/heads/dev-kube'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -144,6 +145,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   build-redis:
+    if: github.ref == 'refs/heads/dev-kube'
     runs-on: ubuntu-latest
     permissions:
       contents: read
