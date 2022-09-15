@@ -14,7 +14,8 @@ COPY cyan_flask/ /cyan_flask
 
 COPY docker/ /docker
 
-# COPY config/ config/
+# NOTE: .env is .dockerignored
+COPY config/ config/
 
 RUN pip install --requirement /cyan_flask/requirements.txt
 
