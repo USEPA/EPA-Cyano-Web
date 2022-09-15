@@ -19,10 +19,7 @@ COPY config/ config/
 
 RUN pip install --requirement /cyan_flask/requirements.txt
 
-# RUN chmod -R 755 /config && \
-# 	chmod 755 /docker/flask/start_flask.sh
-RUN mkdir /config && \
-	chmod -R 755 /config && \
+RUN chmod -R 755 /config && \
 	chmod 755 /docker/flask/start_flask.sh
 
 WORKDIR /cyan_flask
