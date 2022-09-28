@@ -10,7 +10,7 @@ import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 
-import { ConcentrationRanges } from '../test-data/test-levels';
+// import { ConcentrationRanges } from '../test-data/test-levels';
 
 @Component({
   selector: 'app-coordinates',
@@ -19,7 +19,7 @@ import { ConcentrationRanges } from '../test-data/test-levels';
 })
 export class CoordinatesComponent implements OnInit {
 
-	cyan_ranges: ConcentrationRanges;
+	// cyan_ranges: ConcentrationRanges;
 
 	marked: string = 'Check';
 
@@ -55,7 +55,7 @@ export class CoordinatesComponent implements OnInit {
 	private mapService: MapService,
 	private authService: AuthService,
 	private dialogComponent: DialogComponent,
-	private errorDialog: MatDialog
+	private errorDialog: MatDialog,
   ) { }
 
   ngOnInit() {
