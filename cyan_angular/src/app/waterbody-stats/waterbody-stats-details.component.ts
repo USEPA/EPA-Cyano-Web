@@ -421,6 +421,11 @@ export class WaterBodyStatsDetails {
 
     let orderedArrayOfData = this.calcs.sortByDate(wbData['data']);
 
+    this.curatedData = {
+      daily: {},
+      weekly: {}
+    };
+
     this.curatedData[this.selectedDataType]['dates'] = [];
     this.curatedData[this.selectedDataType]['formattedDates'] = [];
 
@@ -502,6 +507,8 @@ export class WaterBodyStatsDetails {
       this.selectedDate = '';  // NOTE: Only used for multi-day
       this.datesWithinRange = this.curatedData[this.selectedDataType].formattedDates;
 
+      this.updateWaterbodyStatsForSelectedDate()
+
       // Single date plotting
       this.handlePlot(chartData);
       if (this.selectedDate == 'all') {
@@ -538,7 +545,12 @@ export class WaterBodyStatsDetails {
     Updates WB stats for selected date for multi-day date ranges.
     Assumes this.curatedData has already been populated.
     */
-    let dateKey = this.calcs.getDayOfYear(this.selectedDate);
+    let dateKey = this.selectedDate.length > 0 ? this.calcs.getDayOfYear(this.selectedDate) : this.calcs.getDayOfYear(this.selectedAvailableDate);
+    
+    if (this.selectedDateRange === '1week') {
+      dateKey = this.curatedData[this.selectedDataType].dates[0];
+    }
+
     this.wbStats.date = this.curatedData[this.selectedDataType][dateKey].stats.date;
     this.wbStats.min = this.curatedData[this.selectedDataType][dateKey].stats.min;
     this.wbStats.max = this.curatedData[this.selectedDataType][dateKey].stats.max;
