@@ -106,7 +106,7 @@ jobs:
         with:
           context: .
           file: docker/angular/Dockerfile
-          build-args: env=kube
+          build-args: env=kube  # NOTE: uses 'kube' build from package.json
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
