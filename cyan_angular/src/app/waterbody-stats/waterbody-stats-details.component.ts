@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import {
   WaterBody,
   WaterBodyStats,
+  DateRangeWaterBodyStats,
   WaterBodyProperties,
   WaterBodyDataByRange,
   RangeItem,
@@ -57,6 +58,7 @@ export class WaterBodyStatsDetails {
   }
 
   wbStats: WaterBodyStats = new WaterBodyStats();
+  wbDateRangeStats: DateRangeWaterBodyStats = new DateRangeWaterBodyStats();
   wbProps: WaterBodyProperties = new WaterBodyProperties();
   wbMetrics: WaterBodyMetrics = new WaterBodyMetrics();
   rangeStats: RangeItem = new RangeItem();
@@ -425,12 +427,19 @@ export class WaterBodyStatsDetails {
     let chartData;
     // Building array for total date range to perform stats on
 
+    let dateRangeConcentrationData = [];  // sum of concentrationData from date range
+    let dateRangeConcentrationArray = [];  // sum of concentrationArray from date range
+
     orderedArrayOfData.forEach(dataObj => {
 
-      let date = Object.keys(dataObj)[0]
+      let date = Object.keys(dataObj)[0];
       let dataArray = wbData['data'][date];
       let concentrationData = this.createCellArray(dataArray);  // array of concentration, count, index objects
       let concentrationArray = concentrationData.filter(obj => obj.count > 0).map(obj => obj.concentration);
+
+      dateRangeConcentrationData = dateRangeConcentrationData.concat(concentrationData);
+      dateRangeConcentrationArray = dateRangeConcentrationArray.concat(concentrationArray);
+
       chartData = this.createChartData(concentrationData);  // data by range for date
 
       this.curatedData[this.selectedDataType][date] = {
@@ -438,16 +447,17 @@ export class WaterBodyStatsDetails {
         data: null  // curated data for plots, divided by range
       };
 
-      this.wbStats.date = this.calcs.getDateFromDayOfYear(date);
-      this.wbStats.min = (concentrationArray.length > 0) ? this.calcs.roundValue(Math.min(...concentrationArray)) : 0;  // min concentration with at least one count
-      this.wbStats.max = (concentrationArray.length > 0) ? this.calcs.roundValue(Math.max(...concentrationArray)) : 0;  // max concentration with at least one count
-      this.wbStats.average = (concentrationArray.length > 0) ? this.calcs.calculateAverage(concentrationData) : 0;
-      this.wbStats.stddev = (concentrationArray.length > 0) ? this.calcs.calculateStdDev(concentrationData) : 0;
+      let wbStats = new WaterBodyStats();
+      wbStats.date = this.calcs.getDateFromDayOfYear(date);
+      wbStats.min = (concentrationArray.length > 0) ? this.calcs.roundValue(Math.min(...concentrationArray)) : 0;  // min concentration with at least one count
+      wbStats.max = (concentrationArray.length > 0) ? this.calcs.roundValue(Math.max(...concentrationArray)) : 0;  // max concentration with at least one count
+      wbStats.average = (concentrationArray.length > 0) ? this.calcs.calculateAverage(concentrationData) : 0;
+      wbStats.stddev = (concentrationArray.length > 0) ? this.calcs.calculateStdDev(concentrationData) : 0;
 
-      this.curatedData[this.selectedDataType][date].stats = this.wbStats;
+      this.curatedData[this.selectedDataType][date].stats = wbStats;
       this.curatedData[this.selectedDataType][date].data = chartData;
       this.curatedData[this.selectedDataType].dates.push(date);
-      this.curatedData[this.selectedDataType].formattedDates.push(this.wbStats.date);
+      this.curatedData[this.selectedDataType].formattedDates.push(wbStats.date);
 
       let belowDetectionCounts = dataArray[0];
       let landCounts = dataArray[254];
@@ -457,10 +467,7 @@ export class WaterBodyStatsDetails {
       this.curatedData[this.selectedDataType][date].data.countsLand = landCounts;
       this.curatedData[this.selectedDataType][date].data.countsNoData = noDataCounts;
 
-      this.wbTotalPixelArea = dataArray.reduce((a, b) => a + b, 0);
-
     });
-
 
     // if (['7day', '30day'].includes(this.selectedDateRange)) {
     if (this.selectedDateRange != '1day' && this.selectedDateRange != '1week') {
@@ -481,6 +488,8 @@ export class WaterBodyStatsDetails {
           return true;
         }
       }).reverse();  // orders dates earliest to latest
+
+      this.calculateDateRangeWaterbodyStats(this.curatedData, dateRangeConcentrationData, dateRangeConcentrationArray);
 
       this.updateSlider();
 
@@ -511,6 +520,31 @@ export class WaterBodyStatsDetails {
       this.getWaterbodyImage(this.wbProps.objectid, year, day);
     });
 
+  }
+
+  calculateDateRangeWaterbodyStats(curatedData, dateRangeConcentrationData, dateRangeConcentrationArray) {
+    /*
+    Waterbody stats for the selected date range.
+    */
+    this.wbDateRangeStats.dates = curatedData[this.selectedDataType].formattedDates;
+    this.wbDateRangeStats.min = (dateRangeConcentrationArray.length > 0) ? this.calcs.roundValue(Math.min(...dateRangeConcentrationArray)) : 0;  // min concentration with at least one count
+    this.wbDateRangeStats.max = (dateRangeConcentrationArray.length > 0) ? this.calcs.roundValue(Math.max(...dateRangeConcentrationArray)) : 0;  // max concentration with at least one count
+    this.wbDateRangeStats.average = (dateRangeConcentrationArray.length > 0) ? this.calcs.calculateAverage(dateRangeConcentrationData) : 0;
+    this.wbDateRangeStats.stddev = (dateRangeConcentrationArray.length > 0) ? this.calcs.calculateStdDev(dateRangeConcentrationData) : 0;
+  }
+
+  updateWaterbodyStatsForSelectedDate() {
+    /*
+    Updates WB stats for selected date for multi-day date ranges.
+    Assumes this.curatedData has already been populated.
+    */
+    let dateKey = this.calcs.getDayOfYear(this.selectedDate);
+    this.wbStats.date = this.curatedData[this.selectedDataType][dateKey].stats.date;
+    this.wbStats.min = this.curatedData[this.selectedDataType][dateKey].stats.min;
+    this.wbStats.max = this.curatedData[this.selectedDataType][dateKey].stats.max;
+    this.wbStats.average = this.curatedData[this.selectedDataType][dateKey].stats.average;
+    this.wbStats.stddev = this.curatedData[this.selectedDataType][dateKey].stats.stddev;
+    this.wbTotalPixelArea = this.curatedData[this.selectedDataType][dateKey].data.totalPixelArea;
   }
 
   determineDateRanges(initDateObj, prevDaysAmount) {
@@ -990,7 +1024,7 @@ export class WaterBodyStatsDetails {
 
     this.dataByRange.totalCounts = totalCounts;
     this.dataByRange.totalConcentration = totalConcentration;
-    this.dataByRange.totalPixelArea = 0.09 * totalCounts;  // total pixels X pixel size (0.09 sqkm/pixel)
+    this.dataByRange.totalPixelArea = this.calcs.roundValue(0.09 * totalCounts);  // total pixels X pixel size (0.09 sqkm/pixel)
 
     this.dataByRange = this.calcs.calculateRangeArea(this.dataByRange, this.chartLabels);
     this.dataByRange = this.calcs.calculatePercentOfArea(this.dataByRange, this.chartLabels);
@@ -1072,6 +1106,8 @@ export class WaterBodyStatsDetails {
     }
 
     this.selectedDate = this.datesWithinRange[this.selectedDateIndex];
+
+    this.updateWaterbodyStatsForSelectedDate();
 
     // Updates slider to new selected date:
     this.sliderValue = this.selectedDateIndex;
