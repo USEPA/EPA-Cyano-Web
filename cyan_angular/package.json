@@ -1,6 +1,6 @@
 {
   "name": "cyan-web-app",
-  "version": "1.1.26",
+  "version": "1.1.29",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,9 +8,9 @@
     "build:standalone": "ng build --prod --outputPath=dist",
     "build:qed": "ng build --prod --baseHref=/cyanweb/ --deployUrl=/static_qed/epa-cyano-web/ --outputHashing=bundles --outputPath=../cyan_django/static/epa-cyano-web",
     "build:docker": "ng build --configuration=docker --output-path=dist",
-    "build:qed-docker": "ng build --configuration=docker --baseHref=/cyanweb --outputHashing=none --outputPath=../../static_qed/epa-cyano-web",
     "build:cyano": "ng build --prod --baseHref=/cyanweb --deployUrl=/cyanweb/ --outputHashing=none --outputPath=dist",
     "build:kube": "ng build --prod --baseHref=/cyanweb/ --outputPath=dist/cyanweb --outputHashing=bundles",
+    "build:qed-docker": "ng build --prod --baseHref=/cyanweb/ --outputPath=cyan_dist/cyanweb --outputHashing=bundles",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
