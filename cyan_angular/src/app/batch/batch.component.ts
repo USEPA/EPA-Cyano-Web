@@ -432,6 +432,8 @@ export class BatchComponent {
     Converts datetime values to local time for "Jobs" table.
     */
     jobsData.forEach(job => {
+      console.log("receivedDatetime", job.receivedDatetime)
+      console.log("finishedDatetime", job.finishedDatetime)
       job.receivedDatetime = this.convertDatetime(job.receivedDatetime);
       job.finishedDatetime = this.convertDatetime(job.finishedDatetime);
     });
@@ -442,11 +444,13 @@ export class BatchComponent {
     /*
     Converts datetime string into local timezone.
     */
+    console.log("convertDatetime datetime: ", datetime)
     if (datetime == 'None') {
       return datetime;
     }
     else {
       let utcFormattedDate = new Date(datetime + ' UTC');  // time in UTC from backend
+      console.log("utcFormattedDate: ", utcFormattedDate)
       return this.datePipe.transform(utcFormattedDate, 'yyyy-MM-dd HH:mm:ss');
     }
   }
