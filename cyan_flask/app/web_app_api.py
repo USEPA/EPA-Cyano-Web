@@ -670,7 +670,11 @@ def get_all_batch_jobs(request_obj):
     """
     username = request_obj["username"]
 
+    logging.warning("get_all_batch_jobs username: {}".format(username))
+
     user_jobs = celery_handler.get_all_jobs(username)
+
+    logging.warning("get_all_batch_jobs user_jobs: {}".format(user_jobs))
 
     jobs = list(
         reversed(Job.create_jobs_json(user_jobs))
