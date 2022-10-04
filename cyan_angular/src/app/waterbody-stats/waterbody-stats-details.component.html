@@ -66,7 +66,7 @@
 							<button mat-raised-button [color]="slidershow ? 'warn' : 'primary'" (click)="startSlideshow()">{{slidershow ? "Stop slideshow" : "Start slideshow"}}</button>
 	          			</div>
 	          			<br>
-	          			<p>Current date: {{selectedDate || selectedAvailableDate}}</p>
+	          			<p>Selected date: {{selectedDate || selectedAvailableDate}}</p>
 	          		</div>
 	          		<div>
           				<ng5-slider
@@ -174,6 +174,15 @@
 						<b>Period:</b> {{wbMetrics.period}}<br>
 						<b>Timestep:</b> {{wbMetrics.timestep}}
 					</div>
+				</div>
+
+				<div *ngIf="showStacked" class="data-item range-data-item">
+					<div *ngIf="wbDateRangeStats.dates"><b>Date Range:</b> {{wbDateRangeStats.dates[wbDateRangeStats.dates.length - 1]}} - {{wbDateRangeStats.dates[0]}}</div>
+					<!-- <b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br> -->
+					<b>Min:</b> {{wbDateRangeStats.min || 'N/A'}} cells/mL<br>
+					<b>Max:</b> {{wbDateRangeStats.max || 'N/A'}} cells/mL<br>
+					<b>Average:</b> {{wbDateRangeStats.average || 'N/A'}} cells/mL<br>
+					<b>Standard Deviation:</b> {{wbDateRangeStats.stddev || 'N/A'}} cells/mL
 				</div>
 
 				<div *ngIf="!showStacked" class="data-item range-data-item">

@@ -16,7 +16,7 @@ WORKDIR /app
 
 RUN apk update && \
 	apk add chromium && \
-	npm install && \
-	npm audit fix && \
-	npm run build:$env && \
-	npx ng test --sourceMap=false --browsers=Chrome_without_sandbox --watch=false
+	npm install --force && \
+	npm run build:$env
+
+# RUN npx ng test --sourceMap=false --browsers=Chrome_without_sandbox --watch=false
