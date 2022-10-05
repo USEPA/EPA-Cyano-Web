@@ -79,9 +79,9 @@
                     <span class="tab-title">Notifications</span>
                 </div>
             </button>
-            <button mat-menu-item class="coordiantes menu-link" [routerLink]="['/coordinates']" aria-label="Geographic coordiantes">
+            <button mat-menu-item class="wbstats menu-link" [routerLink]="['/wbsearch']" aria-label="Waterbody statistics">
                 <div class="menu-div">
-                    <span class="tab-title">Geographic Coordinates</span>
+                    <span class="tab-title">Waterbody Stats</span>
                 </div>
             </button>
         </mat-menu>
@@ -105,10 +105,11 @@
                 <span matBadge="{{new_notifications.length || ''}}" class="tab-title" matBadgeDescription="Number of new notifications">Notifications</span>
             </div>
         </button>
-        <button mat-button class="coordinates menu-item" [routerLink]="['/coordinates']" routerLinkActive="selected-menu-item">
+        <button mat-button class="wbstats menu-item" [routerLink]="['/wbsearch']" routerLinkActive="selected-menu-item">
             <div class="menu-div">
-                <img class="tab-icon" alt="Geographic coordiantes icon" src="assets/images/tab_geo_coord_icon.png"/>
-                <span class="tab-title">Geographic Coordinates</span>
+                <!-- <img class="tab-icon" alt="Waterbody statistics icon" src="assets/images/tab_geo_coord_icon.png"/> -->
+                <mat-icon class="tab-icon" alt="Waterbody statistics icon">query_stats</mat-icon>
+                <span class="tab-title">Waterbody Stats</span>
             </div>
         </button>
     </nav>
