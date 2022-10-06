@@ -206,7 +206,9 @@ export class WaterBodyStatsDetails {
   ngOnInit() {
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
-      this.hideWaterbodyMetrics = this.envService.config.disableWaterbodyMetrics;
+      if (configSet === true) {
+        this.hideWaterbodyMetrics = this.envService.config.disableWaterbodyMetrics;
+      }
     });
 
     this.activatedRoute.params.subscribe(params => {
@@ -258,12 +260,12 @@ export class WaterBodyStatsDetails {
     )
     .subscribe(result => {
 
-      this.waterbodyData['daily']['daily'] = result['daily'];
-      this.waterbodyData['daily']['data'] = result['data'];
+      this.waterbodyData[this.selectedDataType]['daily'] = result['daily'];
+      this.waterbodyData[this.selectedDataType]['data'] = result['data'];
 
       if (
-        Object.keys(this.waterbodyData['daily']).length <= 0 ||
-        Object.keys(this.waterbodyData['daily']['data']).length <= 0
+        Object.keys(this.waterbodyData[this.selectedDataType]).length <= 0 ||
+        Object.keys(this.waterbodyData[this.selectedDataType]['data']).length <= 0
       ) {
         // No data, retry with the date before this one:
         if (this.currentAttempts >= this.totalPrevDayAttempts) {
@@ -599,7 +601,8 @@ export class WaterBodyStatsDetails {
       this.selectedDateRange = '1day';  // defaults to 1day
     }
 
-    this.updateDateRange(this.selectedDateRange);
+    // this.updateDateRange(this.selectedDateRange);
+    this.getMostCurrentAvailableDate();  // gets most recent available date with data when changing data type
 
   }
 
@@ -657,6 +660,19 @@ export class WaterBodyStatsDetails {
       dateRangeArray[3]
     )
     .subscribe(result => {
+
+      if (
+        !('data' in result) ||
+        Object.keys(result['data']).length <= 0
+      ) {
+        // No data found within date range.
+        this.dialog.displayMessageDialog("No data found within date range.");
+        this.calculatingStats = false;  // displays stats for selected date
+        this.plotStats = false;  // displays plot of cell counts
+        this.isLoading = false;
+        return;
+      }
+
       this.isLoading = false;
       this.calculatingStats = true;  // displays stats for selected date
       this.plotStats = true;  // displays plot of cell counts
@@ -1204,6 +1220,7 @@ export class WaterBodyStatsDetails {
     Adds metrics to WB stats feature that's returned
     from the waterbody/data request.
     */
+
     let objectid = this.selectedWaterbody.objectid.toString();
     // this.wbMetrics.areaNormalizedMagnitude = wbData['metrics']['area_normalized_magnitude'][objectid];
     // this.wbMetrics.chiaNormalizedMagnitude = wbData['metrics']['chia_normalized_magnitude'][objectid];
