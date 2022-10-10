@@ -143,7 +143,11 @@ class PasswordHandler:
         Handled contacts page comment submission by sending email
         to cts email using an smtp server.
         """
-        smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
+        smtp_pass = None
+        if os.getenv("EMAIL_PASS"):
+            smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
+        else:
+            logging.warning("No EMAIL_PASS set. Assuming one is not needed.")
         smtp_email = os.getenv("EMAIL")
         user_email = request.get("user_email")
         username = request.get("username")
@@ -155,7 +159,11 @@ class PasswordHandler:
         Sends email to user that batch job is complete.
         Includes info about job and link to download CSV.
         """
-        smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
+        smtp_pass = None
+        if os.getenv("EMAIL_PASS"):
+            smtp_pass = self._handle_config_password(os.getenv("EMAIL_PASS"))
+        else:
+            logging.warning("No EMAIL_PASS set. Assuming one is not needed.")
         smtp_email = os.getenv("EMAIL")
         user_email = request.get("user_email")
         input_filename = request.get("filename")
