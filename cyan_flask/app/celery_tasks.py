@@ -111,13 +111,13 @@ def run_batch_job(self, request_obj):
         celery_handler.handle_failed_job(user_job)
         return
 
-    try:
+    # try:
         # Sends email to user about job being complete:
-        email_handler.send_batch_job_complete_email(request_obj)
-    except Exception as e:
-        logging.error("run_batch_job error sending email of CSV results: {}".format(e))
-        celery_handler.handle_failed_job(user_job)
-        return
+    email_handler.send_batch_job_complete_email(request_obj)
+    # except Exception as e:
+    #     logging.error("run_batch_job error sending email of CSV results: {}".format(e))
+    #     celery_handler.handle_failed_job(user_job)
+    #     return
 
     # Removes CSV from disk after it has been sent as email attachment:
     csv_handler.remove_csv_file(filename)
