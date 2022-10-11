@@ -166,13 +166,13 @@
 					<b>Standard Deviation:</b> {{wbStats.stddev || 'N/A'}} cells/mL
 					<br><br>
 					<div *ngIf=!hideWaterbodyMetrics>
-						<b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
-						<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br>
-						<b>Extent WB:</b> {{wbMetrics.extentWb}} {{wbMetrics.extentWbUnits}}<br>
-						<b>Frequency WB:</b> {{wbMetrics.frequencyWb}} {{wbMetrics.frequencyWbUnits}}<br>
-						<b>Magnitude WB:</b> {{wbMetrics.magnitudeWb}} {{wbMetrics.magnitudeWbUnits}}<br>
-						<b>Period:</b> {{wbMetrics.period}}<br>
-						<b>Timestep:</b> {{wbMetrics.timestep}}
+						<!-- <b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude || 'N/A'}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
+						<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude || 'N/A'}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br> -->
+						<b>Extent WB:</b> {{wbMetrics.extentWb || 'N/A'}} {{wbMetrics.extentWbUnits}}<br>
+						<b>Frequency WB:</b> {{wbMetrics.frequencyWb || 'N/A'}} {{wbMetrics.frequencyWbUnits}}<br>
+						<!-- <b>Magnitude WB:</b> {{wbMetrics.magnitudeWb || 'N/A'}} {{wbMetrics.magnitudeWbUnits}}<br> -->
+						<b>Period:</b> {{wbMetrics.period || 'N/A'}}<br>
+						<b>Timestep:</b> {{wbMetrics.timestep || 'N/A'}}
 					</div>
 				</div>
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class EnvService {
   defaultEnvFile: string = './assets/default-env.json';
 
   // Indicates config has been set and is ready to use:
-  private configSetSubject =  new Subject<boolean>();
+  private configSetSubject =  new BehaviorSubject<boolean>(false);
   configSetObservable = this.configSetSubject.asObservable();
 
   constructor(private http: HttpClient) {}

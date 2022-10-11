@@ -37,7 +37,8 @@
 
 .bottom-menu-title-block {
   float: left;
-  width: 25%;
+  /*width: 25%;*/
+  width: 33%;
   height: 100%;
   display: block;
   align-items: center;
