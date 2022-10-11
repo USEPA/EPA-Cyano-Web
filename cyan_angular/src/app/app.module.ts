@@ -59,7 +59,7 @@ import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
 import { ConfigComponent, SaveDialogComponent } from './config/config.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details/location-details.component';
-import { AccountComponent } from './account/account.component';
+import { AccountComponent, WhatsNewDialog } from './account/account.component';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
@@ -128,7 +128,8 @@ import { ReportsResultsComponent } from './waterbody-stats/reports/reports-resul
         WaterbodyStatsComponent,
         WaterBodyStatsDetails,
         ReportsComponent,
-        ReportsResultsComponent
+        ReportsResultsComponent,
+        WhatsNewDialog
     ],
     imports: [
         BrowserModule,
