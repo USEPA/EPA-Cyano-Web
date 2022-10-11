@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Validators, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { UserIdleService } from 'angular-user-idle';
 import { User, Account, UserService } from '../services/user.service';
@@ -64,7 +65,8 @@ export class AccountComponent implements OnInit {
     private authService: AuthService,
     private userIdle: UserIdleService,
     private locationService: LocationService,
-    private dialog: DialogComponent
+    private dialog: DialogComponent,
+    private matDialog: MatDialog
   ) {
   }
 
@@ -277,6 +279,33 @@ export class AccountComponent implements OnInit {
     else if (!this.authService.emailIsValid(this.registerEmail)) {
       self.dialog.handleError('Email is invalid');
     }
+  }
+
+  displayWhatsNewPopup(): void {
+    /*
+    Uses dialog component to display what's new in a particular version.
+    */
+
+    // this.dialog.displayMessageDialog("<h1>Testing html elements in message</h1>");
+    this.matDialog.open(WhatsNewDialog, {
+
+    });
+
+  }
+
+}
+
+@Component({
+  selector: 'what-new-dialog',
+  templateUrl: 'whats-new-dialog.html'
+})
+export class WhatsNewDialog {
+  constructor(public dialogRef: MatDialogRef<WhatsNewDialog>) {}
+
+  version: string = environment.appVersion;
+
+  exit(): void {
+    this.dialogRef.close();
   }
 
 }

@@ -45,7 +45,9 @@ export class LocationService {
     this.loadUser();
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
-      this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
+      if (configSet === true) {
+        this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
+      }
     });
 
   }

@@ -70,7 +70,7 @@
       <ng-template #userDetailsBlock>
         <div class="app-state-block">
           <div class="app-state-title">Application Details</div>
-          <div class="app-state">Version: {{ version }}</div>
+          <div class="app-state">Version: {{ version }}<mat-icon (click)="displayWhatsNewPopup()" class="whats-new-icon">help_outline</mat-icon></div>
           <div class="app-state"><div class="dev-state"></div></div>
         </div>
         <div class="user-details">
@@ -78,11 +78,13 @@
           <div class="user-details-username">Username: {{ currentUser.user.username }}</div>
           <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
         </div>
-        <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
-        <div *ngIf="loggingOut">
-          <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
-          <!-- <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button> -->
-          <button mat-raised-button color="primary" class="start-app log-out" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
+        <div style="width: fit-content; margin: 0 auto;">
+          <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
+          <div *ngIf="loggingOut">
+            <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
+            <!-- <button mat-raised-button class="start-app" (click)="changePassword()">Change Password</button> -->
+            <button mat-raised-button color="primary" class="start-app log-out" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
+          </div>
         </div>
       </ng-template>
       <div class="login-notification-block" *ngIf="!registerForm">

@@ -179,3 +179,12 @@
     height:  100%;
     margin-top: 4%;
 }
+
+.whats-new-icon {
+    vertical-align: middle;
+}
+
+.whats-new-icon:hover {
+    cursor: pointer;
+    opacity: 0.6;
+}

@@ -35,8 +35,10 @@ export class BottomMenuComponent implements OnInit {
     this.data_type = this.locationService.getDataType();
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
-      this.hideUpload = this.envService.config.disableUpload;
-      this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
+      if (configSet === true) {
+        this.hideUpload = this.envService.config.disableUpload;
+        this.hideWaterbodyStats = this.envService.config.disableWaterbodyStats;
+      }
     });
 
   }
