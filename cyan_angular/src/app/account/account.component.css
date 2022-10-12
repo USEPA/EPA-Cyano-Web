@@ -19,7 +19,8 @@
         margin: 10px;
     }
     .app-information-block {
-        margin-top: 10px;
+        /*margin-top: 10px;*/
+        margin-top: 5%;
         height: 60%;
     }
     .user-details {
@@ -153,7 +154,7 @@
     color: #ef0000;
 }
 .start-app {
-    margin-top: 10px;
+    /*margin-top: 10px;*/
     font-weight: bolder;
     min-width: 20%;
 }
@@ -166,7 +167,8 @@
 }
 .dev-state {
     display: inline-block;
-    color: #ef0000;
+    /*font-size: small;*/
+    /*color: #ef0000;*/
 }
 .app-description {
     font-size: smaller;
@@ -182,9 +184,16 @@
 
 .whats-new-icon {
     vertical-align: middle;
+    transform:  scale(0.85);
 }
 
 .whats-new-icon:hover {
     cursor: pointer;
     opacity: 0.6;
+}
+
+.dev-state ul {
+    /*padding-left: 0;*/
+    text-align: left;
+    font-size: smaller;
 }
