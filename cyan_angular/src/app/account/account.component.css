@@ -193,7 +193,7 @@
 }
 
 .dev-state ul {
-    /*padding-left: 0;*/
+    padding-left: 3rem;
     text-align: left;
     font-size: smaller;
 }
