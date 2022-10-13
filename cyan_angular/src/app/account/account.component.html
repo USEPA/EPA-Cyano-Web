@@ -70,15 +70,15 @@
       <ng-template #userDetailsBlock>
         <div class="app-state-block">
           <div class="app-state-title">Application Details</div>
-          <div class="app-state">Version: {{ version }}<mat-icon (click)="displayWhatsNewPopup()" class="whats-new-icon">help_outline</mat-icon></div>
+          <div class="app-state">Version: <button style="padding: 0;" mat-button (click)="displayWhatsNewPopup()">{{ version }}</button><!-- <mat-icon (click)="displayWhatsNewPopup()" class="whats-new-icon">help_outline</mat-icon> --></div>
           <div class="app-state">
             <div class="dev-state">
-              <ul>
+              <!-- <ul>
                 <li>Request Location Data</li>
                 <li>Waterbody Stats</li>
                 <li>Waterbody reports</li>
                 <li>Waterbody Map Layer</li>
-              </ul>
+              </ul> -->
             </div>
           </div>
         </div>
