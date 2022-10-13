@@ -182,22 +182,6 @@
     margin-top: 4%;
 }
 
-.whats-new-icon {
-    vertical-align: middle;
-    transform:  scale(0.85);
-}
-
-.whats-new-icon:hover {
-    cursor: pointer;
-    opacity: 0.6;
-}
-
-.dev-state ul {
-    padding-left: 3rem;
-    text-align: left;
-    font-size: smaller;
-}
-
 .account-buttons {
     width: fit-content;
     margin: 0 auto;
