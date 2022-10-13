@@ -70,7 +70,7 @@
       <ng-template #userDetailsBlock>
         <div class="app-state-block">
           <div class="app-state-title">Application Details</div>
-          <div class="app-state">Version: <button style="padding: 0;" mat-button (click)="displayWhatsNewPopup()">{{ version }}</button><!-- <mat-icon (click)="displayWhatsNewPopup()" class="whats-new-icon">help_outline</mat-icon> --></div>
+          <div class="app-state">Version: <a class="version-link" (click)="displayWhatsNewPopup()">{{ version }}</a><!-- <mat-icon (click)="displayWhatsNewPopup()" class="whats-new-icon">help_outline</mat-icon> --></div>
           <div class="app-state">
             <div class="dev-state">
               <!-- <ul>
@@ -88,7 +88,7 @@
           <div class="user-details-email">Email: {{ currentUser.user.email }}</div>
           <button *ngIf="loggingOut" mat-raised-button color="primary" class="start-app log-out" (click)="performLogoutRoutine({error:''})" autofocus>Log Out</button>
         </div>
-        <div style="width: fit-content; margin: 0 auto;">
+        <div class="account-buttons">
           <button *ngIf="!loggingOut" mat-raised-button class="start-app" (click)="exitAccount()" autofocus>Start using CyAN</button>
           <div *ngIf="loggingOut">
             <button mat-raised-button class="start-app" (click)="exitAccount()">Continue using CyAN</button>
