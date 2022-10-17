@@ -52,7 +52,7 @@ export class MarkerMapComponent implements OnInit {
   bottomRight = latLng(this.bottom, this.right);
   imageBounds = latLngBounds(this.bottomRight, this.topLeft);
 
-  waterbodyLayer = new ImageOverlay('./assets/images/daily-conus-2021-234.png', this.imageBounds, {});
+  waterbodyLayer = new ImageOverlay('./assets/images/daily_conus-2021-234.png', this.imageBounds, {});
 
   layersControl = {
     baseLayers: {
