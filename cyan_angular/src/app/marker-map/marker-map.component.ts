@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Location as NgLocation } from '@angular/common';
 import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map, DomUtil, Control, latLngBounds, ImageOverlay } from 'leaflet';
+import { featureLayer } from 'esri-leaflet';
 
 import { Router } from '@angular/router';
 
@@ -52,7 +53,14 @@ export class MarkerMapComponent implements OnInit {
   bottomRight = latLng(this.bottom, this.right);
   imageBounds = latLngBounds(this.bottomRight, this.topLeft);
 
-  waterbodyLayer = new ImageOverlay('./assets/images/daily_conus-2021-234.png', this.imageBounds, {});
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // TODO: Get latest daily and weekly layers from WB API.
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  waterbodyDataLayer = new ImageOverlay('./assets/images/daily_conus-2021-234.png', this.imageBounds, {});
+
+  waterbodiesLayer = featureLayer({
+    url: 'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/waterbodies_9/FeatureServer/0'
+  });
 
   layersControl = {
     baseLayers: {
@@ -61,7 +69,8 @@ export class MarkerMapComponent implements OnInit {
       'Topographic Maps': this.topoMap,
     },
     overlays: {
-      'Latest Waterbody Data': this.waterbodyLayer
+      'Latest Daily Data': this.waterbodyDataLayer,
+      'Waterbodies Layer': this.waterbodiesLayer
     }
   };
 
@@ -99,6 +108,10 @@ export class MarkerMapComponent implements OnInit {
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
     });
+
+    // Adds latest daily data to map by default:
+    this.waterbodyDataLayer.addTo(this.mapService.getMap());
+    
   }
 
   tileLayerEvents() {
