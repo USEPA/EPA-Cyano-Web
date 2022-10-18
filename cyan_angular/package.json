@@ -1,6 +1,6 @@
 {
   "name": "cyan-web-app",
-  "version": "1.1.35",
+  "version": "1.1.36",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
