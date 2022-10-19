@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Location as NgLocation } from '@angular/common';
-import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map } from 'leaflet';
+import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map, DomUtil, Control, latLngBounds, ImageOverlay } from 'leaflet';
+import { featureLayer } from 'esri-leaflet';
 
 import { Router } from '@angular/router';
 
@@ -27,6 +28,11 @@ export class MarkerMapComponent implements OnInit {
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
+  bottom: number = 22.802171214983044;
+  right: number = -65.04027865759939;
+  left: number = -131.1651209108407;
+  top: number = 52.921760353630894;
+
   marker_layers: LayerGroup;
 
   esriImagery = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -43,11 +49,28 @@ export class MarkerMapComponent implements OnInit {
     attribution: 'Tiles &copy; Esri'
   });
 
+  topLeft = latLng(this.top, this.left);
+  bottomRight = latLng(this.bottom, this.right);
+  imageBounds = latLngBounds(this.bottomRight, this.topLeft);
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // TODO: Get latest daily and weekly layers from WB API.
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  waterbodyDataLayer = new ImageOverlay('./assets/images/daily_conus-2021-234.png', this.imageBounds, {});
+
+  waterbodiesLayer = featureLayer({
+    url: 'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/waterbodies_9/FeatureServer/0'
+  });
+
   layersControl = {
     baseLayers: {
       'Imagery Maps': this.esriImagery,
       'Street Maps': this.streetMaps,
-      'Topographic Maps': this.topoMap
+      'Topographic Maps': this.topoMap,
+    },
+    overlays: {
+      'Latest Daily Data': this.waterbodyDataLayer,
+      'Waterbodies Layer': this.waterbodiesLayer
     }
   };
 
@@ -85,16 +108,23 @@ export class MarkerMapComponent implements OnInit {
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
     });
+
+    // Adds latest daily data to map by default:
+    this.waterbodyDataLayer.addTo(this.mapService.getMap());
+    
   }
 
   tileLayerEvents() {
     this.esriImagery.on('load', event => {
+      // console.log("esriImagery loaded")
       this.mapService.mainTileLayer = "Imagery Maps";  
     });
     this.streetMaps.on('load', event => {
+      // console.log("streetMaps loaded")
       this.mapService.mainTileLayer = "Street Maps";
     });
     this.topoMap.on('load', event => {
+      // console.log("topoMap loaded")
       this.mapService.mainTileLayer = "Topographic Maps";
     });
   }
