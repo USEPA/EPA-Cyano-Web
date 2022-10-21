@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
 import { EnvService } from '../services/env.service';
 import { DownloaderService } from '../services/downloader.service';
 import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
+import { Calculations } from '../waterbody-stats/utils/calculations';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -82,6 +83,9 @@ export class MarkerMapComponent implements OnInit {
     center: latLng([this.lat_0, this.lng_0])
   };
 
+  currentAttempts: number = 0;
+  totalPrevDayAttempts: number = 10;
+
   constructor(
     private locationService: LocationService,
     private router: Router,
@@ -92,6 +96,7 @@ export class MarkerMapComponent implements OnInit {
     private envService: EnvService,
     private downloader: DownloaderService,
     private waterbodyStats: WaterbodyStatsComponent,
+    private calcs: Calculations
   ) { }
 
   ngOnInit() {
@@ -116,7 +121,8 @@ export class MarkerMapComponent implements OnInit {
     });
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
-    }); 
+    });
+
   }
 
   tileLayerEvents() {
@@ -163,6 +169,89 @@ export class MarkerMapComponent implements OnInit {
       this.waterbodyStats.handleWaterbodySelect(waterbody)
     });
   }
+
+  getMostCurrentAvailableDate() {
+    /*
+    Makes requests for most current available date. Goes back
+    previous days until it finds an available date.
+    */
+
+    let prevDate = this.calcs.getDayOfYearFromDateObject(
+      new Date(new Date().setDate(new Date().getDate() - this.currentAttempts))
+    );
+    let startYear = parseInt(prevDate.split(' ')[0]);
+    let startDay = parseInt(prevDate.split(' ')[1]);
+
+    startYear = 2022;  // for testing
+    startDay = 276;  // for testing
+
+    // this.isLoading = true;
+
+    this.downloader.getConusImage(startYear, startDay, 'True').subscribe(result => {
+
+      console.log("getConusImage result: ", result);
+
+      // let imageBlob = result.body;
+
+      // let bbox = [
+      //   [this.wbProps.y_min, this.wbProps.x_max],
+      //   [this.wbProps.y_max, this.wbProps.x_min]
+      // ];
+
+      // this.waterbodyData[this.selectedDataType]['daily'] = result['daily'];
+      // this.waterbodyData[this.selectedDataType]['data'] = result['data'];
+
+      // No data response:
+      // {
+      //   "daily": true,
+      //   "day": 234,
+      //   "message": "No conus cyano image found for the inputs provided.",
+      //   "year": 2021
+      // }
+
+      // if (
+      //   // Object.keys(this.waterbodyData[this.selectedDataType]).length <= 0 ||
+      //   // Object.keys(this.waterbodyData[this.selectedDataType]['data']).length <= 0
+      //   true
+      // ) {
+      //   // No data, retry with the date before this one:
+      //   if (this.currentAttempts >= this.totalPrevDayAttempts) {
+      //   //   this.isLoading = false;
+      //     this.currentAttempts = 0;
+      //   //   this.dialog.handleError('No ' + this.selectedDataType + ' waterbody data currently available');
+      //   }
+      //   this.currentAttempts += 1;
+      //   this.getMostCurrentAvailableDate();
+      // }
+      // else {
+      //   // this.isLoading = false;
+      //   this.currentAttempts = 0;
+      //   // this.selectedAvailableDateObj = new Date(this.calcs.getDateFromDayOfYear(prevDate));
+      //   // this.selectedAvailableDate = this.calcs.getFormattedDateFromDateObject(this.selectedAvailableDateObj);
+      // }
+
+    });
+
+  }
+
+  // addImageLayer(image: Blob, bounds: any): any {
+  //   if (this.wbImageLayer) {
+  //     this.cyanMap.map.removeLayer(this.wbImageLayer);
+  //   }
+  //   let reader = new FileReader();
+  //   reader.addEventListener("load", () => {
+  //     let topLeft = latLng(bounds[1][0], bounds[1][1]);
+  //     let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+  //     let imageBounds = latLngBounds(bottomRight, topLeft);
+  //     let imageUrl = reader.result.toString();
+  //     this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+  //     this.cyanMap.map.addLayer(this.wbImageLayer);
+  //     return reader.result;
+  //   }, false);
+  //   if (image) {
+  //     reader.readAsDataURL(image);
+  //   }
+  // }
 
   mapPanEvent(e: any): void {
 

@@ -10,6 +10,7 @@ import { AuthService } from '../services/auth.service';
 import { LocationService } from '../services/location.service';
 import {environment} from "../../environments/environment";
 import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
 
 @Component({
   selector: 'app-account',
@@ -66,9 +67,9 @@ export class AccountComponent implements OnInit {
     private userIdle: UserIdleService,
     private locationService: LocationService,
     private dialog: DialogComponent,
-    private matDialog: MatDialog
-  ) {
-  }
+    private matDialog: MatDialog,
+    private markerMap: MarkerMapComponent
+  ) {}
 
   ngOnInit() {
     let self = this;
@@ -214,6 +215,9 @@ export class AccountComponent implements OnInit {
 
         // track user idle timeout, logout if expired
         this.trackUserIdleTimout();
+
+        this.markerMap.getMostCurrentAvailableDate();  // loads most recent daily wb data layer
+
       },
       errorResponse => {
         // error happened, show error in page

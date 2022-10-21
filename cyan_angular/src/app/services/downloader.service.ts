@@ -270,8 +270,6 @@ export class DownloaderService {
     if (endYear) { url += '&end_year=' + endYear; }
     if (endDay) { url += '&end_day=' + endDay; }
 
-    console.log("Request to WB for data: ", url);
-
     return this.executeAuthorizedGetRequest(url); 
   }
 
@@ -305,6 +303,27 @@ export class DownloaderService {
         'Content-Type': 'image/png',
         'App-Name': this.envService.config.appName,
       },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  getConusImage(year: number, day: number, daily: string) {
+    /*
+    Calls waterbody backend's conus_image endpoint, e.g.,
+    /waterbody/conus_image/?year=2021&day=234&daily=True
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.waterbodyUrl + 
+      'conus_image/?year=' + year +
+      '&day=' + day +
+      '&daily=' + daily
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/png',
+        'App-Name': this.envService.config.appName,
+      },
+      // withCredentials: true,
       responseType: 'blob',
       observe: 'response'
     });
