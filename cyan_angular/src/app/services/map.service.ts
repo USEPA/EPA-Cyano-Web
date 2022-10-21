@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker, tileLayer } from 'leaflet';
+import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker, tileLayer, ImageOverlay, latLng, latLngBounds } from 'leaflet';
 import { Location } from '../models/location';
 import { CyanMap } from '../utils/cyan-map';
 import { UserService } from '../services/user.service';
@@ -22,7 +22,20 @@ export class MapService {
 
   degSecRounding: number = 6;  // rounding for dms seconds
 
-  constructor(private cyanMap: CyanMap, private userService: UserService) {}
+  bottom: number = 24.623340905712205;
+  right: number = -65.03986894612699;
+  left: number = -131.1651209108407;
+  top: number = 52.9220879731627;
+  topLeft = latLng(this.top, this.left);
+  bottomRight = latLng(this.bottom, this.right);
+  imageBounds = latLngBounds(this.bottomRight, this.topLeft);
+
+  waterbodyDataLayer = new ImageOverlay('./assets/images/daily-conus-2021-234-new.png', this.imageBounds, {});
+
+  constructor(
+    private cyanMap: CyanMap,
+    private userService: UserService
+  ) {}
 
   setMap(map: Map): void {
     this.cyanMap.map = map;

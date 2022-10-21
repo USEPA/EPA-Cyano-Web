@@ -2,7 +2,6 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Location as NgLocation } from '@angular/common';
 import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map, DomUtil, Control, latLngBounds, ImageOverlay } from 'leaflet';
 import { featureLayer } from 'esri-leaflet';
-
 import { Router } from '@angular/router';
 
 import { LocationService } from '../services/location.service';
@@ -11,6 +10,8 @@ import { Location } from '../models/location';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { EnvService } from '../services/env.service';
+import { DownloaderService } from '../services/downloader.service';
+import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -28,10 +29,10 @@ export class MarkerMapComponent implements OnInit {
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
-  bottom: number = 22.802171214983044;
-  right: number = -65.04027865759939;
+  bottom: number = 24.623340905712205;
+  right: number = -65.03986894612699;
   left: number = -131.1651209108407;
-  top: number = 52.921760353630894;
+  top: number = 52.9220879731627;
 
   marker_layers: LayerGroup;
 
@@ -56,10 +57,11 @@ export class MarkerMapComponent implements OnInit {
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
   // TODO: Get latest daily and weekly layers from WB API.
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  waterbodyDataLayer = new ImageOverlay('./assets/images/daily_conus-2021-234.png', this.imageBounds, {});
+  waterbodyDataLayer = null;  // defined in map service
 
   waterbodiesLayer = featureLayer({
-    url: 'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/waterbodies_9/FeatureServer/0'
+    url: 'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/waterbodies_9/FeatureServer/0',
+    bubblingMouseEvents: false
   });
 
   layersControl = {
@@ -69,7 +71,7 @@ export class MarkerMapComponent implements OnInit {
       'Topographic Maps': this.topoMap,
     },
     overlays: {
-      'Latest Daily Data': this.waterbodyDataLayer,
+      // 'Latest Daily Data': this.waterbodyDataLayer,
       'Waterbodies Layer': this.waterbodiesLayer
     }
   };
@@ -87,8 +89,10 @@ export class MarkerMapComponent implements OnInit {
     private user: UserService,
     private authService: AuthService,
     private ngLocation: NgLocation,
-    private envService: EnvService
-  ) {}
+    private envService: EnvService,
+    private downloader: DownloaderService,
+    private waterbodyStats: WaterbodyStatsComponent,
+  ) { }
 
   ngOnInit() {
     this.getLocations();
@@ -97,7 +101,12 @@ export class MarkerMapComponent implements OnInit {
     if (username == '' && !path.includes('reset')) {
       this.router.navigate(['/account']);
     }
+
+    this.waterbodyDataLayer = this.mapService.waterbodyDataLayer;
+    this.layersControl.overlays['Latest Daily Data'] = this.mapService.waterbodyDataLayer;
+
     this.tileLayerEvents();  // updates main map's tile layer for minimap to access
+
   }
 
   ngAfterViewInit() {
@@ -107,11 +116,7 @@ export class MarkerMapComponent implements OnInit {
     });
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
-    });
-
-    // Adds latest daily data to map by default:
-    this.waterbodyDataLayer.addTo(this.mapService.getMap());
-    
+    }); 
   }
 
   tileLayerEvents() {
@@ -126,6 +131,36 @@ export class MarkerMapComponent implements OnInit {
     this.topoMap.on('load', event => {
       // console.log("topoMap loaded")
       this.mapService.mainTileLayer = "Topographic Maps";
+    });
+    this.waterbodyDataLayer.on('load', event => {
+      console.log("waterbodyDataLayer loaded: ", event)
+      this.waterbodyDataLayer.addTo(this.mapService.getMap());
+    });
+    this.waterbodiesLayer.on('click', event => {
+      this.displayWaterbodyDetails(event);
+    });
+  }
+
+  displayWaterbodyDetails(event): void {
+    // Goes to WB stats for selected WB:
+    this.downloader.searchForWaterbodyByCoords(event.latlng.lat, event.latlng.lng).subscribe(result => {
+      if (!('waterbodies' in result)) {
+        console.log("No waterbodies found: ", result)
+        return;
+      }
+      if (result['waterbodies'].length < 1) {
+        console.log("No waterbodies array: ", result)
+        return;
+      }
+      let waterbody = {
+        objectid: result['waterbodies'][0]['objectid'],
+        name: result['waterbodies'][0]['name'],
+        centroid_lat: result['waterbodies'][0]['centroid_lat'],
+        centroid_lng: result['waterbodies'][0]['centroid_lng'],
+        areasqkm: result['waterbodies'][0]['areasqkm'],
+        state_abbr: result['waterbodies'][0]['state_abbr']
+      };
+      this.waterbodyStats.handleWaterbodySelect(waterbody)
     });
   }
 

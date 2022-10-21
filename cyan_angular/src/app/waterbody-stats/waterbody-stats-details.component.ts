@@ -7,7 +7,7 @@ import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
 import { Label, BaseChartDirective } from 'ng2-charts';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Options, ChangeContext } from 'ng5-slider';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject, BehaviorSubject } from 'rxjs';
 
 import {
   WaterBody,
@@ -200,7 +200,7 @@ export class WaterBodyStatsDetails {
     private calcs: Calculations,
     private charts: Charts,
     private router: Router,
-    private envService: EnvService
+    private envService: EnvService,
   ) { }
 
   ngOnInit() {
@@ -223,6 +223,9 @@ export class WaterBodyStatsDetails {
       this.getWaterbodyGeojson(this.selectedWaterbody);
 
     });
+
+    this.mapService.getMap().removeLayer(this.mapService.waterbodyDataLayer);  // removes wb data layer
+
   }
 
   exit(): void {
