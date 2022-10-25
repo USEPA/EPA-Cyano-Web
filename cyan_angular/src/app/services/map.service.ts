@@ -30,7 +30,8 @@ export class MapService {
   bottomRight = latLng(this.bottom, this.right);
   imageBounds = latLngBounds(this.bottomRight, this.topLeft);
 
-  waterbodyDataLayer = new ImageOverlay('./assets/images/daily-conus-2021-234-new.png', this.imageBounds, {});
+  // waterbodyDataLayer = new ImageOverlay('./assets/images/daily-conus-2021-234-new.png', this.imageBounds, {});
+  waterbodyDataLayer = null;
 
   constructor(
     private cyanMap: CyanMap,

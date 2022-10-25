@@ -323,7 +323,7 @@ export class DownloaderService {
         'Content-Type': 'image/png',
         'App-Name': this.envService.config.appName,
       },
-      withCredentials: true,
+      // withCredentials: true,
       responseType: 'blob',
       observe: 'response'
     });
