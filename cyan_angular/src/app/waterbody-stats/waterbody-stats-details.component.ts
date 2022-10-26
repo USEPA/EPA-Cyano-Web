@@ -340,7 +340,7 @@ export class WaterBodyStatsDetails {
     return imageExist;
   }
 
-  getWaterbodyImage(objectid: number, year: number, day: number): void {
+  getWaterbodyImage(objectid: number, year: number, day: number, daily: string = 'True'): void {
     /*
     Adds waterbody pixel image as a map layer.
     */
@@ -370,7 +370,7 @@ export class WaterBodyStatsDetails {
     else{
       this.isLoading = true;
       this.numExpectedImages += 1;
-      this.downloader.getWaterbodyImage(objectid, year, day).subscribe(response => {
+      this.downloader.getWaterbodyImage(objectid, year, day, daily).subscribe(response => {
 
         let imageBlob = response.body;
         let bbox = [
@@ -529,7 +529,7 @@ export class WaterBodyStatsDetails {
       let doy = this.calcs.getDayOfYear(date);
       let year = parseInt(doy.split(' ')[0]);  // e.g., "2021 03"
       let day = parseInt(doy.split(' ')[1]);
-      this.getWaterbodyImage(this.wbProps.objectid, year, day);
+      this.getWaterbodyImage(this.wbProps.objectid, year, day, this.dataTypeRequestMap[this.selectedDataType]);
     });
 
   }
@@ -1150,7 +1150,7 @@ export class WaterBodyStatsDetails {
 
     // TODO: Expect images already downloaded here?
     // Pick them out of an array?
-    this.getWaterbodyImage(this.wbProps.objectid, year, day);
+    this.getWaterbodyImage(this.wbProps.objectid, year, day, this.dataTypeRequestMap[this.selectedDataType]);
 
     this.chartObjs.forEach((chart) => {
       this.triggerHover(chart.chart);

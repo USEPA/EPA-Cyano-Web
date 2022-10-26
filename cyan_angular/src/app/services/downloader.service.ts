@@ -289,7 +289,7 @@ export class DownloaderService {
     return this.executeAuthorizedGetRequest(url); 
   }
 
-  getWaterbodyImage(objectid: number, year: number, day: number) {
+  getWaterbodyImage(objectid: number, year: number, day: number, daily: string = 'True') {
     /*
     Gets waterbody image for a given date (year and day-of-year).
     */
