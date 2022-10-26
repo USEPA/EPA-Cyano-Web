@@ -216,7 +216,7 @@ export class AccountComponent implements OnInit {
         // track user idle timeout, logout if expired
         this.trackUserIdleTimout();
 
-        this.markerMap.getMostCurrentAvailableDate();  // loads most recent daily wb data layer
+        // this.markerMap.getMostCurrentAvailableDate();  // loads most recent daily wb data layer
 
       },
       errorResponse => {
