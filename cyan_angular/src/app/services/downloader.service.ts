@@ -313,7 +313,7 @@ export class DownloaderService {
     Calls waterbody backend's conus_image endpoint, e.g.,
     /waterbody/conus_image/?year=2021&day=234&daily=True
     */
-    if (!this.authService.checkUserAuthentication()) { return; }
+    // if (!this.authService.checkUserAuthentication()) { return; }
     let url = this.envService.config.waterbodyUrl + 
       'conus_image/?year=' + year +
       '&day=' + day +
