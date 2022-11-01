@@ -271,7 +271,7 @@ export class MarkerMapComponent implements OnInit {
         return container;
       }
     });
-    this.mapService.getMap().addControl(this.customControl);
+    this.mapService.getMap().addControl(new this.customControl);
   }
 
   mapPanEvent(e: any): void {
