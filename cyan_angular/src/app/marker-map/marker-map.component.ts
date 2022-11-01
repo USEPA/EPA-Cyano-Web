@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Location as NgLocation } from '@angular/common';
 import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map, DomUtil, Control, latLngBounds, ImageOverlay } from 'leaflet';
+import * as L from 'leaflet';
 import { featureLayer } from 'esri-leaflet';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -112,16 +113,11 @@ export class MarkerMapComponent implements OnInit {
       this.router.navigate(['/account']);
     }
 
-    // this.waterbodyDataLayer = this.mapService.waterbodyDataLayer;
-    // this.layersControl.overlays['Latest Daily Data'] = this.mapService.waterbodyDataLayer;
-
-    // this.getMostCurrentAvailableDate();
-
     this.tileLayerEvents();  // updates main map's tile layer for minimap to access
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
       if (configSet === true) {
-        // console.log("config set, getting conus image");
+        console.log("config set, getting conus image");
         this.getMostCurrentAvailableDate();
       }
     });
@@ -136,8 +132,6 @@ export class MarkerMapComponent implements OnInit {
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
     });
-
-    // this.getMostCurrentAvailableDate();
 
   }
 
@@ -186,11 +180,13 @@ export class MarkerMapComponent implements OnInit {
     });
   }
 
-  getMostCurrentAvailableDate() {
+  getMostCurrentAvailableDate(daily: boolean = true) {
     /*
     Makes requests for most current available date. Goes back
     previous days until it finds an available date.
     */
+
+    let dailyParam = daily === true ? 'True' : 'False';
 
     let prevDate = this.calcs.getDayOfYearFromDateObject(
       new Date(new Date().setDate(new Date().getDate() - this.currentAttempts))
@@ -198,12 +194,9 @@ export class MarkerMapComponent implements OnInit {
     let startYear = parseInt(prevDate.split(' ')[0]);
     let startDay = parseInt(prevDate.split(' ')[1]);
 
-    // startYear = 2022;  // for testing
-    // startDay = 276;  // for testing
-
     // this.isLoading = true;
 
-    this.downloader.getConusImage(startYear, startDay, 'True').subscribe(result => {
+    this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
 
       console.log("getConusImage result: ", result);
 
@@ -229,40 +222,48 @@ export class MarkerMapComponent implements OnInit {
         this.getMostCurrentAvailableDate();
       }
       else {
-
         this.currentAttempts = 0;
-
         let imageBlob = result.body;
-
-        console.log("Adding image layer")
-
-        this.addImageLayer(imageBlob);
-
-        console.log("Image layer added")
-
+        let dateString = this.calcs.getDateFromDayOfYear(startYear + ' ' + startDay);
+        let dataTypeString = daily === true ? 'Daily' : 'Weekly';
+        this.addImageLayer(imageBlob, dateString, dataTypeString);
+        this.addCustomLabelToMap(dateString, dataTypeString);
       }
 
     });
 
   }
 
-  // addImageLayer(image: Blob, bounds: any): any {
-  addImageLayer(image: Blob): any {
-    // if (this.wbImageLayer) {
-    //   this.cyanMap.map.removeLayer(this.wbImageLayer);
-    // }
+  addImageLayer(image: Blob, dateString: string, dataTypeString: string): any {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       let imageUrl = reader.result.toString();
+      let imageLayerTitle = 'Latest ' + dataTypeString + ' Data (' + dateString + ')';
       this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
-      console.log("Adding leaflet control")
       this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
-      this.layersControl.overlays['Latest Daily Data'] = this.mapService.waterbodyDataLayer;  // adds lealet control
+      this.layersControl.overlays[imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
       return reader.result;
     }, false);
     if (image) {
       reader.readAsDataURL(image);
     }
+  }
+
+  addCustomLabelToMap(dateString: string, dataTypeString: string): void {
+    let customControl = L.Control.extend({
+      options: {
+        position: 'topright'
+      },
+      onAdd: function(map) {
+        let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        container.style.background = 'white';
+        container.style.padding = '5px';
+        container.textContent = dataTypeString + ' Data for ' + dateString;
+        return container;
+      }
+    });
+
+    this.mapService.getMap().addControl(new customControl);
   }
 
   mapPanEvent(e: any): void {

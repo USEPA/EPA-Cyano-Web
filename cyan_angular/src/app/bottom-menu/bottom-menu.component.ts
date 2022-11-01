@@ -7,6 +7,7 @@ import { LocationService } from '../services/location.service';
 import { AuthService } from '../services/auth.service';
 import { BatchComponent } from '../batch/batch.component';
 import { EnvService } from '../services/env.service';
+import { MarkerMapComponent } from '../marker-map/marker-map.component';
 
 
 @Component({
@@ -27,7 +28,8 @@ export class BottomMenuComponent implements OnInit {
     private locationService: LocationService,
     private authService: AuthService,
     private dialog: MatDialog,
-    private envService: EnvService
+    private envService: EnvService,
+    private markerMap: MarkerMapComponent
   ) { }
 
   ngOnInit() {
@@ -50,8 +52,11 @@ export class BottomMenuComponent implements OnInit {
   }
 
   dataTypeClick(type: number): void {
+    console.log("Data type click: ", type)
     this.data_type = type;
     this.locationService.setDataType(type);
+    let dataBool = type === 2 ? true : false;
+    this.markerMap.getMostCurrentAvailableDate(dataBool);
   }
 
   reloadClick(): void {

@@ -17,6 +17,7 @@
 				<div *ngIf="wbProps.elevation"><b>Elevation:</b> {{wbProps.elevation}} m<br></div>
 			</div>
 			<button mat-raised-button id="download-histo-btn" (click)="downloadHistoCSV()">Download Histogram</button>
+			<button *ngIf="showAddWaterbodyButton" mat-raised-button id="download-histo-btn" (click)="addWaterbodyToLocations()">Add Waterbody to Locations</button>
 			<br><br>
 			<div class="details_tab">
 				<!-- User selections for WB stats -->

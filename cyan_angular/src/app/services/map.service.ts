@@ -31,7 +31,7 @@ export class MapService {
   imageBounds = latLngBounds(this.bottomRight, this.topLeft);
 
   // waterbodyDataLayer = new ImageOverlay('./assets/images/daily-conus-2021-234-new.png', this.imageBounds, {});
-  waterbodyDataLayer = null;
+  waterbodyDataLayer = new ImageOverlay('', null, {});
 
   constructor(
     private cyanMap: CyanMap,

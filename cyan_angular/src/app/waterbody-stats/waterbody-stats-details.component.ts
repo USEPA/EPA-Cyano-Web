@@ -184,6 +184,8 @@ export class WaterBodyStatsDetails {
 
   hideWaterbodyMetrics: boolean = true;
 
+  showAddWaterbodyButton: boolean = false;
+
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
     private authService: AuthService,
@@ -221,6 +223,8 @@ export class WaterBodyStatsDetails {
       this.getMostCurrentAvailableDate();
 
       this.getWaterbodyGeojson(this.selectedWaterbody);
+
+      this.checkMyLocationsForWaterbody();
 
     });
 
@@ -1232,6 +1236,54 @@ export class WaterBodyStatsDetails {
     // this.wbMetrics.magnitudeWb = wbData['metrics']['magnitude_wb'][objectid];
     this.wbMetrics.period = wbData['metrics']['metadata']['period'];
     this.wbMetrics.timestep = wbData['metrics']['metadata']['timestep'];
+  }
+
+  checkMyLocationsForWaterbody() {
+    /*
+    Checks if waterbody is already in user's locations. Adds
+    button to WB details for adding WB to locations if it doesn't
+    exist.
+    */
+    let wbExist = false;
+    this.locationService.getStaticLocations().forEach(location => {
+      if (location.waterbody.objectid === this.selectedWaterbody.objectid) {
+        wbExist = true;
+      }
+    });
+    if (wbExist === false) {
+      this.showAddWaterbodyButton = true;
+    }
+    else {
+      this.showAddWaterbodyButton = false;
+    }
+  }
+
+  addWaterbodyToLocations() {
+    /*
+    Adds waterbody to user's locations if not already there.
+    Creates marker at the centroid. NOTE: Check that WB exists
+    at the centroid.
+    */
+    console.log("addWaterbodyToLocations called")
+
+    let map = this.mapService.getMap();
+    let lat = this.selectedWaterbody.centroid_lat;
+    let lng = this.selectedWaterbody.centroid_lng;
+
+    let coords = latLng(lat, lng);
+
+    let name = 'To Be Updated...';
+    let cellCon = 0;
+    let maxCellCon = 0;
+    let cellChange = 0;
+    let dataDate = '01/01/2018';
+    let source = 'OLCI';
+
+    let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
+    map.setView(coords, 12);
+    let m = this.mapService.addMarker(location);
+    m.fireEvent('click');
+
   }
 
 }
