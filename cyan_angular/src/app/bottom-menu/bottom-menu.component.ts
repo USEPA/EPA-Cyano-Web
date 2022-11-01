@@ -56,6 +56,7 @@ export class BottomMenuComponent implements OnInit {
     this.data_type = type;
     this.locationService.setDataType(type);
     let dataBool = type === 2 ? true : false;
+    console.log("dataTypeClick dataBool: ", dataBool)
     this.markerMap.getMostCurrentAvailableDate(dataBool);
   }
 

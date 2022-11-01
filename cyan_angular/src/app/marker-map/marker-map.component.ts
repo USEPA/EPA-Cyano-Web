@@ -91,6 +91,8 @@ export class MarkerMapComponent implements OnInit {
 
   configSetSub: Subscription;
 
+  customControl: any;
+
   constructor(
     private locationService: LocationService,
     private router: Router,
@@ -186,7 +188,11 @@ export class MarkerMapComponent implements OnInit {
     previous days until it finds an available date.
     */
 
+    console.log("getMostCurrentAvailableDate daily: ", daily)
+
     let dailyParam = daily === true ? 'True' : 'False';
+
+    console.log("getMostCurrentAvailableDate dailyParam: ", dailyParam)
 
     let prevDate = this.calcs.getDayOfYearFromDateObject(
       new Date(new Date().setDate(new Date().getDate() - this.currentAttempts))
@@ -250,7 +256,10 @@ export class MarkerMapComponent implements OnInit {
   }
 
   addCustomLabelToMap(dateString: string, dataTypeString: string): void {
-    let customControl = L.Control.extend({
+    if (this.customControl) {
+      this.mapService.getMap().removeControl(this.customControl);
+    }
+    this.customControl = L.Control.extend({
       options: {
         position: 'topright'
       },
@@ -262,8 +271,7 @@ export class MarkerMapComponent implements OnInit {
         return container;
       }
     });
-
-    this.mapService.getMap().addControl(new customControl);
+    this.mapService.getMap().addControl(this.customControl);
   }
 
   mapPanEvent(e: any): void {
