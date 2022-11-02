@@ -93,6 +93,8 @@ export class MarkerMapComponent implements OnInit {
 
   customControl: any;
 
+  geoPopup: any;
+
   constructor(
     private locationService: LocationService,
     private router: Router,
@@ -150,13 +152,24 @@ export class MarkerMapComponent implements OnInit {
       // console.log("topoMap loaded")
       this.mapService.mainTileLayer = "Topographic Maps";
     });
-    // this.mapService.waterbodyDataLayer.on('load', event => {
-    //   console.log("waterbodyDataLayer loaded: ", event)getConusImage
-    //   this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
-    // });
+
     this.waterbodiesLayer.on('click', event => {
       this.displayWaterbodyDetails(event);
     });
+
+    this.waterbodiesLayer.on('mouseover', event => {
+      let coords = latLng(event.layer.feature.properties.c_lat, event.layer.feature.properties.c_lng);
+      let content = event.layer.feature.properties.GNIS_NAME
+      this.geoPopup = L.popup()
+        .setLatLng(coords)
+        .setContent(content)
+        .openOn(this.mapService.getMap());
+    });
+
+    this.waterbodiesLayer.on('mouseout', event => {
+      this.geoPopup.removeFrom(this.mapService.getMap());
+    });
+
   }
 
   displayWaterbodyDetails(event): void {
