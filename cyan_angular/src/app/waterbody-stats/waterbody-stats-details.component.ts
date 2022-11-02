@@ -214,6 +214,8 @@ export class WaterBodyStatsDetails {
     });
 
     this.activatedRoute.params.subscribe(params => {
+
+      console.log("waterbody-stats-details params: ", params)
       
       this.selectedWaterbody = JSON.parse(params.selectedWaterbody);
       this.wbProps = JSON.parse(params.wbProps);
@@ -1264,11 +1266,15 @@ export class WaterBodyStatsDetails {
     Creates marker at the centroid. NOTE: Check that WB exists
     at the centroid.
     */
-    console.log("addWaterbodyToLocations called")
-
     let map = this.mapService.getMap();
     let lat = this.selectedWaterbody.centroid_lat;
     let lng = this.selectedWaterbody.centroid_lng;
+
+    if ('clicked_lat' in this.selectedWaterbody && 'clicked_lng' in this.selectedWaterbody) {
+      console.log("Using clicked coords in waterbody object.")
+      lat = this.selectedWaterbody['clicked_lat'];
+      lng = this.selectedWaterbody['clicked_lng'];
+    }
 
     let coords = latLng(lat, lng);
 
@@ -1280,7 +1286,7 @@ export class WaterBodyStatsDetails {
     let source = 'OLCI';
 
     let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
-    map.setView(coords, 12);
+    // map.setView(coords, 12);
     let m = this.mapService.addMarker(location);
     m.fireEvent('click');
 

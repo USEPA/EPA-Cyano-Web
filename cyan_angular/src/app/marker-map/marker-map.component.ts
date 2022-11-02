@@ -189,9 +189,11 @@ export class MarkerMapComponent implements OnInit {
         centroid_lat: result['waterbodies'][0]['centroid_lat'],
         centroid_lng: result['waterbodies'][0]['centroid_lng'],
         areasqkm: result['waterbodies'][0]['areasqkm'],
-        state_abbr: result['waterbodies'][0]['state_abbr']
+        state_abbr: result['waterbodies'][0]['state_abbr'],
+        clicked_lat: event.latlng.lat,
+        clicked_lng: event.latlng.lng
       };
-      this.waterbodyStats.handleWaterbodySelect(waterbody)
+      this.waterbodyStats.handleWaterbodySelect(waterbody);
     });
   }
 

@@ -375,3 +375,9 @@ h2.label {
 	vertical-align: top;
 	float:  right;
 }
+
+.wb-stats-buttons {
+	display:  grid;
+	justify-content: end;
+	justify-items: start;
+}
