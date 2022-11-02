@@ -7,7 +7,7 @@ import { ChartDataSets, ChartOptions, ChartType, ChartColor } from 'chart.js';
 import { Label, BaseChartDirective } from 'ng2-charts';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Options, ChangeContext } from 'ng5-slider';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject, BehaviorSubject } from 'rxjs';
 
 import {
   WaterBody,
@@ -184,6 +184,8 @@ export class WaterBodyStatsDetails {
 
   hideWaterbodyMetrics: boolean = true;
 
+  showAddWaterbodyButton: boolean = false;
+
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
     private authService: AuthService,
@@ -200,7 +202,7 @@ export class WaterBodyStatsDetails {
     private calcs: Calculations,
     private charts: Charts,
     private router: Router,
-    private envService: EnvService
+    private envService: EnvService,
   ) { }
 
   ngOnInit() {
@@ -212,6 +214,8 @@ export class WaterBodyStatsDetails {
     });
 
     this.activatedRoute.params.subscribe(params => {
+
+      console.log("waterbody-stats-details params: ", params)
       
       this.selectedWaterbody = JSON.parse(params.selectedWaterbody);
       this.wbProps = JSON.parse(params.wbProps);
@@ -222,7 +226,12 @@ export class WaterBodyStatsDetails {
 
       this.getWaterbodyGeojson(this.selectedWaterbody);
 
+      this.checkMyLocationsForWaterbody();
+
     });
+
+    this.mapService.getMap().removeLayer(this.mapService.waterbodyDataLayer);  // removes wb data layer
+
   }
 
   exit(): void {
@@ -337,7 +346,7 @@ export class WaterBodyStatsDetails {
     return imageExist;
   }
 
-  getWaterbodyImage(objectid: number, year: number, day: number): void {
+  getWaterbodyImage(objectid: number, year: number, day: number, daily: string = 'True'): void {
     /*
     Adds waterbody pixel image as a map layer.
     */
@@ -367,7 +376,7 @@ export class WaterBodyStatsDetails {
     else{
       this.isLoading = true;
       this.numExpectedImages += 1;
-      this.downloader.getWaterbodyImage(objectid, year, day).subscribe(response => {
+      this.downloader.getWaterbodyImage(objectid, year, day, daily).subscribe(response => {
 
         let imageBlob = response.body;
         let bbox = [
@@ -526,7 +535,7 @@ export class WaterBodyStatsDetails {
       let doy = this.calcs.getDayOfYear(date);
       let year = parseInt(doy.split(' ')[0]);  // e.g., "2021 03"
       let day = parseInt(doy.split(' ')[1]);
-      this.getWaterbodyImage(this.wbProps.objectid, year, day);
+      this.getWaterbodyImage(this.wbProps.objectid, year, day, this.dataTypeRequestMap[this.selectedDataType]);
     });
 
   }
@@ -1147,7 +1156,7 @@ export class WaterBodyStatsDetails {
 
     // TODO: Expect images already downloaded here?
     // Pick them out of an array?
-    this.getWaterbodyImage(this.wbProps.objectid, year, day);
+    this.getWaterbodyImage(this.wbProps.objectid, year, day, this.dataTypeRequestMap[this.selectedDataType]);
 
     this.chartObjs.forEach((chart) => {
       this.triggerHover(chart.chart);
@@ -1229,6 +1238,58 @@ export class WaterBodyStatsDetails {
     // this.wbMetrics.magnitudeWb = wbData['metrics']['magnitude_wb'][objectid];
     this.wbMetrics.period = wbData['metrics']['metadata']['period'];
     this.wbMetrics.timestep = wbData['metrics']['metadata']['timestep'];
+  }
+
+  checkMyLocationsForWaterbody() {
+    /*
+    Checks if waterbody is already in user's locations. Adds
+    button to WB details for adding WB to locations if it doesn't
+    exist.
+    */
+    let wbExist = false;
+    this.locationService.getStaticLocations().forEach(location => {
+      if (location.waterbody.objectid === this.selectedWaterbody.objectid) {
+        wbExist = true;
+      }
+    });
+    if (wbExist === false) {
+      this.showAddWaterbodyButton = true;
+    }
+    else {
+      this.showAddWaterbodyButton = false;
+    }
+  }
+
+  addWaterbodyToLocations() {
+    /*
+    Adds waterbody to user's locations if not already there.
+    Creates marker at the centroid. NOTE: Check that WB exists
+    at the centroid.
+    */
+    let map = this.mapService.getMap();
+    let lat = this.selectedWaterbody.centroid_lat;
+    let lng = this.selectedWaterbody.centroid_lng;
+
+    if ('clicked_lat' in this.selectedWaterbody && 'clicked_lng' in this.selectedWaterbody) {
+      console.log("Using clicked coords in waterbody object.")
+      lat = this.selectedWaterbody['clicked_lat'];
+      lng = this.selectedWaterbody['clicked_lng'];
+    }
+
+    let coords = latLng(lat, lng);
+
+    let name = 'To Be Updated...';
+    let cellCon = 0;
+    let maxCellCon = 0;
+    let cellChange = 0;
+    let dataDate = '01/01/2018';
+    let source = 'OLCI';
+
+    let location = this.locationService.createLocation(name, lat, lng, cellCon, maxCellCon, cellChange, dataDate, source);
+    // map.setView(coords, 12);
+    let m = this.mapService.addMarker(location);
+    m.fireEvent('click');
+
   }
 
 }
