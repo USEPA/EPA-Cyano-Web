@@ -16,6 +16,7 @@ import { DownloaderService } from '../services/downloader.service';
 import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
 import { Calculations } from '../waterbody-stats/utils/calculations';
 import { DialogComponent } from '../shared/dialog/dialog.component';
+import { LoaderService } from '../services/loader.service';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -33,55 +34,14 @@ export class MarkerMapComponent implements OnInit {
   lat_0: number = 33.927945;
   lng_0: number = -83.346554;
 
-  // bottom: number = 24.623340905712205;
-  // right: number = -65.03986894612699;
-  // left: number = -131.1651209108407;
-  // top: number = 52.9220879731627;
-
   marker_layers: LayerGroup;
 
-  esriImagery = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    detectRetina: true,
-    attribution:
-      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-  });
-  streetMaps = tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    detectRetina: true,
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  });
-  topoMap = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-    detectRetina: true,
-    attribution: 'Tiles &copy; Esri'
-  });
+  layersControl = this.mapService.layersControl;
 
-  // topLeft = latLng(this.top, this.left);
-  // bottomRight = latLng(this.bottom, this.right);
-  // imageBounds = latLngBounds(this.bottomRight, this.topLeft);
-
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  // TODO: Get latest daily and weekly layers from WB API.
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  // waterbodyDataLayer = null;  // defined in map service
-
-  waterbodiesLayer = featureLayer({
-    url: 'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/waterbodies_9/FeatureServer/0',
-    bubblingMouseEvents: false
-  });
-
-  layersControl = {
-    baseLayers: {
-      'Imagery Maps': this.esriImagery,
-      'Street Maps': this.streetMaps,
-      'Topographic Maps': this.topoMap,
-    },
-    overlays: {
-      // 'Latest Daily Data': this.waterbodyDataLayer,
-      'Waterbodies Layer': this.waterbodiesLayer
-    }
-  };
+  imageLayerTitle = this.mapService.imageLayerTitle;
 
   options = {
-    layers: [this.esriImagery],
+    layers: [this.mapService.esriImagery],
     zoom: 4,
     center: latLng([this.lat_0, this.lng_0])
   };
@@ -90,6 +50,7 @@ export class MarkerMapComponent implements OnInit {
   totalPrevDayAttempts: number = 50;
 
   configSetSub: Subscription;
+  dailyTypeSub: Subscription;
 
   customControl: any;
 
@@ -106,7 +67,8 @@ export class MarkerMapComponent implements OnInit {
     private downloader: DownloaderService,
     private waterbodyStats: WaterbodyStatsComponent,
     private calcs: Calculations,
-    private dialog: DialogComponent
+    private dialog: DialogComponent,
+    private loaderService: LoaderService
   ) { }
 
   ngOnInit() {
@@ -121,8 +83,7 @@ export class MarkerMapComponent implements OnInit {
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
       if (configSet === true) {
-        console.log("config set, getting conus image");
-        this.getMostCurrentAvailableDate();
+        this.getMostCurrentAvailableDate(false);
       }
     });
 
@@ -139,25 +100,29 @@ export class MarkerMapComponent implements OnInit {
 
   }
 
+  ngOnDestroy() {
+    // TODO: Remove subscriptions.
+  }
+
   tileLayerEvents() {
-    this.esriImagery.on('load', event => {
+    this.mapService.esriImagery.on('load', event => {
       // console.log("esriImagery loaded")
       this.mapService.mainTileLayer = "Imagery Maps";  
     });
-    this.streetMaps.on('load', event => {
+    this.mapService.streetMaps.on('load', event => {
       // console.log("streetMaps loaded")
       this.mapService.mainTileLayer = "Street Maps";
     });
-    this.topoMap.on('load', event => {
+    this.mapService.topoMap.on('load', event => {
       // console.log("topoMap loaded")
       this.mapService.mainTileLayer = "Topographic Maps";
     });
 
-    this.waterbodiesLayer.on('click', event => {
+    this.mapService.waterbodiesLayer.on('click', event => {
       this.displayWaterbodyDetails(event);
     });
 
-    this.waterbodiesLayer.on('mouseover', event => {
+    this.mapService.waterbodiesLayer.on('mouseover', event => {
       let coords = latLng(event.layer.feature.properties.c_lat, event.layer.feature.properties.c_lng);
       let content = event.layer.feature.properties.GNIS_NAME
       this.geoPopup = L.popup()
@@ -166,7 +131,7 @@ export class MarkerMapComponent implements OnInit {
         .openOn(this.mapService.getMap());
     });
 
-    this.waterbodiesLayer.on('mouseout', event => {
+    this.mapService.waterbodiesLayer.on('mouseout', event => {
       this.geoPopup.removeFrom(this.mapService.getMap());
     });
 
@@ -203,35 +168,21 @@ export class MarkerMapComponent implements OnInit {
     previous days until it finds an available date.
     */
 
-    console.log("getMostCurrentAvailableDate daily: ", daily)
-
     let dailyParam = daily === true ? 'True' : 'False';
-
-    console.log("getMostCurrentAvailableDate dailyParam: ", dailyParam)
-
     let prevDate = this.calcs.getDayOfYearFromDateObject(
       new Date(new Date().setDate(new Date().getDate() - this.currentAttempts))
     );
     let startYear = parseInt(prevDate.split(' ')[0]);
     let startDay = parseInt(prevDate.split(' ')[1]);
 
-    // this.isLoading = true;
+    this.loaderService.show();
 
     this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
 
-      console.log("getConusImage result: ", result);
-
-      // No data response:
-      // {
-      //   "daily": true,
-      //   "day": 234,
-      //   "message": "No conus cyano image found for the inputs provided.",
-      //   "year": 2021
-      // }
+      this.loaderService.hide();
 
       let resonseType = result.body.type;
       let responseStatus = result.status;
-
 
       if (resonseType != 'image/png' || responseStatus != 200) {
         // No data, retry with the date before this one:
@@ -240,7 +191,7 @@ export class MarkerMapComponent implements OnInit {
           this.dialog.handleError('No conus waterbody image found');
         }
         this.currentAttempts += 1;
-        this.getMostCurrentAvailableDate();
+        this.getMostCurrentAvailableDate(daily);
       }
       else {
         this.currentAttempts = 0;
@@ -259,10 +210,20 @@ export class MarkerMapComponent implements OnInit {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       let imageUrl = reader.result.toString();
-      let imageLayerTitle = 'Latest ' + dataTypeString + ' Data (' + dateString + ')';
+      let map = this.mapService.getMap();
+
+      // Updates map layer:
+      this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap())
       this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
       this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
-      this.layersControl.overlays[imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
+
+      // Updates layer controls:
+      if (this.mapService.imageLayerTitle.length > 0) {
+        delete this.layersControl.overlays[this.mapService.imageLayerTitle];
+      }
+      this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
+      this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
+
       return reader.result;
     }, false);
     if (image) {
@@ -271,22 +232,23 @@ export class MarkerMapComponent implements OnInit {
   }
 
   addCustomLabelToMap(dateString: string, dataTypeString: string): void {
-    if (this.customControl) {
-      this.mapService.getMap().removeControl(this.customControl);
+
+    if (this.mapService.customControl) {
+      this.mapService.getMap().removeControl(this.mapService.customControl);
     }
-    this.customControl = L.Control.extend({
-      options: {
-        position: 'topright'
-      },
-      onAdd: function(map) {
-        let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        container.style.background = 'white';
-        container.style.padding = '5px';
-        container.textContent = dataTypeString + ' Data for ' + dateString;
-        return container;
-      }
-    });
-    this.mapService.getMap().addControl(new this.customControl);
+    this.mapService.customControl = new Control()
+    this.mapService.customControl.options = {
+      position: 'topright'
+    };
+    this.mapService.customControl.onAdd = (map) => {
+      let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+      container.style.background = 'white';
+      container.style.padding = '5px';
+      container.textContent = 'Satellite Imagery Showing ' + dataTypeString + ' Data for ' + dateString;
+      return container;
+    }
+
+    this.mapService.getMap().addControl(this.mapService.customControl);
   }
 
   mapPanEvent(e: any): void {

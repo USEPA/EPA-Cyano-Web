@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 
 import { LocationType } from '../models/location';
 import { LocationService } from '../services/location.service';
@@ -52,11 +52,9 @@ export class BottomMenuComponent implements OnInit {
   }
 
   dataTypeClick(type: number): void {
-    console.log("Data type click: ", type)
     this.data_type = type;
     this.locationService.setDataType(type);
     let dataBool = type === 2 ? true : false;
-    console.log("dataTypeClick dataBool: ", dataBool)
     this.markerMap.getMostCurrentAvailableDate(dataBool);
   }
 
