@@ -124,7 +124,9 @@ export class MarkerMapComponent implements OnInit {
 
     this.mapService.waterbodiesLayer.on('mouseover', event => {
       let coords = latLng(event.layer.feature.properties.c_lat, event.layer.feature.properties.c_lng);
-      let content = event.layer.feature.properties.GNIS_NAME
+      let content = '<div style="text-align: center">' + event.layer.feature.properties.GNIS_NAME + '<br>' +
+        'State: ' + event.layer.feature.properties.STATE_ABBR + '<br>' +
+        'Area: ' + this.calcs.roundValue(event.layer.feature.properties.AREASQKM) + 'km<sup>2</sup></div>';
       this.geoPopup = L.popup()
         .setLatLng(coords)
         .setContent(content)
