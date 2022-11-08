@@ -20,6 +20,7 @@ import { UserService } from '../services/user.service';
 import { ConcentrationRanges } from '../test-data/test-levels';
 import { MapPopupComponent } from '../map-popup/map-popup.component';
 import { NgElement, WithProperties } from '@angular/elements';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,8 @@ export class MapService {
 
   // waterbodyDataLayer = new ImageOverlay('./assets/images/daily-conus-2021-234-new.png', this.imageBounds, {});
   waterbodyDataLayer = new ImageOverlay('', null, {});
+
+  waterbodyDataLayerGroup = Array<ImageOverlay>();
 
   customControl = new Control();
 
@@ -82,10 +85,21 @@ export class MapService {
 
   imageLayerTitle: string = '';
 
+  mapTiles: Array<string> = ["1-1", "1-2", "1-3", "1-4", "2-1", "2-2", "2-3", "2-4", "3-1", "3-2", "3-3", "3-4", "3-5", "4-1", "4-2", "4-3", "4-4", "4-5", "5-1", "5-2", "5-3", "5-4", "5-5", "6-1", "6-2", "6-3", "6-4", "6-5", "7-1", "7-2", "7-3", "7-4", "7-5", "8-1", "8-2", "8-3", "8-4"];
+
+  rasterBounds: any = {};
+
   constructor(
     private cyanMap: CyanMap,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private httpClient: HttpClient
+  ) {
+    console.log("Map service constructor")
+    this.httpClient.get('assets/conus_raster_bounds.json').subscribe(data => {
+      console.log("Raster bounds json received: ", data)
+      this.rasterBounds = data;
+    });
+  }
 
   setMap(map: Map): void {
     this.cyanMap.map = map;

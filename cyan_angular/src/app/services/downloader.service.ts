@@ -308,7 +308,7 @@ export class DownloaderService {
     });
   }
 
-  getConusImage(year: number, day: number, daily: string) {
+  getConusImage(year: number, day: number, daily: string, tile: string) {
     /*
     Calls waterbody backend's conus_image endpoint, e.g.,
     /waterbody/conus_image/?year=2021&day=234&daily=True
@@ -317,7 +317,11 @@ export class DownloaderService {
     let url = this.envService.config.waterbodyUrl + 
       'conus_image/?year=' + year +
       '&day=' + day +
-      '&daily=' + daily
+      '&daily=' + daily +
+      '&tile=' + tile;
+
+    console.log("Tile request: ", url)
+
     return this.http.get(url, {
       headers: {
         'Content-Type': 'image/png',
