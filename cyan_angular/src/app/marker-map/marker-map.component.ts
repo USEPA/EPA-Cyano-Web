@@ -193,6 +193,7 @@ export class MarkerMapComponent implements OnInit {
           // this.dialog.handleError('No conus waterbody image found');
           console.log("No conus waterbody image found")
           this.loaderService.hide();
+          return;
         }
         this.currentAttempts += 1;
         this.getMostCurrentAvailableDate(daily);
