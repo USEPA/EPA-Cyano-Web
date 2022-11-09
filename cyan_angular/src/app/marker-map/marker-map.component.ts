@@ -190,7 +190,8 @@ export class MarkerMapComponent implements OnInit {
         // No data, retry with the date before this one:
         if (this.currentAttempts >= this.totalPrevDayAttempts) {
           this.currentAttempts = 0;
-          this.dialog.handleError('No conus waterbody image found');
+          // this.dialog.handleError('No conus waterbody image found');
+          console.log("No conus waterbody image found")
         }
         this.currentAttempts += 1;
         this.getMostCurrentAvailableDate(daily);
