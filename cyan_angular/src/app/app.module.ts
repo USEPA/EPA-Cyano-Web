@@ -82,7 +82,7 @@ import { SessionTimeoutComponent } from './session-timeout/session-timeout.compo
 import { LocationSearchComponent } from './location-search/location-search.component';
 import { BatchComponent } from './batch/batch.component';
 import { WaterbodyStatsComponent } from './waterbody-stats/waterbody-stats.component';
-import { WaterBodyStatsDetails } from './waterbody-stats/waterbody-stats-details.component';
+import { WaterBodyStatsDetails, WaterbodyHelpDialog } from './waterbody-stats/waterbody-stats-details.component';
 import { Calculations } from './waterbody-stats/utils/calculations';
 import { Charts } from './waterbody-stats/utils/charts';
 
@@ -129,7 +129,8 @@ import { ReportsResultsComponent } from './waterbody-stats/reports/reports-resul
         WaterBodyStatsDetails,
         ReportsComponent,
         ReportsResultsComponent,
-        WhatsNewDialog
+        WhatsNewDialog,
+        WaterbodyHelpDialog
     ],
     imports: [
         BrowserModule,
