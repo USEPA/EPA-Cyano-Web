@@ -535,6 +535,9 @@ export class LocationDetailsComponent implements OnInit {
     // if (this.wbImageLayer) {
     //   this.cyanMap.map.removeLayer(this.wbImageLayer);
     // }
+
+    console.log("triggerImageDownload() called: ", image)
+
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       // let topLeft = latLng(bounds[1][0], bounds[1][1]);
@@ -546,6 +549,7 @@ export class LocationDetailsComponent implements OnInit {
       return reader.result;
     }, false);
     if (image) {
+      console.log("readAsDataURL")
       reader.readAsDataURL(image);
     }
   }
