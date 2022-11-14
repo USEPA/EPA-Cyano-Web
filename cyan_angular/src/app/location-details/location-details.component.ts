@@ -519,16 +519,21 @@ export class LocationDetailsComponent implements OnInit {
 
     this.downloader.getLocationImage(tifName, imageURL).subscribe(result => {
       console.log("image request result: ", result)
-      this.triggerImageDownload(result.body);
+      // this.triggerImageDownload(result.body);
+
+      let link = document.createElement('a');
+      let blob = new Blob([result.body], { type: 'application/octet-stream'});
+
+      // link.href = imageURL;
+      link.href = window.URL.createObjectURL(blob);
+      // link.download = tifName;
+      link.setAttribute('download', tifName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
     });
 
-    // let link = document.createElement('a');
-    // // let blob = new Blob([])
-    // link.href = imageURL;
-    // link.download = tifName;
-    // document.body.appendChild(link);
-    // link.click();
-    // document.body.removeChild(link);
   }
 
   triggerImageDownload(image: Blob): any {
