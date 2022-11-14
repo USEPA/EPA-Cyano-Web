@@ -162,7 +162,7 @@
       <ng-template #imagesLoaded>
         <div class="imagery_gallery">
           <div *ngFor="let thumb of filteredPNGs">
-            <div class="image_thumb" (click)="downloadImage2($event, thumb)">
+            <div class="image_thumb" (click)="downloadImage($event, thumb)">
               <img class="png_image" title="Download image for {{ getImageDate2(thumb) }}" src="{{ getImageUrl(thumb.name) }}">
             </div>
           </div>

@@ -468,9 +468,7 @@ export class DownloaderService {
     Gets image from location-details images.
     */
     if (!this.authService.checkUserAuthentication()) { return; }
-
     let url = this.envService.config.tomcatApiUrl + 'location/images/' + tifName;
-
     return this.http.get(url, {
       headers: {
         'Content-Type': 'image/tiff',

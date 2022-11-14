@@ -501,62 +501,16 @@ export class LocationDetailsComponent implements OnInit {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
     let imageURL = this.getImageUrl(tifName);
-    console.log("downloadImage() imageURL: ", imageURL)
-    window.open(imageURL, '_blank');
-  }
-
-  downloadImage2(event: any, image: ImageDetails): void {
-    if (!this.authService.checkUserAuthentication()) { return; }
-
-    console.log("event: ", event)
-    console.log("image: ", image)
-
-    let tifName = image.name.split('.png')[0] + '.tif';
-    let imageURL = this.getImageUrl(tifName);
-
-    console.log("tifName: ", tifName)
-    console.log("imageURL: ", imageURL)
 
     this.downloader.getLocationImage(tifName, imageURL).subscribe(result => {
-      console.log("image request result: ", result)
-      // this.triggerImageDownload(result.body);
-
       let link = document.createElement('a');
       let blob = new Blob([result.body], { type: 'application/octet-stream'});
-
-      // link.href = imageURL;
       link.href = window.URL.createObjectURL(blob);
-      // link.download = tifName;
       link.setAttribute('download', tifName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
     });
-
-  }
-
-  triggerImageDownload(image: Blob): any {
-    // if (this.wbImageLayer) {
-    //   this.cyanMap.map.removeLayer(this.wbImageLayer);
-    // }
-
-    console.log("triggerImageDownload() called: ", image)
-
-    let reader = new FileReader();
-    reader.addEventListener("load", () => {
-      // let topLeft = latLng(bounds[1][0], bounds[1][1]);
-      // let bottomRight = latLng(bounds[0][0], bounds[0][1]);
-      // let imageBounds = latLngBounds(bottomRight, topLeft);
-      // let imageUrl = reader.result.toString();
-      // this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
-      // this.cyanMap.map.addLayer(this.wbImageLayer);
-      return reader.result;
-    }, false);
-    if (image) {
-      console.log("readAsDataURL")
-      reader.readAsDataURL(image);
-    }
   }
 
   downloadTimeSeries() {
