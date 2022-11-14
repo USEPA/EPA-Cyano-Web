@@ -463,6 +463,24 @@ export class DownloaderService {
     });
   }
 
+  getLocationImage(tifName: string, imageURL: string) {
+    /*
+    Gets image from location-details images.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    let url = this.envService.config.tomcatApiUrl + 'location/images/' + tifName;
+
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/tiff',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
   executeAuthorizedPostRequest(url: string, body: any) {
     if (!this.authService.checkUserAuthentication()) { return; }
     return this.http.post(url, body, this.envService.getHeaders());

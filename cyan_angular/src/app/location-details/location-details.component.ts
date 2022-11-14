@@ -501,7 +501,33 @@ export class LocationDetailsComponent implements OnInit {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
     let imageURL = this.getImageUrl(tifName);
+    console.log("downloadImage() imageURL: ", imageURL)
     window.open(imageURL, '_blank');
+  }
+
+  downloadImage2(event: any, image: ImageDetails): void {
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    console.log("event: ", event)
+    console.log("image: ", image)
+
+    let tifName = image.name.split('.png')[0] + '.tif';
+    let imageURL = this.getImageUrl(tifName);
+
+    console.log("tifName: ", tifName)
+    console.log("imageURL: ", imageURL)
+
+    this.downloader.getLocationImage(tifName, imageURL).subscribe(result => {
+      console.log("image request result: ", result)
+    });
+
+    // let link = document.createElement('a');
+    // // let blob = new Blob([])
+    // link.href = imageURL;
+    // link.download = tifName;
+    // document.body.appendChild(link);
+    // link.click();
+    // document.body.removeChild(link);
   }
 
   downloadTimeSeries() {
