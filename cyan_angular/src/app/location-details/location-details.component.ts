@@ -519,6 +519,7 @@ export class LocationDetailsComponent implements OnInit {
 
     this.downloader.getLocationImage(tifName, imageURL).subscribe(result => {
       console.log("image request result: ", result)
+      this.triggerImageDownload(result.body);
     });
 
     // let link = document.createElement('a');
@@ -528,6 +529,25 @@ export class LocationDetailsComponent implements OnInit {
     // document.body.appendChild(link);
     // link.click();
     // document.body.removeChild(link);
+  }
+
+  triggerImageDownload(image: Blob): any {
+    // if (this.wbImageLayer) {
+    //   this.cyanMap.map.removeLayer(this.wbImageLayer);
+    // }
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      // let topLeft = latLng(bounds[1][0], bounds[1][1]);
+      // let bottomRight = latLng(bounds[0][0], bounds[0][1]);
+      // let imageBounds = latLngBounds(bottomRight, topLeft);
+      // let imageUrl = reader.result.toString();
+      // this.wbImageLayer = new ImageOverlay(imageUrl, imageBounds, {opacity: 1.0});
+      // this.cyanMap.map.addLayer(this.wbImageLayer);
+      return reader.result;
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
+    }
   }
 
   downloadTimeSeries() {
