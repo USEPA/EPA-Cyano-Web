@@ -83,7 +83,7 @@ export class MarkerMapComponent implements OnInit {
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
       if (configSet === true) {
-        this.getMostCurrentAvailableDate(false);
+        this.getMostCurrentAvailableDate(false, false);
       }
     });
 
@@ -164,7 +164,7 @@ export class MarkerMapComponent implements OnInit {
     });
   }
 
-  getMostCurrentAvailableDate(daily: boolean = true) {
+  getMostCurrentAvailableDate(daily: boolean = true, initImageLoad: boolean = true) {
     /*
     Makes requests for most current available date. Goes back
     previous days until it finds an available date.
@@ -196,14 +196,14 @@ export class MarkerMapComponent implements OnInit {
           return;
         }
         this.currentAttempts += 1;
-        this.getMostCurrentAvailableDate(daily);
+        this.getMostCurrentAvailableDate(daily, initImageLoad);
       }
       else {
         this.currentAttempts = 0;
         let imageBlob = result.body;
         let dateString = this.calcs.getDateFromDayOfYear(startYear + ' ' + startDay);
         let dataTypeString = daily === true ? 'Daily' : 'Weekly';
-        this.addImageLayer(imageBlob, dateString, dataTypeString);
+        this.addImageLayer(imageBlob, dateString, dataTypeString, initImageLoad);
         this.addCustomLabelToMap(dateString, dataTypeString);
       }
 
@@ -211,7 +211,7 @@ export class MarkerMapComponent implements OnInit {
 
   }
 
-  addImageLayer(image: Blob, dateString: string, dataTypeString: string): any {
+  addImageLayer(image: Blob, dateString: string, dataTypeString: string, initImageLoad: boolean = true): any {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       let imageUrl = reader.result.toString();
@@ -220,7 +220,10 @@ export class MarkerMapComponent implements OnInit {
       // Updates map layer:
       this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap())
       this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
-      this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+
+      if (initImageLoad === true) {
+        this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+      }
 
       // Updates layer controls:
       if (this.mapService.imageLayerTitle.length > 0) {
