@@ -177,11 +177,11 @@ export class MarkerMapComponent implements OnInit {
     let startYear = parseInt(prevDate.split(' ')[0]);
     let startDay = parseInt(prevDate.split(' ')[1]);
 
-    this.loaderService.show();
+    // this.loaderService.show();
 
     this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
 
-      this.loaderService.hide();
+      // this.loaderService.hide();
 
       let resonseType = result.body.type;
       let responseStatus = result.status;
@@ -192,7 +192,7 @@ export class MarkerMapComponent implements OnInit {
           this.currentAttempts = 0;
           // this.dialog.handleError('No conus waterbody image found');
           console.log("No conus waterbody image found")
-          this.loaderService.hide();
+          // this.loaderService.hide();
           return;
         }
         this.currentAttempts += 1;
