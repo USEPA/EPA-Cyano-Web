@@ -40,6 +40,7 @@ export class MarkerMapComponent implements OnInit {
 
   imageLayerTitle = this.mapService.imageLayerTitle;
 
+
   options = {
     layers: [this.mapService.esriImagery],
     zoom: 4,
@@ -47,7 +48,7 @@ export class MarkerMapComponent implements OnInit {
   };
 
   currentAttempts: number = 0;
-  totalPrevDayAttempts: number = 50;
+  totalPrevDayAttempts: number = 700;
 
   configSetSub: Subscription;
   dailyTypeSub: Subscription;
@@ -72,8 +73,6 @@ export class MarkerMapComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
-    console.log("marker-map ngOnInit raster bounds: ", this.mapService.rasterBounds)
 
     this.getLocations();
     let username = this.user.getUserName();
@@ -180,13 +179,7 @@ export class MarkerMapComponent implements OnInit {
     let startYear = parseInt(prevDate.split(' ')[0]);
     let startDay = parseInt(prevDate.split(' ')[1]);
 
-    let testTile = '1-1';
-
-    this.loaderService.show();
-
-    this.downloader.getConusImage(startYear, startDay, dailyParam, testTile).subscribe(result => {
-
-      this.loaderService.hide();
+    this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
 
       let resonseType = result.body.type;
       let responseStatus = result.status;
@@ -195,101 +188,24 @@ export class MarkerMapComponent implements OnInit {
         // No data, retry with the date before this one:
         if (this.currentAttempts >= this.totalPrevDayAttempts) {
           this.currentAttempts = 0;
-          this.dialog.handleError('No conus waterbody image found');
+          // this.dialog.handleError('No conus waterbody image found');
+          console.error('No conus waterbody image found to load onto map');
+          return;
         }
         this.currentAttempts += 1;
         this.getMostCurrentAvailableDate(daily);
       }
       else {
-
-        // TODO: Date found, get images for each tile and add to image layer array!
-
-        console.log("Most recent available date found.");
-
         this.currentAttempts = 0;
-
-        console.log("marker-map getMostCurrentAvailableDate raster bounds: ", this.mapService.rasterBounds)
-
-        this.requestTiles(startYear, startDay, dailyParam);
-
+        let imageBlob = result.body;
+        let dateString = this.calcs.getDateFromDayOfYear(startYear + ' ' + startDay);
+        let dataTypeString = daily === true ? 'Daily' : 'Weekly';
+        this.addImageLayer(imageBlob, dateString, dataTypeString);
+        this.addCustomLabelToMap(dateString, dataTypeString);
+        // this.updateDataLayerControl(dataTypeString);  // testing if it helps to move this above...
       }
 
     });
-
-  }
-
-  requestTiles(year: number, day: number, dailyParam: string) {
-    /*
-    Loops requests for all the tiles, adds them as an array of layers.
-      * dailyParam: 'True' or 'False'
-    */
-
-    this.loaderService.show();
-
-    this.removeDataLayerGroup();
-
-    let dateString = this.calcs.getDateFromDayOfYear(year + ' ' + day);
-
-    this.mapService.mapTiles.forEach(tile => {
-
-      this.downloader.getConusImage(year, day, dailyParam, tile).subscribe(result => {
-
-        let resonseType = result.body.type;
-        let responseStatus = result.status;
-
-        if (resonseType != 'image/png' || responseStatus != 200) {
-          // No data, retry with the date before this one:
-          this.currentAttempts = 0;
-          this.dialog.handleError('No conus waterbody image found');
-        }
-        else {
-
-          // TODO: Date found, get images for each tile and add to image layer array!
-
-          this.currentAttempts = 0;
-          let imageBlob = result.body;
-
-          this.addImageLayer(imageBlob, dateString, dailyParam, tile);
-
-        }
-
-      });
-
-      this.loaderService.hide();
-
-    });
-
-    let dataType = dailyParam === 'True' ? 'Daily' : 'Weekly'
-    this.addCustomLabelToMap(dateString, dataType);
-
-  }
-
-  removeDataLayerGroup(): void {
-    /*
-    Removes current data layer group.
-    */
-    console.log("removeDataLayerGroup called.")
-    let map = this.mapService.getMap();
-    this.mapService.waterbodyDataLayerGroup.forEach(layer => {
-      layer.removeFrom(map);
-    });
-  }
-
-  getTileBounds(tile: string): any {
-    /*
-    Gets bounds for a specific tile.
-    */
-
-    console.log("getTileBounds Tile: ", tile)
-
-    let boundaries: any = this.mapService.rasterBounds[tile]
-
-    console.log("Boundaries for tile: ", boundaries)
-
-    let topLeft = latLng(boundaries['top'], boundaries['left']);
-    let bottomRight = latLng(boundaries['bottom'], boundaries['right']);
-
-    return latLngBounds(bottomRight, topLeft);
 
   }
 
@@ -297,23 +213,28 @@ export class MarkerMapComponent implements OnInit {
     /*
     Updates layer control for waterbody data on main map.
     */
-    // Updates layer controls:
+    if (this.mapService.imageLayerTitle.length > 0) {
+      delete this.layersControl.overlays[this.mapService.imageLayerTitle];
+    }
+    this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
+    this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
+  }
+
+  addImageLayer(image: Blob, dateString: string, dataTypeString: string): any {
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      let imageUrl = reader.result.toString();
+      let map = this.mapService.getMap();
+      this.mapService.waterbodyDataLayer.removeFrom(map);
+      this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
+      this.mapService.waterbodyDataLayer.addTo(map);
+
       if (this.mapService.imageLayerTitle.length > 0) {
         delete this.layersControl.overlays[this.mapService.imageLayerTitle];
       }
       this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
       this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
-  }
 
-  addImageLayer(image: Blob, dateString: string, dataTypeString: string, tile: string): any {
-    let reader = new FileReader();
-    reader.addEventListener("load", () => {
-      let imageUrl = reader.result.toString();
-      let map = this.mapService.getMap();
-      let tileBounds = this.getTileBounds(tile);
-      let tileImage = new ImageOverlay(imageUrl, tileBounds);
-      this.mapService.waterbodyDataLayerGroup.push(tileImage);
-      tileImage.addTo(map);
       return reader.result;
     }, false);
     if (image) {
@@ -322,9 +243,7 @@ export class MarkerMapComponent implements OnInit {
   }
 
   addCustomLabelToMap(dateString: string, dataTypeString: string): void {
-
     let map = this.mapService.getMap();
-
     if (this.mapService.customControl) {
       map.removeControl(this.mapService.customControl);
     }
@@ -336,19 +255,15 @@ export class MarkerMapComponent implements OnInit {
       let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       container.style.background = 'white';
       container.style.padding = '5px';
-      container.textContent = 'Satellite Imagery Showing ' + dataTypeString + ' Data for ' + dateString;
+      container.textContent = 'Satellite Imagery  ' + dataTypeString + ' Data for ' + dateString;
       return container;
     }
-
     map.addControl(this.mapService.customControl);
   }
 
   mapPanEvent(e: any): void {
-
     if (!this.authService.checkUserAuthentication()) { return; }  // won't auto log out, just skips refresh
-
     this.isClicking = false;  // assumes user intends to pan instead of placing location
-
     if (this.isEnabled == true) {
       this.isEnabled = false;
       this.authService.refresh();
