@@ -201,7 +201,14 @@ export class MarkerMapComponent implements OnInit {
       else {
         this.currentAttempts = 0;
         let imageBlob = result.body;
-        let dateString = this.calcs.getDateFromDayOfYear(startYear + ' ' + startDay);
+
+        // Ex: attachment; filename="static/raster_plots/weekly-conus-2022-317.png"
+        let dateArray = result.headers.get('Content-Disposition').split('-');
+        let year = dateArray[dateArray.length - 2];
+        let day = dateArray[dateArray.length - 1].split('.')[0];
+
+        let dateString = this.calcs.getDateFromDayOfYear(year + ' ' + day);
+
         let dataTypeString = daily === true ? 'Daily' : 'Weekly';
         this.addImageLayer(imageBlob, dateString, dataTypeString);
         this.addCustomLabelToMap(dateString, dataTypeString);
@@ -258,7 +265,11 @@ export class MarkerMapComponent implements OnInit {
       let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       container.style.background = 'white';
       container.style.padding = '5px';
-      container.textContent = 'Satellite Imagery  ' + dataTypeString + ' Data for ' + dateString;
+      // container.textContent = 'Satellite Imagery ' + dataTypeString + ' Data -- ' + dateString;
+      container.textContent = dataTypeString + ' Satellite Imagery - ' + dateString;
+
+      console.log("container: ", container)
+
       return container;
     }
     map.addControl(this.mapService.customControl);
