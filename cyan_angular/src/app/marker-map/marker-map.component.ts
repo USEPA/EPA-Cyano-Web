@@ -181,6 +181,9 @@ export class MarkerMapComponent implements OnInit {
 
     this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
 
+      console.log("Conus image result: ", result);
+      console.log("Header: ", result.headers.get('Content-Disposition'))
+
       let resonseType = result.body.type;
       let responseStatus = result.status;
 

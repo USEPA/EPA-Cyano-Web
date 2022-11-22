@@ -6,7 +6,6 @@
     "start": "ng serve",
     "build": "ng build",
     "build:standalone": "ng build --prod --outputPath=dist",
-    "build:qed": "ng build --prod --baseHref=/cyanweb/ --deployUrl=/static_qed/epa-cyano-web/ --outputHashing=bundles --outputPath=../cyan_django/static/epa-cyano-web",
     "build:docker": "ng build --configuration=docker --output-path=dist",
     "build:cyano": "ng build --prod --baseHref=/cyanweb --deployUrl=/cyanweb/ --outputHashing=none --outputPath=dist",
     "build:kube": "ng build --prod --baseHref=/cyanweb/ --outputPath=dist/cyanweb --outputHashing=bundles",
