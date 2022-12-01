@@ -20,6 +20,7 @@ import { UserService } from '../services/user.service';
 import { ConcentrationRanges } from '../test-data/test-levels';
 import { MapPopupComponent } from '../map-popup/map-popup.component';
 import { NgElement, WithProperties } from '@angular/elements';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +45,6 @@ export class MapService {
   bottomRight = latLng(this.bottom, this.right);
   imageBounds = latLngBounds(this.bottomRight, this.topLeft);
 
-  // waterbodyDataLayer = new ImageOverlay('./assets/images/daily-conus-2021-234-new.png', this.imageBounds, {});
   waterbodyDataLayer = new ImageOverlay('', null, {});
 
   customControl = new Control();
@@ -75,7 +75,7 @@ export class MapService {
       'Topographic Maps': this.topoMap,
     },
     overlays: {
-      // 'Latest Daily Data': this.waterbodyDataLayer,
+      // 'Latest Daily Data (Testing)': this.waterbodyDataLayer,
       'Waterbodies': this.waterbodiesLayer
     }
   };
@@ -84,8 +84,9 @@ export class MapService {
 
   constructor(
     private cyanMap: CyanMap,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private httpClient: HttpClient
+  ) { }
 
   setMap(map: Map): void {
     this.cyanMap.map = map;

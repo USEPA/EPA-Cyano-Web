@@ -40,6 +40,7 @@ export class MarkerMapComponent implements OnInit {
 
   imageLayerTitle = this.mapService.imageLayerTitle;
 
+
   options = {
     layers: [this.mapService.esriImagery],
     zoom: 4,
@@ -47,7 +48,7 @@ export class MarkerMapComponent implements OnInit {
   };
 
   currentAttempts: number = 0;
-  totalPrevDayAttempts: number = 50;
+  totalPrevDayAttempts: number = 700;
 
   configSetSub: Subscription;
   dailyTypeSub: Subscription;
@@ -72,6 +73,7 @@ export class MarkerMapComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
     this.getLocations();
     let username = this.user.getUserName();
     let path = this.ngLocation.path();
@@ -177,11 +179,7 @@ export class MarkerMapComponent implements OnInit {
     let startYear = parseInt(prevDate.split(' ')[0]);
     let startDay = parseInt(prevDate.split(' ')[1]);
 
-    // this.loaderService.show();
-
     this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
-
-      // this.loaderService.hide();
 
       let resonseType = result.body.type;
       let responseStatus = result.status;
@@ -190,9 +188,7 @@ export class MarkerMapComponent implements OnInit {
         // No data, retry with the date before this one:
         if (this.currentAttempts >= this.totalPrevDayAttempts) {
           this.currentAttempts = 0;
-          // this.dialog.handleError('No conus waterbody image found');
-          console.log("No conus waterbody image found")
-          // this.loaderService.hide();
+          console.error('No conus waterbody image found to load onto map');
           return;
         }
         this.currentAttempts += 1;
@@ -201,7 +197,14 @@ export class MarkerMapComponent implements OnInit {
       else {
         this.currentAttempts = 0;
         let imageBlob = result.body;
-        let dateString = this.calcs.getDateFromDayOfYear(startYear + ' ' + startDay);
+
+        // Ex: attachment; filename="static/raster_plots/weekly-conus-2022-317.png"
+        let dateArray = result.headers.get('Content-Disposition').split('-');
+        let year = dateArray[dateArray.length - 2];
+        let day = dateArray[dateArray.length - 1].split('.')[0];
+
+        let dateString = this.calcs.getDateFromDayOfYear(year + ' ' + day);
+
         let dataTypeString = daily === true ? 'Daily' : 'Weekly';
         this.addImageLayer(imageBlob, dateString, dataTypeString, initImageLoad);
         this.addCustomLabelToMap(dateString, dataTypeString);
@@ -216,16 +219,13 @@ export class MarkerMapComponent implements OnInit {
     reader.addEventListener("load", () => {
       let imageUrl = reader.result.toString();
       let map = this.mapService.getMap();
-
-      // Updates map layer:
-      this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap())
+      this.mapService.waterbodyDataLayer.removeFrom(map);
       this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
 
       if (initImageLoad === true) {
-        this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+        this.mapService.waterbodyDataLayer.addTo(map);
       }
 
-      // Updates layer controls:
       if (this.mapService.imageLayerTitle.length > 0) {
         delete this.layersControl.overlays[this.mapService.imageLayerTitle];
       }
@@ -240,9 +240,9 @@ export class MarkerMapComponent implements OnInit {
   }
 
   addCustomLabelToMap(dateString: string, dataTypeString: string): void {
-
+    let map = this.mapService.getMap();
     if (this.mapService.customControl) {
-      this.mapService.getMap().removeControl(this.mapService.customControl);
+      map.removeControl(this.mapService.customControl);
     }
     this.mapService.customControl = new Control()
     this.mapService.customControl.options = {
@@ -252,19 +252,19 @@ export class MarkerMapComponent implements OnInit {
       let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       container.style.background = 'white';
       container.style.padding = '5px';
-      container.textContent = 'Satellite Imagery Showing ' + dataTypeString + ' Data for ' + dateString;
+      // container.textContent = 'Satellite Imagery ' + dataTypeString + ' Data -- ' + dateString;
+      container.textContent = dataTypeString + ' Satellite Imagery - ' + dateString;
+
+      console.log("container: ", container)
+
       return container;
     }
-
-    this.mapService.getMap().addControl(this.mapService.customControl);
+    map.addControl(this.mapService.customControl);
   }
 
   mapPanEvent(e: any): void {
-
     if (!this.authService.checkUserAuthentication()) { return; }  // won't auto log out, just skips refresh
-
     this.isClicking = false;  // assumes user intends to pan instead of placing location
-
     if (this.isEnabled == true) {
       this.isEnabled = false;
       this.authService.refresh();

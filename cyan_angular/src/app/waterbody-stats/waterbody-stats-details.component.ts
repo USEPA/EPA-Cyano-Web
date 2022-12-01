@@ -203,6 +203,7 @@ export class WaterBodyStatsDetails {
     private charts: Charts,
     private router: Router,
     private envService: EnvService,
+    private matDialog: MatDialog,
   ) { }
 
   ngOnInit() {
@@ -230,7 +231,9 @@ export class WaterBodyStatsDetails {
 
     });
 
+    // NOTE: This needs to remove all the tiles/images (move remove function to map.service)
     this.mapService.getMap().removeLayer(this.mapService.waterbodyDataLayer);  // removes wb data layer
+    this.mapService.getMap().removeLayer(this.mapService.waterbodiesLayer);  // removes waterbodies layer
 
   }
 

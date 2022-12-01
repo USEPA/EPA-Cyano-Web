@@ -317,7 +317,8 @@ export class DownloaderService {
     let url = this.envService.config.waterbodyUrl + 
       'conus_image/?year=' + year +
       '&day=' + day +
-      '&daily=' + daily
+      '&daily=' + daily;
+
     return this.http.get(url, {
       headers: {
         'Content-Type': 'image/png',
@@ -455,6 +456,22 @@ export class DownloaderService {
       },
       // responseType: 'blob',
       responseType: 'text',
+      observe: 'response'
+    });
+  }
+
+  getLocationImage(tifName: string, imageURL: string) {
+    /*
+    Gets image from location-details images.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let url = this.envService.config.tomcatApiUrl + 'location/images/' + tifName;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'image/tiff',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
       observe: 'response'
     });
   }
