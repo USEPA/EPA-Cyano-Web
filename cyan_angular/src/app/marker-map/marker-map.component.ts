@@ -57,6 +57,10 @@ export class MarkerMapComponent implements OnInit {
 
   geoPopup: any;
 
+  wbLayerZoomThreshold: number = 8;  // zoom level to start showing wb layer
+
+  zoomLevel: number;
+
   constructor(
     private locationService: LocationService,
     private router: Router,
@@ -85,7 +89,7 @@ export class MarkerMapComponent implements OnInit {
 
     this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
       if (configSet === true) {
-        this.getMostCurrentAvailableDate(false);
+        this.getMostCurrentAvailableDate(false, false);
       }
     });
 
@@ -98,6 +102,22 @@ export class MarkerMapComponent implements OnInit {
     });
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
+    });
+
+    this.mapService.getMap().on('zoomend', event => {
+
+      this.zoomLevel = event.target._zoom;
+
+      let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+
+      if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
+        // NOTE: Will not add duplicates, which is nice
+        this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+      }
+      else {
+        this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap()); 
+      }
+
     });
 
   }
@@ -166,7 +186,7 @@ export class MarkerMapComponent implements OnInit {
     });
   }
 
-  getMostCurrentAvailableDate(daily: boolean = true) {
+  getMostCurrentAvailableDate(daily: boolean = true, initImageLoad: boolean = true) {
     /*
     Makes requests for most current available date. Goes back
     previous days until it finds an available date.
@@ -196,7 +216,7 @@ export class MarkerMapComponent implements OnInit {
           return;
         }
         this.currentAttempts += 1;
-        this.getMostCurrentAvailableDate(daily);
+        this.getMostCurrentAvailableDate(daily, initImageLoad);
       }
       else {
         this.currentAttempts = 0;
@@ -210,40 +230,31 @@ export class MarkerMapComponent implements OnInit {
         let dateString = this.calcs.getDateFromDayOfYear(year + ' ' + day);
 
         let dataTypeString = daily === true ? 'Daily' : 'Weekly';
-        this.addImageLayer(imageBlob, dateString, dataTypeString);
+        this.addImageLayer(imageBlob, dateString, dataTypeString, initImageLoad);
         this.addCustomLabelToMap(dateString, dataTypeString);
-        // this.updateDataLayerControl(dataTypeString);  // testing if it helps to move this above...
       }
 
     });
 
   }
 
-  updateDataLayerControl(dataTypeString: string) {
-    /*
-    Updates layer control for waterbody data on main map.
-    */
-    if (this.mapService.imageLayerTitle.length > 0) {
-      delete this.layersControl.overlays[this.mapService.imageLayerTitle];
-    }
-    this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
-    this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
-  }
-
-  addImageLayer(image: Blob, dateString: string, dataTypeString: string): any {
+  addImageLayer(image: Blob, dateString: string, dataTypeString: string, initImageLoad: boolean = true): any {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       let imageUrl = reader.result.toString();
       let map = this.mapService.getMap();
       this.mapService.waterbodyDataLayer.removeFrom(map);
       this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
-      this.mapService.waterbodyDataLayer.addTo(map);
-
-      if (this.mapService.imageLayerTitle.length > 0) {
-        delete this.layersControl.overlays[this.mapService.imageLayerTitle];
+      
+      if (initImageLoad === true) {
+        this.mapService.waterbodyDataLayer.addTo(map);
       }
-      this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
-      this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
+
+      // if (this.mapService.imageLayerTitle.length > 0) {
+      //   delete this.layersControl.overlays[this.mapService.imageLayerTitle];
+      // }
+      // this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
+      // this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
 
       return reader.result;
     }, false);
@@ -265,14 +276,23 @@ export class MarkerMapComponent implements OnInit {
       let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       container.style.background = 'white';
       container.style.padding = '5px';
-      // container.textContent = 'Satellite Imagery ' + dataTypeString + ' Data -- ' + dateString;
-      container.textContent = dataTypeString + ' Satellite Imagery - ' + dateString;
-
-      console.log("container: ", container)
-
+      container.innerHTML = '<form style="float:top;"><input id="leaflet-wb-layer-control" type="checkbox">  ' +
+        dataTypeString + ' Satellite Imagery - ' + dateString + '</input></form>';
       return container;
     }
     map.addControl(this.mapService.customControl);
+
+    document.getElementById('leaflet-wb-layer-control').addEventListener('click', (event) => {
+      event.stopPropagation();
+      let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+      if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
+        this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+      }
+      else if (wbCheckbox.checked !== true) {
+        this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap());
+      }
+    });
+
   }
 
   mapPanEvent(e: any): void {
