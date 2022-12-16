@@ -110,8 +110,9 @@ export class MarkerMapComponent implements OnInit {
 
       let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
 
-      if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
-        // NOTE: Will not add duplicates, which is nice
+      // if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
+      if (this.zoomLevel >= this.wbLayerZoomThreshold) {
+        // NOTE: does not add duplicates, which is nice
         this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
       }
       else {
@@ -268,7 +269,7 @@ export class MarkerMapComponent implements OnInit {
     if (this.mapService.customControl) {
       map.removeControl(this.mapService.customControl);
     }
-    this.mapService.customControl = new Control()
+    this.mapService.customControl = new Control();
     this.mapService.customControl.options = {
       position: 'topright'
     };
@@ -276,22 +277,21 @@ export class MarkerMapComponent implements OnInit {
       let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       container.style.background = 'white';
       container.style.padding = '5px';
-      container.innerHTML = '<form style="float:top;"><input id="leaflet-wb-layer-control" type="checkbox">  ' +
-        dataTypeString + ' Satellite Imagery - ' + dateString + '</input></form>';
+      container.innerHTML = dataTypeString + ' Satellite Imagery - ' + dateString;
       return container;
     }
     map.addControl(this.mapService.customControl);
 
-    document.getElementById('leaflet-wb-layer-control').addEventListener('click', (event) => {
-      event.stopPropagation();
-      let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
-      if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
-        this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
-      }
-      else if (wbCheckbox.checked !== true) {
-        this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap());
-      }
-    });
+    // document.getElementById('leaflet-wb-layer-control').addEventListener('click', (event) => {
+    //   event.stopPropagation();
+    //   let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+    //   if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
+    //     this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+    //   }
+    //   else if (wbCheckbox.checked !== true) {
+    //     this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap());
+    //   }
+    // });
 
   }
 
