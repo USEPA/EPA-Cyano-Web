@@ -156,5 +156,33 @@ export class MyLocationsComponent implements OnInit {
       },
     ]);
   }
+
+  locationMouseEnter(event, location) {
+    /*
+    Mouse event for a location in the My Locations list.
+    */
+    let markers = this.mapService.getMarkers();
+    for (let key of Object.keys(markers['_layers'])) {
+      let layer = markers['_layers'][key];
+      if (layer.options.alt.includes(location.name)) {
+        layer.fire('mouseover');
+      }
+    }
+
+  }
+  
+  locationMouseLeave(event, location) {
+    /*
+    Mouse event for a location in the My Locations list.
+    */
+    let markers = this.mapService.getMarkers();
+    for (let key of Object.keys(markers['_layers'])) {
+      let layer = markers['_layers'][key];
+      if (layer.options.alt.includes(location.name)) {
+        layer.fire('mouseout');
+      }
+    }
+
+  }
   
 }

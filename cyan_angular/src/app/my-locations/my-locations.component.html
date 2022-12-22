@@ -20,7 +20,7 @@
     </ng-template>
   </div>
   <ul class="location_list">
-    <li *ngFor="let location of sorted_locations" class="location_li" (click)="locationSelect($event, location)">
+    <li *ngFor="let location of sorted_locations" class="location_li" (click)="locationSelect($event, location)" (mouseenter)="locationMouseEnter($event, location)" (mouseleave)="locationMouseLeave($event, location)">
       <div class="location_name">{{location.name}}</div>
       <div class="left_block">
         <div class="location_block_1">
