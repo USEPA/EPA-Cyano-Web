@@ -252,6 +252,13 @@ def get_notifications(user, last_visit):
 
     if len(db_values) > 0:
         for val in db_values:
+
+            print("Checking if entry exists: {}".format(val))
+
+            existing_entry = Notifications.query.filter_by(owner=user, id=val.id).first()
+
+            print("EXISTING ENTRY: {}".format(existing_entry))
+
             db.session.add(val)  # trying to add list of Notifications objects
             db_values_list.append(
                 convert_notification_to_list(val)
