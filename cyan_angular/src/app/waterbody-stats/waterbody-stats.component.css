@@ -27,6 +27,7 @@
     .user-ranges {
 		bottom: 2%
 	}
+
 }
 @media screen and (max-width: 979px) and (min-width: 401px) {
 	.locations-block {
@@ -37,6 +38,7 @@
     .user-ranges {
 		bottom: 2%
 	}
+
 }
 @media screen and (max-width: 400px) {
 	.locations-block {
@@ -52,6 +54,23 @@
     }
 
 }
+
+/*
+Determines if aligning WB details horizontall or vertically
+************************************************************
+*/
+@media screen and (min-width: 1080px) {
+	.wb-stats-small-view {
+		display:  none;
+	}
+}
+@media screen and (max-width: 1079px) {
+	.wb-stats-large-view {
+		display:  none;
+	}
+}
+/************************************************************/
+
 
 .details_block_0 {
     /*width: 100vw;*/
@@ -388,4 +407,12 @@ h2.label {
 
 .waterbody-help-icon:hover {
 	cursor: pointer;
+}
+
+.wb-stats-chart {
+	margin-top: 5%;
+}
+
+.wb-stats-values {
+	margin-left: 2%;
 }

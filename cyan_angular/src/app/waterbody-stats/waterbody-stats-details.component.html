@@ -21,6 +21,7 @@
 				<button *ngIf="showAddWaterbodyButton" mat-raised-button id="download-histo-btn" (click)="addWaterbodyToLocations()">Add Waterbody to Locations</button>
 			</div>
 			<br><br>
+
 			<div class="details_tab">
 				<!-- User selections for WB stats -->
 				<div class="wbstats-inputs">
@@ -62,7 +63,6 @@
 
 				</div>
 				<!-- Shows list of dates within selected range -->
-				<!-- <div *ngIf="!isLoading && (selectedDateRange=='7day' || selectedDateRange=='30day')" id="selected-dates-div"> -->
 				<div *ngIf="!isLoading && (selectedDateRange!='1day' && selectedDateRange!='1week')" id="selected-dates-div">
 					<div>
 						<div class="details_slideshow">
@@ -71,145 +71,308 @@
 	          			<br>
 	          			<p>Selected date: {{selectedDate || selectedAvailableDate}}</p>
 	          		</div>
-	          		<div>
+	          		
+	          		<div class="wb-stats-large-view">
           				<ng5-slider
           					[(value)]="sliderValue"
           					[options]="sliderOptions"
-          					(mouseup)="sliderEvent()"
+          					(mouseup)="sliderEvent($event)"
           					[ngClass]="{'tick-legend-30-day': selectedDateRange == '30day' || selectedDateRange == '16week'}">
           				</ng5-slider>
 	          		</div>
+
+	          		<div class="wb-stats-small-view">
+	          			<mat-form-field appearance="fill">
+							<mat-label>{{selectedDate}}</mat-label>
+							<mat-select>
+								<mat-option
+									value="{{selectedDate}}"
+									[class.highlight-date]="date == selectedDate"
+									class="selected-dates-item"
+									*ngFor="let date of datesWithinRange">
+									{{date}}
+								</mat-option>
+								<!-- <mat-option value="one">First option</mat-option> -->
+							</mat-select>
+	          			</mat-form-field>
+	          			<!-- <dl id="selected-dates-list">
+							<dt [class.highlight-date]="date == selectedDate" class="selected-dates-item" *ngFor="let date of datesWithinRange">
+								{{date}}
+							</dt>
+						</dl> -->
+	          		</div>
+
 				</div>
 			</div>
 
 			<br>
+			
 
-			<div class="details_tab" *ngIf="plotStats">
 
-				<!-- Total Cell Counts Plot -->
-				<div class="data-item">
-				  <div class="chart_header">
-				    <div class="chart_title" class="chart-toggle" (click)="togglePlotType();">
-							<mat-icon *ngIf="selectedDateRange=='1day' || selectedDateRange == '1week'">unfold_more</mat-icon>
-							{{selectedPlotType}}
-						</div>
-				    <div class="chart_source_selection"></div>
-				  </div>
-					<div class="chart_graph">
-						<canvas *ngIf="!showStacked && !showPie" aria-label="Total cell counts" baseChart #barChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
-						  [datasets]="chartData"
-						  [options]="chartOptions"
-						  [colors]="chartColors"
-						  [legend]="chartLegend"
-						  [chartType]="chartType"
-						  [labels]="chartLabels"
-						  (chartClick)="chartClick($event)">
-						</canvas>
-						<canvas *ngIf="!showStacked && !showBars" aria-label="Total cell counts" #stackedChart="base-chart" baseChart class="cyan_chart left-chart" width="1" height="1"
-						  [datasets]="pieChartData"
-						  [options]="pieChartOptions"
-						  [colors]="pieChartColors"
-						  [legend]="pieChartLegend"
-						  [chartType]="pieChartType"
-						  [labels]="pieChartLabels"
-						  (chartClick)="chartClick($event)">
-						</canvas>
-						<canvas *ngIf="!showPie && !showBars" aria-label="Total cell counts" baseChart #pieChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
-						  [datasets]="stackedChartData"
-						  [options]="stackedChartOptions"
-						  [colors]="stackedChartColors"
-						  [legend]="stackedChartLegend"
-						  [chartType]="stackedChartType"
-						  [labels]="stackedChartLabels">
-						</canvas>
-					</div>
-				</div>
-				<!-- Cell Concentration Histogram -->
-				<div class="data-item">
-					<div *ngIf="!showStacked" class="chart_header">
-					  <div class="chart_title">Cell Concentration Histogram
-					  	<!-- <mat-icon id="download-histo-btn" (click)="downloadHistoCSV()" class="mat_icon">file_download</mat-icon> -->
+
+			<div class="wb-stats-large-view">
+
+				<div class="details_tab" *ngIf="plotStats">
+					<!-- Total Cell Counts Plot -->
+					<div class="data-item">
+					  <div class="chart_header">
+					    <div class="chart_title" class="chart-toggle" (click)="togglePlotType();">
+								<mat-icon *ngIf="selectedDateRange=='1day' || selectedDateRange == '1week'">unfold_more</mat-icon>
+								{{selectedPlotType}}
+							</div>
+					    <div class="chart_source_selection"></div>
 					  </div>
-					  <!-- <div class="chart_source_selection"></div> -->
+						<div class="chart_graph">
+							<canvas *ngIf="!showStacked && !showPie" aria-label="Total cell counts" baseChart #barChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
+							  [datasets]="chartData"
+							  [options]="chartOptions"
+							  [colors]="chartColors"
+							  [legend]="chartLegend"
+							  [chartType]="chartType"
+							  [labels]="chartLabels"
+							  (chartClick)="chartClick($event)">
+							</canvas>
+							<canvas *ngIf="!showStacked && !showBars" aria-label="Total cell counts" #stackedChart="base-chart" baseChart class="cyan_chart left-chart" width="1" height="1"
+							  [datasets]="pieChartData"
+							  [options]="pieChartOptions"
+							  [colors]="pieChartColors"
+							  [legend]="pieChartLegend"
+							  [chartType]="pieChartType"
+							  [labels]="pieChartLabels"
+							  (chartClick)="chartClick($event)">
+							</canvas>
+							<canvas *ngIf="!showPie && !showBars" aria-label="Total cell counts" baseChart #pieChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
+							  [datasets]="stackedChartData"
+							  [options]="stackedChartOptions"
+							  [colors]="stackedChartColors"
+							  [legend]="stackedChartLegend"
+							  [chartType]="stackedChartType"
+							  [labels]="stackedChartLabels">
+							</canvas>
+						</div>
 					</div>
-					<div *ngIf="showStacked" class="chart_header">
-					  <div class="chart_title">Total Cell Counts by Range</div>
-					  <div class="chart_source_selection"></div>
+					<!-- Cell Concentration Histogram -->
+					<div class="data-item">
+						<div *ngIf="!showStacked" class="chart_header">
+						  <div class="chart_title">Cell Concentration Histogram</div>
+						</div>
+						<div *ngIf="showStacked" class="chart_header">
+						  <div class="chart_title">Total Cell Counts by Range</div>
+						  <div class="chart_source_selection"></div>
+						</div>
+						<div class="chart_graph">
+							<canvas *ngIf="!showStacked" aria-label="Concentration histogram" baseChart class="cyan_chart right-chart" width="1" height="1"
+							  [datasets]="histoChartData"
+							  [options]="histoChartOptions"
+							  [legend]="histoChartLegend"
+							  [chartType]="histoChartType"
+							  [labels]="histoChartLabels">
+							</canvas>
+							<canvas *ngIf="showStacked" aria-label="Total cell counts by range" baseChart class="cyan_chart right-chart" #stackedChart="base-chart" width="1" height="1"
+							  [datasets]="lineChartData"
+							  [options]="lineChartOptions"
+							  [colors]="lineChartColors"
+							  [legend]="lineChartLegend"
+							  [chartType]="lineChartType"
+							  [labels]="lineChartLabels">
+							</canvas>
+						</div>
 					</div>
-					<div class="chart_graph">
-						<canvas *ngIf="!showStacked" aria-label="Concentration histogram" baseChart class="cyan_chart right-chart" width="1" height="1"
-						  [datasets]="histoChartData"
-						  [options]="histoChartOptions"
-						  [legend]="histoChartLegend"
-						  [chartType]="histoChartType"
-						  [labels]="histoChartLabels">
-						</canvas>
-						<canvas *ngIf="showStacked" aria-label="Total cell counts by range" baseChart class="cyan_chart right-chart" #stackedChart="base-chart" width="1" height="1"
-						  [datasets]="lineChartData"
-						  [options]="lineChartOptions"
-						  [colors]="lineChartColors"
-						  [legend]="lineChartLegend"
-						  [chartType]="lineChartType"
-						  [labels]="lineChartLabels">
-						</canvas>
+				</div>
+
+				<div class="details_tab" *ngIf="calculatingStats">
+					<!-- Displays WB stats for a selected date -->
+					<div class="data-item">
+						<b>Date:</b> {{wbStats.date}}<br>
+						<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
+						<b>Min:</b> {{wbStats.min || 'N/A'}} cells/mL<br>
+						<b>Max:</b> {{wbStats.max || 'N/A'}} cells/mL<br>
+						<b>Average:</b> {{wbStats.average || 'N/A'}} cells/mL<br>
+						<b>Standard Deviation:</b> {{wbStats.stddev || 'N/A'}} cells/mL
+						<br><br>
+						<div *ngIf=!hideWaterbodyMetrics>
+							<!-- <b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude || 'N/A'}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
+							<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude || 'N/A'}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br> -->
+							<b>Extent WB:</b> {{wbMetrics.extentWb || 'N/A'}} {{wbMetrics.extentWbUnits}}<br>
+							<b>Frequency WB:</b> {{wbMetrics.frequencyWb || 'N/A'}} {{wbMetrics.frequencyWbUnits}}<br>
+							<!-- <b>Magnitude WB:</b> {{wbMetrics.magnitudeWb || 'N/A'}} {{wbMetrics.magnitudeWbUnits}}<br> -->
+							<b>Period:</b> {{wbMetrics.period || 'N/A'}}<br>
+							<b>Timestep:</b> {{wbMetrics.timestep || 'N/A'}}
+						</div>
+					</div>
+					<div *ngIf="showStacked" class="data-item range-data-item">
+						<div *ngIf="wbDateRangeStats.dates"><b>Date Range:</b> {{wbDateRangeStats.dates[wbDateRangeStats.dates.length - 1]}} - {{wbDateRangeStats.dates[0]}}</div>
+						<!-- <b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br> -->
+						<b>Min:</b> {{wbDateRangeStats.min || 'N/A'}} cells/mL<br>
+						<b>Max:</b> {{wbDateRangeStats.max || 'N/A'}} cells/mL<br>
+						<b>Average:</b> {{wbDateRangeStats.average || 'N/A'}} cells/mL<br>
+						<b>Standard Deviation:</b> {{wbDateRangeStats.stddev || 'N/A'}} cells/mL
+					</div>
+					<div *ngIf="!showStacked" class="data-item range-data-item">
+						<!-- Range selection -->
+						<mat-form-field>
+							<mat-label>Select range</mat-label>
+							<mat-select [(value)]="selectedRange" (selectionChange)="updateHistoChart();">
+								<mat-option value="low">Low</mat-option>
+								<mat-option value="medium">Medium</mat-option>
+								<mat-option value="high">High</mat-option>
+								<mat-option value="veryHigh">Very High</mat-option>
+								<mat-option value="all">All</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<!-- Stats -->
+						<div>
+							<b>Min:</b> {{rangeStats.min || "N/A"}} cells/mL<br>
+							<b>Max:</b> {{rangeStats.max || "N/A"}} cells/mL<br>
+							<b>Average:</b> {{rangeStats.average || "N/A"}} cells/mL<br>
+							<b>Standard Deviation:</b> {{rangeStats.stddev || "N/A"}} cells/mL
+						</div>
 					</div>
 				</div>
 
 			</div>
 
-			<div class="details_tab" *ngIf="calculatingStats">
 
-				<!-- Displays WB stats for a selected date -->
-				<div class="data-item">
-					<b>Date:</b> {{wbStats.date}}<br>
-					<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
-					<b>Min:</b> {{wbStats.min || 'N/A'}} cells/mL<br>
-					<b>Max:</b> {{wbStats.max || 'N/A'}} cells/mL<br>
-					<b>Average:</b> {{wbStats.average || 'N/A'}} cells/mL<br>
-					<b>Standard Deviation:</b> {{wbStats.stddev || 'N/A'}} cells/mL
-					<br><br>
-					<div *ngIf=!hideWaterbodyMetrics>
-						<!-- <b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude || 'N/A'}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
-						<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude || 'N/A'}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br> -->
-						<b>Extent WB:</b> {{wbMetrics.extentWb || 'N/A'}} {{wbMetrics.extentWbUnits}}<br>
-						<b>Frequency WB:</b> {{wbMetrics.frequencyWb || 'N/A'}} {{wbMetrics.frequencyWbUnits}}<br>
-						<!-- <b>Magnitude WB:</b> {{wbMetrics.magnitudeWb || 'N/A'}} {{wbMetrics.magnitudeWbUnits}}<br> -->
-						<b>Period:</b> {{wbMetrics.period || 'N/A'}}<br>
-						<b>Timestep:</b> {{wbMetrics.timestep || 'N/A'}}
+
+
+
+			<div class="wb-stats-small-view">
+
+				<!-- <h1>THIS IS THE SMALL VIEW</h1> -->
+
+				<div class="details_tab" *ngIf="plotStats">
+					<!-- Total Cell Counts Plot -->
+					<div class="wb-stats-chart">
+						<div class="chart_header">
+						<div class="chart_title" class="chart-toggle" (click)="togglePlotType();">
+								<mat-icon *ngIf="selectedDateRange=='1day' || selectedDateRange == '1week'">unfold_more</mat-icon>
+								{{selectedPlotType}}
+							</div>
+						<div class="chart_source_selection"></div>
+						</div>
+						<div class="chart_graph">
+							<canvas *ngIf="!showStacked && !showPie" aria-label="Total cell counts" baseChart #barChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
+							  [datasets]="chartData"
+							  [options]="chartOptions"
+							  [colors]="chartColors"
+							  [legend]="chartLegend"
+							  [chartType]="chartType"
+							  [labels]="chartLabels"
+							  (chartClick)="chartClick($event)">
+							</canvas>
+							<canvas *ngIf="!showStacked && !showBars" aria-label="Total cell counts" #stackedChart="base-chart" baseChart class="cyan_chart left-chart" width="1" height="1"
+							  [datasets]="pieChartData"
+							  [options]="pieChartOptions"
+							  [colors]="pieChartColors"
+							  [legend]="pieChartLegend"
+							  [chartType]="pieChartType"
+							  [labels]="pieChartLabels"
+							  (chartClick)="chartClick($event)">
+							</canvas>
+							<canvas *ngIf="!showPie && !showBars" aria-label="Total cell counts" baseChart #pieChart="base-chart" class="cyan_chart left-chart" width="1" height="1"
+							  [datasets]="stackedChartData"
+							  [options]="stackedChartOptions"
+							  [colors]="stackedChartColors"
+							  [legend]="stackedChartLegend"
+							  [chartType]="stackedChartType"
+							  [labels]="stackedChartLabels">
+							</canvas>
+						</div>
+
+						<div *ngIf="calculatingStats" class="wb-stats-values">
+							<!-- Displays WB stats for a selected date -->
+							<div>
+								<b>Date:</b> {{wbStats.date}}<br>
+								<b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br>
+								<b>Min:</b> {{wbStats.min || 'N/A'}} cells/mL<br>
+								<b>Max:</b> {{wbStats.max || 'N/A'}} cells/mL<br>
+								<b>Average:</b> {{wbStats.average || 'N/A'}} cells/mL<br>
+								<b>Standard Deviation:</b> {{wbStats.stddev || 'N/A'}} cells/mL
+								<!-- <br><br> -->
+								<div *ngIf=!hideWaterbodyMetrics>
+									<!-- <b>Area Normalized Magnitude:</b> {{wbMetrics.areaNormalizedMagnitude || 'N/A'}} {{wbMetrics.areaNormalizedMagnitudeUnits}}<br>
+									<b>Chia Normalized Magnitude:</b> {{wbMetrics.chiaNormalizedMagnitude || 'N/A'}} {{wbMetrics.chiaNormalizedMagnitudeUnits}}<br> -->
+									<b>Extent WB:</b> {{wbMetrics.extentWb || 'N/A'}} {{wbMetrics.extentWbUnits}}<br>
+									<b>Frequency WB:</b> {{wbMetrics.frequencyWb || 'N/A'}} {{wbMetrics.frequencyWbUnits}}<br>
+									<!-- <b>Magnitude WB:</b> {{wbMetrics.magnitudeWb || 'N/A'}} {{wbMetrics.magnitudeWbUnits}}<br> -->
+									<b>Period:</b> {{wbMetrics.period || 'N/A'}}<br>
+									<b>Timestep:</b> {{wbMetrics.timestep || 'N/A'}}
+								</div>
+							</div>
+
+						</div>
+
+
 					</div>
-				</div>
 
-				<div *ngIf="showStacked" class="data-item range-data-item">
-					<div *ngIf="wbDateRangeStats.dates"><b>Date Range:</b> {{wbDateRangeStats.dates[wbDateRangeStats.dates.length - 1]}} - {{wbDateRangeStats.dates[0]}}</div>
-					<!-- <b>Total Pixel Area:</b> {{wbTotalPixelArea}} km<sup>2</sup><br> -->
-					<b>Min:</b> {{wbDateRangeStats.min || 'N/A'}} cells/mL<br>
-					<b>Max:</b> {{wbDateRangeStats.max || 'N/A'}} cells/mL<br>
-					<b>Average:</b> {{wbDateRangeStats.average || 'N/A'}} cells/mL<br>
-					<b>Standard Deviation:</b> {{wbDateRangeStats.stddev || 'N/A'}} cells/mL
-				</div>
-
-				<div *ngIf="!showStacked" class="data-item range-data-item">
-					<!-- Range selection -->
-					<mat-form-field>
-						<mat-label>Select range</mat-label>
-						<mat-select [(value)]="selectedRange" (selectionChange)="updateHistoChart();">
-							<mat-option value="low">Low</mat-option>
-							<mat-option value="medium">Medium</mat-option>
-							<mat-option value="high">High</mat-option>
-							<mat-option value="veryHigh">Very High</mat-option>
-							<mat-option value="all">All</mat-option>
-						</mat-select>
-					</mat-form-field>
-					<!-- Stats -->
-					<div>
-						<b>Min:</b> {{rangeStats.min || "N/A"}} cells/mL<br>
-						<b>Max:</b> {{rangeStats.max || "N/A"}} cells/mL<br>
-						<b>Average:</b> {{rangeStats.average || "N/A"}} cells/mL<br>
-						<b>Standard Deviation:</b> {{rangeStats.stddev || "N/A"}} cells/mL
+					<!-- Cell Concentration Histogram -->
+					<div class="wb-stats-chart">
+						<div *ngIf="!showStacked" class="chart_header">
+						  <div class="chart_title">Cell Concentration Histogram</div>
+						</div>
+						<div *ngIf="showStacked" class="chart_header">
+						  <div class="chart_title">Total Cell Counts by Range</div>
+						  <div class="chart_source_selection"></div>
+						</div>
+						<div class="chart_graph">
+							<canvas *ngIf="!showStacked" aria-label="Concentration histogram" baseChart class="cyan_chart right-chart" width="1" height="1"
+							  [datasets]="histoChartData"
+							  [options]="histoChartOptions"
+							  [legend]="histoChartLegend"
+							  [chartType]="histoChartType"
+							  [labels]="histoChartLabels">
+							</canvas>
+							<canvas *ngIf="showStacked" aria-label="Total cell counts by range" baseChart class="cyan_chart right-chart" #stackedChart="base-chart" width="1" height="1"
+							  [datasets]="lineChartData"
+							  [options]="lineChartOptions"
+							  [colors]="lineChartColors"
+							  [legend]="lineChartLegend"
+							  [chartType]="lineChartType"
+							  [labels]="lineChartLabels">
+							</canvas>
+						</div>
 					</div>
+
+					<div *ngIf="calculatingStats" class="wb-stats-values">
+						<div *ngIf="!showStacked">
+							<!-- Range selection -->
+							<mat-form-field>
+								<mat-label>Select range</mat-label>
+								<mat-select [(value)]="selectedRange" (selectionChange)="updateHistoChart();">
+									<mat-option value="low">Low</mat-option>
+									<mat-option value="medium">Medium</mat-option>
+									<mat-option value="high">High</mat-option>
+									<mat-option value="veryHigh">Very High</mat-option>
+									<mat-option value="all">All</mat-option>
+								</mat-select>
+							</mat-form-field>
+							<!-- Stats -->
+							<div>
+								<b>Min:</b> {{rangeStats.min || "N/A"}} cells/mL<br>
+								<b>Max:</b> {{rangeStats.max || "N/A"}} cells/mL<br>
+								<b>Average:</b> {{rangeStats.average || "N/A"}} cells/mL<br>
+								<b>Standard Deviation:</b> {{rangeStats.stddev || "N/A"}} cells/mL
+							</div>
+						</div>
+						<div *ngIf="showStacked" class="range-data-item">
+							<div *ngIf="wbDateRangeStats.dates"><b>Date Range:</b> {{wbDateRangeStats.dates[wbDateRangeStats.dates.length - 1]}} - {{wbDateRangeStats.dates[0]}}</div>
+							<b>Min:</b> {{wbDateRangeStats.min || 'N/A'}} cells/mL<br>
+							<b>Max:</b> {{wbDateRangeStats.max || 'N/A'}} cells/mL<br>
+							<b>Average:</b> {{wbDateRangeStats.average || 'N/A'}} cells/mL<br>
+							<b>Standard Deviation:</b> {{wbDateRangeStats.stddev || 'N/A'}} cells/mL
+						</div>
+					</div>
+
 				</div>
 
+		
 			</div>
+
+
+
+
+
+
 
 		</div>
 

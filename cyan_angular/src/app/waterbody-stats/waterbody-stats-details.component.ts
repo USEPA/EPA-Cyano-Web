@@ -241,8 +241,13 @@ export class WaterBodyStatsDetails {
     this.dialogRef.close();
   }
 
+  ngAfterViewInit() {
+
+  }
+
   ngOnDestroy() {
     this.removeLayers();
+    this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
   }
 
   getMostCurrentAvailableDate() {
@@ -1176,6 +1181,11 @@ export class WaterBodyStatsDetails {
     let meta = chart.getDatasetMeta(0);
     let rect = chart.canvas.getBoundingClientRect();
     let point = meta.data[this.selectedDateIndex].getCenterPoint();
+
+    if (!point || isNaN(point.x) || isNaN(point.y)) {
+      return;
+    }
+
     let evt = new MouseEvent('mousemove', {
       clientX: rect.left + point.x,
       clientY: rect.top + point.y
@@ -1209,7 +1219,7 @@ export class WaterBodyStatsDetails {
     });
   }
 
-  sliderEvent() {
+  sliderEvent(event) {
     
     if (this.slidershow === true) {
       this.selectedDate = this.datesWithinRange[this.sliderValue];
