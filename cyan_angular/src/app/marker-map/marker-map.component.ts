@@ -108,10 +108,12 @@ export class MarkerMapComponent implements OnInit {
 
       this.zoomLevel = event.target._zoom;
 
-      let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+      // let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+
+      let path = this.ngLocation.path();
 
       // if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
-      if (this.zoomLevel >= this.wbLayerZoomThreshold) {
+      if (this.zoomLevel >= this.wbLayerZoomThreshold && !path.includes("wbstats")) {
         // NOTE: does not add duplicates, which is nice
         this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
       }
@@ -202,9 +204,6 @@ export class MarkerMapComponent implements OnInit {
 
     this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
 
-      console.log("Conus image result: ", result);
-      console.log("Header: ", result.headers.get('Content-Disposition'))
-
       let resonseType = result.body.type;
       let responseStatus = result.status;
 
@@ -247,7 +246,7 @@ export class MarkerMapComponent implements OnInit {
       this.mapService.waterbodyDataLayer.removeFrom(map);
       this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
       
-      if (initImageLoad === true) {
+      if (initImageLoad === true) { 
         this.mapService.waterbodyDataLayer.addTo(map);
       }
 

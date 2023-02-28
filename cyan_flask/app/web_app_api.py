@@ -252,13 +252,10 @@ def get_notifications(user, last_visit):
 
     if len(db_values) > 0:
         for val in db_values:
-
-            print("Checking if entry exists: {}".format(val))
-
             existing_entry = Notifications.query.filter_by(owner=user, id=val.id).first()
-
-            print("EXISTING ENTRY: {}".format(existing_entry))
-
+            if existing_entry != None:
+                logging.warning("Entry already exist: {}, user={}, id={}".format(existing_entry, user, val.id))
+                continue
             db.session.add(val)  # trying to add list of Notifications objects
             db_values_list.append(
                 convert_notification_to_list(val)
@@ -632,7 +629,7 @@ def start_batch_job(request_obj):
     response_obj[
         "status"
     ] = "Job started.\nAn email will be sent to {} \
-		  when the job is complete".format(
+          when the job is complete".format(
         user.email
     )
     response_obj["job"] = Job.create_jobs_json([job_obj])[0]
