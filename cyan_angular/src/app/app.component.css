@@ -27,5 +27,6 @@ app-header {
     position: absolute;
     z-index: 100;
     /* background: white; */
-    height: 80%;
+    /*height: 80%;*/
+    height: 75%;
 }
