@@ -7,7 +7,7 @@ Flask-Migrate==3.1.0
 Flask-RESTful==0.3.9
 Flask-SQLAlchemy==2.5.1
 mysqlclient==2.1.0
-mysql-connector-python==8.0.28
+mysql-connector-python==8.0.33
 PyJWT==2.3.0
 python-dotenv==0.19.2
 redis==4.1.4
