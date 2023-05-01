@@ -91,6 +91,7 @@ import 'chartjs-plugin-zoom';
 import 'chartjs-plugin-datalabels';
 import { ReportsComponent } from './waterbody-stats/reports/reports.component';
 import { ReportsResultsComponent } from './waterbody-stats/reports/reports-results.component';
+import { MonthlyReportsComponent } from './waterbody-stats/monthly-reports/monthly-reports.component';
 
 @NgModule({
     declarations: [
@@ -129,7 +130,8 @@ import { ReportsResultsComponent } from './waterbody-stats/reports/reports-resul
         WaterBodyStatsDetails,
         ReportsComponent,
         ReportsResultsComponent,
-        WhatsNewDialog
+        WhatsNewDialog,
+        MonthlyReportsComponent
     ],
     imports: [
         BrowserModule,
