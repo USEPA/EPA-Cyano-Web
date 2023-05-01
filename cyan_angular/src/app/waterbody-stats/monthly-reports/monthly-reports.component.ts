@@ -106,23 +106,29 @@ export class MonthlyReportsComponent implements OnInit {
     */
     let year = parseInt(this.selectedDate.split('-')[0]);
     let month = parseInt(this.selectedDate.split('-')[1]);
-
     this.loaderService.show();
-    this.downloader.downloadMonthlyReport(this.selectedState, year, month).subscribe(response => {
-      this.loaderService.hide();
-      let filenameArray = response.headers.get('Content-Disposition').split("filename=");
-      let filename = filenameArray[filenameArray.length - 1];
+    this.downloader.downloadMonthlyReport(this.selectedState, year, month).subscribe(
+      response => {
+        this.loaderService.hide();
+        let filenameArray = response.headers.get('Content-Disposition').split("filename=");
+        let filename = filenameArray[filenameArray.length - 1];
 
-      console.log("Filename: ", filename);
+        console.log("Filename: ", filename);
 
-      // Downloads report as PDF:
-      let pdfBlob = response.body;
-      let downloadUrl = window.URL.createObjectURL(pdfBlob);
-      let link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = filename;  // uses report ID for filename
-      link.click();
-    });
+        // Downloads report as PDF:
+        let pdfBlob = response.body;
+        let downloadUrl = window.URL.createObjectURL(pdfBlob);
+        let link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;  // uses report ID for filename
+        link.click();
+      },
+      error => {
+        this.loaderService.hide();
+        console.log("Error requesting report: ", error);
+        this.dialog.displayMessageDialog("Error requesting report.");
+      }
+    );
 
   }
 

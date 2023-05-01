@@ -6,7 +6,7 @@
 
 		<mat-tab-group mat-stretch-tabs class="details_tab_group" #tabGroup>
 
-		    <!-- WB Search Tab -->
+		   <!-- WB Search Tab -->
 		  <mat-tab label="Waterbody Search" >
 				
 				<div class="locations-title">
@@ -73,11 +73,17 @@
 
 			</mat-tab>
 
+			<!-- Waterbody Reports tab -->
 			<mat-tab label="Waterbody Reports">
 				<!-- <div class="locations-title">
 					<h2>Waterbody Report Generation</h2>
 				</div> -->
 				<app-reports></app-reports>
+			</mat-tab>
+
+			<!-- Monthly Reports tab (state and alpine) -->
+			<mat-tab label="Monthly Reports">
+				<app-monthly-reports></app-monthly-reports>
 			</mat-tab>
 
 		</mat-tab-group>
