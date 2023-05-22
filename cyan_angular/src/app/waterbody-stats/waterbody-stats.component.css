@@ -19,6 +19,7 @@
 	}
     .location_block_0 {
     	width: 50vw;
+    	/*height: 100%;*/
     }
     #selected-dates-div {
         padding-top: 5%;
@@ -38,6 +39,10 @@
     .user-ranges {
 		bottom: 2%
 	}
+	.location_block_0 {
+    	/*height: 50%;*/
+    	/*resize:  vertical;*/
+    }
 
 }
 @media screen and (max-width: 400px) {
@@ -52,7 +57,10 @@
     .map-legend {
     	bottom: 2%;
     }
-
+    .location_block_0 {
+    	/*height: 50%;*/
+    	/*resize:  vertical;*/
+    }
 }
 
 /*
@@ -68,9 +76,15 @@ Determines if aligning WB details horizontall or vertically
 	.wb-stats-large-view {
 		display:  none;
 	}
+	/*.menu-windows {
+	    height: fit-content;
+	}*/
 }
 /************************************************************/
 
+.mini_map_block {
+	height: 50vh;
+}
 
 .details_block_0 {
     /*width: 100vw;*/
@@ -231,7 +245,7 @@ h2.label {
 }
 
 .location_block_0 {
-  height: 100%;
+  /*height: 100%;*/
   overflow-y: scroll;
   position: relative;
   background: white;
@@ -415,4 +429,17 @@ h2.label {
 
 .wb-stats-values {
 	margin-left: 2%;
+}
+
+.mini_map_block {
+    display: inline-flex;
+    /*float: left;*/
+    height: 100%;
+    width: 100%;
+    order: 1;
+}
+.mini_map {
+    padding: 0;
+    height: 100%;
+    width: 100%;
 }

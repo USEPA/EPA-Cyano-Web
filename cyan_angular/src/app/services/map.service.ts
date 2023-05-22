@@ -33,7 +33,7 @@ export class MapService {
 
   private data_source = 'OLCI';
 
-  public mainTileLayer: string = '';
+  public mainTileLayer: string = 'esriImagery';
 
   degSecRounding: number = 6;  // rounding for dms seconds
 
@@ -78,6 +78,19 @@ export class MapService {
       // 'Latest Daily Data (Testing)': this.waterbodyDataLayer,
       'Waterbodies': this.waterbodiesLayer
     }
+  };
+
+  lat_0: number = 33.927945;
+  lng_0: number = -83.346554;
+
+  tileLayer: string = this.mainTileLayer;  // uses same tileLayer as main map
+  mapLayer = this.layersControl.baseLayers[this.tileLayer];
+
+  options = {
+    layers: [this.mapLayer],
+    zoomControl: true,
+    zoom: 6,
+    center: latLng([this.lat_0, this.lng_0])
   };
 
   imageLayerTitle: string = '';
