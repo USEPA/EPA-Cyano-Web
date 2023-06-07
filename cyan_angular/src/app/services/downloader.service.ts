@@ -740,6 +740,7 @@ export class DownloaderService {
     /*
     Creates CSV link and clicks it for downloading.
     */
+    if (!this.authService.checkUserAuthentication()) { return; }
     const a = document.createElement('a');
     const blob = new Blob([data], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

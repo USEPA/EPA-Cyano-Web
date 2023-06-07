@@ -130,7 +130,8 @@
 .location_count {
   width: fit-content;
   float: right;
-  display: inline-block;
+  /*display: inline-block;*/
+  display: flex;
   text-align: right;
 }
 .location_block_1 {
@@ -144,7 +145,7 @@
   width: 100%;
 }
 .location_exit {
-  margin-right: 10px;
+  /*margin-right: 10px;*/
   font-size: x-large;
 }
 .location_exit:hover {
@@ -332,4 +333,12 @@
 }
 .wb-icon:hover {
   color: gray;
+}
+.mat_icon:hover {
+    color: gray;
+    cursor: pointer;
+}
+
+#download-btn {
+  margin-left: 5px;
 }

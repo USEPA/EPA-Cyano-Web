@@ -11,12 +11,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import COMMASPACE, formatdate
 import logging
-import secrets
-import zlib
-from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
 
 from cyan_flask.crypt import CryptManager
 from csv_handler import CSVHandler
+
 
 crypt_manager = CryptManager()
 csv_handler = CSVHandler()
