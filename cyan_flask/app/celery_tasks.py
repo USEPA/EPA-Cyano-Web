@@ -226,6 +226,10 @@ class CeleryHandler:
         Gets all user's jobs from db.
         """
         user = User.query.filter_by(username=username).first()
+
+        logging.warning("get_all_jobs user: {}".format(user))
+        logging.warning("get_all_jobs user id: {}".format(user.id))
+
         return Job.query.filter_by(user_id=user.id).all()
 
     def check_celery_job_status(self, job_id):

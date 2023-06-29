@@ -44,7 +44,7 @@ import { LocationCompareComponent, LocationCompareAlert } from './location-compa
 import { NotificationsComponent, NotificationDetails } from './notifications/notifications.component';
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { NgChartsModule } from 'ng2-charts';
+import { ChartsModule } from 'ng2-charts';
 import { UserIdleModule } from 'angular-user-idle';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -59,7 +59,7 @@ import { MapPopupComponent } from './map-popup/map-popup.component';
 import { Location } from './models/location';
 import { ConfigComponent, SaveDialogComponent } from './config/config.component';
 import { LocationDetailsComponent, LocationDetailsNotes } from './location-details/location-details.component';
-import { AccountComponent } from './account/account.component';
+import { AccountComponent, WhatsNewDialog } from './account/account.component';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { LocationCompareDetailsComponent } from './location-compare-details/location-compare-details.component';
@@ -128,7 +128,8 @@ import { ReportsResultsComponent } from './waterbody-stats/reports/reports-resul
         WaterbodyStatsComponent,
         WaterBodyStatsDetails,
         ReportsComponent,
-        ReportsResultsComponent
+        ReportsResultsComponent,
+        WhatsNewDialog
     ],
     imports: [
         BrowserModule,
@@ -145,7 +146,7 @@ import { ReportsResultsComponent } from './waterbody-stats/reports/reports-resul
             ping: environment.userIdlePingSeconds
         }),
         AppRoutingModule,
-        NgChartsModule,
+        ChartsModule,
         MatMenuModule,
         MatSelectModule,
         MatCheckboxModule,

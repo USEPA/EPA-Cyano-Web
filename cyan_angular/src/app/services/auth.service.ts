@@ -23,7 +23,7 @@ export class AuthService {
 
   minPasswordLength: number = 8;
   maxPasswordLength: number = 32;
-  passwordStrength: RegExp = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&]).{8,}/;
+  passwordStrength: RegExp = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%=+<>/?^&*]).{8,}/;
   usernameMinLength: number = 4;
   usernameMaxLength: number = 36;
 

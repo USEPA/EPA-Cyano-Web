@@ -37,13 +37,12 @@ class CryptManager:
 		"""
 		default_path = os.path.join(self.key_location, Path(fullpath).name)
 
-		# TODO: Try to read an env var if it can't find a sk file:
-
 		if os.path.isfile(fullpath):
 			try:
 				file_obj = open(fullpath, "rb")
 				file_content = file_obj.read()
 				file_obj.close()
+				print("Found .env file: {}.".format(fullpath))
 				return file_content
 			except FileNotFoundError:
 				return self._use_env_var_for_key()
@@ -52,6 +51,7 @@ class CryptManager:
 				file_obj = open(default_path, "rb")
 				file_content = file_obj.read()
 				file_obj.close()
+				print("Found .env file: {}.".format(default_path))
 				return file_content
 			except FileNotFoundError:
 				return self._use_env_var_for_key()
@@ -62,6 +62,7 @@ class CryptManager:
 		"""
 		Uses env var instead of file for key.
 		"""
+		print("Using env var for key.")
 		key = os.getenv("CYANWEB_CRYPT_KEY")
 		if not key:
 			logging.warning("No key found in environment for decryption.")
@@ -165,7 +166,6 @@ class CryptManager:
 		"""
 		Gets key path from environment varible.
 		"""
-		print("SK: {}".format(os.environ.get("SK")))
 		try:
 			return self.unobscure(os.environ.get("SK"))
 		except Exception:

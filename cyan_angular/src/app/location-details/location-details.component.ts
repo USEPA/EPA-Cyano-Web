@@ -501,7 +501,16 @@ export class LocationDetailsComponent implements OnInit {
     if (!this.authService.checkUserAuthentication()) { return; }
     let tifName = image.name.split('.png')[0] + '.tif';
     let imageURL = this.getImageUrl(tifName);
-    window.open(imageURL, '_blank');
+
+    this.downloader.getLocationImage(tifName, imageURL).subscribe(result => {
+      let link = document.createElement('a');
+      let blob = new Blob([result.body], { type: 'application/octet-stream'});
+      link.href = window.URL.createObjectURL(blob);
+      link.setAttribute('download', tifName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
   }
 
   downloadTimeSeries() {

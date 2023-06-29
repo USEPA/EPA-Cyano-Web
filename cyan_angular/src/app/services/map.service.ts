@@ -1,11 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Map, LatLng, Marker, LayerGroup, icon, Layer, marker, tileLayer } from 'leaflet';
+import { 
+  Map,
+  LatLng,
+  Marker,
+  LayerGroup,
+  icon,
+  Layer,
+  marker,
+  tileLayer,
+  ImageOverlay,
+  latLng,
+  latLngBounds,
+  Control 
+} from 'leaflet';
+import { featureLayer } from 'esri-leaflet';
 import { Location } from '../models/location';
 import { CyanMap } from '../utils/cyan-map';
 import { UserService } from '../services/user.service';
 import { ConcentrationRanges } from '../test-data/test-levels';
 import { MapPopupComponent } from '../map-popup/map-popup.component';
 import { NgElement, WithProperties } from '@angular/elements';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +37,56 @@ export class MapService {
 
   degSecRounding: number = 6;  // rounding for dms seconds
 
-  constructor(private cyanMap: CyanMap, private userService: UserService) {}
+  bottom: number = 24.623340905712205;
+  right: number = -65.03986894612699;
+  left: number = -131.1651209108407;
+  top: number = 52.9220879731627;
+  topLeft = latLng(this.top, this.left);
+  bottomRight = latLng(this.bottom, this.right);
+  imageBounds = latLngBounds(this.bottomRight, this.topLeft);
+
+  waterbodyDataLayer = new ImageOverlay('', null, {});
+
+  customControl = new Control();
+
+  esriImagery = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    detectRetina: true,
+    attribution:
+      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  });
+  streetMaps = tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    detectRetina: true,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+  topoMap = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    detectRetina: true,
+    attribution: 'Tiles &copy; Esri'
+  });
+
+  waterbodiesLayer = featureLayer({
+    url: 'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/waterbodies_9/FeatureServer/0',
+    bubblingMouseEvents: false
+  });
+
+  layersControl = {
+    baseLayers: {
+      'Imagery Maps': this.esriImagery,
+      'Street Maps': this.streetMaps,
+      'Topographic Maps': this.topoMap,
+    },
+    overlays: {
+      // 'Latest Daily Data (Testing)': this.waterbodyDataLayer,
+      'Waterbodies': this.waterbodiesLayer
+    }
+  };
+
+  imageLayerTitle: string = '';
+
+  constructor(
+    private cyanMap: CyanMap,
+    private userService: UserService,
+    private httpClient: HttpClient
+  ) { }
 
   setMap(map: Map): void {
     this.cyanMap.map = map;

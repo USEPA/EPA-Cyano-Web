@@ -362,10 +362,10 @@ h2.label {
 	height: 100%;
 }
 
-::ng-deep .mat-tab-body-content {
+/*::ng-deep .mat-tab-body-content {
 	height: auto !important;
 }
-
+*/
 ::ng-deep .spinner {
   margin: auto;
   top: 5%;
@@ -374,4 +374,18 @@ h2.label {
 .range-data-item {
 	vertical-align: top;
 	float:  right;
+}
+
+.wb-stats-buttons {
+	display:  grid;
+	justify-content: end;
+	justify-items: start;
+}
+
+.waterbody-help-icon {
+	
+}
+
+.waterbody-help-icon:hover {
+	cursor: pointer;
 }

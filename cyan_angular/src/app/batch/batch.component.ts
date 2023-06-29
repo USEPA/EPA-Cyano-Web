@@ -336,7 +336,13 @@ export class BatchComponent {
     /*
     Creates table object in "Jobs" tab.
     */
+
+    console.log("createTable called")
+
     let tableArray: JobsTableParams[] = jobsResponse['jobs'];
+
+    console.log("tableArray: ", tableArray)
+
     tableArray = this.convertJobsDatetimesToLocal(tableArray);
     this.dataSource = new MatTableDataSource(tableArray);
     this.sortTable();
@@ -432,6 +438,8 @@ export class BatchComponent {
     Converts datetime values to local time for "Jobs" table.
     */
     jobsData.forEach(job => {
+      console.log("receivedDatetime", job.receivedDatetime)
+      console.log("finishedDatetime", job.finishedDatetime)
       job.receivedDatetime = this.convertDatetime(job.receivedDatetime);
       job.finishedDatetime = this.convertDatetime(job.finishedDatetime);
     });
@@ -442,11 +450,13 @@ export class BatchComponent {
     /*
     Converts datetime string into local timezone.
     */
+    let fullDatetime = datetime.replace(" ", "T") + "-00:00";  // sets date string to UTC
+
     if (datetime == 'None') {
       return datetime;
     }
     else {
-      let utcFormattedDate = new Date(datetime + ' UTC');  // time in UTC from backend
+      let utcFormattedDate = new Date(fullDatetime);  // gets local time from UTC time
       return this.datePipe.transform(utcFormattedDate, 'yyyy-MM-dd HH:mm:ss');
     }
   }

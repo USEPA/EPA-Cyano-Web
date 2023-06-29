@@ -1,8 +1,10 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Location as NgLocation } from '@angular/common';
-import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map } from 'leaflet';
-
+import { latLng, tileLayer, marker, icon, Map, LayerGroup, popup, Marker, map, DomUtil, Control, latLngBounds, ImageOverlay } from 'leaflet';
+import * as L from 'leaflet';
+import { featureLayer } from 'esri-leaflet';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { LocationService } from '../services/location.service';
 import { MapService } from '../services/map.service';
@@ -10,6 +12,11 @@ import { Location } from '../models/location';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { EnvService } from '../services/env.service';
+import { DownloaderService } from '../services/downloader.service';
+import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
+import { Calculations } from '../waterbody-stats/utils/calculations';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { LoaderService } from '../services/loader.service';
 
 import { ConcentrationRanges } from '../test-data/test-levels';
 
@@ -29,33 +36,26 @@ export class MarkerMapComponent implements OnInit {
 
   marker_layers: LayerGroup;
 
-  esriImagery = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    detectRetina: true,
-    attribution:
-      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-  });
-  streetMaps = tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    detectRetina: true,
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  });
-  topoMap = tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-    detectRetina: true,
-    attribution: 'Tiles &copy; Esri'
-  });
+  layersControl = this.mapService.layersControl;
 
-  layersControl = {
-    baseLayers: {
-      'Imagery Maps': this.esriImagery,
-      'Street Maps': this.streetMaps,
-      'Topographic Maps': this.topoMap
-    }
-  };
+  imageLayerTitle = this.mapService.imageLayerTitle;
+
 
   options = {
-    layers: [this.esriImagery],
+    layers: [this.mapService.esriImagery],
     zoom: 4,
     center: latLng([this.lat_0, this.lng_0])
   };
+
+  currentAttempts: number = 0;
+  totalPrevDayAttempts: number = 700;
+
+  configSetSub: Subscription;
+  dailyTypeSub: Subscription;
+
+  customControl: any;
+
+  geoPopup: any;
 
   constructor(
     private locationService: LocationService,
@@ -64,17 +64,31 @@ export class MarkerMapComponent implements OnInit {
     private user: UserService,
     private authService: AuthService,
     private ngLocation: NgLocation,
-    private envService: EnvService
-  ) {}
+    private envService: EnvService,
+    private downloader: DownloaderService,
+    private waterbodyStats: WaterbodyStatsComponent,
+    private calcs: Calculations,
+    private dialog: DialogComponent,
+    private loaderService: LoaderService
+  ) { }
 
   ngOnInit() {
+
     this.getLocations();
     let username = this.user.getUserName();
     let path = this.ngLocation.path();
     if (username == '' && !path.includes('reset')) {
       this.router.navigate(['/account']);
     }
+
     this.tileLayerEvents();  // updates main map's tile layer for minimap to access
+
+    this.configSetSub = this.envService.configSetObservable.subscribe(configSet => {
+      if (configSet === true) {
+        this.getMostCurrentAvailableDate(false, false);
+      }
+    });
+
   }
 
   ngAfterViewInit() {
@@ -85,26 +99,172 @@ export class MarkerMapComponent implements OnInit {
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
     });
+
+  }
+
+  ngOnDestroy() {
+    // TODO: Remove subscriptions.
   }
 
   tileLayerEvents() {
-    this.esriImagery.on('load', event => {
+    this.mapService.esriImagery.on('load', event => {
+      // console.log("esriImagery loaded")
       this.mapService.mainTileLayer = "Imagery Maps";  
     });
-    this.streetMaps.on('load', event => {
+    this.mapService.streetMaps.on('load', event => {
+      // console.log("streetMaps loaded")
       this.mapService.mainTileLayer = "Street Maps";
     });
-    this.topoMap.on('load', event => {
+    this.mapService.topoMap.on('load', event => {
+      // console.log("topoMap loaded")
       this.mapService.mainTileLayer = "Topographic Maps";
+    });
+
+    this.mapService.waterbodiesLayer.on('click', event => {
+      this.displayWaterbodyDetails(event);
+    });
+
+    this.mapService.waterbodiesLayer.on('mouseover', event => {
+      let coords = latLng(event.layer.feature.properties.c_lat, event.layer.feature.properties.c_lng);
+      let content = '<div style="text-align: center">' + event.layer.feature.properties.GNIS_NAME + '<br>' +
+        'State: ' + event.layer.feature.properties.STATE_ABBR + '<br>' +
+        'Area: ' + this.calcs.roundValue(event.layer.feature.properties.AREASQKM) + 'km<sup>2</sup></div>';
+      this.geoPopup = L.popup()
+        .setLatLng(coords)
+        .setContent(content)
+        .openOn(this.mapService.getMap());
+    });
+
+    this.mapService.waterbodiesLayer.on('mouseout', event => {
+      this.geoPopup.removeFrom(this.mapService.getMap());
+    });
+
+  }
+
+  displayWaterbodyDetails(event): void {
+    // Goes to WB stats for selected WB:
+    this.downloader.searchForWaterbodyByCoords(event.latlng.lat, event.latlng.lng).subscribe(result => {
+      if (!('waterbodies' in result)) {
+        console.log("No waterbodies found: ", result)
+        return;
+      }
+      if (result['waterbodies'].length < 1) {
+        console.log("No waterbodies array: ", result)
+        return;
+      }
+      let waterbody = {
+        objectid: result['waterbodies'][0]['objectid'],
+        name: result['waterbodies'][0]['name'],
+        centroid_lat: result['waterbodies'][0]['centroid_lat'],
+        centroid_lng: result['waterbodies'][0]['centroid_lng'],
+        areasqkm: result['waterbodies'][0]['areasqkm'],
+        state_abbr: result['waterbodies'][0]['state_abbr'],
+        clicked_lat: event.latlng.lat,
+        clicked_lng: event.latlng.lng
+      };
+      this.waterbodyStats.handleWaterbodySelect(waterbody);
     });
   }
 
+  getMostCurrentAvailableDate(daily: boolean = true, initImageLoad: boolean = true) {
+    /*
+    Makes requests for most current available date. Goes back
+    previous days until it finds an available date.
+    */
+
+    let dailyParam = daily === true ? 'True' : 'False';
+    let prevDate = this.calcs.getDayOfYearFromDateObject(
+      new Date(new Date().setDate(new Date().getDate() - this.currentAttempts))
+    );
+    let startYear = parseInt(prevDate.split(' ')[0]);
+    let startDay = parseInt(prevDate.split(' ')[1]);
+
+    this.downloader.getConusImage(startYear, startDay, dailyParam).subscribe(result => {
+
+      let resonseType = result.body.type;
+      let responseStatus = result.status;
+
+      if (resonseType != 'image/png' || responseStatus != 200) {
+        // No data, retry with the date before this one:
+        if (this.currentAttempts >= this.totalPrevDayAttempts) {
+          this.currentAttempts = 0;
+          console.error('No conus waterbody image found to load onto map');
+          return;
+        }
+        this.currentAttempts += 1;
+        this.getMostCurrentAvailableDate(daily, initImageLoad);
+      }
+      else {
+        this.currentAttempts = 0;
+        let imageBlob = result.body;
+
+        // Ex: attachment; filename="static/raster_plots/weekly-conus-2022-317.png"
+        let dateArray = result.headers.get('Content-Disposition').split('-');
+        let year = dateArray[dateArray.length - 2];
+        let day = dateArray[dateArray.length - 1].split('.')[0];
+
+        let dateString = this.calcs.getDateFromDayOfYear(year + ' ' + day);
+
+        let dataTypeString = daily === true ? 'Daily' : 'Weekly';
+        this.addImageLayer(imageBlob, dateString, dataTypeString, initImageLoad);
+        this.addCustomLabelToMap(dateString, dataTypeString);
+      }
+
+    });
+
+  }
+
+  addImageLayer(image: Blob, dateString: string, dataTypeString: string, initImageLoad: boolean = true): any {
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      let imageUrl = reader.result.toString();
+      let map = this.mapService.getMap();
+      this.mapService.waterbodyDataLayer.removeFrom(map);
+      this.mapService.waterbodyDataLayer = new ImageOverlay(imageUrl, this.mapService.imageBounds);
+
+      if (initImageLoad === true) {
+        this.mapService.waterbodyDataLayer.addTo(map);
+      }
+
+      if (this.mapService.imageLayerTitle.length > 0) {
+        delete this.layersControl.overlays[this.mapService.imageLayerTitle];
+      }
+      this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
+      this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
+
+      return reader.result;
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
+    }
+  }
+
+  addCustomLabelToMap(dateString: string, dataTypeString: string): void {
+    let map = this.mapService.getMap();
+    if (this.mapService.customControl) {
+      map.removeControl(this.mapService.customControl);
+    }
+    this.mapService.customControl = new Control()
+    this.mapService.customControl.options = {
+      position: 'topright'
+    };
+    this.mapService.customControl.onAdd = (map) => {
+      let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+      container.style.background = 'white';
+      container.style.padding = '5px';
+      // container.textContent = 'Satellite Imagery ' + dataTypeString + ' Data -- ' + dateString;
+      container.textContent = dataTypeString + ' Satellite Imagery - ' + dateString;
+
+      console.log("container: ", container)
+
+      return container;
+    }
+    map.addControl(this.mapService.customControl);
+  }
+
   mapPanEvent(e: any): void {
-
     if (!this.authService.checkUserAuthentication()) { return; }  // won't auto log out, just skips refresh
-
     this.isClicking = false;  // assumes user intends to pan instead of placing location
-
     if (this.isEnabled == true) {
       this.isEnabled = false;
       this.authService.refresh();

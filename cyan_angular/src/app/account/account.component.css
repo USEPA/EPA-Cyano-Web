@@ -19,7 +19,8 @@
         margin: 10px;
     }
     .app-information-block {
-        margin-top: 10px;
+        /*margin-top: 10px;*/
+        margin-top: 5%;
         height: 60%;
     }
     .user-details {
@@ -153,7 +154,7 @@
     color: #ef0000;
 }
 .start-app {
-    margin-top: 10px;
+    /*margin-top: 10px;*/
     font-weight: bolder;
     min-width: 20%;
 }
@@ -166,7 +167,8 @@
 }
 .dev-state {
     display: inline-block;
-    color: #ef0000;
+    /*font-size: small;*/
+    /*color: #ef0000;*/
 }
 .app-description {
     font-size: smaller;
@@ -178,4 +180,20 @@
 #reset-form {
     height:  100%;
     margin-top: 4%;
+}
+
+.account-buttons {
+    width: fit-content;
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+.version-link {
+    color:#0d6efd;
+    text-decoration: underline;
+}
+
+.version-link:hover {
+    cursor: pointer;
+    opacity: 0.6;
 }

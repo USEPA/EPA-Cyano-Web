@@ -77,16 +77,18 @@ services:
     image: cyan-db
     container_name: cyan-db
     volumes:
-      # - ${SQL_DUMP:-../cyan_mysql/no_dump.txt}:/tmp/dump.sql  # use optional dump file to build container DB
       # - /var/www/app_data_new/cyano:/var/lib/mysql
       - cyanweb_db:/var/lib/mysql
-      - ../cyanweb_db_dump_20220321.sql:/home/mysql/dump.sql
+      # - ../cyanweb_db_dump_20220321.sql:/home/mysql/dump.sql
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
     env_file:
       - ${CYAN_CONFIG:-../config/.env}
 
-  redis:
-    image: redis:latest
+  cyan-redis:
+    build:
+      context: ../
+      dockerfile: ./docker/redis/Dockerfile
+    image: cyan-redis
     expose:
       - "6379"

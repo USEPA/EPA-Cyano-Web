@@ -10,7 +10,6 @@ import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
-import { WaterBodyStatsDetails } from '../waterbody-stats/waterbody-stats-details.component';
 
 export interface Sort {
   value: string;

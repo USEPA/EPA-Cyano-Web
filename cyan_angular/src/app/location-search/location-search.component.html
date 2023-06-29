@@ -1,26 +1,90 @@
 <div *ngIf="showLocationSearch" class="locations-block">
-	<button mat-button class="locations-exit" [routerLink]="['']">X</button>
-	<div class="locations-title">
-		<h2>Location search</h2>
-	</div>
-	<div style="padding-left:2%;">
-		<mat-form-field>
-			<input matInput [(ngModel)]="enteredLocation" placeholder="Enter location to search" (keyup.enter)="searchLocation();">
+
+	<div class="locations-block">
+		<button mat-button class="locations-exit" [routerLink]="['']">X</button>
+		<div class="locations-title" style="padding-left:2%;">
+			<h2 style="font-size:xx-large;">Location search</h2>
+		</div>
+
+		<mat-form-field style="padding-left:2%;">
+			<mat-label>Select search method</mat-label>
+			<mat-select [(value)]="selectedSearchMethod" (selectionChange)="updateSearchMethod($event.value);">
+				<mat-option value="locationName">Location Name</mat-option>
+				<mat-option value="coordinates">Coordinates</mat-option>
+			</mat-select>
 		</mat-form-field>
-		<button mat-raised-button color="primary" (click)="searchLocation();">Search</button>
-	</div>
-	<br>
-	<div *ngIf="locationResults?.length > 0" class="user-locations">
-		<h4>Results: {{locationResults.length}}</h4>
+
+		<div *ngIf="showNameSearch" style="padding-left:2%;">
+
+			<p style="padding-left:2%;">Enter the name of a location to find waterbodies of interest. NOTE: uses <a href="https://nominatim.openstreetmap.org">Nominatim</a> for obtaining results that may not be waterbodies.</p>
+
+			<mat-form-field>
+				<input matInput [(ngModel)]="enteredLocation" placeholder="Enter location to search" (keyup.enter)="searchLocation();">
+			</mat-form-field>
+			<br>
+			<br>
+			<button mat-raised-button color="primary" (click)="searchLocation();">Search</button>
+		</div>
+
 		<br>
-		<ul>
-			<li *ngFor="let locationResult of locationResults" class="location-li" (click)="viewLocation(locationResult);">
-				<div class="location-item-left">
-					<p><b>{{locationResult.display_name}}</b>
-					{{locationResult.lat}}, {{locationResult.lon}}</p>
-				</div>
-			</li>
-		</ul>
+
+		<div *ngIf="locationResults?.length > 0" class="user-locations" style="padding-left:2%;">
+			<h4>Results: {{locationResults.length}}</h4>
+			<br>
+			<ul>
+				<li *ngFor="let locationResult of locationResults" class="location-li" (click)="viewLocation(locationResult);">
+					<div class="location-item-left">
+						<p><b>{{locationResult.display_name}}</b>
+						{{locationResult.lat}}, {{locationResult.lon}}</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<br>
+
+
+		<!-- Search using coordinates -->
+		<div *ngIf="showCoordsSearch">
+			<p style="padding-left:2%;">Enter the latitude and longitude below to find a new location.</p>
+			<br>
+			<div *ngIf="selectedKey == 'dms'" style="padding-left:2%;">
+				<h1>Latitude:</h1>
+				<input type="number" aria-label="Latitude degree" placeholder="Deg" [(ngModel)]="latDeg" style="width:15%;">
+				<input type="number" aria-label="Latitude minute" placeholder="Min" [(ngModel)]="latMin" style="width:15%;">
+				<input type="number" aria-label="Latitude second" placeholder="Sec" [(ngModel)]="latSec" style="width:15%;">
+				<h2>N</h2>
+				<br>
+				<br>
+				<h1> Longitude: </h1>
+				<input type="number" aria-label="Longitude degree" placeholder="Deg" [(ngModel)]="lonDeg" style="width:15%;">
+				<input type="number" aria-label="Longitude minute" placeholder="Min" [(ngModel)]="lonMin" style="width:15%;">
+				<input type="number" aria-label="Longitude second" placeholder="Sec" [(ngModel)]="lonSec" style="width:15%;">
+				<h2>W</h2>
+			</div>
+			<div *ngIf="selectedKey == 'dd'" style="padding-left:2%;">
+				<h1>Latitude:</h1>
+				<input type="number" placeholder="Decimal" [(ngModel)]="latDec" style="width:50%;">
+				<br>
+				<br>
+				<h1> Longitude: </h1>
+				<input type="number" placeholder="Decimal" [(ngModel)]="lonDec" style="width:50%;">
+			</div>
+			<br>
+			<br>
+			<mat-form-field style="width:50%;" style="padding-left:2%;">
+				<mat-label>Units</mat-label>
+				<mat-select [value]="defaultSelected" (selectionChange)="onSelect($event);">
+					<mat-option *ngFor="let unit of units | keyvalue" [value]="unit.key">
+						{{unit.value}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<br>
+			<br>
+			<button type="button" class="popup-compare-btn popup-btn" (click)="compareLocation()"><span class="compare_icon"></span>Select to Compare</button>
+			<button type="button" class="popup-unmark-btn popup-btn" (click)="markLocation()"><span id="marked-icon" class="mark"></span><span id="marked-label">Check</span> Location</button>
+		</div>
+
 	</div>
-	<br>
+
 </div>

@@ -22,6 +22,14 @@ export class WaterBodyStats {
 	stddev: number;
 }
 
+export class DateRangeWaterBodyStats {
+	dates: Array<string>;  // range of dates
+	min: number;  // min for date range
+	max: number;  // max for date range
+	average: number;  // average for date range
+	stddev: number;  // stddev for date range
+}
+
 export class WaterBodyProperties {
 	areasqkm: number;
 	elevation: number;
@@ -86,3 +94,10 @@ export class WaterBodyMetrics {
 	period: string = '';  // "n days"
 	timestep: string = '';  // "daily", etc.
 }
+
+export class  ImageArrayObj {
+	year: number;
+	day: number;
+  blob: Blob = null;
+  bbox: Array<number[]> = [];
+};
