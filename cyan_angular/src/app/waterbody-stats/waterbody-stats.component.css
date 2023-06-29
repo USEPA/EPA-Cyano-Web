@@ -19,6 +19,7 @@
 	}
     .location_block_0 {
     	width: 50vw;
+    	/*height: 100%;*/
     }
     #selected-dates-div {
         padding-top: 5%;
@@ -27,6 +28,7 @@
     .user-ranges {
 		bottom: 2%
 	}
+
 }
 @media screen and (max-width: 979px) and (min-width: 401px) {
 	.locations-block {
@@ -37,6 +39,11 @@
     .user-ranges {
 		bottom: 2%
 	}
+	.location_block_0 {
+    	/*height: 50%;*/
+    	/*resize:  vertical;*/
+    }
+
 }
 @media screen and (max-width: 400px) {
 	.locations-block {
@@ -50,7 +57,33 @@
     .map-legend {
     	bottom: 2%;
     }
+    .location_block_0 {
+    	/*height: 50%;*/
+    	/*resize:  vertical;*/
+    }
+}
 
+/*
+Determines if aligning WB details horizontall or vertically
+************************************************************
+*/
+@media screen and (min-width: 1080px) {
+	.wb-stats-small-view {
+		display:  none;
+	}
+}
+@media screen and (max-width: 1079px) {
+	.wb-stats-large-view {
+		display:  none;
+	}
+	/*.menu-windows {
+	    height: fit-content;
+	}*/
+}
+/************************************************************/
+
+.mini_map_block {
+	height: 50vh;
 }
 
 .details_block_0 {
@@ -212,7 +245,7 @@ h2.label {
 }
 
 .location_block_0 {
-  height: 100%;
+  /*height: 100%;*/
   overflow-y: scroll;
   position: relative;
   background: white;
@@ -388,4 +421,25 @@ h2.label {
 
 .waterbody-help-icon:hover {
 	cursor: pointer;
+}
+
+.wb-stats-chart {
+	margin-top: 5%;
+}
+
+.wb-stats-values {
+	margin-left: 2%;
+}
+
+.mini_map_block {
+    display: inline-flex;
+    /*float: left;*/
+    height: 100%;
+    width: 100%;
+    order: 1;
+}
+.mini_map {
+    padding: 0;
+    height: 100%;
+    width: 100%;
 }

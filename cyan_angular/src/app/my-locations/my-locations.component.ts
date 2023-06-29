@@ -10,6 +10,8 @@ import { MapService } from '../services/map.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { WaterbodyStatsComponent } from '../waterbody-stats/waterbody-stats.component';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { DownloaderService } from '../services/downloader.service';
 
 export interface Sort {
   value: string;
@@ -41,7 +43,9 @@ export class MyLocationsComponent implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private messageDialog: MatDialog,
-    private waterbodyStats: WaterbodyStatsComponent
+    private waterbodyStats: WaterbodyStatsComponent,
+    private dialog: DialogComponent,
+    private downloader: DownloaderService
   ) {}
 
   ngOnInit() {
@@ -155,6 +159,74 @@ export class MyLocationsComponent implements OnInit {
         locations: this.sorted_locations.map((ln: Location) => ln.id),
       },
     ]);
+  }
+
+  locationMouseEnter(event, location) {
+    /*
+    Mouse event for a location in the My Locations list.
+    */
+    let markers = this.mapService.getMarkers();
+    for (let key of Object.keys(markers['_layers'])) {
+      let layer = markers['_layers'][key];
+      if (layer.options.alt.includes(location.name)) {
+        layer.fire('mouseover');
+      }
+    }
+
+  }
+  
+  locationMouseLeave(event, location) {
+    /*
+    Mouse event for a location in the My Locations list.
+    */
+    let markers = this.mapService.getMarkers();
+    for (let key of Object.keys(markers['_layers'])) {
+      let layer = markers['_layers'][key];
+      if (layer.options.alt.includes(location.name)) {
+        layer.fire('mouseout');
+      }
+    }
+
+  }
+
+  downloadLocationsAsCsv() {
+    /*
+    Downloads CSV of user locations. Can be used
+    in the "Request Data" feature.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+    let dialogRef = this.dialog.displayMessageDialog('Download location data as CSV?');
+    dialogRef.afterClosed().subscribe(response => {
+      if (response !== true) {
+        return;
+      }
+      let chartData = this.curateChartData(this.sorted_locations);
+      let currentUtcTime = new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
+      const filename = 'CyanwebLocations_' + currentUtcTime;
+      this.downloader.downloadFile(filename, chartData);
+    });
+  }
+
+  curateChartData(locations: Location[]): string {
+    /*
+    Gets data from chart data for CSV download.
+    */
+    let csvArray = [];
+    if (locations.length < 1) {
+      this.dialog.handleError('No locations exist for generating CSV.');
+    }
+    locations.forEach((item, index) => {
+      csvArray.push({'name': item.name, 'latitude': item.latitude, 'longitude': item.longitude, 'type': item.sourceFrequency.toLowerCase()})
+    });
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = ['name', 'latitude', 'longitude', 'type'];
+    const csv = csvArray.map((row) =>
+      header
+        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+        .join(',')
+    );
+    csv.unshift(header.join(','));
+    return csv.join('\r\n');
   }
   
 }

@@ -1,0 +1,55 @@
+<div class="details_block_0">
+
+	<div class="main-block">
+		
+		<button mat-button class="exit-button" [routerLink]="['']">X</button>
+		<div class="locations-title">
+			<h2>Monthly Reports</h2>
+			<p>Monthly state and alpine lake reports</p>
+		</div>
+
+		<!-- Report type selection -->
+		<div>
+			<mat-form-field>
+				<label>Select a report type:</label>
+				<br><br>
+				<mat-select (selectionChange)="onReportTypeSelect($event);">
+				<mat-option *ngFor="let reportType of reportTypes | keyvalue" [value]="reportType.value">
+					{{reportType.value}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<!-- Search by state -->
+		<div class="wb-name-div" *ngIf="selectedReportType == 'state'">
+			<mat-form-field>
+				<label>Select a state</label>
+				<br><br>
+				<mat-select (selectionChange)="onStateSelect($event.value);">
+				<mat-option *ngFor="let state of states" [value]="state[0]">
+					{{state[0]}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<div class="wb-name-div" *ngIf="availableDates.length > 0 && (selectedState || selectedReportType == 'alpine')">
+			<mat-form-field>
+				<label>Select a date</label>
+				<br><br>
+				<mat-select (selectionChange)="onDateSelect($event.value);">
+				<mat-option *ngFor="let date of availableDates" [value]="date">
+					{{date}}
+				</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<div *ngIf="selectedDate">
+			<button mat-raised-button class="get-report-btn" color="primary" (click)="getReport()">Get Report</button>
+		</div>
+
+	</div>
+
+</div>

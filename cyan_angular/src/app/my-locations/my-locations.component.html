@@ -16,11 +16,15 @@
         </mat-form-field>
         <mat-checkbox class="location_checked" [value]="show_checked" (change)="toggleChecked();" color="primary">Show checked locations</mat-checkbox>
       </div>
-      <div class="location_count">{{ sorted_locations.length }} locations</div>
+      <div class="location_count">
+        {{ sorted_locations.length }} locations
+        <mat-icon id="download-btn" (click)="downloadLocationsAsCsv()" class="mat_icon" title="Download locations as CSV">file_download</mat-icon>
+      </div>
+
     </ng-template>
   </div>
   <ul class="location_list">
-    <li *ngFor="let location of sorted_locations" class="location_li" (click)="locationSelect($event, location)">
+    <li *ngFor="let location of sorted_locations" class="location_li" (click)="locationSelect($event, location)" (mouseenter)="locationMouseEnter($event, location)" (mouseleave)="locationMouseLeave($event, location)">
       <div class="location_name">{{location.name}}</div>
       <div class="left_block">
         <div class="location_block_1">

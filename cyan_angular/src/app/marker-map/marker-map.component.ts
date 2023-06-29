@@ -57,6 +57,10 @@ export class MarkerMapComponent implements OnInit {
 
   geoPopup: any;
 
+  wbLayerZoomThreshold: number = 8;  // zoom level to start showing wb layer
+
+  zoomLevel: number;
+
   constructor(
     private locationService: LocationService,
     private router: Router,
@@ -98,6 +102,25 @@ export class MarkerMapComponent implements OnInit {
     });
     this.mapService.getMap().on('mouseup', event => {
       // console.log("mouseup event")
+    });
+
+    this.mapService.getMap().on('zoomend', event => {
+
+      this.zoomLevel = event.target._zoom;
+
+      // let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+
+      let path = this.ngLocation.path();
+
+      // if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
+      if (this.zoomLevel >= this.wbLayerZoomThreshold && !path.includes("wbstats")) {
+        // NOTE: does not add duplicates, which is nice
+        this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+      }
+      else {
+        this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap()); 
+      }
+
     });
 
   }
@@ -226,12 +249,6 @@ export class MarkerMapComponent implements OnInit {
         this.mapService.waterbodyDataLayer.addTo(map);
       }
 
-      if (this.mapService.imageLayerTitle.length > 0) {
-        delete this.layersControl.overlays[this.mapService.imageLayerTitle];
-      }
-      this.mapService.imageLayerTitle = 'Latest ' + dataTypeString + ' Satellite Imagery';
-      this.layersControl.overlays[this.mapService.imageLayerTitle] = this.mapService.waterbodyDataLayer;  // adds lealet control
-
       return reader.result;
     }, false);
     if (image) {
@@ -244,7 +261,7 @@ export class MarkerMapComponent implements OnInit {
     if (this.mapService.customControl) {
       map.removeControl(this.mapService.customControl);
     }
-    this.mapService.customControl = new Control()
+    this.mapService.customControl = new Control();
     this.mapService.customControl.options = {
       position: 'topright'
     };
@@ -252,14 +269,22 @@ export class MarkerMapComponent implements OnInit {
       let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       container.style.background = 'white';
       container.style.padding = '5px';
-      // container.textContent = 'Satellite Imagery ' + dataTypeString + ' Data -- ' + dateString;
-      container.textContent = dataTypeString + ' Satellite Imagery - ' + dateString;
-
-      console.log("container: ", container)
-
+      container.innerHTML = dataTypeString + ' Satellite Imagery - ' + dateString;
       return container;
     }
     map.addControl(this.mapService.customControl);
+
+    // document.getElementById('leaflet-wb-layer-control').addEventListener('click', (event) => {
+    //   event.stopPropagation();
+    //   let wbCheckbox = document.getElementById('leaflet-wb-layer-control') as HTMLInputElement;
+    //   if (this.zoomLevel >= this.wbLayerZoomThreshold && wbCheckbox.checked === true) {
+    //     this.mapService.waterbodyDataLayer.addTo(this.mapService.getMap());
+    //   }
+    //   else if (wbCheckbox.checked !== true) {
+    //     this.mapService.waterbodyDataLayer.removeFrom(this.mapService.getMap());
+    //   }
+    // });
+
   }
 
   mapPanEvent(e: any): void {

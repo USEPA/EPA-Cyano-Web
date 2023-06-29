@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { Location } from '../models/location';
@@ -436,10 +436,75 @@ export class DownloaderService {
         'Content-Type': 'application/pdf',
         'App-Name': this.envService.config.appName,
       },
-      // responseType: 'blob',
       responseType: 'blob',
       observe: 'response'
     });
+  }
+
+  downloadMonthlyReport(state: string, year: number, month: number) {
+    /*
+    Requests monthly state or alpine report for a given
+    year and month.
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    if (!(state.length == 2 || state == 'alpine')) {
+      return throwError("'state' must be two characters, e.g., TX, NC, or 'alpine'.");
+    }
+
+    else if(!(year.toString().length === 4)) {
+      return throwError("'year' is not of length 4.");
+    }
+
+    else if (!(month.toString().length === 1 || month.toString().length === 2)) {
+      return throwError("'month is not of length 1 or 2.");
+    }
+
+    let url = this.envService.config.waterbodyUrl + 'report/monthly/?' +
+      'state=' + state +
+      '&year=' + year +
+      '&month=' + month;
+    return this.http.get(url, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'App-Name': this.envService.config.appName,
+      },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  getAvailableMonthlyReports(state: string) {
+    /*
+    Gets available monthly reports by state (actual state or 'alpine').
+    Example response: 
+    {
+      "reports": [
+          [
+              "alpine",s
+              2023,
+              2,
+              "2023-04-27 14:11:05.078890",
+              "http://localstack:4566/wb-dev-local/alpine/2023/2/CyAN-waterbody-report-alpine_2023-59.pdf",
+              "SUCCESS"
+          ]
+      ],
+      "state": "alpine"
+    }
+    */
+    if (!this.authService.checkUserAuthentication()) { return; }
+
+    // TODO: Validation for state, year, and month.
+    if (!(state.length == 2 || state == 'alpine')) {
+      console.error("'state' must be two characters, e.g., TX, NC, or 'alpine'.");
+      return;
+    }
+
+    let url = this.envService.config.waterbodyUrl + 'report/state/?' +
+      'state=' + state;
+
+    return this.executeAuthorizedGetRequest(url);
+
   }
 
   downloadHistoData(objectid: number) {
@@ -675,6 +740,7 @@ export class DownloaderService {
     /*
     Creates CSV link and clicks it for downloading.
     */
+    if (!this.authService.checkUserAuthentication()) { return; }
     const a = document.createElement('a');
     const blob = new Blob([data], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
