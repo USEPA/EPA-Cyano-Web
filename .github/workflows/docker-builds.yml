@@ -140,6 +140,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: config=nginx.conf
 
   build-redis:
     runs-on: ubuntu-latest

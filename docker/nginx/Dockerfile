@@ -14,7 +14,7 @@ ARG config=nginx.conf
 RUN rm -rf /usr/share/nginx/html/* && \
 	rm /etc/nginx/conf.d/default.conf
 
-COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d
+COPY ./docker/nginx/$config /etc/nginx/conf.d
 
 # Uses "node-builder" image from docker/angular/Dockerfile
 # COPY --from=node-builder /app/dist /usr/share/nginx/html
