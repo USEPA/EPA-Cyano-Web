@@ -18,6 +18,11 @@ COPY docker/ /docker
 
 RUN pip install --requirement /cyan_flask/requirements.txt
 
+RUN rm -rf \
+	/root/.cache/pip \
+	/usr/local/lib/python3.8/site-packages/pip \
+	/usr/local/bin/pip
+
 RUN mkdir /config && \
 	chmod -R 755 /config && \
 	chmod 755 /docker/flask/start_flask.sh
