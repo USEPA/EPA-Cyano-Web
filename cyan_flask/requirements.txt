@@ -1,6 +1,6 @@
 bcrypt==4.0.1
 celery==5.3.1
-cryptography==41.0.2
+cryptography==41.0.3
 Flask==2.3.2
 Flask-Cors==4.0.0
 Flask-Migrate==4.0.4
@@ -11,5 +11,5 @@ mysql-connector-python==8.0.33
 PyJWT==2.7.0
 python-dotenv==1.0.0
 redis==4.6.0
-requests==2.25.1
+requests==2.31.0
 simplejson==3.19.1
