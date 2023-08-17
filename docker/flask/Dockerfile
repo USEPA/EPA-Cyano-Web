@@ -24,6 +24,11 @@ RUN chmod -R 755 /config && \
 
 WORKDIR /cyan_flask
 
+# Removes pip per Prisma scan CVE (still open as of 8/17/23):
+RUN rm -rf \
+	/usr/local/lib/python3.8/site-packages/pip \
+	/usr/local/bin/pip
+
 # Runs unit tests (needs secret file to run)
 # RUN python -m unittest
 
