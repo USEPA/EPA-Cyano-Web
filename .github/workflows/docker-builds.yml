@@ -137,7 +137,6 @@ jobs:
         with:
           context: .
           file: docker/nginx/Dockerfile
-          build-args: config=nginx.conf
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
