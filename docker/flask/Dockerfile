@@ -18,10 +18,12 @@ COPY docker/ /docker
 
 RUN pip install --requirement /cyan_flask/requirements.txt
 
+# Removes pip for prisma scan
 RUN rm -rf \
 	/root/.cache/pip \
 	/usr/local/lib/python3.8/site-packages/pip \
-	/usr/local/bin/pip
+	/usr/local/bin/pip \
+	/usr/local/lib/python3.8/site-packages/pip-23.0.1.dist-info
 
 RUN mkdir /config && \
 	chmod -R 755 /config && \
