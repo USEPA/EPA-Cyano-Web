@@ -164,6 +164,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}
+          tags: |
+            type=raw,value=ceam
 
       - name: Build and push Cyanweb Nginx Docker image
         uses: docker/build-push-action@v2
