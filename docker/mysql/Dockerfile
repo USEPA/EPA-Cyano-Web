@@ -1,6 +1,6 @@
 # FROM mysql:8.0
 # FROM mysql:8.0.28-oracle
-FROM mariadb:10.7.3
+FROM mariadb:10.7.5
 
 ENV APP_USER=mysql
 
