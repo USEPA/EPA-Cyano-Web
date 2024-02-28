@@ -1,4 +1,4 @@
-FROM redis:7.0.12-alpine3.18
+FROM redis:7.0.15-alpine3.19
 
 RUN apk update && \
 	apk upgrade

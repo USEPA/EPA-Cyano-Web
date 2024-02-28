@@ -1,4 +1,4 @@
-FROM mariadb:10.7.5
+FROM mariadb:11.3.2
 
 ENV APP_USER=mysql
 
