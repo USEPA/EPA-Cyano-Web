@@ -6,7 +6,7 @@ ENV APP_USER=www-data
 
 RUN apk add python3-dev libffi-dev build-base linux-headers pcre-dev mariadb-dev
 RUN apk update && \
-	apk upgrade --available \
+	apk upgrade --available
 
 # Install uWSGI
 RUN pip install uwsgi
